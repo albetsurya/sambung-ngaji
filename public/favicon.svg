@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background rounded -->
+  <rect width="64" height="64" rx="14" fill="#1E3A8A"/>
+
+  <!-- Kubah utama -->
+  <path d="M32 12c-6 3.6-10 9-10 15v2h20v-2c0-6-4-11.4-10-15Z" fill="#FFFFFF"/>
+
+  <!-- Bulan sabit di atas kubah -->
+  <circle cx="32" cy="14" r="2" fill="#FFFFFF"/>
+
+  <!-- Bangunan utama -->
+  <rect x="18" y="29" width="28" height="20" rx="2" fill="#FFFFFF"/>
+
+  <!-- Menara kiri -->
+  <rect x="12" y="23" width="5" height="26" rx="1.5" fill="#FFFFFF" opacity="0.9"/>
+
+  <!-- Menara kanan -->
+  <rect x="47" y="23" width="5" height="26" rx="1.5" fill="#FFFFFF" opacity="0.9"/>
+
+  <!-- Kubah menara -->
+  <circle cx="14.5" cy="21" r="2.5" fill="#FFFFFF"/>
+  <circle cx="49.5" cy="21" r="2.5" fill="#FFFFFF"/>
+
+  <!-- Pintu utama -->
+  <path d="M28 49v-6a4 4 0 0 1 8 0v6h-8Z" fill="#1E3A8A"/>
+
+  <!-- Jendela kiri & kanan -->
+  <rect x="21" y="34" width="3" height="5" rx="0.5" fill="#1E3A8A" opacity="0.7"/>
+  <rect x="40" y="34" width="3" height="5" rx="0.5" fill="#1E3A8A" opacity="0.7"/>
+</svg>

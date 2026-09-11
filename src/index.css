@@ -1,0 +1,455 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* ─────────────────────────────────────────────────────────────
+     Stockbit-Inspired Palette
+     Tegas, solid, profesional — terinspirasi aplikasi finansial
+     ───────────────────────────────────────────────────────────── */
+
+  /* Background & Surface — putih bersih + abu sangat terang */
+  --c-bg: 255 255 255; /* #FFFFFF — putih bersih */
+  --c-card: 255 255 255; /* #FFFFFF */
+  --c-card2: 248 250 252; /* #F8FAFC — slate-50, surface sekunder */
+  --c-border: 226 232 240; /* #E2E8F0 — slate-200 */
+  --c-muted: 100 116 139; /* #64748B — slate-500 */
+  --c-text: 15 23 42; /* #0F172A — slate-900, hampir hitam */
+
+  /* Primary — Biru navy pekat (Stockbit blue) */
+  --c-accent: 30 58 138; /* #1E3A8A — blue-900, tegas & solid */
+  --c-accent-dark: 23 37 84; /* #172554 — blue-950, hover */
+  --c-accent-light: 239 246 255; /* #EFF6FF — blue-50, soft background */
+
+  /* Semantic — tegas tapi elegan */
+  --c-danger: 220 38 38; /* #DC2626 — red-600, signal turun */
+  --c-warning: 217 119 6; /* #D97706 — amber-600 */
+  --c-success: 22 163 74; /* #16A34A — green-600, signal naik */
+  --c-info: 37 99 235; /* #2563EB — blue-600, aksen sekunder */
+
+  /* Info soft */
+  --c-info-soft: 219 234 254; /* #DBEAFE — blue-100 */
+
+  /* Shadow — subtle, tajam (khas aplikasi finansial) */
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.03);
+  --shadow-float:
+    0 12px 32px rgb(30 58 138 / 0.16), 0 2px 8px rgb(0 0 0 / 0.06);
+  --shadow-bar: 0 -1px 8px rgb(0 0 0 / 0.04);
+
+  --c-shimmer: 255 255 255;
+}
+
+.dark {
+  /* Background & Surface — slate sangat gelap (Stockbit dark mode) */
+  --c-bg: 15 23 42; /* #0F172A — slate-900 */
+  --c-card: 30 41 59; /* #1E293B — slate-800 */
+  --c-card2: 22 32 48; /* #162030 — lebih gelap dari card */
+  --c-border: 51 65 85; /* #334155 — slate-700 */
+  --c-muted: 148 163 184; /* #94A3B8 — slate-400 */
+  --c-text: 241 245 249; /* #F1F5F9 — slate-100 */
+
+  /* Primary — biru cerah (Stockbit dark accent) */
+  --c-accent: 96 165 250; /* #60A5FA — blue-400, cerah tapi kalem */
+  --c-accent-dark: 147 197 253; /* #93C5FD — blue-300, hover */
+  --c-accent-light: 30 58 138; /* #1E3A8A — blue-900, soft bg */
+
+  /* Semantic — versi terang untuk dark mode */
+  --c-danger: 248 113 113; /* #F87171 — red-400 */
+  --c-warning: 251 191 36; /* #FBBF24 — amber-400 */
+  --c-success: 74 222 128; /* #4ADE80 — green-400 */
+  --c-info: 96 165 250; /* #60A5FA — blue-400 */
+  --c-info-soft: 30 58 138; /* #1E3A8A — blue-900 */
+
+  /* Shadow */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.24), 0 1px 3px rgb(0 0 0 / 0.18);
+  --shadow-float: 0 12px 32px rgb(0 0 0 / 0.32), 0 2px 8px rgb(0 0 0 / 0.2);
+  --shadow-bar: 0 -1px 8px rgb(0 0 0 / 0.2);
+  --c-shimmer: 148 163 184;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-surface-bg text-surface-text antialiased;
+  font-family:
+    Inter,
+    "Plus Jakarta Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color 200ms ease-out,
+    color 200ms ease-out;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family:
+    Inter,
+    "Plus Jakarta Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    sans-serif;
+  letter-spacing: -0.015em;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(var(--c-accent) / 0.28);
+  outline-offset: 2px;
+}
+
+.ios-active {
+  transition:
+    transform 200ms ease-out,
+    opacity 200ms ease-out,
+    background-color 200ms ease-out;
+}
+.ios-active:active {
+  transform: scale(0.98);
+}
+.neu-press {
+  transition:
+    transform 200ms ease-out,
+    background-color 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+.neu-press:active {
+  transform: scale(0.98);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-border));
+  border-radius: 999px;
+}
+
+.app-shell {
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (min-width: 640px) {
+  .app-shell {
+    box-shadow: 0 0 0 1px rgb(var(--c-border));
+    min-height: 100vh;
+  }
+}
+
+.pt-safe {
+  padding-top: var(--safe-top);
+}
+.pb-safe {
+  padding-bottom: calc(0.75rem + var(--safe-bottom));
+}
+
+.ios-list-divider {
+  border-bottom: 1px solid rgb(var(--c-border));
+}
+.ios-list-divider:last-child {
+  border-bottom: none;
+}
+
+.tabular-nums,
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes sheetIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popIn {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================================================
+   FAB Glow Animations
+   ======================================================================== */
+
+/**
+ * Glow primary — shadow accent yang membesar-mengecil.
+ * Cocok untuk aksi utama (create, add).
+ */
+@keyframes fabGlowPrimary {
+  0%,
+  100% {
+    box-shadow:
+      0 8px 24px rgb(var(--c-accent) / 0.35),
+      0 0 0 0 rgb(var(--c-accent) / 0.4);
+  }
+  50% {
+    box-shadow:
+      0 12px 32px rgb(var(--c-accent) / 0.5),
+      0 0 0 8px rgb(var(--c-accent) / 0);
+  }
+}
+
+.fab-glow-primary {
+  animation: fabGlowPrimary 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/**
+ * Pulse ring — ring cahaya yang membesar & memudar di belakang FAB.
+ * Memberi efek "denyut" tanpa mengubah ukuran tombol.
+ */
+@keyframes fabPulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgb(var(--c-accent) / 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgb(var(--c-accent) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--c-accent) / 0);
+  }
+}
+
+.fab-pulse-ring {
+  animation: fabPulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/**
+ * Glow secondary — shadow lembut yang berdenyut halus.
+ * Lebih subtle dari primary.
+ */
+@keyframes fabGlowSecondary {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 12px rgb(var(--c-accent) / 0.12),
+      0 0 0 0 rgb(var(--c-accent) / 0.15);
+  }
+  50% {
+    box-shadow:
+      0 6px 18px rgb(var(--c-accent) / 0.22),
+      0 0 0 6px rgb(var(--c-accent) / 0);
+  }
+}
+
+.fab-glow-secondary {
+  animation: fabGlowSecondary 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hover menghentikan pulse sementara agar tidak "bertabrakan" dengan shadow hover */
+.fab-glow-primary:hover,
+.fab-glow-secondary:hover {
+  animation-play-state: paused;
+}
+
+/* Reduced motion — matikan animasi glow */
+@media (prefers-reduced-motion: reduce) {
+  .fab-glow-primary,
+  .fab-glow-secondary,
+  .fab-pulse-ring {
+    animation: none !important;
+    box-shadow: 0 8px 24px rgb(var(--c-accent) / 0.3);
+  }
+}
+
+/* ========================================================================
+   Input Reset — Hilangkan Semua Icon & Style Bawaan Browser
+   ======================================================================== */
+
+/**
+ * Reset appearance bawaan browser (search decoration, spinner, dsb).
+ * Ini memastikan input kita hanya pakai style dari Tailwind + custom CSS.
+ */
+input,
+textarea,
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+}
+
+/* ---------- Sembunyikan Icon Autofill Browser ---------- */
+
+/* Chrome/Safari: icon kunci di password field */
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* Chrome/Safari: icon kontak di username/email field */
+input::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* Chrome baru: icon strong password generator (biru) */
+input::-webkit-strong-password-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Chrome: icon Caps Lock indicator */
+input::-webkit-caps-lock-indicator {
+  visibility: hidden;
+  display: none !important;
+}
+
+/* Chrome/Safari: icon clear (X) di search input */
+input::-webkit-search-cancel-button,
+input::-webkit-search-decoration,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+/* Firefox: icon clear di search input */
+input::-moz-search-cancel-button {
+  display: none !important;
+}
+
+/* IE/Edge legacy: icon reveal password & clear */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+/* ---------- Autofill Background Fix ---------- */
+
+/**
+ * Chrome mengubah background input jadi kuning saat autofill.
+ * Trik: tutupi dengan box-shadow inset seukuran background.
+ * Ini membuat input tetap terlihat normal saat autofill.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgb(var(--c-bg)) inset !important;
+  -webkit-text-fill-color: rgb(var(--c-text)) !important;
+  caret-color: rgb(var(--c-text)) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ---------- Fix untuk iOS Safari ---------- */
+
+/**
+ * iOS Safari menambahkan style bawaan ke input.
+ * Reset agar konsisten dengan Chrome/Android.
+ */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* iOS Safari: matikan zoom otomatis saat fokus input */
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* ---------- Fix untuk Autofill Dark Mode ---------- */
+
+/**
+ * Dark mode: pastikan autofill background tetap gelap, bukan putih.
+ */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgb(var(--c-bg)) inset !important;
+  -webkit-text-fill-color: rgb(var(--c-text)) !important;
+  caret-color: rgb(var(--c-text)) !important;
+}
