@@ -1,6 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
-import { Sun, Moon, User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+} from "../components/common/FontAwesomeIcons";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/common";
@@ -236,11 +244,7 @@ export default function LoginPage() {
             type="submit"
             fullWidth
             disabled={submitting || !username || !password}
-            rightIcon={
-              !submitting ? (
-                <ArrowRight size={16} strokeWidth={2.5} />
-              ) : undefined
-            }
+            rightIcon={!submitting ? <ArrowRight size={16} /> : undefined}
           >
             {submitting ? "Sebentar ya..." : "Masuk"}
           </Button>

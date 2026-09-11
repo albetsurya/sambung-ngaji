@@ -17,7 +17,7 @@ import {
   Sun,
   Moon,
   type LucideIcon,
-} from "lucide-react";
+} from "../components/common/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
 import { Card, Avatar, ErrorState } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";

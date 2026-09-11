@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X } from "./FontAwesomeIcons";
 import type { ReactNode } from "react";
 
 interface SheetProps {

@@ -496,7 +496,7 @@ export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
   return (
     <>
       {/* ------------------------- Meeting picker ------------------------- */}
-      <div className="px-4 pt-3 pb-2">
+      <div className="pt-3 pb-2">
         <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3">
           {/* Icon */}
           <div className="w-10 h-10 rounded-xl bg-surface-card2 animate-pulse flex-shrink-0" />
@@ -516,12 +516,12 @@ export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
         style={{ top: "calc(52px + var(--safe-top))" }}
       >
         {/* Search */}
-        <div className="px-4 pt-2 pb-2">
+        <div className="pt-2 pb-2">
           <div className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card" />
         </div>
 
         {/* Chip row */}
-        <div className="px-4 pb-2 flex gap-2 overflow-hidden">
+        <div className="pb-2 flex gap-2 overflow-hidden">
           {[56, 72, 88, 64, 80].map((w, i) => (
             <div
               key={i}
@@ -532,7 +532,7 @@ export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
         </div>
 
         {/* Bulk action bar */}
-        <div className="px-4 py-2 flex items-center justify-between gap-2 border-t border-surface-border">
+        <div className="py-2 flex items-center justify-between gap-2 border-t border-surface-border">
           <div className="flex items-center gap-2">
             <div className="h-4 w-24 rounded-md bg-surface-card2 animate-pulse" />
             <div className="w-16 h-1.5 rounded-full bg-surface-card2 animate-pulse" />

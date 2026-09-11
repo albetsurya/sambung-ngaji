@@ -1,4 +1,4 @@
-import { Check, X, AlertTriangle } from 'lucide-react';
+import { Check, X, AlertTriangle } from "../common/FontAwesomeIcons";
 import { Card, Badge, GroupedList, ListRow } from '../common';
 import type { Member, Education } from '../../types';
 import { CATEGORY_LABEL, formatDateShort } from '../../utils/format';

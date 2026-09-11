@@ -10,7 +10,7 @@ import {
   Check,
   Share2,
   RefreshCw,
-} from "lucide-react";
+} from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { BottomSheet, LoadingOverlay } from "../components/common";
 import { aiApi } from "../services/aiApi";

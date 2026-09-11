@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Plus, Sun, Moon, Sparkles } from "lucide-react";
+import { ChevronLeft, Plus, Sun, Moon, Sparkles } from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
 

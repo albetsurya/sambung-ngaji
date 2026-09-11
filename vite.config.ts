@@ -7,16 +7,23 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png"],
+      includeAssets: [
+        "favicon.ico",
+        "favicon.svg",
+        "apple-touch-icon.png",
+        "favicon-32x32.png",
+        "favicon-16x16.png",
+      ],
       manifest: {
-        name: "Manajemen Pengajian",
-        short_name: "Pengajian",
-        description: "Kelola jamaah, absensi, dan pembinaan dalam satu tempat.",
+        name: "Manajemen Pengajian Latukan",
+        short_name: "Latukan",
+        description:
+          "Absensi, database, dan pengajian Latukan dalam satu aplikasi.",
         start_url: "/",
         scope: "/",
         display: "standalone",
         orientation: "portrait",
-        theme_color: "#ffffff",
+        theme_color: "#6366F1",
         background_color: "#ffffff",
         icons: [
           {
@@ -33,28 +40,20 @@ export default defineConfig({
             src: "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+            purpose: "maskable",
           },
         ],
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/manajemen-pengajian-five\.vercel\.app\/.*/i,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "app-cache",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 1 hari
-              },
-            },
-          },
-        ],
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/api/],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
       },
       devOptions: {
-        enabled: true, // agar bisa dites saat `npm run dev`
+        enabled: true,
       },
     }),
   ],

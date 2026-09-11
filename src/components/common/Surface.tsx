@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "./FontAwesomeIcons";
 
 export function Card({
   children,

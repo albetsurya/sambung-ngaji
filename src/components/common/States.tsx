@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ClipboardList, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
+import { ClipboardList, AlertTriangle, RefreshCw, Loader2 } from "./FontAwesomeIcons";
 
 /* -------------------------------------------------------------------------- */
 /*                              Wrapper Constants                             */

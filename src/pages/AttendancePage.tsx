@@ -8,7 +8,7 @@ import {
   CircleAlert,
   ChevronDown,
   Calendar,
-} from "lucide-react";
+} from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Button,

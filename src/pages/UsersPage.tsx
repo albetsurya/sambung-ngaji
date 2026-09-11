@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserPlus, User as UserIcon, KeyRound } from "lucide-react";
+import { UserPlus, User as UserIcon, KeyRound } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,

@@ -5,7 +5,7 @@ import {
   CalendarCheck,
   Megaphone,
   MoreHorizontal,
-} from "lucide-react";
+} from "../common/FontAwesomeIcons";
 import { usePermission } from "../../hooks/usePermission";
 
 const ITEMS = [

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, Megaphone, Copy, Share2, Calendar } from "lucide-react";
+import { AlertTriangle, Megaphone, Copy, Share2, Calendar } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,

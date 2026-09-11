@@ -9,7 +9,7 @@ import {
   Briefcase,
   Check,
   Loader2,
-} from "lucide-react";
+} from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { Button, Input, Select, Textarea } from "../components/common";
 import { memberApi } from "../services/memberApi";
