@@ -243,7 +243,6 @@ function JamaahCard({
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
-        g
         gender={normalizeGender(member?.jenis_kelamin)}
       />
       <div className="flex-1 min-w-0">
