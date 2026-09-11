@@ -17,7 +17,7 @@ import { Avatar, LoadingState, ErrorState } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import { attendanceApi, monitoringApi } from "../services/domainApi";
 import type { Member, MonitoringEntry, AttendanceRecord } from "../types";
-import { CATEGORY_LABEL } from "../utils/format";
+import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import {
   BiodataTab,
   EducationTab,
@@ -197,7 +197,7 @@ export default function MemberDetailPage() {
           src={member.foto_url}
           name={member.nama_lengkap}
           size={64}
-          gender={member.jenis_kelamin}
+          gender={normalizeGender(member?.jenis_kelamin)}
         />
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">

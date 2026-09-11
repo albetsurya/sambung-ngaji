@@ -18,7 +18,7 @@ import {
 } from "../components/common";
 import { memberApi, type MemberFilters } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
-import { CATEGORY_LABEL } from "../utils/format";
+import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
@@ -243,7 +243,8 @@ function JamaahCard({
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
-        gender={member.jenis_kelamin}
+        g
+        gender={normalizeGender(member?.jenis_kelamin)}
       />
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm text-surface-text truncate">

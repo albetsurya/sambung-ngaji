@@ -1,18 +1,22 @@
-export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TIM_PNKB' | 'TIM_ABSENSI';
+export type Role = "SUPER_ADMIN" | "ADMIN" | "TIM_PNKB" | "TIM_ABSENSI";
 
 export type MemberCategory =
-  | 'CABERAWIT'
-  | 'PRA_REMAJA'
-  | 'REMAJA'
-  | 'PRA_NIKAH'
-  | 'DEWASA'
-  | 'MANULA';
+  | "CABERAWIT"
+  | "PRA_REMAJA"
+  | "REMAJA"
+  | "PRA_NIKAH"
+  | "DEWASA"
+  | "MANULA";
 
-export type AttendanceStatus = 'HADIR' | 'IJIN' | 'SAKIT' | 'TANPA_KETERANGAN';
+export type AttendanceStatus = "HADIR" | "IJIN" | "SAKIT" | "TANPA_KETERANGAN";
 
-export type MonitoringStatus = 'AKTIF' | 'PERLU_PERHATIAN' | 'KURANG_AKTIF' | 'TIDAK_AKTIF';
+export type MonitoringStatus =
+  | "AKTIF"
+  | "PERLU_PERHATIAN"
+  | "KURANG_AKTIF"
+  | "TIDAK_AKTIF";
 
-export type AnnouncementStatus = 'DRAFT' | 'READY' | 'SHARED' | 'CANCELLED';
+export type AnnouncementStatus = "DRAFT" | "READY" | "SHARED" | "CANCELLED";
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -26,13 +30,18 @@ export interface User {
   nama: string;
   role: Role;
   member_id?: string;
+  jenis_kelamin?: string; // ← TAMBAH INI
+  status_aktif?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  last_login_at?: string;
 }
 
 export interface Member {
   member_id: string;
   nama_lengkap: string;
   nama_panggilan?: string;
-  jenis_kelamin?: 'L' | 'P' | '';
+  jenis_kelamin?: "L" | "P" | "";
   tempat_lahir?: string;
   tanggal_lahir?: string;
   kelompok?: string;
@@ -144,7 +153,12 @@ export interface DashboardGeneral {
   total_jamaah_aktif: number;
   per_kategori: Record<MemberCategory, number>;
   rata_rata_kehadiran: number;
-  pengajian_terdekat: { meeting_id: string; tanggal: string; hari: string; acara?: string } | null;
+  pengajian_terdekat: {
+    meeting_id: string;
+    tanggal: string;
+    hari: string;
+    acara?: string;
+  } | null;
   jamaah_perlu_perhatian: AttentionItem[];
   data_belum_lengkap: number;
   user_aktif?: number;
@@ -159,7 +173,12 @@ export interface DashboardPNKB {
 }
 
 export interface DashboardAbsensi {
-  pengajian_hari_ini: { meeting_id: string; jam?: string; acara?: string; group_id?: string }[];
+  pengajian_hari_ini: {
+    meeting_id: string;
+    jam?: string;
+    acara?: string;
+    group_id?: string;
+  }[];
   jumlah_jamaah: number;
   hadir: number;
   ijin: number;

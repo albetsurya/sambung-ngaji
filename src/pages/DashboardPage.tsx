@@ -23,7 +23,7 @@ import { Card, Avatar, ErrorState } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { dashboardApi } from "../services/domainApi";
-import { CATEGORY_LABEL } from "../utils/format";
+import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import type {
   DashboardAbsensi,
   DashboardGeneral,
@@ -106,7 +106,7 @@ export default function DashboardPage() {
             <Avatar
               name={user?.nama || "?"}
               size={40}
-              gender={user?.jenis_kelamin}
+              gender={normalizeGender(user?.jenis_kelamin)}
             />
           </div>
         </div>
@@ -374,7 +374,7 @@ function AttentionListSection({
             <Avatar
               src={m.foto_url}
               name={m.nama_lengkap}
-              gender={m.jenis_kelamin || "L"}
+              gender={normalizeGender(m?.jenis_kelamin)}
             />
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm text-surface-text truncate">

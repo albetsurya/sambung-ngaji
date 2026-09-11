@@ -31,7 +31,10 @@ import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { AttendanceListSkeleton, AttendancePageSkeleton } from "../components/common/Skeleton";
+import {
+  AttendanceListSkeleton,
+  AttendancePageSkeleton,
+} from "../components/common/Skeleton";
 
 /* -------------------------------------------------------------------------- */
 /*                          Status Button Config                              */
@@ -209,13 +212,10 @@ export default function AttendancePage() {
           status: nextStatus,
         });
       } else {
-        // Kalau backend support delete, panggil; kalau tidak, abaikan
-        if (attendanceApi.remove) {
-          await attendanceApi.remove({
-            meeting_id: selectedMeeting.meeting_id,
-            member_id: memberId,
-          });
-        }
+        await attendanceApi.remove({
+          meeting_id: selectedMeeting.meeting_id,
+          member_id: memberId,
+        });
       }
     } catch (err) {
       // Rollback
