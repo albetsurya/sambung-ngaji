@@ -1,90 +1,76 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
-import {
-  Sun,
-  Moon,
-  User,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Sun, Moon, User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/common";
 import { ApiError } from "../services/api";
 
 /* -------------------------------------------------------------------------- */
-/*                            Custom Masjid Icon                              */
+/*                       App icon — checklist / database                      */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Icon masjid + kubah + bulan sabit, digambar sebagai SVG inline.
- * Lebih relevan dengan konteks "pengajian" daripada icon Landmark generik.
- */
-function MasjidIcon({ size = 32 }: { size?: number }) {
+function AppIcon({ size = 44 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 512 512"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Kubah utama */}
-      <path
-        d="M16 3c-3.5 2-6 5-6 8.5V14h12v-2.5C22 8 19.5 5 16 3Z"
-        fill="currentColor"
-        opacity="0.9"
-      />
-      {/* Bulan sabit di atas kubah */}
-      <circle cx="16" cy="4" r="1.2" fill="currentColor" />
-      {/* Bangunan */}
-      <rect x="8" y="14" width="16" height="12" rx="1" fill="currentColor" />
-      {/* Menara kiri */}
-      <rect
-        x="4"
-        y="10"
-        width="3"
-        height="16"
-        rx="1"
-        fill="currentColor"
-        opacity="0.85"
-      />
-      {/* Menara kanan */}
-      <rect
-        x="25"
-        y="10"
-        width="3"
-        height="16"
-        rx="1"
-        fill="currentColor"
-        opacity="0.85"
-      />
-      {/* Kubah menara */}
-      <circle cx="5.5" cy="9" r="1.5" fill="currentColor" />
-      <circle cx="26.5" cy="9" r="1.5" fill="currentColor" />
-      {/* Pintu utama */}
-      <path d="M14 26v-5a2 2 0 0 1 4 0v5h-4Z" fill="rgba(255,255,255,0.85)" />
-      {/* Jendela kiri & kanan */}
-      <rect
-        x="10"
-        y="17"
-        width="2"
-        height="3"
-        rx="0.5"
-        fill="rgba(255,255,255,0.7)"
-      />
-      <rect
-        x="20"
-        y="17"
-        width="2"
-        height="3"
-        rx="0.5"
-        fill="rgba(255,255,255,0.7)"
-      />
+      <defs>
+        <linearGradient id="appicon-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0EA5E9" />
+          <stop offset="50%" stopColor="#6366F1" />
+          <stop offset="100%" stopColor="#8B5CF6" />
+        </linearGradient>
+        <linearGradient id="appicon-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28" />
+          <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      <rect width="512" height="512" rx="120" fill="url(#appicon-bg)" />
+      <rect width="512" height="256" rx="120" fill="url(#appicon-shine)" />
+
+      <g transform="translate(0, 8)">
+        <rect
+          x="128"
+          y="120"
+          width="256"
+          height="288"
+          rx="28"
+          fill="#ffffff"
+          opacity="0.18"
+        />
+        <rect x="148" y="100" width="216" height="288" rx="24" fill="#ffffff" />
+      </g>
+
+      <g fill="url(#appicon-bg)">
+        <circle cx="192" cy="176" r="18" />
+        <circle cx="192" cy="240" r="18" />
+        <circle cx="192" cy="304" r="18" />
+      </g>
+
+      <g
+        stroke="#ffffff"
+        strokeWidth="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      >
+        <path d="M186 176 l5 5 l10 -12" />
+        <path d="M186 240 l5 5 l10 -12" />
+        <path d="M186 304 l5 5 l10 -12" />
+      </g>
+
+      <g fill="#CBD5E1">
+        <rect x="232" y="168" width="108" height="16" rx="8" />
+        <rect x="232" y="232" width="88" height="16" rx="8" />
+        <rect x="232" y="296" width="98" height="16" rx="8" />
+      </g>
     </svg>
   );
 }
@@ -130,17 +116,15 @@ export default function LoginPage() {
 
   return (
     <div className="app-shell min-h-screen flex flex-col bg-surface-bg relative overflow-hidden">
-      {/* -------------------- Decorative background -------------------- */}
       <div
-        className="absolute -top-32 -right-32 w-80 h-80 rounded-full pointer-events-none"
-        style={{ background: "rgb(var(--c-accent) / 0.06)" }}
+        className="absolute -top-32 -right-32 w-80 h-80 rounded-full pointer-events-none blur-3xl"
+        style={{ background: "rgb(var(--c-accent) / 0.18)" }}
       />
       <div
-        className="absolute -bottom-40 -left-32 w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: "rgb(var(--c-accent) / 0.06)" }}
+        className="absolute -bottom-40 -left-32 w-96 h-96 rounded-full pointer-events-none blur-3xl"
+        style={{ background: "rgb(var(--c-accent) / 0.18)" }}
       />
 
-      {/* -------------------------- Theme toggle ------------------------ */}
       <button
         onClick={toggleTheme}
         aria-label="Ganti mode tampilan"
@@ -149,41 +133,34 @@ export default function LoginPage() {
         {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       </button>
 
-      {/* --------------------------- Content ---------------------------- */}
       <div className="relative flex-1 flex flex-col justify-center px-6 py-12">
-        {/* ---------------------------- Hero ---------------------------- */}
         <div className="mb-8 text-center">
-          {/* Icon container dengan gradient + glow */}
           <div className="relative inline-block mb-5">
-            {/* Glow ring */}
             <div
-              className="absolute inset-0 rounded-3xl blur-2xl pointer-events-none"
-              style={{ background: "rgb(var(--c-accent) / 0.4)" }}
+              className="absolute inset-0 rounded-[26px] blur-2xl pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0EA5E9 0%, #6366F1 50%, #8B5CF6 100%)",
+                opacity: 0.55,
+              }}
             />
-            {/* Icon box */}
-            <div className="relative w-20 h-20 rounded-3xl bg-accent flex items-center justify-center shadow-lg shadow-accent/40">
-              <MasjidIcon size={40} />
+            <div className="relative w-20 h-20 rounded-[26px] overflow-hidden shadow-xl">
+              <AppIcon size={80} />
             </div>
-            {/* Sparkle badge */}
-            <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-surface-card border-2 border-surface-bg flex items-center justify-center shadow-md">
-              <Sparkles size={11} className="text-accent" />
-            </span>
           </div>
 
           <h1 className="text-[26px] font-bold text-surface-text tracking-[-0.02em] leading-tight">
-            Selamat Datang
+            Hai, Jamaah Latukan 👋
           </h1>
           <p className="text-ios-body text-surface-muted mt-2 max-w-[280px] mx-auto leading-relaxed">
-            Kelola jamaah, absensi, dan pembinaan dalam satu tempat.
+            Absen, cek data, dan ikut pengajian — semua di satu tempat.
           </p>
         </div>
 
-        {/* ---------------------------- Form ---------------------------- */}
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-sm mx-auto bg-surface-card/80 backdrop-blur-xl rounded-3xl border border-surface-border shadow-lg shadow-black/[0.03] p-6"
         >
-          {/* Username field */}
           <div className="mb-4">
             <label
               htmlFor="username"
@@ -199,7 +176,7 @@ export default function LoginPage() {
               <input
                 id="username"
                 type="text"
-                placeholder="Masukkan username"
+                placeholder="Username kamu"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
@@ -212,7 +189,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Password field */}
           <div className="mb-4">
             <label
               htmlFor="password"
@@ -228,14 +204,13 @@ export default function LoginPage() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Masukkan password"
+                placeholder="Password rahasia kamu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 required
                 className="w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-bg/60 pl-10 pr-12 text-[16px] text-surface-text placeholder:text-surface-muted/60 transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
               />
-              {/* Toggle password visibility */}
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
@@ -249,7 +224,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Error message */}
           {error && (
             <div className="mb-4 px-3 py-2.5 rounded-xl bg-danger-soft border border-danger/20">
               <p className="text-ios-footnote text-danger leading-relaxed">
@@ -258,7 +232,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Submit button */}
           <Button
             type="submit"
             fullWidth
@@ -269,13 +242,12 @@ export default function LoginPage() {
               ) : undefined
             }
           >
-            {submitting ? "Memproses..." : "Masuk"}
+            {submitting ? "Sebentar ya..." : "Masuk"}
           </Button>
         </form>
 
-        {/* --------------------------- Footer --------------------------- */}
         <p className="text-center text-ios-caption text-surface-muted/70 mt-8">
-          © 2026 Manajemen Pengajian
+          dibuat dengan 🤍 untuk jamaah Latukan
         </p>
       </div>
     </div>
