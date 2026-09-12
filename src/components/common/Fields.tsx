@@ -1,9 +1,12 @@
+import { useState } from "react";
 import type {
   InputHTMLAttributes,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
   ReactNode,
 } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash, faLock } from "@fortawesome/free-solid-svg-icons";
 
 interface FieldWrapProps {
   label?: string;
@@ -29,10 +32,6 @@ function FieldWrap({ label, children, hint }: FieldWrapProps) {
   );
 }
 
-/**
- * Input modern: permukaan bersih dengan border halus, bukan inset shadow.
- * Fokus ditandai dengan border accent + ring lembut — jelas tapi tidak berat.
- */
 const baseInputClasses =
   "w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-card px-4 text-[16px] text-surface-text placeholder:text-surface-muted/50 shadow-sm transition-all duration-200 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 hover:border-surface-border/80";
 
@@ -40,10 +39,53 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   hint?: string;
 }
-export function Input({ label, hint, className = "", ...rest }: InputProps) {
+
+export function Input({
+  label,
+  hint,
+  className = "",
+  type,
+  ...rest
+}: InputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPassword = type === "password";
+  const inputType = isPassword && showPassword ? "text" : type;
+
   return (
     <FieldWrap label={label} hint={hint}>
-      <input className={`${baseInputClasses} ${className}`} {...rest} />
+      <div className="relative">
+        {isPassword && (
+          <FontAwesomeIcon
+            icon={faLock}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-muted pointer-events-none text-[16px] z-[1]"
+          />
+        )}
+
+        <input
+          {...rest}
+          type={inputType}
+          className={`${baseInputClasses} ${
+            isPassword ? "pl-10 pr-12" : ""
+          } ${className}`}
+        />
+
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={
+              showPassword ? "Sembunyikan password" : "Tampilkan password"
+            }
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text"
+          >
+            <FontAwesomeIcon
+              icon={showPassword ? faEyeSlash : faEye}
+              className="text-[16px]"
+            />
+          </button>
+        )}
+      </div>
     </FieldWrap>
   );
 }
@@ -52,6 +94,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   hint?: string;
 }
+
 export function Select({
   label,
   hint,
@@ -75,6 +118,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   hint?: string;
 }
+
 export function Textarea({
   label,
   hint,

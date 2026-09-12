@@ -28,6 +28,8 @@ import PendingMemberDetailPage from "./pages/PendingMemberDetailPage";
 import PublicRegistrationPage from "./pages/PublicRegistrationPage";
 import RegistrationSuccessPage from "./pages/RegistrationSuccessPage";
 import MemberAiChatPage from "./pages/MemberAiChatPage";
+import AiUsagePage from "./pages/AiUsagePage";
+import QrCodePage from "./pages/QrCodePage";
 
 export default function App() {
   return (
@@ -86,6 +88,10 @@ export default function App() {
                     path="pendaftar/:submission_id"
                     element={<PendingMemberDetailPage />}
                   />
+
+                  <Route path="qr-code" element={<QrCodePage />} />
+                  <Route path="ai-usage" element={<AiUsagePage />} />
+
                   <Route path="users" element={<UsersPage />} />
                   <Route path="pengaturan" element={<SettingsPage />} />
                   <Route path="audit-log" element={<AuditLogPage />} />

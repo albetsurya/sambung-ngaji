@@ -14,7 +14,7 @@ import {
   ListRow,
   ChevronRow,
 } from "../components/common";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { PendingMembersSkeleton } from "../components/common/Skeleton";
 import { pendingApi } from "../services/pendingApi";
 import type { PendingMember, PendingStatus } from "../types";
 import { formatDateShort, normalizePhoneNumber } from "../utils/format";
@@ -109,7 +109,7 @@ export default function PendingMembersPage() {
       </div>
 
       <div className="py-3">
-        {loading && <GroupedListSkeleton rows={5} />}
+        {loading && <PendingMembersSkeleton rows={5} />}
 
         {!loading && error && <ErrorState message={error} onRetry={load} />}
 

@@ -5,28 +5,39 @@ import {
   Input,
   GroupedList,
   LoadingOverlay,
+  ErrorState,
 } from "../components/common";
+import { SettingsSkeleton } from "../components/common/Skeleton";
 import { settingsApi } from "../services/domainApi";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
-import { SettingsSkeleton } from "../components/common/Skeleton";
 
 export default function SettingsPage() {
   const [jadwal, setJadwal] = useState<string[]>(["Minggu", "Selasa", "Kamis"]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const { showToast } = useToast();
 
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      const s = await settingsApi.get();
+      if (Array.isArray(s.jadwal_rutin)) {
+        setJadwal(s.jadwal_rutin as string[]);
+      }
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : "Gagal memuat pengaturan",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    settingsApi
-      .get()
-      .then((s) => {
-        if (Array.isArray(s.jadwal_rutin)) {
-          setJadwal(s.jadwal_rutin as string[]);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    load();
   }, []);
 
   async function handleSave() {
@@ -53,9 +64,11 @@ export default function SettingsPage() {
       />
 
       <div className="py-3">
-        {loading ? (
-          <SettingsSkeleton />
-        ) : (
+        {loading && <SettingsSkeleton />}
+
+        {!loading && error && <ErrorState message={error} onRetry={load} />}
+
+        {!loading && !error && (
           <GroupedList>
             <div className="p-4">
               <p className="text-ios-body font-semibold text-surface-text mb-1">
@@ -83,7 +96,6 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* ✅ Overlay untuk submit (blocking) */}
       <LoadingOverlay open={saving} label="Menyimpan pengaturan..." />
     </AppLayout>
   );

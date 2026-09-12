@@ -8,7 +8,10 @@ import {
   LogOut,
   Sun,
   Moon,
+  Lock,
   ClipboardList,
+  Sparkles,
+  QrCode,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -17,29 +20,54 @@ import {
   GroupedList,
   ListRow,
   ChevronRow,
+  ChangePasswordSheet,
 } from "../components/common";
+
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
 import { pendingApi } from "../services/pendingApi";
+import { useDelayedLoading } from "../hooks/useDelayedLoading";
+import {
+  ThemePickerRow,
+  ThemePickerSheet,
+} from "../components/common/ThemePickerSheet";
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isAdminLike, isSuperAdmin } = usePermission();
   const navigate = useNavigate();
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingLoading, setPendingLoading] = useState(false);
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
+
+  const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
   useEffect(() => {
     if (!isAdminLike) return;
+    setPendingLoading(true);
     pendingApi
       .list({ status: "PENDING" })
       .then((list) => setPendingCount(list.length))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setPendingLoading(false));
   }, [isAdminLike]);
 
   const menu = [
+    // 1. Fitur Utama / Operasional Harian
+    {
+      key: "pendaftar",
+      label: "Pendaftar",
+      description: "Verifikasi pendaftar baru",
+      Icon: ClipboardList,
+      to: "/lainnya/pendaftar",
+      show: isAdminLike,
+      badge: pendingCount > 0 ? pendingCount : undefined,
+      badgeLoading: pendingLoading,
+    },
     {
       key: "kelompok",
       label: "Kelompok",
@@ -49,13 +77,22 @@ export default function OthersPage() {
       show: isAdminLike,
     },
     {
-      key: "pendaftar",
-      label: "Pendaftar",
-      description: "Verifikasi pendaftar baru",
-      Icon: ClipboardList,
-      to: "/lainnya/pendaftar",
+      key: "qr-code",
+      label: "QR Pendaftaran",
+      description: "Bagikan link pendaftaran",
+      Icon: QrCode,
+      to: "/lainnya/qr-code",
       show: isAdminLike,
-      badge: pendingCount > 0 ? pendingCount : undefined,
+    },
+
+    // 2. Akun & Keamanan Pengguna
+    {
+      key: "change-password",
+      label: "Ganti Password",
+      description: "Ubah password akun Anda",
+      Icon: Lock, 
+      to: "",
+      show: true,
     },
     {
       key: "users",
@@ -64,6 +101,16 @@ export default function OthersPage() {
       Icon: KeyRound,
       to: "/lainnya/users",
       show: isSuperAdmin,
+    },
+
+    // 3. Monitoring, Sistem, & Konfigurasi
+    {
+      key: "ai-usage",
+      label: "Monitoring AI",
+      description: "Statistik pemakaian AI",
+      Icon: Sparkles,
+      to: "/lainnya/ai-usage",
+      show: isAdminLike,
     },
     {
       key: "settings",
@@ -135,6 +182,10 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
+        <GroupedList>
+          <ThemePickerRow onClick={() => setThemePickerOpen(true)} />
+        </GroupedList>
+
         {menu.length > 0 && (
           <GroupedList>
             {menu.map((m, i) => {
@@ -142,7 +193,13 @@ export default function OthersPage() {
               return (
                 <ListRow
                   key={m.key}
-                  onClick={() => navigate(m.to)}
+                  onClick={() => {
+                    if (m.key === "change-password") {
+                      setChangePasswordOpen(true);
+                    } else {
+                      navigate(m.to);
+                    }
+                  }}
                   insetDivider={i !== menu.length - 1}
                   leading={
                     <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
@@ -162,11 +219,15 @@ export default function OthersPage() {
                           </p>
                         )}
                       </div>
-                      {m.badge !== undefined && (
+                      {m.badgeLoading && showBadgeSkeleton ? (
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-surface-card2 animate-pulse shrink-0">
+                          <span className="w-2 h-2 rounded-full bg-surface-muted/40" />
+                        </span>
+                      ) : m.badge !== undefined ? (
                         <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
                           {m.badge > 99 ? "99+" : m.badge}
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   </ChevronRow>
                 </ListRow>
@@ -206,6 +267,15 @@ export default function OthersPage() {
           setConfirmLogout(false);
           logout();
         }}
+      />
+
+      <ThemePickerSheet
+        open={themePickerOpen}
+        onClose={() => setThemePickerOpen(false)}
+      />
+      <ChangePasswordSheet
+        open={changePasswordOpen}
+        onClose={() => setChangePasswordOpen(false)}
       />
     </AppLayout>
   );

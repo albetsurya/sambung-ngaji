@@ -8,7 +8,6 @@ interface SheetProps {
   children: ReactNode;
 }
 
-/** Bottom sheet modern: sudut membulat besar, backdrop blur, slide-up halus. */
 export function BottomSheet({ open, onClose, title, children }: SheetProps) {
   if (!open) return null;
   return (
@@ -42,7 +41,6 @@ export function BottomSheet({ open, onClose, title, children }: SheetProps) {
   );
 }
 
-/** Modal modern: terpusat, backdrop blur, shadow lembut. */
 export function Modal({ open, onClose, title, children }: SheetProps) {
   if (!open) return null;
   return (
@@ -81,10 +79,6 @@ interface ConfirmProps {
   onCancel: () => void;
 }
 
-/**
- * Dialog konfirmasi modern: kartu terpusat, tipografi jelas, tombol
- * dengan hierarki visual yang tegas (outline vs solid).
- */
 export function ConfirmDialog({
   open,
   title,

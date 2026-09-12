@@ -13,11 +13,13 @@ import {
   GroupedList,
   ListRow,
   ChevronRow,
+  ErrorState,
 } from "../components/common";
 import { groupApi } from "../services/domainApi";
 import type { Group } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
+import { GroupedListSkeleton } from "../components/common/Skeleton";
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -25,16 +27,15 @@ export default function GroupsPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Group | null>(null);
   const { showToast } = useToast();
+  const [error, setError] = useState("");
 
   async function load() {
     setLoading(true);
+    setError("");
     try {
       setGroups(await groupApi.list());
     } catch (err) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal memuat kelompok",
-        "error",
-      );
+      setError(err instanceof ApiError ? err.message : "Gagal memuat kelompok");
     } finally {
       setLoading(false);
     }
@@ -62,11 +63,27 @@ export default function GroupsPage() {
         backLabel="Lainnya"
       />
       <div className="py-3">
-        {loading && <LoadingState />}
-        {!loading && groups.length === 0 && (
+        {loading && <GroupedListSkeleton rows={5} />}
+        {!loading && !error && groups.length === 0 && (
+          <EmptyState
+            title="Belum ada kelompok"
+            description="Tambahkan kelompok pertama untuk memulai pengelolaan."
+            action={
+              <Button
+                onClick={() => {
+                  setEditing(null);
+                  setOpen(true);
+                }}
+              >
+                Tambah Kelompok
+              </Button>
+            }
+          />
+        )}
+        {!loading && !error && groups.length === 0 && (
           <EmptyState title="Belum ada kelompok" />
         )}
-        {!loading && groups.length > 0 && (
+        {!loading && !error && groups.length > 0 && (
           <GroupedList>
             {groups.map((g, i) => (
               <ListRow

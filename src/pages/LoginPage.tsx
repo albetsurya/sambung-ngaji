@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Navigate, Link } from "react-router-dom";
 import {
   Sun,
   Moon,
@@ -161,7 +161,7 @@ export default function LoginPage() {
             Hai, Jamaah Latukan 👋
           </h1>
           <p className="text-ios-body text-surface-muted mt-2 max-w-[280px] mx-auto leading-relaxed">
-            Absen, cek data, dan ikut pengajian — semua di satu tempat.
+            Absen, cek data, dan ikut pengajian — semua di satu aplikasi.
           </p>
         </div>
 
@@ -246,11 +246,24 @@ export default function LoginPage() {
             disabled={submitting || !username || !password}
             rightIcon={!submitting ? <ArrowRight size={16} /> : undefined}
           >
-            {submitting ? "Sebentar ya..." : "Masuk"}
+            {submitting ? "Memproses..." : "Masuk"}
           </Button>
         </form>
 
-        <p className="text-center text-ios-caption text-surface-muted/70 mt-8">
+        <div className="mt-6 text-center">
+          <p className="text-ios-footnote text-surface-muted mb-3">
+            Belum punya akun?
+          </p>
+          <Link
+            to="/daftar"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl border border-accent/30 bg-accent-soft text-accent text-ios-subhead font-semibold transition-all hover:bg-accent-soft/80 active:scale-[0.97]"
+          >
+            Daftar sekarang
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        <p className="text-center text-ios-caption text-surface-muted/70 mt-6">
           dibuat dengan 🤍 untuk jamaah Latukan
         </p>
       </div>

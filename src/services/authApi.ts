@@ -33,7 +33,7 @@ export const authApi = {
   async validateSession() {
     console.log("🔐 authApi.validateSession called");
     try {
-      const data = await call<{ user: User }>("validateSession");
+      const data = await call<{ user: User }>("validateSession", {}); // ← tambah {}
       console.log("✅ Session valid:", data.user);
       return data.user;
     } catch (error) {

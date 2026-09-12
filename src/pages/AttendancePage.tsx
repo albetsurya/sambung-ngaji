@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   Plus,
@@ -8,8 +8,13 @@ import {
   CircleAlert,
   ChevronDown,
   Calendar,
+  Trash2,
 } from "../components/common/FontAwesomeIcons";
-import { AppLayout, Header } from "../components/layout/AppLayout";
+import {
+  AppLayout,
+  Header,
+  FloatingActionButton,
+} from "../components/layout/AppLayout";
 import {
   Button,
   EmptyState,
@@ -17,15 +22,12 @@ import {
   Select,
   Input,
   LoadingOverlay,
+  ConfirmDialog,
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
 import type { Meeting, Member, AttendanceStatus, Group } from "../types";
-import {
-  ATTENDANCE_LABEL,
-  formatDateLong,
-  getHariFromDate,
-} from "../utils/format";
+import { formatDateLong, getHariFromDate } from "../utils/format";
 import { ATTENDANCE_STATUSES, MEMBER_CATEGORIES } from "../constants";
 import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
@@ -35,10 +37,6 @@ import {
   AttendanceListSkeleton,
   AttendancePageSkeleton,
 } from "../components/common/Skeleton";
-
-/* -------------------------------------------------------------------------- */
-/*                          Status Button Config                              */
-/* -------------------------------------------------------------------------- */
 
 const STATUS_CONFIG: Record<
   AttendanceStatus,
@@ -79,10 +77,6 @@ const STATUS_CONFIG: Record<
   },
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
-
 export default function AttendancePage() {
   const { isAdminLike, role } = usePermission();
   const { showToast } = useToast();
@@ -92,7 +86,6 @@ export default function AttendancePage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [records, setRecords] = useState<Record<string, AttendanceStatus>>({});
 
-  // Loading terpisah agar UI feedback lebih akurat
   const [loadingMeetings, setLoadingMeetings] = useState(true);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [isSwitchingMeeting, setIsSwitchingMeeting] = useState(false);
@@ -103,7 +96,13 @@ export default function AttendancePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [meetingPickerOpen, setMeetingPickerOpen] = useState(false);
 
-  /* ------------------------------ Load meetings ------------------------------ */
+  const [deleteTarget, setDeleteTarget] = useState<{
+    memberId: string;
+    memberName: string;
+  } | null>(null);
+  const [confirmResetAll, setConfirmResetAll] = useState(false);
+  const [resettingAll, setResettingAll] = useState(false);
+
   useEffect(() => {
     (async () => {
       setLoadingMeetings(true);
@@ -130,7 +129,6 @@ export default function AttendancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* --------------------------- Load attendance data -------------------------- */
   useEffect(() => {
     if (!selectedMeeting) {
       setMembers([]);
@@ -138,7 +136,6 @@ export default function AttendancePage() {
       return;
     }
 
-    // Clear data lama dulu supaya tidak "nyangkut"
     setMembers([]);
     setRecords({});
     setLoadingAttendance(true);
@@ -168,7 +165,6 @@ export default function AttendancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMeeting]);
 
-  /* --------------------------------- Filter --------------------------------- */
   const filteredMembers = useMemo(() => {
     return members.filter((m) => {
       if (category && m.kategori !== category) return false;
@@ -181,20 +177,20 @@ export default function AttendancePage() {
     });
   }, [members, category, search]);
 
-  /* ------------------------------- Progress --------------------------------- */
   const hadirCount = useMemo(
     () => Object.values(records).filter((s) => s === "HADIR").length,
     [records],
   );
+
+  const totalRecords = useMemo(() => Object.keys(records).length, [records]);
+
   const progress = filteredMembers.length
     ? (hadirCount / filteredMembers.length) * 100
     : 0;
 
-  /* --------------------------------- Actions -------------------------------- */
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
     const prev = records[memberId];
-    // Toggle: jika tap status yang sama, hapus (un-set)
     const nextStatus = prev === status ? undefined : status;
 
     setRecords((r) => {
@@ -218,7 +214,6 @@ export default function AttendancePage() {
         });
       }
     } catch (err) {
-      // Rollback
       setRecords((r) => {
         const next = { ...r };
         if (prev) next[memberId] = prev;
@@ -232,6 +227,32 @@ export default function AttendancePage() {
     }
   }
 
+  async function deleteAttendance(memberId: string) {
+    if (!selectedMeeting) return;
+    const prev = records[memberId];
+    if (!prev) return;
+
+    setRecords((r) => {
+      const next = { ...r };
+      delete next[memberId];
+      return next;
+    });
+
+    try {
+      await attendanceApi.remove({
+        meeting_id: selectedMeeting.meeting_id,
+        member_id: memberId,
+      });
+      showToast("Absensi dihapus");
+    } catch (err) {
+      setRecords((r) => ({ ...r, [memberId]: prev }));
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus absensi",
+        "error",
+      );
+    }
+  }
+
   async function markAllPresent() {
     if (!selectedMeeting) return;
     const targets = filteredMembers.filter(
@@ -239,7 +260,6 @@ export default function AttendancePage() {
     );
     if (!targets.length) return;
 
-    // Optimistic update
     const prevRecords = { ...records };
     setRecords((r) => {
       const next = { ...r };
@@ -272,8 +292,31 @@ export default function AttendancePage() {
     }
   }
 
-  /* ---------------------------------- Render -------------------------------- */
+  async function resetAllAttendance() {
+    if (!selectedMeeting) return;
+
+    const prevRecords = { ...records };
+    setRecords({});
+    setResettingAll(true);
+
+    try {
+      await attendanceApi.removeByMeeting(selectedMeeting.meeting_id);
+      showToast("Semua absensi dihapus");
+    } catch (err) {
+      setRecords(prevRecords);
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus semua absensi",
+        "error",
+      );
+    } finally {
+      setResettingAll(false);
+      setConfirmResetAll(false);
+    }
+  }
+
   const canCreate = isAdminLike || role === "TIM_ABSENSI";
+  const isInitialLoading =
+    loadingMeetings || (!!selectedMeeting && loadingAttendance);
 
   return (
     <AppLayout
@@ -290,157 +333,175 @@ export default function AttendancePage() {
         }
       />
 
-      {/* Meeting picker */}
-      <div className="px-4 pt-3 pb-2">
-        {loadingMeetings ? (
-          <AttendancePageSkeleton rows={8} />
-        ) : meetings.length > 0 ? (
-          <button
-            onClick={() => setMeetingPickerOpen(true)}
-            className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 text-left transition-all hover:border-accent/40 hover:shadow-md active:scale-[0.99]"
-          >
-            <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0">
-              <Calendar size={18} className="text-accent" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
-                Jadwal dipilih
-              </p>
-              <p className="text-ios-body font-medium text-surface-text truncate">
-                {selectedMeeting
-                  ? `${selectedMeeting.hari} — ${
-                      selectedMeeting.acara || "Pengajian"
-                    }`
-                  : "Pilih jadwal"}
-              </p>
-              {selectedMeeting && (
-                <p className="text-ios-footnote text-surface-muted truncate">
-                  {selectedMeeting.tanggal} · {selectedMeeting.jam || "—"}
+      {isInitialLoading ? (
+        <AttendancePageSkeleton rows={8} />
+      ) : (
+        <>
+          <div className="pt-3 pb-2 animate-[fadeIn_0.2s_ease-out]">
+            {meetings.length > 0 ? (
+              <div className="px-4">
+                <button
+                  onClick={() => setMeetingPickerOpen(true)}
+                  className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 text-left transition-all hover:border-accent/40 hover:shadow-md active:scale-[0.99]"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0">
+                    <Calendar size={18} className="text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
+                      Jadwal dipilih
+                    </p>
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      {selectedMeeting
+                        ? `${selectedMeeting.hari} — ${
+                            selectedMeeting.acara || "Pengajian"
+                          }`
+                        : "Pilih jadwal"}
+                    </p>
+                    {selectedMeeting && (
+                      <p className="text-ios-footnote text-surface-muted truncate">
+                        {selectedMeeting.tanggal} · {selectedMeeting.jam || "—"}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronDown
+                    size={18}
+                    className="text-surface-muted flex-shrink-0"
+                  />
+                </button>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
+                <p className="text-ios-subhead text-surface-muted">
+                  Belum ada jadwal pengajian
                 </p>
-              )}
-            </div>
-            <ChevronDown
-              size={18}
-              className="text-surface-muted flex-shrink-0"
-            />
-          </button>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
-            <p className="text-ios-subhead text-surface-muted">
-              Belum ada jadwal pengajian
-            </p>
-            {canCreate && (
-              <button
-                onClick={() => setCreateOpen(true)}
-                className="mt-2 inline-flex items-center gap-1 text-ios-subhead font-medium text-accent transition-colors hover:text-accent-dark"
-              >
-                <Plus size={14} /> Buat jadwal pengajian
-              </button>
+                {canCreate && (
+                  <button
+                    onClick={() => setCreateOpen(true)}
+                    className="mt-2 inline-flex items-center gap-1 text-ios-subhead font-medium text-accent transition-colors hover:text-accent-dark"
+                  >
+                    <Plus size={14} /> Buat jadwal pengajian
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      {selectedMeeting && (
-        <>
-          {/* Sticky wrapper: search + chips + bulk action */}
-          <div
-            className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-            style={{ top: "calc(52px + var(--safe-top))" }}
-          >
-            {/* Search */}
-            <div className="px-4 pt-2 pb-2">
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
-                />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari jamaah"
-                  className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-3.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
-                />
-              </div>
-            </div>
+          {selectedMeeting && (
+            <>
+              <div
+                className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
+                style={{ top: "calc(52px + var(--safe-top))" }}
+              >
+                <div className="px-4 pt-2 pb-2">
+                  <div className="relative">
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+                    />
+                    <input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Cari jamaah"
+                      className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-3.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+                    />
+                  </div>
+                </div>
 
-            {/* Category chips */}
-            <div className="px-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
-              <CategoryChip
-                active={category === ""}
-                label="Semua"
-                onClick={() => setCategory("")}
-              />
-              {MEMBER_CATEGORIES.map((c) => (
-                <CategoryChip
-                  key={c}
-                  active={category === c}
-                  label={CATEGORY_LABEL[c]}
-                  onClick={() => setCategory(c)}
-                />
-              ))}
-            </div>
-
-            {/* Bulk action bar */}
-            <div className="px-4 py-2 flex items-center justify-between gap-2 border-t border-surface-border">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-ios-footnote text-surface-muted tabular-nums">
-                  <span className="font-semibold text-surface-text">
-                    {hadirCount}
-                  </span>
-                  /{filteredMembers.length} hadir
-                </span>
-                <div className="w-16 h-1.5 rounded-full bg-surface-card2 overflow-hidden">
-                  <div
-                    className="h-full bg-accent transition-all duration-300"
-                    style={{ width: `${progress}%` }}
+                <div className="px-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
+                  <CategoryChip
+                    active={category === ""}
+                    label="Semua"
+                    onClick={() => setCategory("")}
                   />
+                  {MEMBER_CATEGORIES.map((c) => (
+                    <CategoryChip
+                      key={c}
+                      active={category === c}
+                      label={CATEGORY_LABEL[c]}
+                      onClick={() => setCategory(c)}
+                    />
+                  ))}
+                </div>
+
+                <div className="px-4 py-2 flex items-center justify-between gap-2 border-t border-surface-border">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-ios-footnote text-surface-muted tabular-nums">
+                      <span className="font-semibold text-surface-text">
+                        {hadirCount}
+                      </span>
+                      /{filteredMembers.length} hadir
+                    </span>
+                    <div className="w-16 h-1.5 rounded-full bg-surface-card2 overflow-hidden">
+                      <div
+                        className="h-full bg-accent transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {totalRecords > 0 && (
+                      <button
+                        onClick={() => setConfirmResetAll(true)}
+                        disabled={saving || loadingAttendance || resettingAll}
+                        aria-label="Reset semua absensi"
+                        title="Reset semua absensi"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-danger transition-colors hover:bg-danger-soft active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                    <button
+                      onClick={markAllPresent}
+                      disabled={
+                        saving ||
+                        loadingAttendance ||
+                        hadirCount === filteredMembers.length
+                      }
+                      className="text-ios-footnote font-medium bg-accent-soft text-accent px-3 h-8 rounded-lg transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {saving ? "Menyimpan..." : "Hadir semua"}
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button
-                onClick={markAllPresent}
-                disabled={
-                  saving ||
-                  loadingAttendance ||
-                  hadirCount === filteredMembers.length
-                }
-                className="text-ios-footnote font-medium text-accent px-3 h-8 rounded-lg transition-colors hover:bg-accent-soft active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {saving ? "Menyimpan..." : "Tandai semua hadir"}
-              </button>
-            </div>
-          </div>
 
-          {/* List compact */}
-          <div className="bg-surface-card">
-            {loadingAttendance && <AttendanceListSkeleton rows={8} />}
+              <div className="bg-surface-card">
+                {loadingAttendance && <AttendanceListSkeleton rows={8} />}
 
-            {!loadingAttendance && filteredMembers.length === 0 && (
-              <EmptyState
-                title="Tidak ada jamaah"
-                description={
-                  search || category
-                    ? "Coba ubah kata kunci atau filter kategori."
-                    : "Belum ada jamaah yang terdaftar di kelompok ini."
-                }
-              />
-            )}
+                {!loadingAttendance && filteredMembers.length === 0 && (
+                  <EmptyState
+                    title="Tidak ada jamaah"
+                    description={
+                      search || category
+                        ? "Coba ubah kata kunci atau filter kategori."
+                        : "Belum ada jamaah yang terdaftar di kelompok ini."
+                    }
+                  />
+                )}
 
-            {!loadingAttendance &&
-              filteredMembers.map((m, i) => (
-                <CompactAttendanceRow
-                  key={m.member_id}
-                  member={m}
-                  status={records[m.member_id]}
-                  onStatus={(s) => tapStatus(m.member_id, s)}
-                  divider={i !== filteredMembers.length - 1}
-                />
-              ))}
-          </div>
+                {!loadingAttendance &&
+                  filteredMembers.map((m, i) => (
+                    <CompactAttendanceRow
+                      key={m.member_id}
+                      member={m}
+                      status={records[m.member_id]}
+                      onStatus={(s) => tapStatus(m.member_id, s)}
+                      onRequestDelete={() =>
+                        setDeleteTarget({
+                          memberId: m.member_id,
+                          memberName: m.nama_lengkap,
+                        })
+                      }
+                      divider={i !== filteredMembers.length - 1}
+                    />
+                  ))}
+              </div>
+            </>
+          )}
         </>
       )}
 
-      {/* Meeting picker sheet */}
       <MeetingPickerSheet
         open={meetingPickerOpen}
         meetings={meetings}
@@ -458,7 +519,6 @@ export default function AttendancePage() {
         canCreate={canCreate}
       />
 
-      {/* Create meeting sheet */}
       <CreateMeetingSheet
         open={createOpen}
         onClose={() => setCreateOpen(false)}
@@ -468,37 +528,97 @@ export default function AttendancePage() {
         }}
       />
 
-      {/* ---------------------- Loading Overlay (switch) ---------------------- */}
-      <LoadingOverlay open={isSwitchingMeeting} label="Memuat absensi..." />
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Hapus absensi?"
+        description={
+          deleteTarget
+            ? `Hapus catatan absensi ${deleteTarget.memberName}?`
+            : ""
+        }
+        confirmLabel="Hapus"
+        danger
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteAttendance(deleteTarget.memberId);
+            setDeleteTarget(null);
+          }
+        }}
+      />
 
-      {/* -------------------- Loading Overlay (bulk save) --------------------- */}
+      <ConfirmDialog
+        open={confirmResetAll}
+        title="Reset semua absensi?"
+        description={`Semua catatan absensi untuk ${
+          selectedMeeting?.acara || "pengajian ini"
+        } akan dihapus. Tindakan ini tidak bisa dibatalkan.`}
+        confirmLabel="Ya, Reset"
+        danger
+        onCancel={() => setConfirmResetAll(false)}
+        onConfirm={resetAllAttendance}
+      />
+
+      <LoadingOverlay open={isSwitchingMeeting} label="Memuat absensi..." />
       <LoadingOverlay open={saving} label="Menyimpan absensi..." />
+      <LoadingOverlay open={resettingAll} label="Menghapus absensi..." />
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                          Compact Attendance Row                            */
-/* -------------------------------------------------------------------------- */
 
 function CompactAttendanceRow({
   member,
   status,
   onStatus,
+  onRequestDelete,
   divider,
 }: {
   member: Member;
   status?: AttendanceStatus;
   onStatus: (s: AttendanceStatus) => void;
+  onRequestDelete: () => void;
   divider?: boolean;
 }) {
+  const longPressTimer = useRef<number | null>(null);
+  const didLongPress = useRef(false);
+
+  function startLongPress() {
+    if (!status) return;
+    didLongPress.current = false;
+    longPressTimer.current = window.setTimeout(() => {
+      didLongPress.current = true;
+      onRequestDelete();
+    }, 600);
+  }
+
+  function cancelLongPress() {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }
+
+  function handleContextMenu(e: React.MouseEvent) {
+    if (status) {
+      e.preventDefault();
+      onRequestDelete();
+    }
+  }
+
   return (
     <div
-      className={`flex items-center gap-2 px-4 min-h-[56px] transition-colors hover:bg-surface-card2/40 ${
+      onTouchStart={startLongPress}
+      onTouchEnd={cancelLongPress}
+      onTouchMove={cancelLongPress}
+      onTouchCancel={cancelLongPress}
+      onMouseDown={startLongPress}
+      onMouseUp={cancelLongPress}
+      onMouseLeave={cancelLongPress}
+      onContextMenu={handleContextMenu}
+      className={`flex items-center gap-2 px-4 min-h-[56px] transition-colors hover:bg-surface-card2/40 select-none ${
         divider ? "border-b border-surface-border" : ""
       }`}
     >
-      {/* Nama + kelompok */}
       <div className="flex-1 min-w-0 py-2">
         <p className="text-ios-body font-medium text-surface-text truncate">
           {member.nama_lengkap}
@@ -510,7 +630,6 @@ function CompactAttendanceRow({
         )}
       </div>
 
-      {/* Segmented compact: 4 tombol icon */}
       <div className="flex gap-1 flex-shrink-0">
         {ATTENDANCE_STATUSES.map((s) => {
           const config = STATUS_CONFIG[s];
@@ -534,10 +653,6 @@ function CompactAttendanceRow({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                            Meeting Picker Sheet                            */
-/* -------------------------------------------------------------------------- */
 
 function MeetingPickerSheet({
   open,
@@ -608,32 +723,6 @@ function MeetingPickerSheet({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Floating Action Button                            */
-/* -------------------------------------------------------------------------- */
-
-function FloatingActionButton({
-  onClick,
-  label = "Tambah",
-}: {
-  onClick: () => void;
-  label?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className="w-14 h-14 rounded-2xl bg-accent text-white shadow-lg shadow-accent/30 flex items-center justify-center transition-all duration-200 hover:shadow-xl hover:shadow-accent/40 hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
-    >
-      <Plus size={26} strokeWidth={2.5} />
-    </button>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              Category Chip                                 */
-/* -------------------------------------------------------------------------- */
-
 function CategoryChip({
   active,
   label,
@@ -656,10 +745,6 @@ function CategoryChip({
     </button>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                          Create Meeting Sheet                              */
-/* -------------------------------------------------------------------------- */
 
 function CreateMeetingSheet({
   open,

@@ -52,6 +52,13 @@ import {
   faLock,
   faLockOpen,
   faTrash,
+  faInfoCircle,
+  faCircleQuestion,
+  faShieldHalved,
+  faLandmark,
+  faQrcode,
+  faDownload,
+  faPalette,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -135,4 +142,11 @@ export const CheckCircle2 = createIcon(faCircleCheck);
 export const ArrowUpRight = createIcon(faArrowUpRightFromSquare);
 export const Lock = createIcon(faLock);
 export const LockOpen = createIcon(faLockOpen);
+export const Info = createIcon(faInfoCircle);
+export const HelpCircle = createIcon(faCircleQuestion);
+export const Shield = createIcon(faShieldHalved);
+export const Landmark = createIcon(faLandmark);
 export const Trash2 = createIcon(faTrash);
+export const QrCode = createIcon(faQrcode);
+export const Download = createIcon(faDownload);
+export const Palette = createIcon(faPalette);

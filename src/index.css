@@ -1,3 +1,4 @@
+@import "./styles/themes.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,34 +7,27 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ─────────────────────────────────────────────────────────────
-     Stockbit-Inspired Palette
-     Tegas, solid, profesional — terinspirasi aplikasi finansial
-     ───────────────────────────────────────────────────────────── */
+  --c-bg: 255 255 255;
+  --c-card: 255 255 255;
+  --c-card2: 248 250 252;
+  --c-border: 226 232 240;
+  --c-muted: 100 116 139;
+  --c-text: 15 23 42;
 
-  /* Background & Surface — putih bersih + abu sangat terang */
-  --c-bg: 255 255 255; /* #FFFFFF — putih bersih */
-  --c-card: 255 255 255; /* #FFFFFF */
-  --c-card2: 248 250 252; /* #F8FAFC — slate-50, surface sekunder */
-  --c-border: 226 232 240; /* #E2E8F0 — slate-200 */
-  --c-muted: 100 116 139; /* #64748B — slate-500 */
-  --c-text: 15 23 42; /* #0F172A — slate-900, hampir hitam */
+  --c-accent: 30 58 138;
+  --c-accent-dark: 23 37 84;
+  --c-accent-light: 239 246 255;
 
-  /* Primary — Biru navy pekat (Stockbit blue) */
-  --c-accent: 30 58 138; /* #1E3A8A — blue-900, tegas & solid */
-  --c-accent-dark: 23 37 84; /* #172554 — blue-950, hover */
-  --c-accent-light: 239 246 255; /* #EFF6FF — blue-50, soft background */
+  --c-accent-2: 30 58 138;
+  --c-accent-2-dark: 23 37 84;
+  --c-accent-2-light: 239 246 255;
 
-  /* Semantic — tegas tapi elegan */
-  --c-danger: 220 38 38; /* #DC2626 — red-600, signal turun */
-  --c-warning: 217 119 6; /* #D97706 — amber-600 */
-  --c-success: 22 163 74; /* #16A34A — green-600, signal naik */
-  --c-info: 37 99 235; /* #2563EB — blue-600, aksen sekunder */
+  --c-danger: 220 38 38;
+  --c-warning: 217 119 6;
+  --c-success: 22 163 74;
+  --c-info: 37 99 235;
+  --c-info-soft: 219 234 254;
 
-  /* Info soft */
-  --c-info-soft: 219 234 254; /* #DBEAFE — blue-100 */
-
-  /* Shadow — subtle, tajam (khas aplikasi finansial) */
   --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.03);
   --shadow-float:
     0 12px 32px rgb(30 58 138 / 0.16), 0 2px 8px rgb(0 0 0 / 0.06);
@@ -43,27 +37,27 @@
 }
 
 .dark {
-  /* Background & Surface — slate sangat gelap (Stockbit dark mode) */
-  --c-bg: 15 23 42; /* #0F172A — slate-900 */
-  --c-card: 30 41 59; /* #1E293B — slate-800 */
-  --c-card2: 22 32 48; /* #162030 — lebih gelap dari card */
-  --c-border: 51 65 85; /* #334155 — slate-700 */
-  --c-muted: 148 163 184; /* #94A3B8 — slate-400 */
-  --c-text: 241 245 249; /* #F1F5F9 — slate-100 */
+  --c-bg: 15 23 42;
+  --c-card: 30 41 59;
+  --c-card2: 22 32 48;
+  --c-border: 51 65 85;
+  --c-muted: 148 163 184;
+  --c-text: 241 245 249;
 
-  /* Primary — biru cerah (Stockbit dark accent) */
-  --c-accent: 96 165 250; /* #60A5FA — blue-400, cerah tapi kalem */
-  --c-accent-dark: 147 197 253; /* #93C5FD — blue-300, hover */
-  --c-accent-light: 30 58 138; /* #1E3A8A — blue-900, soft bg */
+  --c-accent: 96 165 250;
+  --c-accent-dark: 147 197 253;
+  --c-accent-light: 30 58 138;
 
-  /* Semantic — versi terang untuk dark mode */
-  --c-danger: 248 113 113; /* #F87171 — red-400 */
-  --c-warning: 251 191 36; /* #FBBF24 — amber-400 */
-  --c-success: 74 222 128; /* #4ADE80 — green-400 */
-  --c-info: 96 165 250; /* #60A5FA — blue-400 */
-  --c-info-soft: 30 58 138; /* #1E3A8A — blue-900 */
+  --c-accent-2: 96 165 250;
+  --c-accent-2-dark: 147 197 253;
+  --c-accent-2-light: 30 58 138;
 
-  /* Shadow */
+  --c-danger: 248 113 113;
+  --c-warning: 251 191 36;
+  --c-success: 74 222 128;
+  --c-info: 96 165 250;
+  --c-info-soft: 30 58 138;
+
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.24), 0 1px 3px rgb(0 0 0 / 0.18);
   --shadow-float: 0 12px 32px rgb(0 0 0 / 0.32), 0 2px 8px rgb(0 0 0 / 0.2);
   --shadow-bar: 0 -1px 8px rgb(0 0 0 / 0.2);
@@ -194,6 +188,15 @@ textarea:focus-visible {
   font-feature-settings: "tnum" 1;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(16px);
@@ -231,6 +234,20 @@ textarea:focus-visible {
   }
 }
 
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-toast-in {
+  animation: toast-in 0.2s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -254,13 +271,13 @@ textarea:focus-visible {
   0%,
   100% {
     box-shadow:
-      0 8px 24px rgb(var(--c-accent) / 0.35),
-      0 0 0 0 rgb(var(--c-accent) / 0.4);
+      0 8px 24px rgb(var(--c-accent-2) / 0.35),
+      0 0 0 0 rgb(var(--c-accent-2) / 0.4);
   }
   50% {
     box-shadow:
-      0 12px 32px rgb(var(--c-accent) / 0.5),
-      0 0 0 8px rgb(var(--c-accent) / 0);
+      0 12px 32px rgb(var(--c-accent-2) / 0.5),
+      0 0 0 8px rgb(var(--c-accent-2) / 0);
   }
 }
 
@@ -274,13 +291,13 @@ textarea:focus-visible {
  */
 @keyframes fabPulseRing {
   0% {
-    box-shadow: 0 0 0 0 rgb(var(--c-accent) / 0.5);
+    box-shadow: 0 0 0 0 rgb(var(--c-accent-2) / 0.5);
   }
   70% {
-    box-shadow: 0 0 0 12px rgb(var(--c-accent) / 0);
+    box-shadow: 0 0 0 12px rgb(var(--c-accent-2) / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgb(var(--c-accent) / 0);
+    box-shadow: 0 0 0 0 rgb(var(--c-accent-2) / 0);
   }
 }
 
@@ -296,13 +313,13 @@ textarea:focus-visible {
   0%,
   100% {
     box-shadow:
-      0 4px 12px rgb(var(--c-accent) / 0.12),
-      0 0 0 0 rgb(var(--c-accent) / 0.15);
+      0 4px 12px rgb(var(--c-accent-2) / 0.12),
+      0 0 0 0 rgb(var(--c-accent-2) / 0.15);
   }
   50% {
     box-shadow:
-      0 6px 18px rgb(var(--c-accent) / 0.22),
-      0 0 0 6px rgb(var(--c-accent) / 0);
+      0 6px 18px rgb(var(--c-accent-2) / 0.22),
+      0 0 0 6px rgb(var(--c-accent-2) / 0);
   }
 }
 
@@ -322,7 +339,7 @@ textarea:focus-visible {
   .fab-glow-secondary,
   .fab-pulse-ring {
     animation: none !important;
-    box-shadow: 0 8px 24px rgb(var(--c-accent) / 0.3);
+    box-shadow: 0 8px 24px rgb(var(--c-accent-2) / 0.3);
   }
 }
 

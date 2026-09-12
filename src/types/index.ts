@@ -1,3 +1,5 @@
+import { call } from "../services/api";
+
 export type Role =
   | "SUPER_ADMIN"
   | "ADMIN"

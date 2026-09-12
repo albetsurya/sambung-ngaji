@@ -302,7 +302,7 @@ export function MemberSelfSkeleton() {
       </div>
 
       {/* Tab bar */}
-      <div className="px-3 pb-2">
+      <div className="px-3 flex gap-1 overflow-x-auto no-scrollbar border-b border-surface-border pb-2">
         <div className="flex gap-1 overflow-hidden">
           {[80, 92, 106].map((w, i) => (
             <Skeleton key={i} width={w} height={36} className="rounded-xl" />
@@ -473,6 +473,58 @@ export function AttendanceListSkeleton({ rows = 6 }: { rows?: number }) {
   );
 }
 
+export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
+  return (
+    <>
+      <div className="pt-3 pb-2">
+        <div className="px-4">
+          <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-surface-card2 animate-pulse flex-shrink-0" />
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="h-3 w-16 rounded-md bg-surface-card2 animate-pulse" />
+              <div className="h-4 w-2/3 rounded-md bg-surface-card2 animate-pulse" />
+              <div className="h-3 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="sticky px-4 z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
+        style={{ top: "calc(52px + var(--safe-top))" }}
+      >
+        <div className="pt-2 pb-2">
+          <div className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card" />
+        </div>
+
+        <div className="pb-2 flex gap-2 overflow-hidden">
+          {[56, 72, 88, 64, 80].map((w, i) => (
+            <div
+              key={i}
+              className="h-7 rounded-full bg-surface-card2 animate-pulse flex-shrink-0"
+              style={{ width: `${w}px` }}
+            />
+          ))}
+        </div>
+
+        <div className="py-2 flex items-center justify-between gap-2 border-t border-surface-border">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-24 rounded-md bg-surface-card2 animate-pulse" />
+            <div className="w-16 h-1.5 rounded-full bg-surface-card2 animate-pulse" />
+          </div>
+          <div className="h-8 w-32 rounded-lg bg-surface-card2 animate-pulse" />
+        </div>
+      </div>
+
+      <div className="bg-surface-card">
+        {Array.from({ length: rows }).map((_, i) => (
+          <AttendanceRowSkeleton key={i} divider={i !== rows - 1} />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export function SettingsSkeleton() {
   return (
     <GroupedList>
@@ -526,82 +578,38 @@ export function UsersSkeleton({ rows = 4 }: { rows?: number }) {
   );
 }
 
-export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
+export function PendingMembersSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <>
-      {/* ------------------------- Meeting picker ------------------------- */}
-      <div className="pt-3 pb-2">
-        <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3">
-          {/* Icon */}
-          <div className="w-10 h-10 rounded-xl bg-surface-card2 animate-pulse flex-shrink-0" />
-
-          {/* Text */}
-          <div className="flex-1 min-w-0 space-y-2">
-            <div className="h-3 w-16 rounded-md bg-surface-card2 animate-pulse" />
-            <div className="h-4 w-2/3 rounded-md bg-surface-card2 animate-pulse" />
-            <div className="h-3 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
-          </div>
-        </div>
-      </div>
-
-      {/* ------------------------- Sticky wrapper ------------------------- */}
-      <div
-        className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-        style={{ top: "calc(52px + var(--safe-top))" }}
-      >
-        {/* Search */}
-        <div className="pt-2 pb-2">
-          <div className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card" />
-        </div>
-
-        {/* Chip row */}
-        <div className="pb-2 flex gap-2 overflow-hidden">
-          {[56, 72, 88, 64, 80].map((w, i) => (
-            <div
-              key={i}
-              className="h-7 rounded-full bg-surface-card2 animate-pulse flex-shrink-0"
-              style={{ width: `${w}px` }}
-            />
+      <div className="px-4 py-2.5 border-b border-surface-border">
+        <div className="flex gap-2 overflow-hidden">
+          {[72, 88, 96, 80].map((w, i) => (
+            <Skeleton key={i} width={w} height={32} className="rounded-full" />
           ))}
         </div>
-
-        {/* Bulk action bar */}
-        <div className="py-2 flex items-center justify-between gap-2 border-t border-surface-border">
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-24 rounded-md bg-surface-card2 animate-pulse" />
-            <div className="w-16 h-1.5 rounded-full bg-surface-card2 animate-pulse" />
-          </div>
-          <div className="h-8 w-32 rounded-lg bg-surface-card2 animate-pulse" />
-        </div>
       </div>
-
-      {/* --------------------------- List rows --------------------------- */}
-      <div className="bg-surface-card">
+      <GroupedList>
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className={`flex items-center gap-2 px-4 min-h-[56px] ${
-              i !== rows - 1 ? "border-b border-surface-border" : ""
+            className={`flex items-center gap-3 min-h-[60px] px-4 py-3 ${
+              i !== rows - 1 ? "ios-list-divider" : ""
             }`}
           >
-            {/* Nama + kelompok */}
-            <div className="flex-1 min-w-0 py-2 space-y-2">
-              <div className="h-4 w-2/5 rounded-md bg-surface-card2 animate-pulse" />
-              <div className="h-3 w-1/4 rounded-md bg-surface-card2 animate-pulse" />
+            <Skeleton variant="rect" width={40} height={40} />
+            <div className="flex-1 min-w-0 space-y-2">
+              <Skeleton width="50%" height={16} />
+              <Skeleton width="35%" height={12} />
             </div>
-
-            {/* 4 tombol status */}
-            <div className="flex gap-1 flex-shrink-0">
-              {Array.from({ length: 4 }).map((_, j) => (
-                <div
-                  key={j}
-                  className="w-10 h-10 rounded-xl bg-surface-card2 animate-pulse"
-                />
-              ))}
-            </div>
+            <Skeleton
+              variant="rect"
+              width={64}
+              height={24}
+              className="rounded-full"
+            />
           </div>
         ))}
-      </div>
+      </GroupedList>
     </>
   );
 }

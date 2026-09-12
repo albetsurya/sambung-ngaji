@@ -28,6 +28,12 @@ export default {
           soft: "rgb(var(--c-accent-light) / <alpha-value>)",
           softStrong: "rgb(var(--c-accent) / 0.16)",
         },
+        accent2: {
+          DEFAULT: "rgb(var(--c-accent-2) / <alpha-value>)",
+          dark: "rgb(var(--c-accent-2-dark) / <alpha-value>)",
+          soft: "rgb(var(--c-accent-2-light) / <alpha-value>)",
+          softStrong: "rgb(var(--c-accent-2) / 0.16)",
+        },
         success: {
           DEFAULT: "rgb(var(--c-success) / <alpha-value>)",
           soft: "rgb(var(--c-success) / 0.12)",

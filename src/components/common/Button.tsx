@@ -1,26 +1,14 @@
-// src/components/common/Button.tsx
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
-  /** Icon di kiri teks */
   leftIcon?: ReactNode;
-  /** Icon di kanan teks */
   rightIcon?: ReactNode;
-  /** Mode icon-only (tombol bulat/rounded tanpa teks) */
   iconOnly?: boolean;
   children?: ReactNode;
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                  Config                                    */
-/* -------------------------------------------------------------------------- */
 
 const VARIANTS: Record<string, string> = {
   primary:
@@ -66,18 +54,6 @@ const SIZES: Record<
   },
 };
 
-/* -------------------------------------------------------------------------- */
-/*                                  Button                                    */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Button modern dengan dukungan icon yang rapi.
- *
- * Pemakaian:
- *   <Button leftIcon={<Copy size={16} />}>Salin</Button>
- *   <Button rightIcon={<ChevronRight size={16} />}>Lanjut</Button>
- *   <Button iconOnly aria-label="Tutup"><X size={18} /></Button>
- */
 export function Button({
   variant = "primary",
   size = "md",
@@ -91,9 +67,6 @@ export function Button({
 }: Props) {
   const s = SIZES[size];
 
-  // --------------------------------------------------------------
-  // Icon-only: tombol bulat tanpa padding horizontal besar
-  // --------------------------------------------------------------
   if (iconOnly) {
     return (
       <button
@@ -109,9 +82,6 @@ export function Button({
     );
   }
 
-  // --------------------------------------------------------------
-  // Regular: dengan teks + optional icon kiri/kanan
-  // --------------------------------------------------------------
   return (
     <button
       className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${fullWidth ? "w-full" : ""} ${className}`}

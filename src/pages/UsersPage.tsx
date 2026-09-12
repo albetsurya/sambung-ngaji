@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   UserPlus,
   User as UserIcon,
+  KeyRound,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -20,6 +21,7 @@ import {
   ErrorState,
   EmptyState,
 } from "../components/common";
+import { ResetPasswordSheet } from "../components/common/ChangePasswordSheet";
 import { userApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
 import type { Member, Role, User } from "../types";
@@ -48,6 +50,10 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<{
+    userId: string;
+    userName: string;
+  } | null>(null);
   const { showToast } = useToast();
 
   async function load() {
@@ -127,7 +133,23 @@ export default function UsersPage() {
                       @{u.username}
                     </p>
                   </div>
-                  <Badge>{ROLE_LABEL[u.role]}</Badge>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge>{ROLE_LABEL[u.role]}</Badge>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setResetTarget({
+                          userId: u.user_id,
+                          userName: u.nama || u.username,
+                        });
+                      }}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted transition-colors hover:bg-accent-soft hover:text-accent active:scale-[0.95]"
+                      aria-label={`Reset password ${u.nama}`}
+                      title="Reset password"
+                    >
+                      <KeyRound size={14} />
+                    </button>
+                  </div>
                 </div>
               </ListRow>
             ))}
@@ -139,6 +161,13 @@ export default function UsersPage() {
         open={open}
         onClose={() => setOpen(false)}
         onCreated={load}
+      />
+
+      <ResetPasswordSheet
+        open={!!resetTarget}
+        onClose={() => setResetTarget(null)}
+        userId={resetTarget?.userId || null}
+        userName={resetTarget?.userName || ""}
       />
     </AppLayout>
   );

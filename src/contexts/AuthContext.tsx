@@ -112,14 +112,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function logout() {
     console.log("🔐 AuthProvider.logout called");
-    try {
-      await authApi.logout();
-    } catch (err) {
+
+    // 1. Clear state & token DULU — biar UI instant redirect
+    clearToken();
+    setUser(null);
+
+    // 2. API call di background — tidak blocking, error di-ignore
+    authApi.logout().catch((err) => {
       console.warn("Logout API error (ignored):", err);
-    } finally {
-      clearToken();
-      setUser(null);
-    }
+    });
   }
 
   return (

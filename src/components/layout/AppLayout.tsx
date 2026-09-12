@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
@@ -9,10 +9,6 @@ import {
 } from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
-
-/* -------------------------------------------------------------------------- */
-/*                                   Header                                   */
-/* -------------------------------------------------------------------------- */
 
 interface HeaderProps {
   title: string;
@@ -83,10 +79,6 @@ export function Header({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                 AppLayout                                  */
-/* -------------------------------------------------------------------------- */
-
 export function AppLayout({
   children,
   hideNav,
@@ -102,10 +94,23 @@ export function AppLayout({
 
   const showAiChatFab = showAiChat && !hideNav;
   const showFloating = showAiChatFab || !!fab || !hideNav;
-
-  // ⬇️ hideNav → tambah padding bottom setara tinggi BottomNav + gap
-  //    supaya FAB naik seperti ada nav, meskipun nav tidak render
   const containerPadding = hideNav ? "pb-[68px]" : "pb-2";
+
+  useEffect(() => {
+    let offset = 16;
+
+    if (!hideNav) {
+      offset = showAiChatFab ? 96 : 80;
+    } else if (fab) {
+      offset = 84;
+    }
+
+    document.documentElement.style.setProperty("--toast-offset", `${offset}px`);
+
+    return () => {
+      document.documentElement.style.removeProperty("--toast-offset");
+    };
+  }, [hideNav, fab, showAiChatFab]);
 
   return (
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
@@ -126,9 +131,7 @@ export function AppLayout({
                 icon={<Sparkles size={18} strokeWidth={2.2} />}
               />
             )}
-
             {fab}
-
             {!hideNav && <BottomNav />}
           </div>
         </div>
@@ -137,17 +140,9 @@ export function AppLayout({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          FloatingActionGroup                               */
-/* -------------------------------------------------------------------------- */
-
 export function FloatingActionGroup({ children }: { children: ReactNode }) {
   return <div className="flex flex-col items-end gap-2.5">{children}</div>;
 }
-
-/* -------------------------------------------------------------------------- */
-/*                          FloatingActionButton                              */
-/* -------------------------------------------------------------------------- */
 
 export function FloatingActionButton({
   onClick,

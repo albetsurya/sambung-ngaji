@@ -52,6 +52,10 @@ export const attendanceApi = {
   ) => call<AttendanceRecord[]>("bulkSaveAttendance", { meeting_id, items }),
   remove: (payload: { meeting_id: string; member_id: string }) =>
     call<{ deleted: number }>("deleteAttendance", payload),
+  removeByMeeting: (meeting_id: string) =>
+    call<{ deleted: number }>("deleteAttendanceByMeeting", { meeting_id }),
+  removeByMember: (member_id: string) =>
+    call<{ deleted: number }>("deleteAttendanceByMember", { member_id }),
 };
 
 export const monitoringApi = {
@@ -107,6 +111,11 @@ export const userApi = {
     call<import("../types").User>("createUser", payload),
   update: (user_id: string, payload: Record<string, unknown>) =>
     call<import("../types").User>("updateUser", { user_id, ...payload }),
+  changePassword: (payload: { old_password: string; new_password: string }) =>
+    call<{ changed: boolean }>("changeMyPassword", payload),
+
+  resetPassword: (payload: { user_id: string; new_password: string }) =>
+    call<{ reset: boolean; user_id: string }>("resetUserPassword", payload),
 };
 
 export const settingsApi = {
@@ -128,4 +137,36 @@ export const auditApi = {
   list: (
     params: { user_id?: string; target_type?: string; limit?: number } = {},
   ) => call<AuditLogEntry[]>("getAuditLogs", params),
+};
+
+export interface AiUsageStats {
+  today: {
+    chat_count: number;
+    total_tokens: number;
+  };
+  month: {
+    chat_count: number;
+    total_tokens: number;
+  };
+  by_provider: {
+    provider: string;
+    chat_count: number;
+    total_tokens: number;
+  }[];
+  by_role: {
+    role: string;
+    chat_count: number;
+    total_tokens: number;
+  }[];
+  top_users: {
+    user_id: string;
+    user_nama: string;
+    role: string;
+    chat_count: number;
+    total_tokens: number;
+  }[];
+}
+
+export const aiUsageApi = {
+  stats: () => call<AiUsageStats>("getAiUsageStats", {}),
 };

@@ -5,6 +5,7 @@ import {
   EmptyState,
   GroupedList,
   ListRow,
+  ErrorState,
 } from "../components/common";
 import { auditApi, type AuditLogEntry } from "../services/domainApi";
 import { useToast } from "../contexts/ToastContext";
@@ -15,19 +16,19 @@ export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    setError("");
     auditApi
       .list({ limit: 100 })
       .then(setLogs)
       .catch((err) =>
-        showToast(
+        setError(
           err instanceof ApiError ? err.message : "Gagal memuat audit log",
-          "error",
         ),
       )
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -39,10 +40,11 @@ export default function AuditLogPage() {
       />
       <div className="py-3">
         {loading && <GroupedListSkeleton rows={6} />}
-        {!loading && logs.length === 0 && (
+        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!loading && !error && logs.length === 0 && (
           <EmptyState title="Belum ada aktivitas" />
         )}
-        {!loading && logs.length > 0 && (
+        {!loading && !error && logs.length > 0 && (
           <GroupedList>
             {logs.map((l, i) => (
               <ListRow key={l.log_id} insetDivider={i !== logs.length - 1}>

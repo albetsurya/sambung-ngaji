@@ -14,14 +14,11 @@ import {
   CircleAlert,
   ArrowUpRight,
   ChevronRight,
-  Sun,
-  Moon,
   type LucideIcon,
 } from "../components/common/FontAwesomeIcons";
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout, Header } from "../components/layout/AppLayout";
 import { Card, Avatar, ErrorState } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext";
 import { dashboardApi } from "../services/domainApi";
 import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import type {
@@ -36,18 +33,12 @@ import {
   SectionHeaderSkeleton,
   CategoryDistributionSkeleton,
   MeetingCardSkeleton,
-  AttentionCardSkeleton,
 } from "../components/common/Skeleton";
 
 type IconType = LucideIcon;
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
-
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const [data, setData] = useState<
     DashboardGeneral | DashboardPNKB | DashboardAbsensi | null
   >(null);
@@ -86,43 +77,36 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      {/* ------------------------------ Header ------------------------------ */}
-      <div className="sticky top-0 z-30 border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 pt-safe">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="min-w-0">
-            <p className="text-ios-footnote text-surface-muted">{greeting},</p>
-            <h1 className="text-[19px] font-semibold text-surface-text leading-tight tracking-[-0.01em] truncate">
-              {user?.nama}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={toggleTheme}
-              aria-label="Ganti mode tampilan"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all hover:bg-surface-card2 active:scale-95"
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <Avatar
-              name={user?.nama || "?"}
-              size={40}
-              gender={normalizeGender(user?.jenis_kelamin)}
-            />
-          </div>
-        </div>
-      </div>
+      <Header
+        title="Dashboard"
+        right={
+          <Avatar
+            name={user?.nama || "?"}
+            size={32}
+            gender={normalizeGender(user?.jenis_kelamin)}
+          />
+        }
+        showThemeToggle
+      />
 
-      {/* ------------------------------ Content ----------------------------- */}
       <div className="px-4 py-4 space-y-4">
         {loading && <DashboardSkeleton />}
 
         {!loading && error && <ErrorState message={error} onRetry={load} />}
 
         {!loading && !error && data && user?.role === "TIM_PNKB" && (
-          <PNKBDashboard data={data as DashboardPNKB} />
+          <PNKBDashboard
+            data={data as DashboardPNKB}
+            greeting={greeting}
+            userName={user?.nama || ""}
+          />
         )}
         {!loading && !error && data && user?.role === "TIM_ABSENSI" && (
-          <AbsensiDashboard data={data as DashboardAbsensi} />
+          <AbsensiDashboard
+            data={data as DashboardAbsensi}
+            greeting={greeting}
+            userName={user?.nama || ""}
+          />
         )}
         {!loading &&
           !error &&
@@ -131,16 +115,14 @@ export default function DashboardPage() {
             <GeneralDashboard
               data={data as DashboardGeneral}
               isSuperAdmin={user.role === "SUPER_ADMIN"}
+              greeting={greeting}
+              userName={user?.nama || ""}
             />
           )}
       </div>
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Section Header                                */
-/* -------------------------------------------------------------------------- */
 
 function SectionHeader({
   title,
@@ -171,28 +153,23 @@ function SectionHeader({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Hero Stat Card                                */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Hero card dengan soft accent background — bukan solid accent.
- * Ditambah decorative circles untuk tekstur halus tanpa berat.
- */
 function HeroStatCard({
   label,
   value,
   footer,
   Icon,
+  greeting,
+  userName,
 }: {
   label: string;
   value: string | number;
   footer?: string;
   Icon: IconType;
+  greeting?: string;
+  userName?: string;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-accent-soft border border-accent/15 shadow-sm p-5">
-      {/* Decorative circles — subtle texture */}
       <div
         className="absolute -right-10 -top-10 w-40 h-40 rounded-full pointer-events-none"
         style={{ background: "rgb(var(--c-accent) / 0.06)" }}
@@ -203,7 +180,16 @@ function HeroStatCard({
       />
 
       <div className="relative">
-        {/* Header row */}
+        {greeting && userName && (
+          <>
+            <p className="text-ios-footnote text-accent/75">{greeting},</p>
+            <h1 className="text-[22px] font-bold text-accent tracking-[-0.02em] leading-tight mt-0.5 truncate">
+              {userName}
+            </h1>
+            <div className="h-px bg-accent/15 my-4" />
+          </>
+        )}
+
         <div className="flex items-start justify-between">
           <p className="text-xs font-medium text-accent/75">{label}</p>
           <span className="w-9 h-9 rounded-xl bg-accent/10 backdrop-blur-sm flex items-center justify-center">
@@ -211,14 +197,12 @@ function HeroStatCard({
           </span>
         </div>
 
-        {/* Value */}
         <div className="flex items-baseline gap-2 mt-2">
           <span className="font-display text-[34px] font-bold text-accent tabular-nums tracking-[-0.03em] leading-none">
             {value}
           </span>
         </div>
 
-        {/* Footer */}
         {footer && (
           <p className="text-xs text-accent/75 mt-3 flex items-center gap-1">
             <ArrowUpRight size={13} className="text-accent" /> {footer}
@@ -228,10 +212,6 @@ function HeroStatCard({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                Stat Tile                                   */
-/* -------------------------------------------------------------------------- */
 
 type StatTone = "default" | "accent" | "warning" | "danger" | "info";
 
@@ -297,10 +277,6 @@ function StatTile({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Meeting Card                                  */
-/* -------------------------------------------------------------------------- */
-
 function MeetingCard({
   meeting,
   onClick,
@@ -338,10 +314,6 @@ function MeetingCard({
     </Card>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                          Attention List Section                            */
-/* -------------------------------------------------------------------------- */
 
 function AttentionListSection({
   items,
@@ -395,16 +367,16 @@ function AttentionListSection({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          General Dashboard                                 */
-/* -------------------------------------------------------------------------- */
-
 function GeneralDashboard({
   data,
   isSuperAdmin,
+  greeting,
+  userName,
 }: {
   data: DashboardGeneral;
   isSuperAdmin: boolean;
+  greeting: string;
+  userName: string;
 }) {
   const navigate = useNavigate();
 
@@ -415,15 +387,15 @@ function GeneralDashboard({
 
   return (
     <>
-      {/* Hero */}
       <HeroStatCard
         label="Total Jamaah Aktif"
         value={data.total_jamaah}
         footer="Data diperbarui hari ini"
         Icon={Users}
+        greeting={greeting}
+        userName={userName}
       />
 
-      {/* Row 1 */}
       <div className="flex gap-3">
         <StatTile
           label="Kehadiran"
@@ -439,7 +411,6 @@ function GeneralDashboard({
         />
       </div>
 
-      {/* Row 2 — Super admin only */}
       {isSuperAdmin && (
         <div className="flex gap-3">
           <StatTile
@@ -457,7 +428,6 @@ function GeneralDashboard({
         </div>
       )}
 
-      {/* Distribusi kategori */}
       <Card>
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs text-surface-muted font-medium">
@@ -484,7 +454,6 @@ function GeneralDashboard({
         </div>
       </Card>
 
-      {/* Pengajian terdekat */}
       {data.pengajian_terdekat && (
         <div className="space-y-2">
           <SectionHeader
@@ -498,17 +467,20 @@ function GeneralDashboard({
         </div>
       )}
 
-      {/* Perlu perhatian */}
       <AttentionListSection items={data.jamaah_perlu_perhatian} />
     </>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          PNKB Dashboard                                    */
-/* -------------------------------------------------------------------------- */
-
-function PNKBDashboard({ data }: { data: DashboardPNKB }) {
+function PNKBDashboard({
+  data,
+  greeting,
+  userName,
+}: {
+  data: DashboardPNKB;
+  greeting: string;
+  userName: string;
+}) {
   return (
     <>
       <HeroStatCard
@@ -516,6 +488,8 @@ function PNKBDashboard({ data }: { data: DashboardPNKB }) {
         value={data.total}
         footer={`${data.aktif} aktif dalam pembinaan`}
         Icon={Heart}
+        greeting={greeting}
+        userName={userName}
       />
 
       <div className="flex gap-3">
@@ -543,11 +517,15 @@ function PNKBDashboard({ data }: { data: DashboardPNKB }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Absensi Dashboard                                 */
-/* -------------------------------------------------------------------------- */
-
-function AbsensiDashboard({ data }: { data: DashboardAbsensi }) {
+function AbsensiDashboard({
+  data,
+  greeting,
+  userName,
+}: {
+  data: DashboardAbsensi;
+  greeting: string;
+  userName: string;
+}) {
   const navigate = useNavigate();
   return (
     <>
@@ -556,6 +534,8 @@ function AbsensiDashboard({ data }: { data: DashboardAbsensi }) {
         value={data.jumlah_jamaah}
         footer={`${data.hadir} hadir`}
         Icon={CheckCircle2}
+        greeting={greeting}
+        userName={userName}
       />
 
       <SectionHeader
@@ -607,43 +587,23 @@ function AbsensiDashboard({ data }: { data: DashboardAbsensi }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Dashboard Skeleton                                */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Skeleton lengkap yang mirror layout dashboard:
- * 1. Hero card
- * 2. Stat tiles (2 baris × 2 tile)
- * 3. Kartu distribusi kategori
- * 4. Section header + meeting card
- * 5. Section header + 2 attention card
- *
- * Total tinggi ≈ dashboard asli, sehingga saat data muncul
- * tidak ada "lompatan" layout.
- */
 function DashboardSkeleton() {
   return (
     <>
-      {/* 1. Hero card */}
       <HeroCardSkeleton />
 
-      {/* 2. Stat tiles — row 1 */}
       <div className="flex gap-3">
         <StatTileSkeleton />
         <StatTileSkeleton />
       </div>
 
-      {/* 2. Stat tiles — row 2 */}
       <div className="flex gap-3">
         <StatTileSkeleton />
         <StatTileSkeleton />
       </div>
 
-      {/* 3. Distribusi kategori */}
       <CategoryDistributionSkeleton />
 
-      {/* 4. Pengajian terdekat */}
       <div className="space-y-2">
         <SectionHeaderSkeleton />
         <MeetingCardSkeleton />

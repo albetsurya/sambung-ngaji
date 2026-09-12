@@ -55,7 +55,7 @@ function sleep(ms: number): Promise<void> {
 /*                              Main API Call                                 */
 /* -------------------------------------------------------------------------- */
 
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 3;
 
 export async function call<T>(
   action: string,
@@ -75,7 +75,7 @@ export async function call<T>(
       }
 
       // Exponential backoff: 300ms, 600ms
-      const delay = 300 * Math.pow(2, attempt);
+      const delay = 500 * Math.pow(2, attempt);
       console.warn(
         `⚠️ API call gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
       );

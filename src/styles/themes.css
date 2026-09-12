@@ -1,0 +1,163 @@
+[data-preset="whatsapp"] {
+  --c-accent: 37 211 102;
+  --c-accent-dark: 18 140 66;
+  --c-accent-light: 220 248 228;
+  --c-accent-2: 18 140 66;
+  --c-accent-2-dark: 12 110 50;
+  --c-accent-2-light: 200 240 210;
+}
+[data-preset="whatsapp"].dark {
+  --c-accent: 37 211 102;
+  --c-accent-dark: 74 222 128;
+  --c-accent-light: 18 60 35;
+  --c-accent-2: 74 222 128;
+  --c-accent-2-dark: 110 231 153;
+  --c-accent-2-light: 25 80 45;
+}
+
+[data-preset="instagram"] {
+  --c-accent: 225 48 108;
+  --c-accent-dark: 193 33 87;
+  --c-accent-light: 252 231 243;
+  --c-accent-2: 245 158 11;
+  --c-accent-2-dark: 217 119 6;
+  --c-accent-2-light: 254 243 199;
+}
+[data-preset="instagram"].dark {
+  --c-bg: 10 10 10;
+  --c-card: 22 22 22;
+  --c-card2: 16 16 16;
+  --c-border: 40 40 40;
+  --c-accent: 244 114 182;
+  --c-accent-dark: 249 168 212;
+  --c-accent-light: 80 25 60;
+  --c-accent-2: 251 191 36;
+  --c-accent-2-dark: 252 211 77;
+  --c-accent-2-light: 80 50 10;
+  --c-text: 255 255 255;
+}
+
+[data-preset="tiktok"] {
+  --c-accent: 20 184 179;
+  --c-accent-dark: 13 148 144;
+  --c-accent-light: 220 252 251;
+  --c-accent-2: 254 44 85;
+  --c-accent-2-dark: 230 30 70;
+  --c-accent-2-light: 255 220 230;
+}
+[data-preset="tiktok"].dark {
+  --c-bg: 0 0 0;
+  --c-card: 22 22 22;
+  --c-card2: 15 15 15;
+  --c-border: 42 42 42;
+  --c-accent: 37 244 238;
+  --c-accent-dark: 94 248 242;
+  --c-accent-light: 10 40 40;
+  --c-accent-2: 254 44 85;
+  --c-accent-2-dark: 255 90 120;
+  --c-accent-2-light: 40 10 20;
+  --c-text: 255 255 255;
+}
+
+[data-preset="spotify"] {
+  --c-accent: 29 185 84;
+  --c-accent-dark: 22 145 65;
+  --c-accent-light: 220 245 227;
+  --c-accent-2: 29 185 84;
+  --c-accent-2-dark: 22 145 65;
+  --c-accent-2-light: 220 245 227;
+}
+[data-preset="spotify"].dark {
+  --c-bg: 18 18 18;
+  --c-card: 24 24 24;
+  --c-card2: 18 18 18;
+  --c-border: 40 40 40;
+  --c-accent: 29 185 84;
+  --c-accent-dark: 30 215 96;
+  --c-accent-light: 20 50 30;
+  --c-accent-2: 30 215 96;
+  --c-accent-2-dark: 74 222 128;
+  --c-accent-2-light: 25 60 35;
+  --c-text: 255 255 255;
+}
+
+[data-preset="masjid"] {
+  --c-accent: 5 150 105;
+  --c-accent-dark: 4 120 87;
+  --c-accent-light: 209 250 229;
+  --c-accent-2: 217 119 6;
+  --c-accent-2-dark: 180 83 9;
+  --c-accent-2-light: 254 243 199;
+}
+[data-preset="masjid"].dark {
+  --c-accent: 52 211 153;
+  --c-accent-dark: 110 231 183;
+  --c-accent-light: 6 78 59;
+  --c-accent-2: 251 191 36;
+  --c-accent-2-dark: 252 211 77;
+  --c-accent-2-light: 80 50 10;
+}
+
+[data-preset="ocean"] {
+  --c-accent: 6 182 212;
+  --c-accent-dark: 8 145 178;
+  --c-accent-light: 207 250 254;
+}
+[data-preset="ocean"].dark {
+  --c-bg: 8 20 30;
+  --c-card: 15 30 45;
+  --c-card2: 10 22 34;
+  --c-border: 30 58 80;
+  --c-accent: 34 211 238;
+  --c-accent-dark: 103 232 249;
+  --c-accent-light: 8 51 68;
+  --c-text: 240 249 255;
+}
+
+[data-preset="sunset"] {
+  --c-accent: 249 115 22;
+  --c-accent-dark: 234 88 12;
+  --c-accent-light: 255 237 213;
+}
+[data-preset="sunset"].dark {
+  --c-bg: 20 12 24;
+  --c-card: 32 20 38;
+  --c-card2: 24 15 28;
+  --c-border: 55 35 60;
+  --c-accent: 251 146 60;
+  --c-accent-dark: 253 186 116;
+  --c-accent-light: 60 25 15;
+  --c-text: 255 245 235;
+}
+
+[data-preset="discord"] {
+  --c-accent: 88 101 242;
+  --c-accent-dark: 71 82 196;
+  --c-accent-light: 224 231 255;
+}
+[data-preset="discord"].dark {
+  --c-bg: 30 33 36;
+  --c-card: 42 46 51;
+  --c-card2: 35 39 42;
+  --c-border: 60 65 70;
+  --c-accent: 114 137 218;
+  --c-accent-dark: 150 170 240;
+  --c-accent-light: 40 45 90;
+  --c-text: 255 255 255;
+}
+
+[data-preset="midnight"] {
+  --c-accent: 139 92 246;
+  --c-accent-dark: 124 58 237;
+  --c-accent-light: 237 233 254;
+}
+[data-preset="midnight"].dark {
+  --c-bg: 0 0 0;
+  --c-card: 15 15 20;
+  --c-card2: 8 8 12;
+  --c-border: 35 35 45;
+  --c-accent: 167 139 250;
+  --c-accent-dark: 196 181 253;
+  --c-accent-light: 30 15 50;
+  --c-text: 250 250 255;
+}

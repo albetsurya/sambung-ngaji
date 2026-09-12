@@ -4,3 +4,4 @@ export * from "./Surface";
 export * from "./States";
 export * from "./Overlays";
 export * from "./Skeleton";
+export * from "./ChangePasswordSheet";

@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, SlidersHorizontal, X } from "../components/common/FontAwesomeIcons";
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+} from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -23,10 +27,14 @@ import { MEMBER_CATEGORIES } from "../constants";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { JamaahListSkeleton } from "../components/common/Skeleton";
+import { Download } from "../components/common/FontAwesomeIcons";
+import { exportMembersToCsv } from "../utils/exportCsv";
+import { useToast } from "../contexts/ToastContext";
 
 export default function MembersListPage() {
   const navigate = useNavigate();
   const { role } = usePermission();
+  const { showToast } = useToast();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -91,7 +99,7 @@ export default function MembersListPage() {
         style={{ top: "calc(52px + var(--safe-top))" }}
       >
         <div className="px-4 pt-2 pb-2 flex gap-2">
-          {/* Search */}
+          {/* Search — wrapper terpisah */}
           <div className="relative flex-1">
             <Search
               size={16}
@@ -103,7 +111,6 @@ export default function MembersListPage() {
               placeholder="Cari nama jamaah"
               className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
             />
-            {/* Clear search */}
             {hasActiveSearch && (
               <button
                 onClick={() => setSearch("")}
@@ -115,7 +122,23 @@ export default function MembersListPage() {
             )}
           </div>
 
-          {/* Filter button dengan badge count */}
+          {/* ✅ Export button — di luar wrapper search */}
+          <button
+            onClick={() => {
+              if (members.length === 0) {
+                showToast("Tidak ada data untuk di-export", "error");
+                return;
+              }
+              exportMembersToCsv(members);
+              showToast(`${members.length} jamaah di-export`);
+            }}
+            aria-label="Export CSV"
+            className="min-h-[40px] px-3.5 rounded-xl bg-surface-card border border-surface-border text-ios-subhead font-medium text-surface-text flex items-center gap-1.5 transition-colors hover:bg-surface-card2 active:scale-[0.97]"
+          >
+            <Download size={15} />
+          </button>
+
+          {/* Filter button */}
           <button
             onClick={() => setFilterOpen(true)}
             className="relative min-h-[40px] px-3.5 rounded-xl bg-surface-card border border-surface-border text-ios-subhead font-medium text-surface-text flex items-center gap-1.5 transition-colors hover:bg-surface-card2 active:scale-[0.97]"
