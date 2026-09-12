@@ -6,23 +6,37 @@ import {
   type ReactNode,
 } from "react";
 
+type ToastVariant = "success" | "error" | "warning";
+
 interface Toast {
   id: number;
   message: string;
-  variant: "success" | "error";
+  variant: ToastVariant;
 }
 
 interface ToastContextValue {
-  showToast: (message: string, variant?: "success" | "error") => void;
+  showToast: (message: string, variant?: ToastVariant) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
+
+const VARIANT_CLASS: Record<ToastVariant, string> = {
+  success: "bg-accent",
+  warning: "bg-warning",
+  error: "bg-danger",
+};
+
+const VARIANT_ICON: Record<ToastVariant, string> = {
+  success: "\u2713 ",
+  warning: "\u26A0 ",
+  error: "\u26A0 ",
+};
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const showToast = useCallback(
-    (message: string, variant: "success" | "error" = "success") => {
+    (message: string, variant: ToastVariant = "success") => {
       const id = Date.now() + Math.random();
       setToasts((prev) => [...prev, { id, message, variant }]);
       setTimeout(
@@ -37,7 +51,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ showToast }}>
       {children}
 
-      {/* Toast container — posisi adaptif via --toast-offset */}
       <div
         className="fixed left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"
         style={{
@@ -46,17 +59,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         }}
       >
         {toasts.map((t) => (
-          // Di ToastContext.tsx — opsional
           <div
             key={t.id}
-            className={`app-shell w-full pointer-events-auto rounded-2xl px-4 py-3 text-sm font-medium shadow-neu-float text-white animate-toast-in ${
-              t.variant === "success" ? "bg-accent" : "bg-danger"
-            }`}
+            className={`app-shell w-full pointer-events-auto rounded-2xl px-4 py-3 text-sm font-medium shadow-neu-float text-white animate-toast-in ${VARIANT_CLASS[t.variant]}`}
             style={{
               fontSize: "var(--toast-font-size, 0.875rem)",
             }}
           >
-            {t.variant === "success" ? "\u2713 " : "\u26A0 "}
+            {VARIANT_ICON[t.variant]}
             {t.message}
           </div>
         ))}
