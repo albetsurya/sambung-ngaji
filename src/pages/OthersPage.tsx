@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Building2,
   KeyRound,
@@ -8,6 +8,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  ClipboardList,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -20,6 +21,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
+import { pendingApi } from "../services/pendingApi";
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
@@ -27,6 +29,15 @@ export default function OthersPage() {
   const { isAdminLike, isSuperAdmin } = usePermission();
   const navigate = useNavigate();
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAdminLike) return;
+    pendingApi
+      .list({ status: "PENDING" })
+      .then((list) => setPendingCount(list.length))
+      .catch(() => {});
+  }, [isAdminLike]);
 
   const menu = [
     {
@@ -36,6 +47,15 @@ export default function OthersPage() {
       Icon: Building2,
       to: "/lainnya/kelompok",
       show: isAdminLike,
+    },
+    {
+      key: "pendaftar",
+      label: "Pendaftar",
+      description: "Verifikasi pendaftar baru",
+      Icon: ClipboardList,
+      to: "/lainnya/pendaftar",
+      show: isAdminLike,
+      badge: pendingCount > 0 ? pendingCount : undefined,
     },
     {
       key: "users",
@@ -68,7 +88,6 @@ export default function OthersPage() {
       <Header title="Lainnya" />
 
       <div className="py-4">
-        {/* ---------------------------- Profile Card ---------------------------- */}
         <GroupedList>
           <ListRow insetDivider={false} className="py-3.5">
             <div className="flex items-center gap-3">
@@ -88,7 +107,6 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
-        {/* --------------------------- Preferences ---------------------------- */}
         <GroupedList>
           <ListRow onClick={toggleTheme} insetDivider={false}>
             <div className="flex items-center gap-3">
@@ -117,7 +135,6 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
-        {/* ----------------------------- Menu Group --------------------------- */}
         {menu.length > 0 && (
           <GroupedList>
             {menu.map((m, i) => {
@@ -134,14 +151,21 @@ export default function OthersPage() {
                   }
                 >
                   <ChevronRow>
-                    <div className="min-w-0">
-                      <p className="text-ios-body font-medium text-surface-text truncate">
-                        {m.label}
-                      </p>
-                      {m.description && (
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {m.description}
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-ios-body font-medium text-surface-text truncate">
+                          {m.label}
                         </p>
+                        {m.description && (
+                          <p className="text-ios-caption text-surface-muted truncate">
+                            {m.description}
+                          </p>
+                        )}
+                      </div>
+                      {m.badge !== undefined && (
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
+                          {m.badge > 99 ? "99+" : m.badge}
+                        </span>
                       )}
                     </div>
                   </ChevronRow>
@@ -151,7 +175,6 @@ export default function OthersPage() {
           </GroupedList>
         )}
 
-        {/* --------------------------- Logout Group --------------------------- */}
         <GroupedList>
           <ListRow
             onClick={() => setConfirmLogout(true)}
@@ -165,7 +188,6 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
-        {/* ----------------------------- Version ----------------------------- */}
         <div className="text-center pt-5 pb-3">
           <p className="text-ios-caption text-surface-muted">
             Manajemen Pengajian · v1.0.0
@@ -195,6 +217,7 @@ function roleLabel(role?: string) {
     ADMIN: "Admin",
     TIM_PNKB: "Tim PNKB",
     TIM_ABSENSI: "Tim Absensi",
+    MEMBER: "Member",
   };
   return role ? map[role] || role : "";
 }

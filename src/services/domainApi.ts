@@ -50,7 +50,6 @@ export const attendanceApi = {
     meeting_id: string,
     items: { member_id: string; status: string; catatan?: string }[],
   ) => call<AttendanceRecord[]>("bulkSaveAttendance", { meeting_id, items }),
-  // ✅ TAMBAH INI
   remove: (payload: { meeting_id: string; member_id: string }) =>
     call<{ deleted: number }>("deleteAttendance", payload),
 };
@@ -91,6 +90,9 @@ export const announcementApi = {
 export const uploadApi = {
   photo: (member_id: string, base64: string, mime_type: string) =>
     call<{ foto_url: string }>("uploadPhoto", { member_id, base64, mime_type }),
+
+  delete: (member_id?: string) =>
+    call<{ deleted: boolean }>("deletePhoto", member_id ? { member_id } : {}),
 };
 
 export const dashboardApi = {

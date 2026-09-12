@@ -3,6 +3,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
+import { MemberRoute } from "./components/layout/MemberRoute";
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -18,6 +19,16 @@ import SettingsPage from "./pages/SettingsPage";
 import AuditLogPage from "./pages/AuditLogPage";
 import AiChatPage from "./pages/AiChatPage";
 
+import MemberSelfPage from "./pages/MemberSelfPage";
+import MemberEditProfilePage from "./pages/MemberEditProfilePage";
+
+import PendingMembersPage from "./pages/PendingMembersPage";
+import PendingMemberDetailPage from "./pages/PendingMemberDetailPage";
+
+import PublicRegistrationPage from "./pages/PublicRegistrationPage";
+import RegistrationSuccessPage from "./pages/RegistrationSuccessPage";
+import MemberAiChatPage from "./pages/MemberAiChatPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -27,114 +38,61 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
 
+              <Route path="/daftar" element={<PublicRegistrationPage />} />
               <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                }
+                path="/daftar/sukses"
+                element={<RegistrationSuccessPage />}
               />
 
               <Route
-                path="/jamaah"
+                path="/member"
                 element={
-                  <ProtectedRoute>
-                    <MembersListPage />
-                  </ProtectedRoute>
+                  <MemberRoute>
+                    <MemberSelfPage />
+                  </MemberRoute>
                 }
               />
               <Route
-                path="/jamaah/baru"
+                path="/member/edit"
                 element={
-                  <ProtectedRoute>
-                    <MemberFormPage />
-                  </ProtectedRoute>
+                  <MemberRoute>
+                    <MemberEditProfilePage />
+                  </MemberRoute>
                 }
               />
               <Route
-                path="/jamaah/:id"
+                path="/member/ai"
                 element={
-                  <ProtectedRoute>
-                    <MemberDetailPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/jamaah/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <MemberFormPage />
-                  </ProtectedRoute>
+                  <MemberRoute>
+                    <MemberAiChatPage />
+                  </MemberRoute>
                 }
               />
 
-              <Route
-                path="/absensi"
-                element={
-                  <ProtectedRoute>
-                    <AttendancePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/pengumuman"
-                element={
-                  <ProtectedRoute>
-                    <AnnouncementsPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/jamaah" element={<MembersListPage />} />
+                <Route path="/jamaah/baru" element={<MemberFormPage />} />
+                <Route path="/jamaah/:id" element={<MemberDetailPage />} />
+                <Route path="/jamaah/:id/edit" element={<MemberFormPage />} />
+                <Route path="/absensi" element={<AttendancePage />} />
+                <Route path="/pengumuman" element={<AnnouncementsPage />} />
 
-              <Route
-                path="/lainnya"
-                element={
-                  <ProtectedRoute>
-                    <OthersPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lainnya/kelompok"
-                element={
-                  <ProtectedRoute>
-                    <GroupsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lainnya/users"
-                element={
-                  <ProtectedRoute>
-                    <UsersPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lainnya/pengaturan"
-                element={
-                  <ProtectedRoute>
-                    <SettingsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/lainnya/audit-log"
-                element={
-                  <ProtectedRoute>
-                    <AuditLogPage />
-                  </ProtectedRoute>
-                }
-              />
+                <Route path="/lainnya">
+                  <Route index element={<OthersPage />} />
+                  <Route path="kelompok" element={<GroupsPage />} />
+                  <Route path="pendaftar" element={<PendingMembersPage />} />
+                  <Route
+                    path="pendaftar/:submission_id"
+                    element={<PendingMemberDetailPage />}
+                  />
+                  <Route path="users" element={<UsersPage />} />
+                  <Route path="pengaturan" element={<SettingsPage />} />
+                  <Route path="audit-log" element={<AuditLogPage />} />
+                </Route>
 
-              <Route
-                path="/ai-chat"
-                element={
-                  <ProtectedRoute>
-                    <AiChatPage />
-                  </ProtectedRoute>
-                }
-              />
+                <Route path="/ai-chat" element={<AiChatPage />} />
+              </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

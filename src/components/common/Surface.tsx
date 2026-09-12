@@ -174,14 +174,18 @@ export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
       ? "bg-accent-soft text-accent"
       : "bg-surface-card2 text-surface-muted";
 
+  console.log(src);
+
   if (showPhoto) {
     return (
       <img
         src={src}
         alt={name}
-        onError={() => setImgError(true)}
+        onError={() => setImgError(true)} // ← ini penting
         style={{ width: size, height: size }}
         className="rounded-full object-cover bg-accent-soft flex-shrink-0 ring-1 ring-surface-border"
+        loading="lazy" // ← optimasi
+        referrerPolicy="no-referrer" // ← hilangkan referrer
       />
     );
   }

@@ -18,6 +18,7 @@ import type { Group, Member } from "../types";
 import { getMemberCategory, normalizePhoneNumber } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
+import imageCompression from "browser-image-compression";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -58,6 +59,7 @@ export default function MemberFormPage() {
   const [submitting, setSubmitting] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [compressing, setCompressing] = useState(false);
 
   useEffect(() => {
     groupApi
@@ -82,19 +84,47 @@ export default function MemberFormPage() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       showToast("Foto harus berformat JPEG/PNG/WEBP", "error");
       return;
     }
+
     if (file.size > 5 * 1024 * 1024) {
       showToast("Ukuran foto maksimum 5MB", "error");
       return;
     }
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+
+    setCompressing(true);
+
+    try {
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 1000,
+        useWebWorker: true,
+        fileType: "image/jpeg",
+        initialQuality: 0.8,
+      });
+
+      const compressedFile = new File(
+        [compressed],
+        file.name.replace(/\.[^.]+$/, ".jpg"),
+        { type: "image/jpeg" },
+      );
+
+      setPhotoFile(compressedFile);
+      setPhotoPreview(URL.createObjectURL(compressedFile));
+    } catch (err) {
+      console.error("Kompres gagal:", err);
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+      showToast("Foto dikompres gagal, pakai file asli", "warning");
+    } finally {
+      setCompressing(false);
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -128,7 +158,6 @@ export default function MemberFormPage() {
     }
   }
 
-  /* ------------------------------- Loading UI ------------------------------- */
   if (loading) {
     return (
       <AppLayout hideNav>
@@ -150,10 +179,9 @@ export default function MemberFormPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="px-4 py-4 pb-32 space-y-4"
+        className="px-4 py-4 pb-40 space-y-4"
         id="member-form"
       >
-        {/* -------------------------- Photo Picker -------------------------- */}
         <div className="flex flex-col items-center">
           <label className="relative cursor-pointer group">
             <div className="w-28 h-28 rounded-2xl bg-surface-card border-2 border-dashed border-surface-border overflow-hidden flex items-center justify-center transition-all group-hover:border-accent/60 group-active:scale-[0.98]">
@@ -162,6 +190,7 @@ export default function MemberFormPage() {
                   src={photoPreview}
                   alt="Foto"
                   className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
                 />
               ) : (
                 <div className="flex flex-col items-center gap-1 text-surface-muted">
@@ -175,13 +204,20 @@ export default function MemberFormPage() {
               accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={handlePhotoChange}
+              disabled={compressing}
             />
             <span className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-accent text-white shadow-lg shadow-accent/30 flex items-center justify-center border-[3px] border-surface-bg transition-transform group-hover:scale-110">
               <Pencil size={14} strokeWidth={2.5} />
             </span>
           </label>
 
-          {previewCategory && (
+          {compressing && (
+            <p className="mt-3 text-ios-footnote text-surface-muted">
+              Mengkompres foto...
+            </p>
+          )}
+
+          {previewCategory && !compressing && (
             <div className="mt-3 inline-flex items-center gap-1.5 text-ios-footnote font-medium text-accent bg-accent-soft px-3 py-1.5 rounded-full">
               <Check size={12} strokeWidth={3} />
               Kategori: {previewCategory}
@@ -189,7 +225,6 @@ export default function MemberFormPage() {
           )}
         </div>
 
-        {/* -------------------------- Section: Data Diri -------------------------- */}
         <FormSection
           icon={<User size={16} />}
           title="Data Diri"
@@ -234,7 +269,6 @@ export default function MemberFormPage() {
           </div>
         </FormSection>
 
-        {/* -------------------------- Section: Alamat -------------------------- */}
         <FormSection
           icon={<MapPin size={16} />}
           title="Alamat & Kontak"
@@ -281,7 +315,6 @@ export default function MemberFormPage() {
           />
         </FormSection>
 
-        {/* -------------------------- Section: Status -------------------------- */}
         <FormSection
           icon={<Heart size={16} />}
           title="Status & Data Tambahan"
@@ -331,7 +364,6 @@ export default function MemberFormPage() {
           />
         </FormSection>
 
-        {/* -------------------------- Section: Pekerjaan -------------------------- */}
         <FormSection
           icon={<Briefcase size={16} />}
           title="Pekerjaan"
@@ -346,26 +378,31 @@ export default function MemberFormPage() {
         </FormSection>
       </form>
 
-      {/* -------------------------- Sticky Submit Button -------------------------- */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
-        <div className="app-shell px-4 pt-3 pb-4 bg-surface-bg/80 backdrop-blur-xl border-t border-surface-border">
-          <Button
-            type="submit"
-            form="member-form"
-            fullWidth
-            disabled={submitting}
-          >
-            {submitting ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Menyimpan...
-              </>
-            ) : isEdit ? (
-              "Simpan Perubahan"
-            ) : (
-              "Tambah Jamaah"
-            )}
-          </Button>
+      <div className="fixed bottom-0 left-0 right-0 z-30">
+        <div className="pointer-events-none h-6 bg-gradient-to-t from-surface-bg to-transparent" />
+
+        <div className="bg-surface-bg backdrop-blur-xl border-t border-surface-border pb-safe">
+          <div className="app-shell px-5 pt-3 pb-4">
+            <Button
+              type="submit"
+              form="member-form"
+              fullWidth
+              disabled={submitting || compressing}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Menyimpan...
+                </>
+              ) : compressing ? (
+                "Mengkompres..."
+              ) : isEdit ? (
+                "Simpan Perubahan"
+              ) : (
+                "Tambah Jamaah"
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </AppLayout>

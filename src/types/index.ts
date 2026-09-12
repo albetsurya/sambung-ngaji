@@ -1,4 +1,9 @@
-export type Role = "SUPER_ADMIN" | "ADMIN" | "TIM_PNKB" | "TIM_ABSENSI";
+export type Role =
+  | "SUPER_ADMIN"
+  | "ADMIN"
+  | "TIM_PNKB"
+  | "TIM_ABSENSI"
+  | "MEMBER";
 
 export type MemberCategory =
   | "CABERAWIT"
@@ -18,6 +23,8 @@ export type MonitoringStatus =
 
 export type AnnouncementStatus = "DRAFT" | "READY" | "SHARED" | "CANCELLED";
 
+export type PendingStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -30,7 +37,7 @@ export interface User {
   nama: string;
   role: Role;
   member_id?: string;
-  jenis_kelamin?: string; // ← TAMBAH INI
+  jenis_kelamin?: string;
   status_aktif?: boolean;
   created_at?: string;
   updated_at?: string;
@@ -58,11 +65,16 @@ export interface Member {
   pekerjaan?: string;
   foto_url?: string;
   status_pembinaan?: MonitoringStatus;
+  status_aktif?: boolean;
   tanggal_masuk?: string;
   tanggal_keluar?: string;
-  status_aktif?: boolean;
   kategori?: MemberCategory;
   usia?: number | null;
+  jenjang_pendidikan?: string;
+  sekolah?: string;
+  jurusan?: string;
+  tahun_mulai_pendidikan?: string | number;
+  tahun_selesai_pendidikan?: string | number;
   updated_at?: string;
   pendidikan?: Education[];
 }
@@ -107,6 +119,18 @@ export interface AttendanceRecord {
   member_id: string;
   status: AttendanceStatus;
   catatan?: string;
+}
+
+export interface MyAttendanceEntry {
+  attendance_id: string;
+  meeting_id: string;
+  status: AttendanceStatus;
+  catatan?: string;
+  tanggal: string;
+  hari: string;
+  acara: string;
+  jam: string;
+  created_at?: string;
 }
 
 export interface MonitoringEntry {
@@ -184,4 +208,45 @@ export interface DashboardAbsensi {
   ijin: number;
   sakit: number;
   tanpa_keterangan: number;
+}
+
+export interface PendingMember {
+  submission_id: string;
+  nama_lengkap: string;
+  nama_panggilan?: string;
+  jenis_kelamin: "L" | "P";
+  tempat_lahir?: string;
+  tanggal_lahir?: string;
+  no_wa: string;
+  alamat_rumah?: string;
+  desa?: string;
+  daerah?: string;
+  pekerjaan?: string;
+  hobi?: string;
+  is_nikah?: boolean;
+  jenjang_pendidikan?: string;
+  sekolah?: string;
+  jurusan?: string;
+  tahun_mulai_pendidikan?: string;
+  tahun_selesai_pendidikan?: string;
+  foto_url?: string;
+  status: PendingStatus;
+  submitted_at: string;
+  submitted_ip?: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  rejection_reason?: string;
+  created_member_id?: string;
+}
+
+export interface AiUsageEntry {
+  usage_id: string;
+  user_id: string;
+  user_nama: string;
+  role: Role;
+  provider: string;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  timestamp: string;
 }

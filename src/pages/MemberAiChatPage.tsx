@@ -1,70 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Send,
-  Sparkles,
   User as UserIcon,
   Loader2,
-  ChevronDown,
-  Zap,
   Copy,
   Check,
   Share2,
   RefreshCw,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { BottomSheet, LoadingOverlay } from "../components/common";
 import { aiApi } from "../services/aiApi";
 import { useToast } from "../contexts/ToastContext";
-import { useAuth } from "../contexts/AuthContext";
 import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types & Config                                */
-/* -------------------------------------------------------------------------- */
-
 const SUGGESTIONS = [
-  "Berapa total jamaah aktif?",
-  "Siapa saja yang perlu perhatian?",
-  "Ringkasan kehadiran bulan ini",
-  "Pengajian terdekat kapan?",
-  "Daftar kelompok dan pembinanya",
+  "Berapa persen kehadiran saya?",
+  "Kapan jadwal pengajian berikutnya?",
+  "Bagaimana status pembinaan saya?",
+  "Tampilkan riwayat absensi saya",
+  "Data diri saya saat ini",
 ];
-
-const PLACEHOLDER_BY_ROLE: Record<string, string> = {
-  SUPER_ADMIN: "Tanya data pengajian...",
-  ADMIN: "Tanya data pengajian...",
-  TIM_PNKB: "Tanya data pra nikah...",
-  TIM_ABSENSI: "Tanya data absensi...",
-};
-
-const PROVIDERS = [
-  {
-    key: "auto",
-    label: "Otomatis",
-    description: "Pilih provider terbaik otomatis",
-  },
-  {
-    key: "omniroute",
-    label: "OmniRoute",
-    description: "Provider utama, respons cepat",
-  },
-  {
-    key: "gemini",
-    label: "Gemini",
-    description: "Google Gemini 2.0 Flash",
-  },
-  {
-    key: "groq",
-    label: "Groq",
-    description: "Llama 3.3 70B (cepat & gratis)",
-  },
-] as const;
-
-type ProviderKey = (typeof PROVIDERS)[number]["key"];
-
-/* -------------------------------------------------------------------------- */
-/*                          Avatar Icon (Custom)                              */
-/* -------------------------------------------------------------------------- */
 
 function AiAvatar({ size = 32 }: { size?: number }) {
   return (
@@ -101,66 +56,20 @@ function AiAvatar({ size = 32 }: { size?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
-
-export default function AiChatPage() {
+export default function MemberAiChatPage() {
   const { showToast } = useToast();
-  const { user } = useAuth();
 
-  // ✅ Pakai hook untuk history
   const { messages, setMessages, clearHistory, hydrated } = useAiChatHistory();
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [provider, setProvider] = useState<ProviderKey>("auto");
-  const [activeProvider, setActiveProvider] = useState<string>("");
-  const [providerSheetOpen, setProviderSheetOpen] = useState(false);
-  const [switchingProvider, setSwitchingProvider] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  /* ----------------------------- Load provider ----------------------------- */
-  useEffect(() => {
-    aiApi
-      .getCurrentProvider()
-      .then((info) => {
-        setProvider((info.provider as ProviderKey) || "auto");
-        setActiveProvider(info.active);
-      })
-      .catch(() => {
-        // ignore — pakai default
-      });
-  }, []);
-
-  /* ------------------------------ Auto scroll ------------------------------ */
   useEffect(() => {
     if (!hydrated) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading, hydrated]);
 
-  /* ----------------------------- Change provider --------------------------- */
-  async function handleSelectProvider(key: ProviderKey) {
-    setProviderSheetOpen(false);
-    if (key === provider) return;
-
-    setSwitchingProvider(true);
-    try {
-      const info = await aiApi.setProvider(key);
-      setProvider(key);
-      setActiveProvider(info.active);
-      showToast(`Model: ${PROVIDERS.find((p) => p.key === key)?.label}`);
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Gagal ganti model",
-        "error",
-      );
-    } finally {
-      setSwitchingProvider(false);
-    }
-  }
-
-  /* ------------------------------- Send chat ------------------------------- */
   async function handleSend(text?: string) {
     const query = (text || input).trim();
     if (!query || loading) return;
@@ -177,9 +86,7 @@ export default function AiChatPage() {
 
     try {
       const history = messages.map((m) => ({ role: m.role, text: m.text }));
-      const res = await aiApi.chat(query, history, provider);
-
-      if (res.provider) setActiveProvider(res.provider);
+      const res = await aiApi.chat(query, history);
 
       setMessages((prev) => [
         ...prev,
@@ -209,7 +116,6 @@ export default function AiChatPage() {
     }
   }
 
-  /* ---------------------------- Regenerate chat ---------------------------- */
   async function handleRegenerate() {
     if (loading) return;
 
@@ -230,9 +136,7 @@ export default function AiChatPage() {
         role: m.role,
         text: m.text,
       }));
-      const res = await aiApi.chat(lastUserMessage.text, history, provider);
-
-      if (res.provider) setActiveProvider(res.provider);
+      const res = await aiApi.chat(lastUserMessage.text, history);
 
       setMessages((prev) => [
         ...prev,
@@ -253,58 +157,36 @@ export default function AiChatPage() {
     }
   }
 
-  const placeholder =
-    PLACEHOLDER_BY_ROLE[user?.role || ""] || "Tanya data pengajian...";
-
-  const currentProviderLabel =
-    PROVIDERS.find((p) => p.key === provider)?.label || provider;
-
   return (
     <AppLayout hideNav>
       <Header
-        title="Asisten Pengajian"
-        subtitle={`Model: ${currentProviderLabel}`}
+        title="Asisten Pribadi"
+        subtitle="Bantuan data jamaah Anda"
         onBack={() => history.back()}
         right={
-          <div className="flex items-center gap-1">
+          messages.length > 0 ? (
             <button
-              onClick={() => setProviderSheetOpen(true)}
-              aria-label="Ganti model AI"
-              className="flex items-center gap-1 h-9 px-2.5 rounded-xl text-ios-footnote font-medium text-accent transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
+              onClick={clearHistory}
+              className="text-ios-body font-medium text-accent px-2 h-9 rounded-xl transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
             >
-              <Zap size={14} strokeWidth={2.4} />
-              <span className="hidden xs:inline">Model</span>
-              <ChevronDown size={12} strokeWidth={2.5} />
+              Reset
             </button>
-
-            {messages.length > 0 && (
-              <button
-                onClick={clearHistory}
-                className="text-ios-body font-medium text-accent px-2 h-9 rounded-xl transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
-              >
-                Reset
-              </button>
-            )}
-          </div>
+          ) : undefined
         }
       />
 
       <div className="flex-1 flex flex-col min-h-0">
-        {/* Chat area */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {/* Loading saat history belum load */}
           {!hydrated && (
             <div className="flex items-center justify-center py-12">
               <Loader2 size={20} className="animate-spin text-surface-muted" />
             </div>
           )}
 
-          {/* Empty state */}
           {hydrated && messages.length === 0 && !loading && (
             <EmptyChat onSuggest={handleSend} />
           )}
 
-          {/* Messages */}
           {hydrated &&
             messages.map((msg, i) => {
               const isLastAssistant =
@@ -323,7 +205,6 @@ export default function AiChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input area */}
         <div className="sticky bottom-0 border-t border-surface-border backdrop-blur-xl bg-surface-bg/80">
           <div className="app-shell px-4 py-3 pb-safe">
             <div className="flex items-end gap-2">
@@ -336,7 +217,7 @@ export default function AiChatPage() {
                     handleSend();
                   }
                 }}
-                placeholder={placeholder}
+                placeholder="Tanya tentang data Anda..."
                 rows={1}
                 disabled={loading || !hydrated}
                 className="flex-1 min-h-[44px] max-h-[120px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all resize-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 disabled:opacity-50"
@@ -357,75 +238,9 @@ export default function AiChatPage() {
           </div>
         </div>
       </div>
-
-      {/* ------------------ Provider Picker Sheet ------------------ */}
-      <BottomSheet
-        open={providerSheetOpen}
-        onClose={() => setProviderSheetOpen(false)}
-        title="Pilih Model AI"
-      >
-        <div className="space-y-2">
-          {PROVIDERS.map((p) => {
-            const isActive = p.key === provider;
-            const isReallyActive = p.key === activeProvider;
-            return (
-              <button
-                key={p.key}
-                onClick={() => handleSelectProvider(p.key)}
-                className={`w-full text-left rounded-2xl border p-3.5 flex items-center gap-3 transition-all active:scale-[0.99] ${
-                  isActive
-                    ? "border-accent bg-accent-soft"
-                    : "border-surface-border bg-surface-card hover:bg-surface-card2"
-                }`}
-              >
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isActive
-                      ? "bg-accent text-white"
-                      : "bg-surface-card2 text-surface-muted"
-                  }`}
-                >
-                  <Sparkles size={18} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-ios-body font-medium text-surface-text truncate">
-                      {p.label}
-                    </p>
-                    {isReallyActive && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-accent-soft text-accent text-[9px] font-bold uppercase tracking-wide">
-                        Aktif
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-ios-footnote text-surface-muted truncate">
-                    {p.description}
-                  </p>
-                </div>
-                {isActive && (
-                  <div className="w-5 h-5 rounded-full bg-accent text-white flex items-center justify-center flex-shrink-0">
-                    <Check size={12} strokeWidth={3} />
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="mt-4 text-ios-caption text-surface-muted text-center leading-relaxed">
-          Model aktif akan dipakai untuk chat berikutnya. Jika model utama
-          gagal, sistem otomatis beralih ke model lain.
-        </p>
-      </BottomSheet>
-
-      <LoadingOverlay open={switchingProvider} label="Mengganti model..." />
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Empty Chat                                    */
-/* -------------------------------------------------------------------------- */
 
 function EmptyChat({ onSuggest }: { onSuggest: (text: string) => void }) {
   return (
@@ -437,8 +252,8 @@ function EmptyChat({ onSuggest }: { onSuggest: (text: string) => void }) {
         Assalamu'alaikum
       </h3>
       <p className="text-ios-footnote text-surface-muted max-w-xs leading-relaxed mb-6">
-        Saya siap membantu menjawab pertanyaan tentang jamaah, absensi,
-        kelompok, dan pengumuman.
+        Saya siap membantu menjawab pertanyaan tentang data pribadi Anda —
+        biodata, absensi, pembinaan, dan jadwal pengajian.
       </p>
       <div className="w-full max-w-sm space-y-2">
         {SUGGESTIONS.map((s) => (
@@ -454,10 +269,6 @@ function EmptyChat({ onSuggest }: { onSuggest: (text: string) => void }) {
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Chat Bubble                                   */
-/* -------------------------------------------------------------------------- */
 
 function ChatBubble({
   message,
@@ -476,18 +287,14 @@ function ChatBubble({
       await navigator.clipboard.writeText(message.text);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   async function handleShare() {
     if (navigator.share) {
       try {
         await navigator.share({ text: message.text });
-      } catch {
-        // user cancelled
-      }
+      } catch {}
     } else {
       handleCopy();
     }
@@ -564,10 +371,6 @@ function ActionButton({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Message Content Renderer                          */
-/* -------------------------------------------------------------------------- */
-
 function MessageContent({ text }: { text: string }) {
   const blocks = parseMarkdownBlocks(text);
   return (
@@ -578,10 +381,6 @@ function MessageContent({ text }: { text: string }) {
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Markdown Parser                               */
-/* -------------------------------------------------------------------------- */
 
 type MdBlock =
   | { type: "text"; content: string }
@@ -676,10 +475,6 @@ function splitTableRow(line: string): string[] {
     .map((c) => c.trim());
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Block Renderer                                */
-/* -------------------------------------------------------------------------- */
-
 function BlockRenderer({ block }: { block: MdBlock }) {
   switch (block.type) {
     case "heading": {
@@ -718,10 +513,6 @@ function BlockRenderer({ block }: { block: MdBlock }) {
       );
   }
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Inline Renderer                               */
-/* -------------------------------------------------------------------------- */
 
 function renderInline(text: string): React.ReactNode[] {
   const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
@@ -775,10 +566,6 @@ function renderInline(text: string): React.ReactNode[] {
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Code Block                                    */
-/* -------------------------------------------------------------------------- */
-
 function CodeBlock({
   language,
   content,
@@ -793,9 +580,7 @@ function CodeBlock({
       await navigator.clipboard.writeText(content);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   return (
@@ -819,10 +604,6 @@ function CodeBlock({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Markdown Table                                */
-/* -------------------------------------------------------------------------- */
 
 function MarkdownTable({
   headers,
@@ -869,10 +650,6 @@ function MarkdownTable({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                          Typing Indicator                                  */
-/* -------------------------------------------------------------------------- */
 
 function TypingIndicator() {
   return (

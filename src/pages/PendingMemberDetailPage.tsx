@@ -1,0 +1,497 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  UserPlus,
+  X,
+  AlertTriangle,
+  Calendar as CalendarIcon,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Lock,
+  Check,
+} from "../components/common/FontAwesomeIcons";
+import { AppLayout, Header } from "../components/layout/AppLayout";
+import {
+  Badge,
+  Button,
+  Card,
+  Input,
+  Select,
+  Textarea,
+  BottomSheet,
+  LoadingOverlay,
+  ErrorState,
+  LoadingState,
+  Avatar,
+} from "../components/common";
+import { pendingApi } from "../services/pendingApi";
+import { groupApi } from "../services/domainApi";
+import type { Group, PendingMember } from "../types";
+import { formatDateShort, normalizeGender } from "../utils/format";
+import { useToast } from "../contexts/ToastContext";
+import { ApiError } from "../services/api";
+
+const STATUS_BADGE = {
+  PENDING: { label: "Menunggu Verifikasi", color: "amber" as const },
+  APPROVED: { label: "Disetujui", color: "emerald" as const },
+  REJECTED: { label: "Ditolak", color: "red" as const },
+};
+
+export default function PendingMemberDetailPage() {
+  const { submission_id } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const [data, setData] = useState<PendingMember | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [approveOpen, setApproveOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  async function load() {
+    if (!submission_id) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await pendingApi.detail(submission_id);
+      setData(res);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Gagal memuat data");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+  }, [submission_id]);
+
+  if (loading) {
+    return (
+      <AppLayout hideNav>
+        <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
+        <LoadingState />
+      </AppLayout>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppLayout hideNav>
+        <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
+        <ErrorState message={error || "Data tidak ditemukan"} onRetry={load} />
+      </AppLayout>
+    );
+  }
+
+  const badge = STATUS_BADGE[data.status];
+  const canProcess = data.status === "PENDING";
+
+  return (
+    <AppLayout hideNav>
+      <Header
+        title="Detail Pendaftar"
+        onBack={() => navigate(-1)}
+        backLabel="Pendaftar"
+      />
+
+      <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+        <Avatar
+          src={data.foto_url}
+          name={data.nama_lengkap}
+          size={64}
+          gender={normalizeGender(data.jenis_kelamin)}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
+            {data.nama_lengkap}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <Badge color={badge.color}>{badge.label}</Badge>
+          </div>
+          <p className="text-ios-caption text-surface-muted mt-1">
+            Dikirim {formatDateShort(data.submitted_at)}
+          </p>
+        </div>
+      </div>
+
+      <div className="px-4 py-4 space-y-4 pb-32">
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Data Diri
+          </p>
+          <div className="space-y-2.5">
+            <Field label="Nama Panggilan" value={data.nama_panggilan} />
+            <Field
+              label="Jenis Kelamin"
+              value={data.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"}
+            />
+            <Field label="Tempat Lahir" value={data.tempat_lahir} />
+            <Field
+              label="Tanggal Lahir"
+              value={
+                data.tanggal_lahir ? formatDateShort(data.tanggal_lahir) : "-"
+              }
+            />
+            <Field
+              label="Status Pernikahan"
+              value={data.is_nikah ? "Sudah menikah" : "Belum menikah"}
+            />
+          </div>
+        </Card>
+
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Kontak & Alamat
+          </p>
+          <div className="space-y-2.5">
+            <Field
+              label="No. WhatsApp"
+              value={data.no_wa ? `+${data.no_wa}` : "-"}
+            />
+            <Field label="Alamat" value={data.alamat_rumah} />
+            <Field label="Desa" value={data.desa} />
+            <Field label="Daerah" value={data.daerah} />
+          </div>
+        </Card>
+
+        {(data.pekerjaan || data.hobi) && (
+          <Card>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+              Pekerjaan & Hobi
+            </p>
+            <div className="space-y-2.5">
+              <Field label="Pekerjaan" value={data.pekerjaan} />
+              <Field label="Hobi" value={data.hobi} />
+            </div>
+          </Card>
+        )}
+
+        {(data.jenjang_pendidikan || data.sekolah || data.jurusan) && (
+          <Card>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+              Pendidikan
+            </p>
+            <div className="space-y-2.5">
+              <Field label="Jenjang" value={data.jenjang_pendidikan} />
+              <Field label="Sekolah" value={data.sekolah} />
+              <Field label="Jurusan" value={data.jurusan} />
+              <Field label="Tahun Mulai" value={data.tahun_mulai_pendidikan} />
+              <Field
+                label="Tahun Selesai"
+                value={data.tahun_selesai_pendidikan}
+              />
+            </div>
+          </Card>
+        )}
+
+        {data.status === "REJECTED" && data.rejection_reason && (
+          <Card>
+            <div className="flex items-start gap-2">
+              <AlertTriangle
+                size={16}
+                className="text-danger flex-shrink-0 mt-0.5"
+              />
+              <div>
+                <p className="text-ios-footnote font-medium text-danger mb-1">
+                  Alasan Ditolak
+                </p>
+                <p className="text-ios-footnote text-surface-text leading-relaxed">
+                  {data.rejection_reason}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {canProcess && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
+          <div className="app-shell px-4 pt-3 pb-4 bg-surface-bg/80 backdrop-blur-xl border-t border-surface-border">
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                fullWidth
+                onClick={() => setRejectOpen(true)}
+                leftIcon={<X size={16} />}
+              >
+                Tolak
+              </Button>
+              <Button
+                fullWidth
+                onClick={() => setApproveOpen(true)}
+                leftIcon={<UserPlus size={16} />}
+              >
+                Setujui
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ApproveSheet
+        open={approveOpen}
+        data={data}
+        onClose={() => setApproveOpen(false)}
+        onSuccess={() => {
+          setApproveOpen(false);
+          showToast("Pendaftar disetujui");
+          navigate("/lainnya/pendaftar", { replace: true });
+        }}
+      />
+
+      <RejectSheet
+        open={rejectOpen}
+        submissionId={data.submission_id}
+        onClose={() => setRejectOpen(false)}
+        onSuccess={() => {
+          setRejectOpen(false);
+          showToast("Pendaftar ditolak");
+          load();
+        }}
+      />
+    </AppLayout>
+  );
+}
+
+function Field({ label, value }: { label: string; value?: string }) {
+  if (!value || value === "") {
+    return (
+      <div className="flex justify-between gap-3 py-1.5 border-b border-surface-border last:border-b-0">
+        <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+          {label}
+        </span>
+        <span className="text-ios-footnote text-surface-muted italic">
+          Belum diisi
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex justify-between gap-3 py-1.5 border-b border-surface-border last:border-b-0">
+      <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+        {label}
+      </span>
+      <span className="text-ios-body text-surface-text text-right">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function ApproveSheet({
+  open,
+  data,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  data: PendingMember;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const { showToast } = useToast();
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [kelompok, setKelompok] = useState("");
+  const [createUser, setCreateUser] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    groupApi
+      .list()
+      .then(setGroups)
+      .catch(() => {});
+    setKelompok("");
+    setCreateUser(false);
+    setUsername(data.no_wa || "");
+    setPassword("");
+  }, [open, data]);
+
+  async function handleApprove() {
+    setSaving(true);
+    try {
+      await pendingApi.approve({
+        submission_id: data.submission_id,
+        kelompok: kelompok,
+        create_user: createUser,
+        username: createUser ? username : undefined,
+        password: createUser ? password : undefined,
+      });
+      onSuccess();
+    } catch (err) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyetujui",
+        "error",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const canSubmit =
+    !createUser || (username.length >= 3 && password.length >= 6);
+
+  return (
+    <>
+      <BottomSheet open={open} onClose={onClose} title="Setujui Pendaftar">
+        <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
+          <p className="text-ios-footnote text-accent/80 leading-relaxed">
+            <strong>{data.nama_lengkap}</strong> akan ditambahkan sebagai jamaah
+            aktif.
+          </p>
+        </div>
+
+        <Select
+          label="Kelompok (opsional)"
+          value={kelompok}
+          onChange={(e) => setKelompok(e.target.value)}
+          hint="Bisa diubah nanti oleh admin"
+        >
+          <option value="">Pilih kelompok</option>
+          {groups.map((g) => (
+            <option key={g.group_id} value={g.group_id}>
+              {g.group_name}
+            </option>
+          ))}
+        </Select>
+
+        <button
+          type="button"
+          onClick={() => setCreateUser(!createUser)}
+          className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 active:scale-[0.99] text-left mb-4 ${
+            createUser
+              ? "bg-accent-soft border-accent/40"
+              : "bg-surface-card border-surface-border hover:bg-surface-card2"
+          }`}
+        >
+          <div
+            className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+              createUser
+                ? "bg-accent text-white"
+                : "bg-surface-card2 border border-surface-border"
+            }`}
+          >
+            {createUser && <Check size={14} strokeWidth={3} />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-ios-body font-medium text-surface-text">
+              Buat akun login
+            </p>
+            <p className="text-ios-caption text-surface-muted">
+              Jamaah bisa login untuk lihat data sendiri
+            </p>
+          </div>
+        </button>
+
+        {createUser && (
+          <>
+            <Input
+              label="Username"
+              placeholder="Minimal 3 karakter"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Minimal 6 karakter"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              hint="Catat password ini dan berikan ke jamaah"
+            />
+          </>
+        )}
+
+        <Button
+          fullWidth
+          onClick={handleApprove}
+          disabled={saving || !canSubmit}
+          leftIcon={!saving ? <UserPlus size={16} /> : undefined}
+        >
+          {saving ? "Memproses..." : "Setujui & Tambah Jamaah"}
+        </Button>
+      </BottomSheet>
+
+      <LoadingOverlay open={saving} label="Memproses..." />
+    </>
+  );
+}
+
+function RejectSheet({
+  open,
+  submissionId,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  submissionId: string;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const { showToast } = useToast();
+  const [reason, setReason] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setReason("");
+  }, [open]);
+
+  async function handleReject() {
+    setSaving(true);
+    try {
+      await pendingApi.reject({
+        submission_id: submissionId,
+        reason: reason || "Tidak memenuhi syarat",
+      });
+      onSuccess();
+    } catch (err) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menolak",
+        "error",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <BottomSheet open={open} onClose={onClose} title="Tolak Pendaftar">
+        <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/20">
+          <p className="text-ios-footnote text-danger leading-relaxed">
+            Pendaftar akan ditolak dan tidak akan ditambahkan sebagai jamaah.
+          </p>
+        </div>
+
+        <Textarea
+          label="Alasan Penolakan"
+          placeholder="Contoh: Data tidak lengkap, tidak memenuhi syarat, dll"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+
+        <Button
+          variant="danger"
+          fullWidth
+          onClick={handleReject}
+          disabled={saving}
+          leftIcon={!saving ? <X size={16} /> : undefined}
+        >
+          {saving ? "Memproses..." : "Tolak Pendaftar"}
+        </Button>
+      </BottomSheet>
+
+      <LoadingOverlay open={saving} label="Memproses..." />
+    </>
+  );
+}

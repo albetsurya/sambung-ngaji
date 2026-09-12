@@ -34,7 +34,7 @@ function FieldWrap({ label, children, hint }: FieldWrapProps) {
  * Fokus ditandai dengan border accent + ring lembut — jelas tapi tidak berat.
  */
 const baseInputClasses =
-  "w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-card px-4 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all duration-200 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 hover:border-surface-border/80";
+  "w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-card px-4 text-[16px] text-surface-text placeholder:text-surface-muted/50 shadow-sm transition-all duration-200 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 hover:border-surface-border/80";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;

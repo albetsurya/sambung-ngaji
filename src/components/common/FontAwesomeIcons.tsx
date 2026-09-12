@@ -51,6 +51,7 @@ import {
   faArrowUpRightFromSquare,
   faLock,
   faLockOpen,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -134,3 +135,4 @@ export const CheckCircle2 = createIcon(faCircleCheck);
 export const ArrowUpRight = createIcon(faArrowUpRightFromSquare);
 export const Lock = createIcon(faLock);
 export const LockOpen = createIcon(faLockOpen);
+export const Trash2 = createIcon(faTrash);

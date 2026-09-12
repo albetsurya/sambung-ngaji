@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Plus, Sun, Moon, Sparkles } from "../common/FontAwesomeIcons";
+import {
+  ChevronLeft,
+  Plus,
+  Sun,
+  Moon,
+  Sparkles,
+} from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -17,16 +23,6 @@ interface HeaderProps {
   showThemeToggle?: boolean;
 }
 
-/**
- * Header modern dengan grid 3 kolom (kiri | judul | kanan).
- *
- * ⚠️ PENTING: Header TIDAK pakai `app-shell`.
- * Parent (AppLayout) sudah pakai `app-shell`, jadi header otomatis
- * mengikuti lebar 480px dan border-nya sejajar dengan konten.
- *
- * Kalau Header dipakai di luar AppLayout (mis. halaman login),
- * bungkus manual dengan `<div className="app-shell">...</div>`.
- */
 export function Header({
   title,
   subtitle,
@@ -40,9 +36,7 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
-      {/* ✅ TANPA app-shell — parent (AppLayout) yang mengatur */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
-        {/* --------------------------- Kolom kiri --------------------------- */}
         <div className="flex items-center justify-start min-w-0">
           {onBack && (
             <button
@@ -61,7 +55,6 @@ export function Header({
           )}
         </div>
 
-        {/* ----------------------------- Judul ----------------------------- */}
         <div className="flex flex-col items-center justify-center min-w-0 max-w-[60vw]">
           <h1 className="w-full text-center text-ios-nav font-semibold text-surface-text truncate tracking-[-0.01em]">
             {title}
@@ -73,7 +66,6 @@ export function Header({
           )}
         </div>
 
-        {/* --------------------------- Kolom kanan -------------------------- */}
         <div className="flex items-center justify-end gap-1.5 min-w-0">
           {showThemeToggle && (
             <button
@@ -108,18 +100,25 @@ export function AppLayout({
 }) {
   const navigate = useNavigate();
 
+  const showAiChatFab = showAiChat && !hideNav;
+  const showFloating = showAiChatFab || !!fab || !hideNav;
+
+  // ⬇️ hideNav → tambah padding bottom setara tinggi BottomNav + gap
+  //    supaya FAB naik seperti ada nav, meskipun nav tidak render
+  const containerPadding = hideNav ? "pb-[68px]" : "pb-2";
+
   return (
-    // ✅ app-shell di sini — semua child (Header + konten) sejajar 480px
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
       <div className={`flex flex-col flex-1 ${hideNav ? "" : "pb-32"}`}>
         {children}
       </div>
 
-      {!hideNav && (
+      {showFloating && (
         <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe pointer-events-none">
-          {/* ✅ app-shell di FAB container — karena `fixed`, keluar dari flow parent */}
-          <div className="app-shell px-3 pb-2 flex flex-col items-end gap-2.5 pointer-events-auto">
-            {showAiChat && (
+          <div
+            className={`app-shell px-3 ${containerPadding} flex flex-col items-end gap-2.5 pointer-events-auto`}
+          >
+            {showAiChatFab && (
               <FloatingActionButton
                 onClick={() => navigate("/ai-chat")}
                 label="Tanya AI"
@@ -130,7 +129,7 @@ export function AppLayout({
 
             {fab}
 
-            <BottomNav />
+            {!hideNav && <BottomNav />}
           </div>
         </div>
       )}

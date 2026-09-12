@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { UserPlus, User as UserIcon, KeyRound } from "../components/common/FontAwesomeIcons";
+import {
+  UserPlus,
+  User as UserIcon,
+} from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -18,20 +21,18 @@ import {
   EmptyState,
 } from "../components/common";
 import { userApi } from "../services/domainApi";
-import type { Role, User } from "../types";
+import { memberApi } from "../services/memberApi";
+import type { Member, Role, User } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
-
-/* -------------------------------------------------------------------------- */
-/*                              Constants                                     */
-/* -------------------------------------------------------------------------- */
 
 const ROLE_LABEL: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
   ADMIN: "Admin",
   TIM_PNKB: "Tim PNKB",
   TIM_ABSENSI: "Tim Absensi",
+  MEMBER: "Member",
 };
 
 const ROLE_DESCRIPTION: Record<Role, string> = {
@@ -39,11 +40,8 @@ const ROLE_DESCRIPTION: Record<Role, string> = {
   ADMIN: "Kelola jamaah, kelompok, dan absensi",
   TIM_PNKB: "Khusus pembinaan pra nikah",
   TIM_ABSENSI: "Khusus absensi pengajian",
+  MEMBER: "Hanya bisa lihat data sendiri",
 };
-
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -68,7 +66,6 @@ export default function UsersPage() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -147,10 +144,6 @@ export default function UsersPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Create User Sheet                                 */
-/* -------------------------------------------------------------------------- */
-
 function CreateUserSheet({
   open,
   onClose,
@@ -164,28 +157,53 @@ function CreateUserSheet({
   const [nama, setNama] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("TIM_ABSENSI");
+  const [memberId, setMemberId] = useState("");
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
 
-  // Reset form saat sheet dibuka
   useEffect(() => {
     if (!open) return;
     setUsername("");
     setNama("");
     setPassword("");
     setRole("TIM_ABSENSI");
+    setMemberId("");
+    setMembers([]);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (role !== "MEMBER") return;
+
+    setLoadingMembers(true);
+    memberApi
+      .list({})
+      .then(setMembers)
+      .catch(() => {
+        showToast("Gagal memuat daftar jamaah", "error");
+      })
+      .finally(() => setLoadingMembers(false));
+  }, [open, role]);
 
   const canSubmit =
     username.trim().length >= 3 &&
     nama.trim().length >= 2 &&
-    password.length >= 6;
+    password.length >= 6 &&
+    (role !== "MEMBER" || memberId !== "");
 
   async function handleCreate() {
     if (!canSubmit) return;
     setSaving(true);
     try {
-      await userApi.create({ username, nama, password, role });
+      await userApi.create({
+        username,
+        nama,
+        password,
+        role,
+        member_id: role === "MEMBER" ? memberId : "",
+      });
       showToast("User berhasil dibuat");
       onCreated();
       onClose();
@@ -202,7 +220,6 @@ function CreateUserSheet({
   return (
     <>
       <BottomSheet open={open} onClose={onClose} title="User Baru">
-        {/* Info role */}
         <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
           <p className="text-ios-footnote text-accent/80 leading-relaxed">
             User akan dapat login ke aplikasi dengan username dan password yang
@@ -247,10 +264,33 @@ function CreateUserSheet({
           ))}
         </Select>
 
-        {/* Info role terpilih */}
         <p className="-mt-2 mb-4 text-ios-caption text-surface-muted px-0.5">
           {ROLE_DESCRIPTION[role]}
         </p>
+
+        {role === "MEMBER" && (
+          <Select
+            label="Jamaah"
+            value={memberId}
+            onChange={(e) => setMemberId(e.target.value)}
+            hint={
+              loadingMembers
+                ? "Memuat daftar jamaah..."
+                : "Pilih jamaah yang terhubung dengan akun ini"
+            }
+            disabled={loadingMembers}
+          >
+            <option value="">
+              {loadingMembers ? "Memuat..." : "Pilih jamaah"}
+            </option>
+            {members.map((m) => (
+              <option key={m.member_id} value={m.member_id}>
+                {m.nama_lengkap}
+                {m.kelompok ? ` — ${m.kelompok}` : ""}
+              </option>
+            ))}
+          </Select>
+        )}
 
         <Button
           fullWidth
@@ -262,7 +302,6 @@ function CreateUserSheet({
         </Button>
       </BottomSheet>
 
-      {/* Loading overlay — blocking saat submit */}
       <LoadingOverlay open={saving} label="Membuat user..." />
     </>
   );

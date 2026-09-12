@@ -152,7 +152,7 @@ export default function MembersListPage() {
       <div className="flex flex-col flex-1">
         {loading && (
           <div className="px-4 py-2">
-            <JamaahListSkeleton rows={5} />
+            <JamaahListSkeleton rows={8} />
           </div>
         )}
 

@@ -280,43 +280,77 @@ export function AnnouncementListSkeleton({ rows = 5 }: { rows?: number }) {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Skeleton untuk MemberDetailPage — mirror:
- * - Profile header (avatar 64px + nama + badge)
- * - Tab bar
- * - 6 baris field (label + value)
+ * Skeleton untuk MemberSelfPage — mirror layout asli:
+ * - Profile header (avatar 64px + nama + badge + kelompok)
+ * - Tab bar (3 tab: Profil, Absensi, Pembinaan)
+ * - Card "Biodata" dengan 8 baris field
+ * - Section "Jadwal Pengajian Mendatang" dengan 2 card jadwal
  */
-export function MemberDetailSkeleton() {
+export function MemberSelfSkeleton() {
   return (
     <>
       {/* Profile header */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Skeleton variant="circle" width={64} height={64} />
         <div className="flex-1 min-w-0 space-y-2">
-          <Skeleton width="50%" height={20} />
-          <Skeleton width="30%" height={16} />
+          <Skeleton width="60%" height={20} />
+          <div className="flex items-center gap-2">
+            <Skeleton width={64} height={22} className="rounded-full" />
+            <Skeleton width={80} height={16} />
+          </div>
         </div>
       </div>
 
       {/* Tab bar */}
-      <div className="sticky z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2">
+      <div className="px-3 pb-2">
         <div className="flex gap-1 overflow-hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} width={96} height={36} />
+          {[80, 92, 106].map((w, i) => (
+            <Skeleton key={i} width={w} height={36} className="rounded-xl" />
           ))}
         </div>
       </div>
 
-      {/* Content — 6 field rows */}
-      <div className="px-4 py-4 space-y-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-2xl border border-surface-border bg-surface-card shadow-sm p-4 flex items-center justify-between"
-          >
-            <Skeleton width="30%" height={16} />
-            <Skeleton width="50%" height={16} />
+      {/* Content — mirror tab "Profil" */}
+      <div className="px-4 py-4 space-y-4">
+        {/* Card Biodata */}
+        <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4">
+          <div className="mb-3 px-0.5">
+            <Skeleton width={60} height={14} />
           </div>
-        ))}
+          <div className="space-y-2.5">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex justify-between gap-3 py-2 border-b border-surface-border last:border-b-0"
+              >
+                <Skeleton width="30%" height={16} />
+                <Skeleton width="50%" height={16} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Section Jadwal Pengajian Mendatang */}
+        <div className="space-y-2">
+          <div className="px-0.5">
+            <Skeleton width={200} height={14} />
+          </div>
+
+          {/* Card jadwal */}
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4 flex items-center gap-3"
+            >
+              <Skeleton variant="rect" width={48} height={48} />
+              <div className="flex-1 min-w-0 space-y-2">
+                <Skeleton width={64} height={14} className="rounded-full" />
+                <Skeleton width="60%" height={16} />
+                <Skeleton width="40%" height={12} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
