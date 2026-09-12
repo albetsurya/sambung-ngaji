@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   UserPlus,
   User as UserIcon,
@@ -28,6 +29,7 @@ import type { Member, Role, User } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
+import { queryKeys } from "../lib/queryClient";
 
 const ROLE_LABEL: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
@@ -46,33 +48,23 @@ const ROLE_DESCRIPTION: Record<Role, string> = {
 };
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [resetTarget, setResetTarget] = useState<{
     userId: string;
     userName: string;
   } | null>(null);
-  const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      setUsers(await userApi.list());
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat daftar user",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
+  const {
+    data: users = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.users(),
+    queryFn: () => userApi.list(),
+    staleTime: 2 * 60_000,
+  });
 
   return (
     <AppLayout
@@ -93,11 +85,18 @@ export default function UsersPage() {
       />
 
       <div className="py-3">
-        {loading && <UsersSkeleton rows={4} />}
+        {isLoading && <UsersSkeleton rows={4} />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError ? error.message : "Gagal memuat user"
+            }
+            onRetry={refetch}
+          />
+        )}
 
-        {!loading && !error && users.length === 0 && (
+        {!isLoading && !error && users.length === 0 && (
           <EmptyState
             title="Belum ada user"
             description="Tambahkan user untuk memberikan akses ke aplikasi."
@@ -112,7 +111,7 @@ export default function UsersPage() {
           />
         )}
 
-        {!loading && !error && users.length > 0 && (
+        {!isLoading && !error && users.length > 0 && (
           <GroupedList>
             {users.map((u, i) => (
               <ListRow
@@ -160,7 +159,9 @@ export default function UsersPage() {
       <CreateUserSheet
         open={open}
         onClose={() => setOpen(false)}
-        onCreated={load}
+        onCreated={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+        }}
       />
 
       <ResetPasswordSheet
@@ -187,10 +188,14 @@ function CreateUserSheet({
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("TIM_ABSENSI");
   const [memberId, setMemberId] = useState("");
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
-  const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
+
+  const { data: members = [], isLoading: loadingMembers } = useQuery({
+    queryKey: queryKeys.members(),
+    queryFn: () => memberApi.list({}),
+    enabled: open && role === "MEMBER",
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -199,52 +204,35 @@ function CreateUserSheet({
     setPassword("");
     setRole("TIM_ABSENSI");
     setMemberId("");
-    setMembers([]);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    if (role !== "MEMBER") return;
-
-    setLoadingMembers(true);
-    memberApi
-      .list({})
-      .then(setMembers)
-      .catch(() => {
-        showToast("Gagal memuat daftar jamaah", "error");
-      })
-      .finally(() => setLoadingMembers(false));
-  }, [open, role]);
+  const mutation = useMutation({
+    mutationFn: () =>
+      userApi.create({
+        username,
+        nama,
+        password,
+        role,
+        member_id: role === "MEMBER" ? memberId : "",
+      }),
+    onSuccess: () => {
+      showToast("User berhasil dibuat");
+      onCreated();
+      onClose();
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal membuat user",
+        "error",
+      );
+    },
+  });
 
   const canSubmit =
     username.trim().length >= 3 &&
     nama.trim().length >= 2 &&
     password.length >= 6 &&
     (role !== "MEMBER" || memberId !== "");
-
-  async function handleCreate() {
-    if (!canSubmit) return;
-    setSaving(true);
-    try {
-      await userApi.create({
-        username,
-        nama,
-        password,
-        role,
-        member_id: role === "MEMBER" ? memberId : "",
-      });
-      showToast("User berhasil dibuat");
-      onCreated();
-      onClose();
-    } catch (err) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal membuat user",
-        "error",
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
 
   return (
     <>
@@ -323,15 +311,15 @@ function CreateUserSheet({
 
         <Button
           fullWidth
-          onClick={handleCreate}
-          disabled={saving || !canSubmit}
-          leftIcon={!saving ? <UserPlus size={16} /> : undefined}
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || !canSubmit}
+          leftIcon={!mutation.isPending ? <UserPlus size={16} /> : undefined}
         >
-          {saving ? "Menyimpan..." : "Buat User"}
+          {mutation.isPending ? "Menyimpan..." : "Buat User"}
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={saving} label="Membuat user..." />
+      <LoadingOverlay open={mutation.isPending} label="Membuat user..." />
     </>
   );
 }

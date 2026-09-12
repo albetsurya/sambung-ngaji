@@ -26,8 +26,19 @@ import {
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
-import type { Meeting, Member, AttendanceStatus, Group } from "../types";
-import { formatDateLong, getHariFromDate } from "../utils/format";
+import type {
+  Meeting,
+  Member,
+  AttendanceStatus,
+  Group,
+  MemberCategory,
+} from "../types";
+import {
+  formatDateLong,
+  formatDateShort,
+  getHariFromDate,
+  getTodayIso,
+} from "../utils/format";
 import { ATTENDANCE_STATUSES, MEMBER_CATEGORIES } from "../constants";
 import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
@@ -37,6 +48,9 @@ import {
   AttendanceListSkeleton,
   AttendancePageSkeleton,
 } from "../components/common/Skeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../lib/queryClient";
+import { DateInput } from "../components/common/DateInput";
 
 const STATUS_CONFIG: Record<
   AttendanceStatus,
@@ -80,16 +94,12 @@ const STATUS_CONFIG: Record<
 export default function AttendancePage() {
   const { isAdminLike, role } = usePermission();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
-  const [records, setRecords] = useState<Record<string, AttendanceStatus>>({});
-
-  const [loadingMeetings, setLoadingMeetings] = useState(true);
-  const [loadingAttendance, setLoadingAttendance] = useState(false);
-  const [isSwitchingMeeting, setIsSwitchingMeeting] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [pinnedMeetingId, setPinnedMeetingId] = useState<string | null>(null);
+  const [optimistic, setOptimistic] = useState<
+    Record<string, AttendanceStatus | undefined>
+  >({});
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -101,72 +111,77 @@ export default function AttendancePage() {
     memberName: string;
   } | null>(null);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
-  const [resettingAll, setResettingAll] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoadingMeetings(true);
-      try {
-        const today = new Date().toISOString().slice(0, 10);
-        const from = new Date(Date.now() - 14 * 86400000)
-          .toISOString()
-          .slice(0, 10);
-        const list = await meetingApi.list({ from });
-        setMeetings(list);
-        const todays = list.find((m) => m.tanggal === today) || list[0] || null;
-        setSelectedMeeting(todays);
-      } catch (err) {
-        showToast(
-          err instanceof ApiError
-            ? err.message
-            : "Gagal memuat jadwal pengajian",
-          "error",
-        );
-      } finally {
-        setLoadingMeetings(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    data: meetings = [],
+    isLoading: loadingMeetings,
+    error: meetingsError,
+  } = useQuery({
+    queryKey: queryKeys.meetings({ range: "recent" }),
+    queryFn: () => {
+      const from = new Date(Date.now() - 14 * 86400000)
+        .toISOString()
+        .slice(0, 10);
+      return meetingApi.list({ from });
+    },
+    staleTime: 2 * 60_000,
+  });
 
-  useEffect(() => {
-    if (!selectedMeeting) {
-      setMembers([]);
-      setRecords({});
-      return;
+  const selectedMeeting = useMemo(() => {
+    if (meetings.length === 0) return null;
+    if (pinnedMeetingId) {
+      return meetings.find((m) => m.meeting_id === pinnedMeetingId) || null;
     }
+    const today = new Date().toISOString().slice(0, 10);
+    return meetings.find((m) => m.tanggal === today) || meetings[0] || null;
+  }, [meetings, pinnedMeetingId]);
 
-    setMembers([]);
-    setRecords({});
-    setLoadingAttendance(true);
+  useEffect(() => {
+    setOptimistic({});
+  }, [selectedMeeting?.meeting_id]);
 
-    (async () => {
-      try {
-        const [mList, att] = await Promise.all([
-          memberApi.listForAttendance({}),
-          attendanceApi.byMeeting(selectedMeeting.meeting_id),
-        ]);
-        setMembers(mList);
-        const map: Record<string, AttendanceStatus> = {};
-        att.forEach((a) => {
-          map[a.member_id] = a.status;
-        });
-        setRecords(map);
-      } catch (err) {
-        showToast(
-          err instanceof ApiError ? err.message : "Gagal memuat data absensi",
-          "error",
-        );
-      } finally {
-        setLoadingAttendance(false);
-        setIsSwitchingMeeting(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMeeting]);
+  const memberQuery = useQuery({
+    queryKey: ["attendance-members"],
+    queryFn: () => memberApi.listForAttendance({}),
+    enabled: !!selectedMeeting,
+    staleTime: 5 * 60_000,
+  });
+
+  const members = memberQuery.data ?? [];
+  const loadingMembers = memberQuery.isLoading;
+  const membersError = memberQuery.error;
+
+  const eligibleMembers = useMemo(() => {
+    const targets = normalizeTargets(selectedMeeting?.kategori_target);
+    if (targets.length === 0) return members;
+    return members.filter((m) => m.kategori && targets.includes(m.kategori));
+  }, [members, selectedMeeting?.kategori_target]);
+
+  const attendanceQuery = useQuery({
+    queryKey: queryKeys.attendance(selectedMeeting?.meeting_id || ""),
+    queryFn: () => attendanceApi.byMeeting(selectedMeeting!.meeting_id),
+    enabled: !!selectedMeeting,
+    staleTime: 30_000,
+  });
+
+  const attendanceRows = attendanceQuery.data ?? [];
+  const loadingAttendance = attendanceQuery.isLoading;
+  const attendanceError = attendanceQuery.error;
+
+  const records = useMemo(() => {
+    const base: Record<string, AttendanceStatus> = {};
+    attendanceRows.forEach((a) => {
+      base[a.member_id] = a.status;
+    });
+    Object.entries(optimistic).forEach(([memberId, status]) => {
+      if (status === undefined) delete base[memberId];
+      else base[memberId] = status;
+    });
+    return base;
+  }, [attendanceRows, optimistic]);
 
   const filteredMembers = useMemo(() => {
-    return members.filter((m) => {
+    return eligibleMembers.filter((m) => {
       if (category && m.kategori !== category) return false;
       if (
         search &&
@@ -175,7 +190,7 @@ export default function AttendancePage() {
         return false;
       return true;
     });
-  }, [members, category, search]);
+  }, [eligibleMembers, category, search]);
 
   const hadirCount = useMemo(
     () => Object.values(records).filter((s) => s === "HADIR").length,
@@ -188,42 +203,73 @@ export default function AttendancePage() {
     ? (hadirCount / filteredMembers.length) * 100
     : 0;
 
+  const saveMutation = useMutation({
+    mutationFn: attendanceApi.save,
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyimpan absensi",
+        "error",
+      );
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: attendanceApi.remove,
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus absensi",
+        "error",
+      );
+    },
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: (meetingId: string) => attendanceApi.removeByMeeting(meetingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance(selectedMeeting?.meeting_id || ""),
+      });
+      showToast("Semua absensi dihapus");
+      setConfirmResetAll(false);
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus semua absensi",
+        "error",
+      );
+      setConfirmResetAll(false);
+    },
+  });
+
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
     const prev = records[memberId];
     const nextStatus = prev === status ? undefined : status;
 
-    setRecords((r) => {
-      const next = { ...r };
-      if (nextStatus) next[memberId] = nextStatus;
-      else delete next[memberId];
-      return next;
-    });
+    setOptimistic((o) => ({ ...o, [memberId]: nextStatus }));
 
     try {
       if (nextStatus) {
-        await attendanceApi.save({
+        await saveMutation.mutateAsync({
           meeting_id: selectedMeeting.meeting_id,
           member_id: memberId,
           status: nextStatus,
         });
       } else {
-        await attendanceApi.remove({
+        await removeMutation.mutateAsync({
           meeting_id: selectedMeeting.meeting_id,
           member_id: memberId,
         });
       }
-    } catch (err) {
-      setRecords((r) => {
-        const next = { ...r };
-        if (prev) next[memberId] = prev;
-        else delete next[memberId];
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+      });
+    } catch {
+      setOptimistic((o) => {
+        const next = { ...o };
+        delete next[memberId];
         return next;
       });
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal menyimpan absensi",
-        "error",
-      );
     }
   }
 
@@ -232,24 +278,23 @@ export default function AttendancePage() {
     const prev = records[memberId];
     if (!prev) return;
 
-    setRecords((r) => {
-      const next = { ...r };
-      delete next[memberId];
-      return next;
-    });
+    setOptimistic((o) => ({ ...o, [memberId]: undefined }));
 
     try {
-      await attendanceApi.remove({
+      await removeMutation.mutateAsync({
         meeting_id: selectedMeeting.meeting_id,
         member_id: memberId,
       });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+      });
       showToast("Absensi dihapus");
-    } catch (err) {
-      setRecords((r) => ({ ...r, [memberId]: prev }));
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal menghapus absensi",
-        "error",
-      );
+    } catch {
+      setOptimistic((o) => {
+        const next = { ...o };
+        delete next[memberId];
+        return next;
+      });
     }
   }
 
@@ -260,16 +305,12 @@ export default function AttendancePage() {
     );
     if (!targets.length) return;
 
-    const prevRecords = { ...records };
-    setRecords((r) => {
-      const next = { ...r };
-      targets.forEach((m) => {
-        next[m.member_id] = "HADIR";
-      });
-      return next;
+    const optimisticPatch: Record<string, AttendanceStatus | undefined> = {};
+    targets.forEach((m) => {
+      optimisticPatch[m.member_id] = "HADIR";
     });
+    setOptimistic((o) => ({ ...o, ...optimisticPatch }));
 
-    setSaving(true);
     try {
       await Promise.all(
         targets.map((m) =>
@@ -280,43 +321,39 @@ export default function AttendancePage() {
           }),
         ),
       );
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+      });
       showToast(`${targets.length} jamaah ditandai hadir`);
     } catch (err) {
-      setRecords(prevRecords);
+      setOptimistic((o) => {
+        const next = { ...o };
+        targets.forEach((m) => delete next[m.member_id]);
+        return next;
+      });
       showToast(
         err instanceof ApiError ? err.message : "Gagal menandai semua hadir",
         "error",
       );
-    } finally {
-      setSaving(false);
     }
   }
 
-  async function resetAllAttendance() {
+  function resetAllAttendance() {
     if (!selectedMeeting) return;
-
-    const prevRecords = { ...records };
-    setRecords({});
-    setResettingAll(true);
-
-    try {
-      await attendanceApi.removeByMeeting(selectedMeeting.meeting_id);
-      showToast("Semua absensi dihapus");
-    } catch (err) {
-      setRecords(prevRecords);
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal menghapus semua absensi",
-        "error",
-      );
-    } finally {
-      setResettingAll(false);
-      setConfirmResetAll(false);
-    }
+    setOptimistic({});
+    resetMutation.mutate(selectedMeeting.meeting_id);
   }
 
   const canCreate = isAdminLike || role === "TIM_ABSENSI";
+
+  const attendanceReady =
+    !selectedMeeting || attendanceQuery.data !== undefined;
+
+  const membersReady = !selectedMeeting || memberQuery.data !== undefined;
+
   const isInitialLoading =
-    loadingMeetings || (!!selectedMeeting && loadingAttendance);
+    loadingMeetings ||
+    (!!selectedMeeting && (!attendanceReady || !membersReady));
 
   return (
     <AppLayout
@@ -337,7 +374,7 @@ export default function AttendancePage() {
         <AttendancePageSkeleton rows={8} />
       ) : (
         <>
-          <div className="pt-3 pb-2 animate-[fadeIn_0.2s_ease-out]">
+          <div className="pt-3 pb-2">
             {meetings.length > 0 ? (
               <div className="px-4">
                 <button
@@ -358,9 +395,21 @@ export default function AttendancePage() {
                           }`
                         : "Pilih jadwal"}
                     </p>
-                    {selectedMeeting && (
-                      <p className="text-ios-footnote text-surface-muted truncate">
-                        {selectedMeeting.tanggal} · {selectedMeeting.jam || "—"}
+                    {selectedMeeting &&
+                      normalizeTargets(selectedMeeting.kategori_target).length >
+                        0 && (
+                        <p className="text-ios-caption text-accent truncate mt-0.5">
+                          {normalizeTargets(selectedMeeting.kategori_target)
+                            .map((k) => CATEGORY_LABEL[k])
+                            .join(" · ")}
+                        </p>
+                      )}
+                    {normalizeTargets(selectedMeeting?.kategori_target).length >
+                      0 && (
+                      <p className="text-ios-caption text-accent truncate mt-0.5">
+                        {normalizeTargets(selectedMeeting?.kategori_target)
+                          .map((k) => CATEGORY_LABEL[k])
+                          .join(" · ")}
                       </p>
                     )}
                   </div>
@@ -371,7 +420,7 @@ export default function AttendancePage() {
                 </button>
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
+              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
                 <p className="text-ios-subhead text-surface-muted">
                   Belum ada jadwal pengajian
                 </p>
@@ -443,7 +492,7 @@ export default function AttendancePage() {
                     {totalRecords > 0 && (
                       <button
                         onClick={() => setConfirmResetAll(true)}
-                        disabled={saving || loadingAttendance || resettingAll}
+                        disabled={loadingAttendance || resetMutation.isPending}
                         aria-label="Reset semua absensi"
                         title="Reset semua absensi"
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-danger transition-colors hover:bg-danger-soft active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
@@ -454,48 +503,51 @@ export default function AttendancePage() {
                     <button
                       onClick={markAllPresent}
                       disabled={
-                        saving ||
                         loadingAttendance ||
                         hadirCount === filteredMembers.length
                       }
                       className="text-ios-footnote font-medium bg-accent-soft text-accent px-3 h-8 rounded-lg transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                      {saving ? "Menyimpan..." : "Hadir semua"}
+                      Hadir semua
                     </button>
                   </div>
                 </div>
               </div>
 
               <div className="bg-surface-card">
-                {loadingAttendance && <AttendanceListSkeleton rows={8} />}
-
-                {!loadingAttendance && filteredMembers.length === 0 && (
+                {filteredMembers.length === 0 && (
                   <EmptyState
                     title="Tidak ada jamaah"
                     description={
                       search || category
                         ? "Coba ubah kata kunci atau filter kategori."
-                        : "Belum ada jamaah yang terdaftar di kelompok ini."
+                        : normalizeTargets(selectedMeeting?.kategori_target)
+                              .length > 0
+                          ? `Tidak ada jamaah dengan kategori ${normalizeTargets(
+                              selectedMeeting?.kategori_target,
+                            )
+                              .map((k) => CATEGORY_LABEL[k])
+                              .join(", ")}.`
+                          : "Belum ada jamaah yang terdaftar di kelompok ini."
                     }
                   />
                 )}
 
-                {!loadingAttendance &&
-                  filteredMembers.map((m, i) => (
-                    <CompactAttendanceRow
-                      key={m.member_id}
-                      member={m}
-                      status={records[m.member_id]}
-                      onStatus={(s) => tapStatus(m.member_id, s)}
-                      onRequestDelete={() =>
-                        setDeleteTarget({
-                          memberId: m.member_id,
-                          memberName: m.nama_lengkap,
-                        })
-                      }
-                      divider={i !== filteredMembers.length - 1}
-                    />
-                  ))}
+                {filteredMembers.map((m, i) => (
+                  <CompactAttendanceRow
+                    key={m.member_id}
+                    member={m}
+                    status={records[m.member_id]}
+                    onStatus={(s) => tapStatus(m.member_id, s)}
+                    onRequestDelete={() =>
+                      setDeleteTarget({
+                        memberId: m.member_id,
+                        memberName: m.nama_lengkap,
+                      })
+                    }
+                    divider={i !== filteredMembers.length - 1}
+                  />
+                ))}
               </div>
             </>
           )}
@@ -507,8 +559,7 @@ export default function AttendancePage() {
         meetings={meetings}
         selectedId={selectedMeeting?.meeting_id}
         onSelect={(m) => {
-          setIsSwitchingMeeting(true);
-          setSelectedMeeting(m);
+          setPinnedMeetingId(m.meeting_id);
           setMeetingPickerOpen(false);
         }}
         onClose={() => setMeetingPickerOpen(false)}
@@ -523,8 +574,18 @@ export default function AttendancePage() {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={(m) => {
-          setMeetings((prev) => [m, ...prev]);
-          setSelectedMeeting(m);
+          queryClient.setQueryData(
+            queryKeys.meetings({ range: "recent" }),
+            (old: Meeting[] = []) => {
+              const exists = old.some((x) => x.meeting_id === m.meeting_id);
+              if (exists) return old;
+              return [m, ...old];
+            },
+          );
+          setPinnedMeetingId(m.meeting_id);
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.meetings({ range: "recent" }),
+          });
         }}
       />
 
@@ -559,9 +620,10 @@ export default function AttendancePage() {
         onConfirm={resetAllAttendance}
       />
 
-      <LoadingOverlay open={isSwitchingMeeting} label="Memuat absensi..." />
-      <LoadingOverlay open={saving} label="Menyimpan absensi..." />
-      <LoadingOverlay open={resettingAll} label="Menghapus absensi..." />
+      <LoadingOverlay
+        open={resetMutation.isPending}
+        label="Menghapus absensi..."
+      />
     </AppLayout>
   );
 }
@@ -654,6 +716,20 @@ function CompactAttendanceRow({
   );
 }
 
+function normalizeTargets(raw: unknown): MemberCategory[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as MemberCategory[];
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as MemberCategory[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 function MeetingPickerSheet({
   open,
   meetings,
@@ -676,6 +752,7 @@ function MeetingPickerSheet({
       <div className="space-y-2">
         {meetings.map((m) => {
           const active = m.meeting_id === selectedId;
+          const targets = normalizeTargets(m.kategori_target);
           return (
             <button
               key={m.meeting_id}
@@ -700,8 +777,20 @@ function MeetingPickerSheet({
                   {m.hari} — {m.acara || "Pengajian"}
                 </p>
                 <p className="text-ios-footnote text-surface-muted truncate">
-                  {m.tanggal} · {m.jam || "—"}
+                  {formatDateShort(m.tanggal)} · {m.jam || "—"}
                 </p>
+                {targets.length > 0 && (
+                  <div className="flex items-center gap-1 mt-1 flex-wrap">
+                    {targets.map((k) => (
+                      <span
+                        key={k}
+                        className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
+                      >
+                        {CATEGORY_LABEL[k]}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               {active && (
                 <Check size={18} className="text-accent flex-shrink-0" />
@@ -756,54 +845,64 @@ function CreateMeetingSheet({
   onCreated: (m: Meeting) => void;
 }) {
   const { showToast } = useToast();
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
+  const [tanggal, setTanggal] = useState(getTodayIso());
   const [jam, setJam] = useState("Isya di tempat");
   const [groupId, setGroupId] = useState("");
   const [acara, setAcara] = useState("Sambung Kelompok");
-  const [saving, setSaving] = useState(false);
+  const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>([]);
+
+  const { data: groups = [] } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    enabled: open,
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
-    if (open)
-      groupApi
-        .list()
-        .then(setGroups)
-        .catch(() => {});
+    if (!open) return;
+    setTanggal(getTodayIso());
+    setJam("Isya di tempat");
+    setGroupId("");
+    setAcara("Sambung Kelompok");
+    setKategoriTarget([]);
   }, [open]);
 
-  async function handleCreate() {
-    setSaving(true);
-    try {
-      const meeting = await meetingApi.create({
+  const mutation = useMutation({
+    mutationFn: () =>
+      meetingApi.create({
         tanggal,
         jam,
         group_id: groupId,
         acara,
-      });
+        kategori_target: kategoriTarget,
+      }),
+    onSuccess: (meeting) => {
       showToast("Jadwal pengajian dibuat");
       onCreated(meeting);
       onClose();
-    } catch (err) {
+    },
+    onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal membuat jadwal",
         "error",
       );
-    } finally {
-      setSaving(false);
-    }
+    },
+  });
+
+  function toggleKategori(c: MemberCategory) {
+    setKategoriTarget((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c],
+    );
   }
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Jadwal Pengajian Baru">
-      <Input
+      <DateInput
         label="Tanggal"
-        type="date"
         value={tanggal}
-        onChange={(e) => setTanggal(e.target.value)}
+        onChange={setTanggal}
+        hint={`Hari: ${getHariFromDate(tanggal)}`}
       />
-      <p className="text-xs text-surface-muted -mt-3 mb-4">
-        Hari: {getHariFromDate(tanggal)}
-      </p>
       <Select
         label="Kelompok"
         value={groupId}
@@ -822,8 +921,41 @@ function CreateMeetingSheet({
         value={acara}
         onChange={(e) => setAcara(e.target.value)}
       />
-      <Button fullWidth onClick={handleCreate} disabled={saving}>
-        {saving ? "Menyimpan..." : "Buat Jadwal"}
+
+      <div className="mb-4">
+        <label className="block text-ios-footnote font-medium text-surface-text mb-2 px-1">
+          Kategori Jamaah yang Diabsen
+        </label>
+        <p className="text-ios-caption text-surface-muted mb-3 px-1">
+          Kosongkan untuk semua kategori
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {MEMBER_CATEGORIES.map((c) => {
+            const active = kategoriTarget.includes(c);
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => toggleKategori(c)}
+                className={`px-3.5 py-1.5 rounded-full text-ios-footnote font-medium border transition-all duration-200 active:scale-[0.97] ${
+                  active
+                    ? "bg-accent text-white border-accent shadow-sm shadow-accent/30"
+                    : "bg-surface-card text-surface-text/80 border-surface-border hover:bg-surface-card2"
+                }`}
+              >
+                {CATEGORY_LABEL[c]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <Button
+        fullWidth
+        onClick={() => mutation.mutate()}
+        disabled={mutation.isPending}
+      >
+        {mutation.isPending ? "Menyimpan..." : "Buat Jadwal"}
       </Button>
     </BottomSheet>
   );

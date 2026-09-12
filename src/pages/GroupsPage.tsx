@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AppLayout,
   Header,
@@ -8,7 +9,6 @@ import {
   Button,
   Input,
   BottomSheet,
-  LoadingState,
   EmptyState,
   GroupedList,
   ListRow,
@@ -20,30 +20,41 @@ import type { Group } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { queryKeys } from "../lib/queryClient";
 
 export default function GroupsPage() {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Group | null>(null);
   const { showToast } = useToast();
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      setGroups(await groupApi.list());
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Gagal memuat kelompok");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {
+    data: groups = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    staleTime: 5 * 60_000,
+  });
 
-  useEffect(() => {
-    load();
-  }, []);
+  const saveMutation = useMutation({
+    mutationFn: (payload: Partial<Group>) => groupApi.save(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups() });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      showToast("Kelompok disimpan");
+      setOpen(false);
+      setEditing(null);
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyimpan kelompok",
+        "error",
+      );
+    },
+  });
 
   return (
     <AppLayout
@@ -63,8 +74,20 @@ export default function GroupsPage() {
         backLabel="Lainnya"
       />
       <div className="py-3">
-        {loading && <GroupedListSkeleton rows={5} />}
-        {!loading && !error && groups.length === 0 && (
+        {isLoading && <GroupedListSkeleton rows={5} />}
+
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat kelompok"
+            }
+            onRetry={refetch}
+          />
+        )}
+
+        {!isLoading && !error && groups.length === 0 && (
           <EmptyState
             title="Belum ada kelompok"
             description="Tambahkan kelompok pertama untuk memulai pengelolaan."
@@ -80,10 +103,8 @@ export default function GroupsPage() {
             }
           />
         )}
-        {!loading && !error && groups.length === 0 && (
-          <EmptyState title="Belum ada kelompok" />
-        )}
-        {!loading && !error && groups.length > 0 && (
+
+        {!isLoading && !error && groups.length > 0 && (
           <GroupedList>
             {groups.map((g, i) => (
               <ListRow
@@ -110,11 +131,16 @@ export default function GroupsPage() {
           </GroupedList>
         )}
       </div>
+
       <GroupSheet
         open={open}
         group={editing}
-        onClose={() => setOpen(false)}
-        onSaved={load}
+        onClose={() => {
+          setOpen(false);
+          setEditing(null);
+        }}
+        onSave={(payload) => saveMutation.mutate(payload)}
+        saving={saveMutation.isPending}
       />
     </AppLayout>
   );
@@ -124,16 +150,16 @@ function GroupSheet({
   open,
   group,
   onClose,
-  onSaved,
+  onSave,
+  saving,
 }: {
   open: boolean;
   group: Group | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSave: (payload: Partial<Group>) => void;
+  saving: boolean;
 }) {
   const [form, setForm] = useState<Partial<Group>>({});
-  const [saving, setSaving] = useState(false);
-  const { showToast } = useToast();
 
   useEffect(() => {
     setForm(
@@ -147,21 +173,8 @@ function GroupSheet({
     );
   }, [group, open]);
 
-  async function handleSave() {
-    setSaving(true);
-    try {
-      await groupApi.save(group ? { ...form, group_id: group.group_id } : form);
-      showToast("Kelompok disimpan");
-      onSaved();
-      onClose();
-    } catch (err) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal menyimpan kelompok",
-        "error",
-      );
-    } finally {
-      setSaving(false);
-    }
+  function handleSave() {
+    onSave(group ? { ...form, group_id: group.group_id } : form);
   }
 
   return (

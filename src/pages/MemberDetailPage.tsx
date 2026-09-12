@@ -1,19 +1,19 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Check,
   X,
   Thermometer,
   CircleAlert,
   TrendingUp,
-  Pencil,
   User,
   GraduationCap,
   Calendar,
   Heart,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Avatar, LoadingState, ErrorState } from "../components/common";
+import { Avatar, ErrorState } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import { attendanceApi, monitoringApi } from "../services/domainApi";
 import type { Member, MonitoringEntry, AttendanceRecord } from "../types";
@@ -29,10 +29,7 @@ import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 import { usePermission } from "../hooks/usePermission";
 import { ATTENDANCE_LABEL } from "../utils/format";
 import { ApiError } from "../services/api";
-
-/* -------------------------------------------------------------------------- */
-/*                                    Tabs                                    */
-/* -------------------------------------------------------------------------- */
+import { queryKeys } from "../lib/queryClient";
 
 const TABS = [
   { key: "Biodata", label: "Biodata", Icon: User },
@@ -43,83 +40,53 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-/* -------------------------------------------------------------------------- */
-/*                              StatBox Config                                */
-/* -------------------------------------------------------------------------- */
-
 const STAT_CONFIG: Record<
   string,
-  { label: string; Icon: typeof Check; accent: string; iconColor: string }
+  { label: string; Icon: typeof Check; iconColor: string }
 > = {
-  HADIR: {
-    label: "Hadir",
-    Icon: Check,
-    accent: "text-accent",
-    iconColor: "text-accent",
-  },
-  IJIN: {
-    label: "Ijin",
-    Icon: X,
-    accent: "text-warning",
-    iconColor: "text-warning",
-  },
-  SAKIT: {
-    label: "Sakit",
-    Icon: Thermometer,
-    accent: "text-info",
-    iconColor: "text-info",
-  },
+  HADIR: { label: "Hadir", Icon: Check, iconColor: "text-accent" },
+  IJIN: { label: "Ijin", Icon: X, iconColor: "text-warning" },
+  SAKIT: { label: "Sakit", Icon: Thermometer, iconColor: "text-info" },
   TANPA_KETERANGAN: {
     label: "Alpa",
     Icon: CircleAlert,
-    accent: "text-danger",
     iconColor: "text-danger",
   },
 };
-
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAdminLike, role } = usePermission();
-  const [member, setMember] = useState<Member | null>(null);
-  const [monitoring, setMonitoring] = useState<MonitoringEntry[]>([]);
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [tab, setTab] = useState<TabKey>("Biodata");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-  const load = useCallback(async () => {
-    if (!id) return;
-    setLoading(true);
-    setError("");
-    try {
-      const [m, mon, att] = await Promise.all([
-        memberApi.detail(id),
-        monitoringApi.list(id).catch(() => []),
-        attendanceApi.byMember(id).catch(() => []),
-      ]);
-      setMember(m);
-      setMonitoring(mon);
-      setAttendance(att);
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat data jamaah",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+  const {
+    data: member,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.memberDetail(id || ""),
+    queryFn: () => memberApi.detail(id!),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data: monitoring = [] } = useQuery({
+    queryKey: queryKeys.monitoring(id || ""),
+    queryFn: () => monitoringApi.list(id!).catch(() => []),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
 
-  /* ------------------------------- Loading UI ------------------------------- */
-  if (loading) {
+  const { data: attendance = [] } = useQuery({
+    queryKey: queryKeys.attendanceByMember(id || ""),
+    queryFn: () => attendanceApi.byMember(id!).catch(() => []),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
+
+  if (isLoading) {
     return (
       <AppLayout hideNav>
         <Header title="Jamaah" onBack={() => navigate(-1)} />
@@ -128,17 +95,20 @@ export default function MemberDetailPage() {
     );
   }
 
-  /* -------------------------------- Error UI -------------------------------- */
   if (error || !member) {
     return (
       <AppLayout hideNav>
         <Header title="Jamaah" onBack={() => navigate(-1)} />
-        <ErrorState message={error || "Data tidak ditemukan"} onRetry={load} />
+        <ErrorState
+          message={
+            error instanceof ApiError ? error.message : "Data tidak ditemukan"
+          }
+          onRetry={refetch}
+        />
       </AppLayout>
     );
   }
 
-  /* ---------------------------- Timeline Events ----------------------------- */
   const timelineEvents: TimelineEvent[] = [
     ...attendance.map((a) => ({
       date: a.attendance_id,
@@ -162,7 +132,6 @@ export default function MemberDetailPage() {
     .filter((e) => e.type === "monitoring")
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  /* --------------------------- Attendance Summary --------------------------- */
   const counts = {
     HADIR: attendance.filter((a) => a.status === "HADIR").length,
     IJIN: attendance.filter((a) => a.status === "IJIN").length,
@@ -191,7 +160,6 @@ export default function MemberDetailPage() {
         }
       />
 
-      {/* Profile Header */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
           src={member.foto_url}
@@ -214,7 +182,6 @@ export default function MemberDetailPage() {
         </div>
       </div>
 
-      {/* Tab Bar — segmented pill style */}
       <div
         className="sticky z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
         style={{ top: "calc(52px + var(--safe-top))" }}
@@ -241,7 +208,6 @@ export default function MemberDetailPage() {
         </div>
       </div>
 
-      {/* Tab Content */}
       <div className="px-4 py-4 animate-[fadeIn_0.2s_ease-out]" key={tab}>
         {tab === "Biodata" && <BiodataTab member={member} />}
         {tab === "Pendidikan" && (
@@ -249,7 +215,6 @@ export default function MemberDetailPage() {
         )}
         {tab === "Kehadiran" && (
           <div className="space-y-4">
-            {/* Attendance Summary */}
             <div className="grid grid-cols-4 gap-2">
               {(
                 Object.keys(STAT_CONFIG) as Array<keyof typeof STAT_CONFIG>
@@ -264,7 +229,6 @@ export default function MemberDetailPage() {
               ))}
             </div>
 
-            {/* Persentase Card */}
             <div className="rounded-2xl border border-surface-border bg-surface-card shadow-sm p-4 flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
                 <TrendingUp size={20} className="text-accent" />
@@ -285,7 +249,6 @@ export default function MemberDetailPage() {
               </div>
             </div>
 
-            {/* Timeline */}
             <TimelineTab events={timelineEvents} />
           </div>
         )}
@@ -294,17 +257,13 @@ export default function MemberDetailPage() {
             memberId={member.member_id}
             entries={monitoring}
             canWrite={isAdminLike || role === "TIM_PNKB"}
-            onSaved={load}
+            onSaved={refetch}
           />
         )}
       </div>
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                  StatBox                                   */
-/* -------------------------------------------------------------------------- */
 
 function StatBox({
   label,
@@ -330,14 +289,9 @@ function StatBox({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Member Detail Skeleton                            */
-/* -------------------------------------------------------------------------- */
-
 function MemberDetailSkeleton() {
   return (
     <>
-      {/* Profile header skeleton */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <div className="w-16 h-16 rounded-full bg-surface-card2 animate-pulse flex-shrink-0" />
         <div className="flex-1 min-w-0 space-y-2">
@@ -346,7 +300,6 @@ function MemberDetailSkeleton() {
         </div>
       </div>
 
-      {/* Tab bar skeleton */}
       <div
         className="sticky z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
         style={{ top: "calc(52px + var(--safe-top))" }}
@@ -361,7 +314,6 @@ function MemberDetailSkeleton() {
         </div>
       </div>
 
-      {/* Content skeleton — 4 baris field */}
       <div className="px-4 py-4 space-y-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div

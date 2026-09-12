@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   UserPlus,
   X,
   AlertTriangle,
-  Calendar as CalendarIcon,
-  MapPin,
-  Briefcase,
-  GraduationCap,
-  Lock,
   Check,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
@@ -31,6 +27,7 @@ import type { Group, PendingMember } from "../types";
 import { formatDateShort, normalizeGender } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
 
 const STATUS_BADGE = {
   PENDING: { label: "Menunggu Verifikasi", color: "amber" as const },
@@ -42,32 +39,26 @@ export default function PendingMemberDetailPage() {
   const { submission_id } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [data, setData] = useState<PendingMember | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
   const [approveOpen, setApproveOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
 
-  async function load() {
-    if (!submission_id) return;
-    setLoading(true);
-    setError("");
-    try {
-      const res = await pendingApi.detail(submission_id);
-      setData(res);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Gagal memuat data");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: queryKeys.pendingDetail(submission_id || ""),
+    queryFn: () => pendingApi.detail(submission_id!),
+    enabled: !!submission_id,
+    staleTime: 60_000,
+  });
 
-  useEffect(() => {
-    load();
-  }, [submission_id]);
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["pending-members"] });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.pendingDetail(submission_id || ""),
+    });
+    queryClient.invalidateQueries({ queryKey: ["members"] });
+  };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AppLayout hideNav>
         <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
@@ -80,7 +71,12 @@ export default function PendingMemberDetailPage() {
     return (
       <AppLayout hideNav>
         <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
-        <ErrorState message={error || "Data tidak ditemukan"} onRetry={load} />
+        <ErrorState
+          message={
+            error instanceof ApiError ? error.message : "Data tidak ditemukan"
+          }
+          onRetry={refetch}
+        />
       </AppLayout>
     );
   }
@@ -235,6 +231,7 @@ export default function PendingMemberDetailPage() {
         data={data}
         onClose={() => setApproveOpen(false)}
         onSuccess={() => {
+          invalidateAll();
           setApproveOpen(false);
           showToast("Pendaftar disetujui");
           navigate("/lainnya/pendaftar", { replace: true });
@@ -246,9 +243,9 @@ export default function PendingMemberDetailPage() {
         submissionId={data.submission_id}
         onClose={() => setRejectOpen(false)}
         onSuccess={() => {
+          invalidateAll();
           setRejectOpen(false);
           showToast("Pendaftar ditolak");
-          load();
         }}
       />
     </AppLayout>
@@ -292,45 +289,43 @@ function ApproveSheet({
   onSuccess: () => void;
 }) {
   const { showToast } = useToast();
-  const [groups, setGroups] = useState<Group[]>([]);
   const [kelompok, setKelompok] = useState("");
   const [createUser, setCreateUser] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [saving, setSaving] = useState(false);
+
+  const { data: groups = [] } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    enabled: open,
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
     if (!open) return;
-    groupApi
-      .list()
-      .then(setGroups)
-      .catch(() => {});
     setKelompok("");
     setCreateUser(false);
     setUsername(data.no_wa || "");
     setPassword("");
   }, [open, data]);
 
-  async function handleApprove() {
-    setSaving(true);
-    try {
-      await pendingApi.approve({
+  const mutation = useMutation({
+    mutationFn: () =>
+      pendingApi.approve({
         submission_id: data.submission_id,
-        kelompok: kelompok,
+        kelompok,
         create_user: createUser,
         username: createUser ? username : undefined,
         password: createUser ? password : undefined,
-      });
-      onSuccess();
-    } catch (err) {
+      }),
+    onSuccess: () => onSuccess(),
+    onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menyetujui",
         "error",
       );
-    } finally {
-      setSaving(false);
-    }
-  }
+    },
+  });
 
   const canSubmit =
     !createUser || (username.length >= 3 && password.length >= 6);
@@ -413,15 +408,15 @@ function ApproveSheet({
 
         <Button
           fullWidth
-          onClick={handleApprove}
-          disabled={saving || !canSubmit}
-          leftIcon={!saving ? <UserPlus size={16} /> : undefined}
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || !canSubmit}
+          leftIcon={!mutation.isPending ? <UserPlus size={16} /> : undefined}
         >
-          {saving ? "Memproses..." : "Setujui & Tambah Jamaah"}
+          {mutation.isPending ? "Memproses..." : "Setujui & Tambah Jamaah"}
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={saving} label="Memproses..." />
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." />
     </>
   );
 }
@@ -439,30 +434,26 @@ function RejectSheet({
 }) {
   const { showToast } = useToast();
   const [reason, setReason] = useState("");
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setReason("");
   }, [open]);
 
-  async function handleReject() {
-    setSaving(true);
-    try {
-      await pendingApi.reject({
+  const mutation = useMutation({
+    mutationFn: () =>
+      pendingApi.reject({
         submission_id: submissionId,
         reason: reason || "Tidak memenuhi syarat",
-      });
-      onSuccess();
-    } catch (err) {
+      }),
+    onSuccess: () => onSuccess(),
+    onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menolak",
         "error",
       );
-    } finally {
-      setSaving(false);
-    }
-  }
+    },
+  });
 
   return (
     <>
@@ -483,15 +474,15 @@ function RejectSheet({
         <Button
           variant="danger"
           fullWidth
-          onClick={handleReject}
-          disabled={saving}
-          leftIcon={!saving ? <X size={16} /> : undefined}
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+          leftIcon={!mutation.isPending ? <X size={16} /> : undefined}
         >
-          {saving ? "Memproses..." : "Tolak Pendaftar"}
+          {mutation.isPending ? "Memproses..." : "Tolak Pendaftar"}
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={saving} label="Memproses..." />
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." />
     </>
   );
 }

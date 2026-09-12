@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Button,
@@ -11,49 +12,38 @@ import { SettingsSkeleton } from "../components/common/Skeleton";
 import { settingsApi } from "../services/domainApi";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
 
 export default function SettingsPage() {
   const [jadwal, setJadwal] = useState<string[]>(["Minggu", "Selasa", "Kamis"]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const s = await settingsApi.get();
-      if (Array.isArray(s.jadwal_rutin)) {
-        setJadwal(s.jadwal_rutin as string[]);
-      }
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat pengaturan",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: queryKeys.settings(),
+    queryFn: () => settingsApi.get(),
+    staleTime: 5 * 60_000,
+  });
 
   useEffect(() => {
-    load();
-  }, []);
+    if (data && Array.isArray(data.jadwal_rutin)) {
+      setJadwal(data.jadwal_rutin as string[]);
+    }
+  }, [data]);
 
-  async function handleSave() {
-    setSaving(true);
-    try {
-      await settingsApi.update("jadwal_rutin", jadwal);
+  const mutation = useMutation({
+    mutationFn: () => settingsApi.update("jadwal_rutin", jadwal),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.settings() });
       showToast("Pengaturan disimpan");
-    } catch (err) {
+    },
+    onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menyimpan pengaturan",
         "error",
       );
-    } finally {
-      setSaving(false);
-    }
-  }
+    },
+  });
 
   return (
     <AppLayout hideNav>
@@ -64,11 +54,20 @@ export default function SettingsPage() {
       />
 
       <div className="py-3">
-        {loading && <SettingsSkeleton />}
+        {isLoading && <SettingsSkeleton />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat pengaturan"
+            }
+            onRetry={refetch}
+          />
+        )}
 
-        {!loading && !error && (
+        {!isLoading && !error && (
           <GroupedList>
             <div className="p-4">
               <p className="text-ios-body font-semibold text-surface-text mb-1">
@@ -88,15 +87,22 @@ export default function SettingsPage() {
                   )
                 }
               />
-              <Button fullWidth onClick={handleSave} disabled={saving}>
-                {saving ? "Menyimpan..." : "Simpan"}
+              <Button
+                fullWidth
+                onClick={() => mutation.mutate()}
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? "Menyimpan..." : "Simpan"}
               </Button>
             </div>
           </GroupedList>
         )}
       </div>
 
-      <LoadingOverlay open={saving} label="Menyimpan pengaturan..." />
+      <LoadingOverlay
+        open={mutation.isPending}
+        label="Menyimpan pengaturan..."
+      />
     </AppLayout>
   );
 }

@@ -19,6 +19,7 @@ import { getMemberCategory, normalizePhoneNumber } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import imageCompression from "browser-image-compression";
+import { DateInput } from "../components/common/DateInput";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -260,11 +261,10 @@ export default function MemberFormPage() {
               onChange={(e) => update("tempat_lahir", e.target.value)}
               placeholder="Kota"
             />
-            <Input
+            <DateInput
               label="Tanggal Lahir"
-              type="date"
               value={form.tanggal_lahir || ""}
-              onChange={(e) => update("tanggal_lahir", e.target.value)}
+              onChange={(iso) => update("tanggal_lahir", iso)}
             />
           </div>
         </FormSection>

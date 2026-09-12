@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   User,
   Calendar,
@@ -39,12 +40,7 @@ import {
 } from "../components/common";
 import { MemberSelfSkeleton } from "../components/common/Skeleton";
 import { memberSelfApi } from "../services/memberSelfApi";
-import type {
-  Member,
-  MyAttendanceEntry,
-  MonitoringEntry,
-  Meeting,
-} from "../types";
+import type { Member, MonitoringEntry, Meeting } from "../types";
 import {
   CATEGORY_LABEL,
   normalizeGender,
@@ -53,6 +49,11 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { ApiError } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
+import {
+  ThemePickerRow,
+  ThemePickerSheet,
+} from "../components/common/ThemePickerSheet";
 
 const TABS = [
   { key: "profil", label: "Profil", Icon: User },
@@ -75,61 +76,15 @@ const STATUS_CONFIG: Record<
 
 export default function MemberSelfPage() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Member | null>(null);
-  const [attendance, setAttendance] = useState<MyAttendanceEntry[]>([]);
-  const [monitoring, setMonitoring] = useState<MonitoringEntry[]>([]);
-  const [upcoming, setUpcoming] = useState<Meeting[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [tab, setTab] = useState<TabKey>("profil");
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await memberSelfApi.getDashboard();
-      setProfile(res.profile);
-      setAttendance(res.attendance);
-      setMonitoring(res.monitoring);
-      setUpcoming(res.upcoming);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Gagal memuat data");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: queryKeys.memberSelfDashboard(),
+    queryFn: () => memberSelfApi.getDashboard(),
+    staleTime: 60_000,
+  });
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await memberSelfApi.getDashboard();
-        if (cancelled) return;
-        setProfile(res.profile);
-        setAttendance(res.attendance);
-        setMonitoring(res.monitoring);
-        setUpcoming(res.upcoming);
-      } catch (err) {
-        if (cancelled) return;
-        setError(err instanceof ApiError ? err.message : "Gagal memuat data");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <AppLayout hideNav>
         <Header title="Profil Saya" />
@@ -138,14 +93,21 @@ export default function MemberSelfPage() {
     );
   }
 
-  if (error || !profile) {
+  if (error || !data) {
     return (
       <AppLayout hideNav>
         <Header title="Profil Saya" />
-        <ErrorState message={error || "Data tidak ditemukan"} onRetry={load} />
+        <ErrorState
+          message={
+            error instanceof ApiError ? error.message : "Data tidak ditemukan"
+          }
+          onRetry={refetch}
+        />
       </AppLayout>
     );
   }
+
+  const { profile, attendance, monitoring, upcoming } = data;
 
   const hadirCount = attendance.filter((a) => a.status === "HADIR").length;
   const persentase = attendance.length
@@ -346,7 +308,7 @@ function AttendanceTab({
   hadirCount,
   persentase,
 }: {
-  attendance: MyAttendanceEntry[];
+  attendance: import("../types").MyAttendanceEntry[];
   hadirCount: number;
   persentase: number;
 }) {

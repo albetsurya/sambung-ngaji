@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Sparkles,
   TrendingUp,
   Users,
   Zap,
-  Loader2,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -14,10 +13,10 @@ import {
   EmptyState,
   GroupedList,
   ListRow,
-  Avatar,
 } from "../components/common";
-import { aiUsageApi, type AiUsageStats } from "../services/domainApi";
+import { aiUsageApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
 
 const PROVIDER_LABEL: Record<string, string> = {
   omniroute: "OmniRoute",
@@ -40,26 +39,11 @@ function formatNumber(n: number): string {
 }
 
 export default function AiUsagePage() {
-  const [data, setData] = useState<AiUsageStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await aiUsageApi.stats();
-      setData(res);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Gagal memuat data");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: queryKeys.aiUsage(),
+    queryFn: () => aiUsageApi.stats(),
+    staleTime: 60_000,
+  });
 
   return (
     <AppLayout hideNav>
@@ -70,11 +54,18 @@ export default function AiUsagePage() {
       />
 
       <div className="py-4">
-        {loading && <LoadingState label="Memuat statistik AI..." />}
+        {isLoading && <LoadingState label="Memuat statistik AI..." />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError ? error.message : "Gagal memuat data"
+            }
+            onRetry={refetch}
+          />
+        )}
 
-        {!loading && !error && data && (
+        {!isLoading && !error && data && (
           <div className="space-y-4">
             <div className="px-4 grid grid-cols-2 gap-3">
               <Card>

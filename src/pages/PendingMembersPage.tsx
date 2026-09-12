@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   User as UserIcon,
-  ClipboardList,
   RefreshCw,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
@@ -17,8 +17,9 @@ import {
 import { PendingMembersSkeleton } from "../components/common/Skeleton";
 import { pendingApi } from "../services/pendingApi";
 import type { PendingMember, PendingStatus } from "../types";
-import { formatDateShort, normalizePhoneNumber } from "../utils/format";
+import { formatDateShort } from "../utils/format";
 import { ApiError } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
 
 const STATUS_FILTERS: {
   key: PendingStatus | "ALL";
@@ -42,30 +43,22 @@ const STATUS_BADGE: Record<
 
 export default function PendingMembersPage() {
   const navigate = useNavigate();
-  const [list, setList] = useState<PendingMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [filter, setFilter] = useState<PendingStatus | "ALL">("PENDING");
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
+  const {
+    data: list = [],
+    isLoading,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: queryKeys.pendingMembers(filter === "ALL" ? undefined : filter),
+    queryFn: () => {
       const params = filter === "ALL" ? {} : { status: filter };
-      const data = await pendingApi.list(params);
-      setList(data);
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat pendaftar",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-  }, [filter]);
+      return pendingApi.list(params);
+    },
+    staleTime: 60_000,
+  });
 
   return (
     <AppLayout hideNav>
@@ -78,11 +71,11 @@ export default function PendingMembersPage() {
         backLabel="Lainnya"
         right={
           <button
-            onClick={load}
+            onClick={() => refetch()}
             aria-label="Refresh"
             className="w-9 h-9 flex items-center justify-center rounded-xl text-accent transition-colors hover:bg-accent-soft/60 active:scale-95"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
           </button>
         }
       />
@@ -109,11 +102,20 @@ export default function PendingMembersPage() {
       </div>
 
       <div className="py-3">
-        {loading && <PendingMembersSkeleton rows={5} />}
+        {isLoading && <PendingMembersSkeleton rows={5} />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat pendaftar"
+            }
+            onRetry={refetch}
+          />
+        )}
 
-        {!loading && !error && list.length === 0 && (
+        {!isLoading && !error && list.length === 0 && (
           <EmptyState
             title={
               filter === "PENDING"
@@ -128,7 +130,7 @@ export default function PendingMembersPage() {
           />
         )}
 
-        {!loading && !error && list.length > 0 && (
+        {!isLoading && !error && list.length > 0 && (
           <GroupedList>
             {list.map((p, i) => {
               const badge = STATUS_BADGE[p.status];

@@ -27,43 +27,25 @@ import type {
   DashboardPNKB,
 } from "../types";
 import { ApiError } from "../services/api";
-import {
-  HeroCardSkeleton,
-  StatTileSkeleton,
-  SectionHeaderSkeleton,
-  CategoryDistributionSkeleton,
-  MeetingCardSkeleton,
-} from "../components/common/Skeleton";
+import { DashboardSkeleton } from "../components/common/Skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "../lib/queryClient";
 
 type IconType = LucideIcon;
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [data, setData] = useState<
-    DashboardGeneral | DashboardPNKB | DashboardAbsensi | null
-  >(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await dashboardApi.general();
-      setData(res as any);
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat dashboard",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.dashboard(),
+    queryFn: () => dashboardApi.general(),
+    staleTime: 30_000,
+  });
 
   const hour = new Date().getHours();
   const greeting =
@@ -92,18 +74,27 @@ export default function DashboardPage() {
       <div className="px-4 py-4 space-y-4">
         {loading && <DashboardSkeleton />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!loading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat dashboard"
+            }
+            onRetry={refetch}
+          />
+        )}
 
         {!loading && !error && data && user?.role === "TIM_PNKB" && (
           <PNKBDashboard
-            data={data as DashboardPNKB}
+            data={data as unknown as DashboardPNKB}
             greeting={greeting}
             userName={user?.nama || ""}
           />
         )}
         {!loading && !error && data && user?.role === "TIM_ABSENSI" && (
           <AbsensiDashboard
-            data={data as DashboardAbsensi}
+            data={data as unknown as DashboardAbsensi}
             greeting={greeting}
             userName={user?.nama || ""}
           />
@@ -327,42 +318,57 @@ function AttentionListSection({
   }[];
 }) {
   const navigate = useNavigate();
-  if (!items.length) return null;
   return (
     <div className="space-y-2">
       <SectionHeader
         title="Perlu Perhatian"
         Icon={AlertTriangle}
         iconColor="text-warning"
-        onSeeAll={() => navigate("/jamaah")}
+        onSeeAll={items.length > 0 ? () => navigate("/jamaah") : undefined}
       />
-      <div className="space-y-2">
-        {items.map((m) => (
-          <Card
-            key={m.member_id}
-            onClick={() => navigate(`/jamaah/${m.member_id}`)}
-            className="flex items-center gap-3"
-          >
-            <Avatar
-              src={m.foto_url}
-              name={m.nama_lengkap}
-              gender={normalizeGender(m?.jenis_kelamin)}
-            />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm text-surface-text truncate">
-                {m.nama_lengkap}
-              </p>
-              <p className="text-xs text-surface-muted truncate">
-                {m.reasons[0]}
-              </p>
-            </div>
-            <ChevronRight
-              size={18}
-              className="text-surface-muted flex-shrink-0"
-            />
-          </Card>
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <Card className="flex items-center gap-3 py-5">
+          <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
+            <CheckCircle2 size={18} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-sm text-surface-text">
+              Semua jamaah dalam kondisi baik
+            </p>
+            <p className="text-xs text-surface-muted">
+              Tidak ada jamaah yang perlu perhatian saat ini
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {items.map((m) => (
+            <Card
+              key={m.member_id}
+              onClick={() => navigate(`/jamaah/${m.member_id}`)}
+              className="flex items-center gap-3"
+            >
+              <Avatar
+                src={m.foto_url}
+                name={m.nama_lengkap}
+                gender={normalizeGender(m?.jenis_kelamin)}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm text-surface-text truncate">
+                  {m.nama_lengkap}
+                </p>
+                <p className="text-xs text-surface-muted truncate">
+                  {m.reasons[0]}
+                </p>
+              </div>
+              <ChevronRight
+                size={18}
+                className="text-surface-muted flex-shrink-0"
+              />
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -437,35 +443,57 @@ function GeneralDashboard({
             Total {totalKategori}
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {Object.entries(data.per_kategori).map(([k, v]) => (
-            <div
-              key={k}
-              className="flex items-center justify-between bg-surface-card2 rounded-xl px-3 py-2.5"
-            >
-              <span className="text-ios-footnote text-surface-text">
-                {CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]}
-              </span>
-              <span className="text-xs font-semibold text-surface-text tabular-nums">
-                {v}
-              </span>
-            </div>
-          ))}
-        </div>
+        {totalKategori === 0 ? (
+          <p className="text-ios-footnote text-surface-muted text-center py-4">
+            Belum ada data jamaah
+          </p>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {Object.entries(data.per_kategori).map(([k, v]) => (
+              <div
+                key={k}
+                className="flex items-center justify-between bg-surface-card2 rounded-xl px-3 py-2.5"
+              >
+                <span className="text-ios-footnote text-surface-text">
+                  {CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]}
+                </span>
+                <span className="text-xs font-semibold text-surface-text tabular-nums">
+                  {v}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
 
-      {data.pengajian_terdekat && (
-        <div className="space-y-2">
-          <SectionHeader
-            title="Pengajian Terdekat"
-            onSeeAll={() => navigate("/absensi")}
-          />
+      <div className="space-y-2">
+        <SectionHeader
+          title="Pengajian Terdekat"
+          onSeeAll={
+            data.pengajian_terdekat ? () => navigate("/absensi") : undefined
+          }
+        />
+        {data.pengajian_terdekat ? (
           <MeetingCard
             meeting={data.pengajian_terdekat}
             onClick={() => navigate("/absensi")}
           />
-        </div>
-      )}
+        ) : (
+          <Card className="flex items-center gap-3 py-5">
+            <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center text-surface-muted flex-shrink-0">
+              <Calendar size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm text-surface-text">
+                Belum ada jadwal pengajian
+              </p>
+              <p className="text-xs text-surface-muted">
+                Jadwal akan muncul setelah dibuat
+              </p>
+            </div>
+          </Card>
+        )}
+      </div>
 
       <AttentionListSection items={data.jamaah_perlu_perhatian} />
     </>
@@ -532,36 +560,79 @@ function AbsensiDashboard({
       <HeroStatCard
         label="Jamaah Diabsen Hari Ini"
         value={data.jumlah_jamaah}
-        footer={`${data.hadir} hadir`}
+        footer={`${data.hadir} hadir dari ${data.total_target} target`}
         Icon={CheckCircle2}
         greeting={greeting}
         userName={userName}
       />
 
-      <SectionHeader
-        title="Pengajian Hari Ini"
-        onSeeAll={() => navigate("/absensi")}
-      />
-      {data.pengajian_hari_ini.length === 0 && (
-        <Card>
-          <p className="text-sm text-surface-muted">
-            Tidak ada jadwal pengajian hari ini.
-          </p>
-        </Card>
-      )}
-      {data.pengajian_hari_ini.map((m) => (
-        <MeetingCard
-          key={m.meeting_id}
-          meeting={{
-            meeting_id: m.meeting_id,
-            tanggal: new Date().toISOString(),
-            hari: "Hari Ini",
-            acara: m.acara,
-            jam: m.jam,
-          }}
-          onClick={() => navigate("/absensi")}
+      <div className="space-y-2">
+        <SectionHeader
+          title="Pengajian Hari Ini"
+          onSeeAll={
+            data.pengajian_hari_ini.length > 0
+              ? () => navigate("/absensi")
+              : undefined
+          }
         />
-      ))}
+        {data.pengajian_hari_ini.length === 0 ? (
+          <Card className="flex items-center gap-3 py-5">
+            <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center text-surface-muted flex-shrink-0">
+              <Calendar size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm text-surface-text">
+                Tidak ada pengajian hari ini
+              </p>
+              <p className="text-xs text-surface-muted">
+                Jadwal pengajian berikutnya akan muncul di sini
+              </p>
+            </div>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {data.pengajian_hari_ini.map((m) => (
+              <Card
+                key={m.meeting_id}
+                onClick={() => navigate("/absensi")}
+                className="flex items-center gap-3"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
+                  <Calendar size={12} className="text-accent" />
+                  <span className="text-[10px] font-bold text-accent leading-none mt-0.5">
+                    {m.jam || "—"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-surface-text truncate">
+                    {m.acara || "Pengajian"}
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                    {m.kategori_target.length === 0 ? (
+                      <span className="text-[10px] font-semibold tracking-wide text-surface-muted bg-surface-card2 rounded-full px-2 py-0.5 uppercase">
+                        Semua Kategori
+                      </span>
+                    ) : (
+                      m.kategori_target.map((k) => (
+                        <span
+                          key={k}
+                          className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
+                        >
+                          {CATEGORY_LABEL[k]}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <ChevronRight
+                  size={18}
+                  className="text-surface-muted flex-shrink-0"
+                />
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="flex gap-3">
         <StatTile
@@ -583,31 +654,92 @@ function AbsensiDashboard({
           Icon={CircleAlert}
         />
       </div>
-    </>
-  );
-}
 
-function DashboardSkeleton() {
-  return (
-    <>
-      <HeroCardSkeleton />
+      {data.by_category.length > 0 && (
+        <div className="space-y-2">
+          <SectionHeader title="Ringkasan per Kategori" />
+          <div className="space-y-2">
+            {data.by_category.map((cat, i) => (
+              <Card key={i}>
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {cat.is_semua ? (
+                        <span className="text-[11px] font-bold tracking-wide text-surface-text bg-surface-card2 rounded-full px-2 py-0.5 uppercase">
+                          Semua Kategori
+                        </span>
+                      ) : (
+                        cat.kategori.map((k) => (
+                          <span
+                            key={k}
+                            className="text-[11px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
+                          >
+                            {CATEGORY_LABEL[k]}
+                          </span>
+                        ))
+                      )}
+                    </div>
+                    <p className="text-ios-caption text-surface-muted mt-1">
+                      {cat.meeting_count} pengajian · target {cat.total_target}{" "}
+                      jamaah
+                    </p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-display text-lg font-semibold text-surface-text tabular-nums">
+                      {cat.persentase}%
+                    </p>
+                    <p className="text-ios-caption text-surface-muted">
+                      kehadiran
+                    </p>
+                  </div>
+                </div>
 
-      <div className="flex gap-3">
-        <StatTileSkeleton />
-        <StatTileSkeleton />
-      </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <div className="rounded-lg bg-accent-soft px-2 py-1.5 text-center">
+                    <p className="text-[15px] font-bold text-accent tabular-nums leading-none">
+                      {cat.hadir}
+                    </p>
+                    <p className="text-[9px] text-accent/70 mt-0.5 font-medium">
+                      HADIR
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-warning-soft px-2 py-1.5 text-center">
+                    <p className="text-[15px] font-bold text-warning tabular-nums leading-none">
+                      {cat.ijin}
+                    </p>
+                    <p className="text-[9px] text-warning/70 mt-0.5 font-medium">
+                      IJIN
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-info-soft px-2 py-1.5 text-center">
+                    <p className="text-[15px] font-bold text-info tabular-nums leading-none">
+                      {cat.sakit}
+                    </p>
+                    <p className="text-[9px] text-info/70 mt-0.5 font-medium">
+                      SAKIT
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-danger-soft px-2 py-1.5 text-center">
+                    <p className="text-[15px] font-bold text-danger tabular-nums leading-none">
+                      {cat.tanpa_keterangan}
+                    </p>
+                    <p className="text-[9px] text-danger/70 mt-0.5 font-medium">
+                      ALPA
+                    </p>
+                  </div>
+                </div>
 
-      <div className="flex gap-3">
-        <StatTileSkeleton />
-        <StatTileSkeleton />
-      </div>
-
-      <CategoryDistributionSkeleton />
-
-      <div className="space-y-2">
-        <SectionHeaderSkeleton />
-        <MeetingCardSkeleton />
-      </div>
+                <div className="mt-3 h-1.5 rounded-full bg-surface-card2 overflow-hidden">
+                  <div
+                    className="h-full bg-accent transition-all duration-500"
+                    style={{ width: `${cat.persentase}%` }}
+                  />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 }

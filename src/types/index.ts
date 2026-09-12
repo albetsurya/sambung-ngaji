@@ -107,12 +107,16 @@ export interface Meeting {
   meeting_id: string;
   tanggal: string;
   hari: string;
-  jam?: string;
-  group_id?: string;
-  acara?: string;
+  jam: string;
+  group_id: string;
+  acara: string;
   materi?: string;
-  status?: string;
+  status: string;
   catatan?: string;
+  kategori_target?: MemberCategory[];
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AttendanceRecord {
@@ -198,18 +202,35 @@ export interface DashboardPNKB {
   data_belum_lengkap: number;
 }
 
-export interface DashboardAbsensi {
-  pengajian_hari_ini: {
-    meeting_id: string;
-    jam?: string;
-    acara?: string;
-    group_id?: string;
-  }[];
-  jumlah_jamaah: number;
+export interface DashboardAbsensiCategory {
+  kategori: MemberCategory[];
+  is_semua: boolean;
   hadir: number;
   ijin: number;
   sakit: number;
   tanpa_keterangan: number;
+  total_absen: number;
+  total_target: number;
+  meeting_count: number;
+  persentase: number;
+}
+
+export interface DashboardAbsensi {
+  pengajian_hari_ini: {
+    meeting_id: string;
+    tanggal: string;
+    jam: string;
+    acara: string;
+    group_id: string;
+    kategori_target: MemberCategory[];
+  }[];
+  jumlah_jamaah: number;
+  total_target: number;
+  hadir: number;
+  ijin: number;
+  sakit: number;
+  tanpa_keterangan: number;
+  by_category: DashboardAbsensiCategory[];
 }
 
 export interface PendingMember {

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { AlertTriangle, Megaphone, Copy, Share2, Calendar } from "../components/common/FontAwesomeIcons";
+import { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Megaphone, Copy, Share2 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -21,14 +22,10 @@ import {
 import { announcementApi, groupApi } from "../services/domainApi";
 import type { Announcement, AnnouncementTemplate, Group } from "../types";
 import { formatDateShort, getHariFromDate } from "../utils/format";
-import { JADWAL_RUTIN } from "../constants";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-
-/* -------------------------------------------------------------------------- */
-/*                              Status Config                                 */
-/* -------------------------------------------------------------------------- */
+import { queryKeys } from "../lib/queryClient";
 
 const STATUS_CONFIG: Record<
   string,
@@ -39,38 +36,22 @@ const STATUS_CONFIG: Record<
   PENDING: { label: "Menunggu", color: "amber" },
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
-
 export default function AnnouncementsPage() {
   const { isAdminLike } = usePermission();
-  const { showToast } = useToast();
-  const [list, setList] = useState<Announcement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [preview, setPreview] = useState<Announcement | null>(null);
+  const queryClient = useQueryClient();
 
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await announcementApi.list();
-      setList(res);
-    } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : "Gagal memuat pengumuman",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    data: list = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.announcements(),
+    queryFn: () => announcementApi.list(),
+    staleTime: 60_000,
+  });
 
   return (
     <AppLayout
@@ -83,11 +64,20 @@ export default function AnnouncementsPage() {
       <Header title="Pengumuman" subtitle="Template WhatsApp pengajian" />
 
       <div className="flex flex-col flex-1">
-        {loading && <AnnouncementListSkeleton rows={5} />}
+        {isLoading && <AnnouncementListSkeleton rows={5} />}
 
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat pengumuman"
+            }
+            onRetry={refetch}
+          />
+        )}
 
-        {!loading && !error && list.length === 0 && (
+        {!isLoading && !error && list.length === 0 && (
           <EmptyState
             title="Belum ada pengumuman"
             description="Buat pengumuman pertama untuk jadwal pengajian rutin."
@@ -101,7 +91,7 @@ export default function AnnouncementsPage() {
           />
         )}
 
-        {!loading && !error && list.length > 0 && (
+        {!isLoading && !error && list.length > 0 && (
           <div className="py-3">
             <GroupedList>
               {list.map((a, i) => {
@@ -143,7 +133,9 @@ export default function AnnouncementsPage() {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         onCreated={(a) => {
-          setList((prev) => [a, ...prev]);
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.announcements(),
+          });
           setPreview(a);
         }}
       />
@@ -152,10 +144,6 @@ export default function AnnouncementsPage() {
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Preview Modal                                 */
-/* -------------------------------------------------------------------------- */
 
 function PreviewModal({
   announcement,
@@ -185,9 +173,7 @@ function PreviewModal({
     if (navigator.share) {
       try {
         await navigator.share({ text: announcement!.generated_text });
-      } catch {
-        /* user membatalkan share, abaikan */
-      }
+      } catch {}
     } else {
       const url = `https://wa.me/?text=${encodeURIComponent(
         announcement!.generated_text,
@@ -198,7 +184,6 @@ function PreviewModal({
 
   return (
     <Modal open={!!announcement} onClose={onClose} title="Preview Pengumuman">
-      {/* Metadata */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Badge color={status.color}>{status.label}</Badge>
         <span className="text-ios-caption text-surface-muted">
@@ -206,14 +191,12 @@ function PreviewModal({
         </span>
       </div>
 
-      {/* Preview text */}
       <div className="rounded-2xl border border-surface-border p-4 mb-4 max-h-[45vh] overflow-y-auto bg-accent-soft/40">
         <pre className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-surface-text font-sans">
           {announcement.generated_text}
         </pre>
       </div>
 
-      {/* Actions — icon-only untuk salin, icon+teks untuk bagikan */}
       <div className="flex gap-3">
         <Button
           variant="secondary"
@@ -231,10 +214,6 @@ function PreviewModal({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Create Announcement Sheet                         */
-/* -------------------------------------------------------------------------- */
-
 function CreateAnnouncementSheet({
   open,
   onClose,
@@ -245,8 +224,6 @@ function CreateAnnouncementSheet({
   onCreated: (a: Announcement) => void;
 }) {
   const { showToast } = useToast();
-  const [templates, setTemplates] = useState<AnnouncementTemplate[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
   const [templateId, setTemplateId] = useState("");
   const [groupId, setGroupId] = useState("");
   const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
@@ -254,34 +231,41 @@ function CreateAnnouncementSheet({
   const [acara, setAcara] = useState("Sambung Kelompok");
   const [materi, setMateri] = useState("");
   const [catatan, setCatatan] = useState("");
-  const [saving, setSaving] = useState(false);
 
-  /* Reset form ketika sheet dibuka kembali */
-  useEffect(() => {
-    if (!open) return;
+  const { data: templates = [] } = useQuery({
+    queryKey: ["announcement-templates"],
+    queryFn: () => announcementApi.templates(),
+    enabled: open,
+    staleTime: 10 * 60_000,
+  });
 
-    announcementApi.templates().then((t) => {
-      setTemplates(t);
-      if (t[0]) setTemplateId(t[0].template_id);
-    });
-    groupApi.list().then(setGroups);
+  const { data: groups = [] } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    enabled: open,
+    staleTime: 5 * 60_000,
+  });
 
-    // Reset ke nilai default
-    setGroupId("");
-    setTanggal(new Date().toISOString().slice(0, 10));
-    setJam("Isya di tempat");
-    setAcara("Sambung Kelompok");
-    setMateri("");
-    setCatatan("");
+  useMemo(() => {
+    if (open && templates.length > 0 && !templateId) {
+      setTemplateId(templates[0].template_id);
+    }
+  }, [open, templates, templateId]);
+
+  useMemo(() => {
+    if (open) {
+      setGroupId("");
+      setTanggal(new Date().toISOString().slice(0, 10));
+      setJam("Isya di tempat");
+      setAcara("Sambung Kelompok");
+      setMateri("");
+      setCatatan("");
+    }
   }, [open]);
 
-  const hari = getHariFromDate(tanggal);
-  const isRoutine = JADWAL_RUTIN.includes(hari);
-
-  async function handleCreate() {
-    setSaving(true);
-    try {
-      const created = await announcementApi.create({
+  const mutation = useMutation({
+    mutationFn: () =>
+      announcementApi.create({
         template_id: templateId,
         group_id: groupId,
         tanggal,
@@ -289,19 +273,21 @@ function CreateAnnouncementSheet({
         acara,
         materi,
         catatan,
-      });
+      }),
+    onSuccess: (created) => {
       showToast("Pengumuman dibuat");
       onCreated(created);
       onClose();
-    } catch (err) {
+    },
+    onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal membuat pengumuman",
         "error",
       );
-    } finally {
-      setSaving(false);
-    }
-  }
+    },
+  });
+
+  const hari = getHariFromDate(tanggal);
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Buat Pengumuman">
@@ -338,19 +324,6 @@ function CreateAnnouncementSheet({
         hint={`Hari: ${hari}`}
       />
 
-      {/* Warning jadwal rutin — di bawah input tanggal, tidak overlap */}
-      {!isRoutine && (
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-warning-soft border border-warning/20 mb-4 -mt-2">
-          <AlertTriangle
-            size={14}
-            className="text-warning flex-shrink-0 mt-0.5"
-          />
-          <p className="text-ios-footnote text-warning leading-relaxed">
-            Tanggal ini bukan jadwal rutin pengajian (Minggu/Selasa/Kamis).
-          </p>
-        </div>
-      )}
-
       <Input label="Jam" value={jam} onChange={(e) => setJam(e.target.value)} />
       <Input
         label="Acara"
@@ -372,23 +345,19 @@ function CreateAnnouncementSheet({
 
       <Button
         fullWidth
-        onClick={handleCreate}
-        disabled={saving || !groupId || !templateId}
+        onClick={() => mutation.mutate()}
+        disabled={mutation.isPending || !groupId || !templateId}
       >
-        {saving ? "Membuat..." : "Generate & Preview"}
+        {mutation.isPending ? "Membuat..." : "Generate & Preview"}
       </Button>
     </BottomSheet>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Announcement List Skeleton                        */
-/* -------------------------------------------------------------------------- */
-
 function AnnouncementListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="py-3">
-      <div className="mx-4 my-4 bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
+      <div className="mx-4 my-2 bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}

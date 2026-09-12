@@ -59,6 +59,8 @@ import {
   faQrcode,
   faDownload,
   faPalette,
+  faTableCells,
+  faList,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -150,3 +152,5 @@ export const Trash2 = createIcon(faTrash);
 export const QrCode = createIcon(faQrcode);
 export const Download = createIcon(faDownload);
 export const Palette = createIcon(faPalette);
+export const LayoutGrid = createIcon(faTableCells);
+export const List = createIcon(faList);

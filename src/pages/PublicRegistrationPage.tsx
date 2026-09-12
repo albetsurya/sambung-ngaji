@@ -19,6 +19,7 @@ import {
 import { publicApi } from "../services/publicApi";
 import { normalizePhoneNumber } from "../utils/format";
 import { ApiError } from "../services/api";
+import { DateInput } from "../components/common/DateInput";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -301,11 +302,10 @@ export default function PublicRegistrationPage() {
                   value={form.tempat_lahir}
                   onChange={(e) => update("tempat_lahir", e.target.value)}
                 />
-                <Input
+                <DateInput
                   label="Tanggal Lahir"
-                  type="date"
-                  value={form.tanggal_lahir}
-                  onChange={(e) => update("tanggal_lahir", e.target.value)}
+                  value={form.tanggal_lahir || ""}
+                  onChange={(iso) => update("tanggal_lahir", iso)}
                 />
               </div>
             </div>

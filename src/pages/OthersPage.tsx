@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Building2,
   KeyRound,
@@ -22,7 +23,6 @@ import {
   ChevronRow,
   ChangePasswordSheet,
 } from "../components/common";
-
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
@@ -32,6 +32,7 @@ import {
   ThemePickerRow,
   ThemePickerSheet,
 } from "../components/common/ThemePickerSheet";
+import { queryKeys } from "../lib/queryClient";
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
@@ -40,24 +41,19 @@ export default function OthersPage() {
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [pendingLoading, setPendingLoading] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
 
+  const { data: pendingList = [], isFetching: pendingLoading } = useQuery({
+    queryKey: queryKeys.pendingMembers("PENDING"),
+    queryFn: () => pendingApi.list({ status: "PENDING" }),
+    enabled: isAdminLike,
+    staleTime: 2 * 60_000,
+  });
+
+  const pendingCount = pendingList.length;
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
-  useEffect(() => {
-    if (!isAdminLike) return;
-    setPendingLoading(true);
-    pendingApi
-      .list({ status: "PENDING" })
-      .then((list) => setPendingCount(list.length))
-      .catch(() => {})
-      .finally(() => setPendingLoading(false));
-  }, [isAdminLike]);
-
   const menu = [
-    // 1. Fitur Utama / Operasional Harian
     {
       key: "pendaftar",
       label: "Pendaftar",
@@ -84,13 +80,11 @@ export default function OthersPage() {
       to: "/lainnya/qr-code",
       show: isAdminLike,
     },
-
-    // 2. Akun & Keamanan Pengguna
     {
       key: "change-password",
       label: "Ganti Password",
       description: "Ubah password akun Anda",
-      Icon: Lock, 
+      Icon: Lock,
       to: "",
       show: true,
     },
@@ -102,8 +96,6 @@ export default function OthersPage() {
       to: "/lainnya/users",
       show: isSuperAdmin,
     },
-
-    // 3. Monitoring, Sistem, & Konfigurasi
     {
       key: "ai-usage",
       label: "Monitoring AI",

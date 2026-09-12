@@ -1,35 +1,27 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
-  LoadingState,
   EmptyState,
   GroupedList,
   ListRow,
   ErrorState,
 } from "../components/common";
-import { auditApi, type AuditLogEntry } from "../services/domainApi";
-import { useToast } from "../contexts/ToastContext";
+import { auditApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
 import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { queryKeys } from "../lib/queryClient";
 
 export default function AuditLogPage() {
-  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    setError("");
-    auditApi
-      .list({ limit: 100 })
-      .then(setLogs)
-      .catch((err) =>
-        setError(
-          err instanceof ApiError ? err.message : "Gagal memuat audit log",
-        ),
-      )
-      .finally(() => setLoading(false));
-  }, []);
+  const {
+    data: logs = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.auditLogs(100),
+    queryFn: () => auditApi.list({ limit: 100 }),
+    staleTime: 60_000,
+  });
 
   return (
     <AppLayout hideNav>
@@ -39,12 +31,24 @@ export default function AuditLogPage() {
         backLabel="Lainnya"
       />
       <div className="py-3">
-        {loading && <GroupedListSkeleton rows={6} />}
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
-        {!loading && !error && logs.length === 0 && (
+        {isLoading && <GroupedListSkeleton rows={6} />}
+
+        {!isLoading && error && (
+          <ErrorState
+            message={
+              error instanceof ApiError
+                ? error.message
+                : "Gagal memuat audit log"
+            }
+            onRetry={refetch}
+          />
+        )}
+
+        {!isLoading && !error && logs.length === 0 && (
           <EmptyState title="Belum ada aktivitas" />
         )}
-        {!loading && !error && logs.length > 0 && (
+
+        {!isLoading && !error && logs.length > 0 && (
           <GroupedList>
             {logs.map((l, i) => (
               <ListRow key={l.log_id} insetDivider={i !== logs.length - 1}>

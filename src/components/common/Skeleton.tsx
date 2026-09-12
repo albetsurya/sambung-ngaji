@@ -44,6 +44,30 @@ export function Skeleton({
 /*                              List Skeleton                                 */
 /* -------------------------------------------------------------------------- */
 
+export function DashboardSkeleton() {
+  return (
+    <>
+      <HeroCardSkeleton />
+
+      <div className="flex gap-3">
+        <StatTileSkeleton />
+        <StatTileSkeleton />
+      </div>
+
+      <div className="flex gap-3">
+        <StatTileSkeleton />
+        <StatTileSkeleton />
+      </div>
+
+      <CategoryDistributionSkeleton />
+
+      <div className="space-y-2">
+        <SectionHeaderSkeleton />
+        <MeetingCardSkeleton />
+      </div>
+    </>
+  );
+}
 /**
  * Skeleton untuk baris jamaah — mirror PERSIS layout Card + Avatar + text.
  * Tinggi text disesuaikan dengan line-height Tailwind:

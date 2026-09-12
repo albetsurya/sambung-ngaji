@@ -38,42 +38,90 @@ const BULAN_ID_FULL = [
   "Desember",
 ];
 
+export function getTodayIso(): string {
+  return toLocalIso(new Date());
+}
+
+export function toLocalIso(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function parseIsoParts(
+  dateStr?: string,
+): { year: number; month: number; day: number } | null {
+  if (!dateStr) return null;
+  const iso = String(dateStr).slice(0, 10);
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return { year: y, month: m, day: d };
+}
+
 export function formatDate(dateStr?: string): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-  return d.toISOString().slice(0, 10);
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
 }
 
 export function formatDateShort(dateStr?: string): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-  return `${d.getDate()} ${BULAN_ID[d.getMonth()]} ${d.getFullYear()}`;
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(p.day)} ${BULAN_ID[p.month - 1]} ${p.year}`;
 }
 
 export function formatDateLong(dateStr?: string): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  const d = new Date(p.year, p.month - 1, p.day);
   if (isNaN(d.getTime())) return "";
-  return `${HARI_ID[d.getDay()]}, ${d.getDate()} ${BULAN_ID_FULL[d.getMonth()]} ${d.getFullYear()}`;
+  return `${HARI_ID[d.getDay()]}, ${p.day} ${BULAN_ID_FULL[p.month - 1]} ${p.year}`;
 }
 
 export function getHariFromDate(dateStr?: string): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  const d = new Date(p.year, p.month - 1, p.day);
   if (isNaN(d.getTime())) return "";
   return HARI_ID[d.getDay()];
 }
 
+export function formatDateCustom(
+  dateStr: string | undefined,
+  format:
+    | "dd-mm-yyyy"
+    | "dd/mm/yyyy"
+    | "yyyy-mm-dd"
+    | "dd MMM yyyy" = "dd-mm-yyyy",
+): string {
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  switch (format) {
+    case "dd-mm-yyyy":
+      return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
+    case "dd/mm/yyyy":
+      return `${pad(p.day)}/${pad(p.month)}/${p.year}`;
+    case "yyyy-mm-dd":
+      return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
+    case "dd MMM yyyy":
+      return `${p.day} ${BULAN_ID[p.month - 1]} ${p.year}`;
+    default:
+      return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
+  }
+}
+
 export function getMemberAge(tanggalLahir?: string): number | null {
-  if (!tanggalLahir) return null;
-  const d = new Date(tanggalLahir);
-  if (isNaN(d.getTime())) return null;
+  const p = parseIsoParts(tanggalLahir);
+  if (!p) return null;
   const now = new Date();
-  let age = now.getFullYear() - d.getFullYear();
-  const m = now.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+  let age = now.getFullYear() - p.year;
+  const m = now.getMonth() + 1 - p.month;
+  if (m < 0 || (m === 0 && now.getDate() < p.day)) age--;
   return age;
 }
 

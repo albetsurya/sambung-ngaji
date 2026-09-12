@@ -27,12 +27,26 @@ export const groupApi = {
 };
 
 export const meetingApi = {
-  list: (params: { group_id?: string; from?: string; to?: string } = {}) =>
-    call<Meeting[]>("getMeetings", params),
-  create: (payload: Partial<Meeting>) =>
-    call<Meeting>("createMeeting", payload),
-  update: (meeting_id: string, payload: Partial<Meeting>) =>
-    call<Meeting>("updateMeeting", { meeting_id, ...payload }),
+  list: (params?: { from?: string; to?: string; group_id?: string }) =>
+    call<Meeting[]>("getMeetings", params || {}),
+  create: (payload: {
+    tanggal: string;
+    jam: string;
+    group_id: string;
+    acara: string;
+    materi?: string;
+    kategori_target?: string[];
+  }) => call<Meeting>("createMeeting", payload),
+  update: (payload: {
+    meeting_id: string;
+    jam?: string;
+    group_id?: string;
+    acara?: string;
+    materi?: string;
+    status?: string;
+    catatan?: string;
+    kategori_target?: string[];
+  }) => call<Meeting>("updateMeeting", payload),
 };
 
 export const attendanceApi = {
