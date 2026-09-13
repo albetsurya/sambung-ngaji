@@ -4,7 +4,7 @@ import { ToastProvider } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { MemberRoute } from "./components/layout/MemberRoute";
-
+import { useBackgroundSync } from "./hooks/useBackgroundSync";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import MembersListPage from "./pages/MembersListPage";
@@ -32,6 +32,8 @@ import AiUsagePage from "./pages/AiUsagePage";
 import QrCodePage from "./pages/QrCodePage";
 
 export default function App() {
+  useBackgroundSync();
+
   return (
     <BrowserRouter>
       <ThemeProvider>
@@ -39,7 +41,6 @@ export default function App() {
           <ToastProvider>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
-
               <Route path="/daftar" element={<PublicRegistrationPage />} />
               <Route
                 path="/daftar/sukses"
@@ -80,6 +81,12 @@ export default function App() {
                 <Route path="/absensi" element={<AttendancePage />} />
                 <Route path="/pengumuman" element={<AnnouncementsPage />} />
 
+                <Route path="/profil-saya" element={<MemberSelfPage />} />
+                <Route
+                  path="/profil-saya/edit"
+                  element={<MemberEditProfilePage />}
+                />
+
                 <Route path="/lainnya">
                   <Route index element={<OthersPage />} />
                   <Route path="kelompok" element={<GroupsPage />} />
@@ -88,10 +95,8 @@ export default function App() {
                     path="pendaftar/:submission_id"
                     element={<PendingMemberDetailPage />}
                   />
-
                   <Route path="qr-code" element={<QrCodePage />} />
                   <Route path="ai-usage" element={<AiUsagePage />} />
-
                   <Route path="users" element={<UsersPage />} />
                   <Route path="pengaturan" element={<SettingsPage />} />
                   <Route path="audit-log" element={<AuditLogPage />} />

@@ -1318,7 +1318,7 @@
 
 "@rollup/rollup-linux-x64-musl@4.62.4":
   version "4.62.4"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.62.4.tgz"
+  resolved "https://registry.yarnpkg.com/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.62.4.tgz#19df9a17d20ff3c17bd8e9cc2553563ae0aa0580"
   integrity sha512-qiXbGG2jkjXhzXpsFZSR2Xpb8DN/UaxYsbb/STbuR/6fpaDgRmmaq1B/LmtF2wQFOFOSsK2jdE0RZ3a0zHn4QA==
 
 "@rollup/rollup-openbsd-x64@4.62.4":
@@ -1361,6 +1361,21 @@
   resolved "https://registry.npmjs.org/@tanstack/query-devtools/-/query-devtools-5.102.8.tgz"
   integrity sha512-ZgeMKuF5d/zOE+tgWm3cSbD6Zcbr6IugVsnbHzUcSismqLZDSUPBKM6ILUxExgwe6rPAOox2x5bA5T+PSOQG0Q==
 
+"@tanstack/query-persist-client-core@5.102.8":
+  version "5.102.8"
+  resolved "https://registry.npmjs.org/@tanstack/query-persist-client-core/-/query-persist-client-core-5.102.8.tgz"
+  integrity sha512-t3v4/D6ejo/BrPzM5gm/AT3c4CWPCxFa+0cIjAeHAeanGPG6rCjFS1hZnPZH/rf55qe3qYYgx5U6iBZMY1PQjA==
+  dependencies:
+    "@tanstack/query-core" "5.102.8"
+
+"@tanstack/query-sync-storage-persister@^5.102.8":
+  version "5.102.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.102.8.tgz#ef37ba17f1d73a5a75a63ef92a8f35e4fdc2489d"
+  integrity sha512-UvIpYl6jipKJHfITAieQaXMvVPoJh2IkQkWDYZNRPycoGbNYdqB+UdRVoXkZagB3EdeKnlC7sA61grsEC87Wfw==
+  dependencies:
+    "@tanstack/query-core" "5.102.8"
+    "@tanstack/query-persist-client-core" "5.102.8"
+
 "@tanstack/react-query-devtools@^5.102.8":
   version "5.102.8"
   resolved "https://registry.npmjs.org/@tanstack/react-query-devtools/-/react-query-devtools-5.102.8.tgz"
@@ -1368,12 +1383,31 @@
   dependencies:
     "@tanstack/query-devtools" "5.102.8"
 
+"@tanstack/react-query-persist-client@^5.102.8":
+  version "5.102.8"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.102.8.tgz#4e77712da521879ecbefc5c3e05e0474dfe43efa"
+  integrity sha512-WOZReC+m9klekPtG7eeZ3txJeMA9lg2R0RytSG3yXcZgJItQAVIyoobJdbdIQtlpgcU2tSzsOEBtJacs2vlCOA==
+  dependencies:
+    "@tanstack/query-persist-client-core" "5.102.8"
+
 "@tanstack/react-query@^5.102.8":
   version "5.102.8"
   resolved "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.102.8.tgz"
   integrity sha512-TYBea4OuXWD7MhaSHq069TWbFe7rcwWN6kzT7JF0OKi1K6c1gTv2IzD6A6ExJsCMozdkqBWeuIUZmu4KQg0O5A==
   dependencies:
     "@tanstack/query-core" "5.102.8"
+
+"@tanstack/react-virtual@^3.14.12":
+  version "3.14.12"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-virtual/-/react-virtual-3.14.12.tgz#2e27d94218db8179b570bce25e3635ef25b6c52e"
+  integrity sha512-EOJkBss/FRqzFrCpX8M96lIh+ZMc0jPt0LILhxWQ3tOHQ3XdVvuE0jceS2yZXpDtayNfpjeg2EnuYPm90CxIlA==
+  dependencies:
+    "@tanstack/virtual-core" "3.17.10"
+
+"@tanstack/virtual-core@3.17.10":
+  version "3.17.10"
+  resolved "https://registry.npmjs.org/@tanstack/virtual-core/-/virtual-core-3.17.10.tgz"
+  integrity sha512-eMorKWIi2nekElu+8DgSMJR4iR+sTDeh+W8VjKiMH79yUfEDJ3W9aL/96/wwbxNjyV6EfN39HKszSxjd90zAqQ==
 
 "@trickfilm400/rollup-plugin-off-main-thread@^3.0.0-pre1":
   version "3.0.0-pre1"
@@ -2372,6 +2406,11 @@ ico-endec@*:
   version "0.1.6"
   resolved "https://registry.npmjs.org/ico-endec/-/ico-endec-0.1.6.tgz"
   integrity sha512-ZdLU38ZoED3g1j3iEyzcQj+wAkY2xfWNkymszfJPoxucIUhK7NayQ+/C4Kv0nDFMIsbtbEHldv3V8PU494/ueQ==
+
+idb-keyval@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.3.0.tgz#3fa4c062fcaddd7e577c51b51f69924bccfb58e6"
+  integrity sha512-um+2dgAWmYsu615EXpWVwSmapJhON0G43t3Ka/EVaohzPQXSMqKEqeDK/oIW3Ow+BXaF2PvSc+oBTFp793A5Ow==
 
 idb@^7.0.1:
   version "7.1.1"
@@ -3813,7 +3852,7 @@ workbox-broadcast-update@7.4.1:
 
 workbox-build@^7.4.1:
   version "7.4.1"
-  resolved "https://registry.yarnpkg.com/workbox-build/-/workbox-build-7.4.1.tgz#b705d678dde0559d5e818cb6a9e9908668f792e1"
+  resolved "https://registry.npmjs.org/workbox-build/-/workbox-build-7.4.1.tgz"
   integrity sha512-SDhxIvEAde9Gy/5w4Yo1Jh/M49Z0qE3q0oteyE8zGq0DScxFqVBcCtIXFuLtmtxRQZCMbf0prco4VyEu3KBQuw==
   dependencies:
     "@apideck/better-ajv-errors" "^0.3.1"
@@ -3946,17 +3985,9 @@ workbox-sw@7.4.1:
   resolved "https://registry.npmjs.org/workbox-sw/-/workbox-sw-7.4.1.tgz"
   integrity sha512-fez5f2DUlDJWTFYkCWQpY10N8gtztd849NswCbVFk0QlcSM4HT5A8x4g4ii650yem4I8tHY0R7JZahwp3ltIPw==
 
-workbox-window@7.4.1:
+workbox-window@7.4.1, workbox-window@^7.4.1:
   version "7.4.1"
   resolved "https://registry.npmjs.org/workbox-window/-/workbox-window-7.4.1.tgz"
-  integrity sha512-notZDH2u8VXaqyuD7xaqIfEFi6SRM4SUSd7ewe9PDsVqADuepxX2ZMY3uvuZGxzY5ZOsGC/vD3A/3smFtJt4/A==
-  dependencies:
-    "@types/trusted-types" "^2.0.2"
-    workbox-core "7.4.1"
-
-workbox-window@^7.4.1:
-  version "7.4.1"
-  resolved "https://registry.yarnpkg.com/workbox-window/-/workbox-window-7.4.1.tgz#ab3bfb2db306fb1584e791cc9ea02bf6e2f69e19"
   integrity sha512-notZDH2u8VXaqyuD7xaqIfEFi6SRM4SUSd7ewe9PDsVqADuepxX2ZMY3uvuZGxzY5ZOsGC/vD3A/3smFtJt4/A==
   dependencies:
     "@types/trusted-types" "^2.0.2"

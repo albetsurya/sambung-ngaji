@@ -1,14 +1,17 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ChevronLeft,
   Plus,
   Sun,
   Moon,
   Sparkles,
+  RefreshCw,
 } from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useToast } from "../../contexts/ToastContext";
 
 interface HeaderProps {
   title: string;
@@ -17,6 +20,7 @@ interface HeaderProps {
   backLabel?: string;
   right?: ReactNode;
   showThemeToggle?: boolean;
+  showSyncButton?: boolean;
 }
 
 export function Header({
@@ -26,9 +30,24 @@ export function Header({
   backLabel,
   right,
   showThemeToggle,
+  showSyncButton = true,
 }: HeaderProps) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  const [syncing, setSyncing] = useState(false);
+
+  async function handleSync() {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      await queryClient.invalidateQueries();
+      showToast("Data diperbarui");
+    } finally {
+      setTimeout(() => setSyncing(false), 500);
+    }
+  }
 
   return (
     <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
@@ -63,6 +82,17 @@ export function Header({
         </div>
 
         <div className="flex items-center justify-end gap-1.5 min-w-0">
+          {showSyncButton && (
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              aria-label="Sync data"
+              title="Sync data"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all hover:bg-surface-card2 active:scale-95 shrink-0 disabled:opacity-50"
+            >
+              <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
+            </button>
+          )}
           {showThemeToggle && (
             <button
               onClick={toggleTheme}

@@ -69,12 +69,14 @@ export function Modal({ open, onClose, title, children }: SheetProps) {
   );
 }
 
-interface ConfirmProps {
+interface ConfirmDialogProps {
   open: boolean;
   title: string;
-  description?: string;
+  description: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   danger?: boolean;
+  loading?: boolean; // ← TAMBAH
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -85,15 +87,16 @@ export function ConfirmDialog({
   description,
   confirmLabel = "Ya, lanjutkan",
   danger,
+  loading = false,
   onConfirm,
   onCancel,
-}: ConfirmProps) {
+}: ConfirmDialogProps) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-10">
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.15s_ease-out]"
-        onClick={onCancel}
+        onClick={loading ? undefined : onCancel}
       />
       <div className="relative w-full max-w-[300px] bg-surface-card rounded-[24px] border border-surface-border overflow-hidden shadow-2xl animate-[popIn_0.2s_ease-out]">
         <div className="px-5 pt-5 pb-4 text-center">
@@ -109,17 +112,19 @@ export function ConfirmDialog({
         <div className="flex gap-2.5 px-4 pb-4">
           <button
             onClick={onCancel}
+            disabled={loading}
             className="flex-1 h-11 rounded-2xl text-[15px] font-medium text-surface-text border border-surface-border bg-surface-card transition-colors hover:bg-surface-card2 active:scale-[0.97]"
           >
             Batal
           </button>
           <button
             onClick={onConfirm}
+            disabled={loading}
             className={`flex-1 h-11 rounded-2xl text-[15px] font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97] ${
               danger ? "bg-danger" : "bg-accent"
             }`}
           >
-            {confirmLabel}
+            {loading ? "Memproses..." : confirmLabel}
           </button>
         </div>
       </div>

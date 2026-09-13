@@ -1,6 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Search,
   SlidersHorizontal,
@@ -22,9 +31,8 @@ import {
   EmptyState,
   BottomSheet,
   Button,
-  Select,
 } from "../components/common";
-import { memberApi, type MemberFilters } from "../services/memberApi";
+import { memberApi } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
 import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
@@ -36,8 +44,10 @@ import { useToast } from "../contexts/ToastContext";
 import { queryKeys } from "../lib/queryClient";
 
 type ViewMode = "list" | "grid";
+type GridCols = 2 | 3 | 4;
 
 const VIEW_KEY = "members_view_mode";
+const COLS_KEY = "members_grid_cols";
 
 export default function MembersListPage() {
   const navigate = useNavigate();
@@ -45,6 +55,7 @@ export default function MembersListPage() {
   const { showToast } = useToast();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const deferredSearch = useDeferredValue(debouncedSearch);
   const [kategori, setKategori] = useState<MemberCategory | "">("");
   const [jenisKelamin, setJenisKelamin] = useState("");
   const [view, setView] = useState<ViewMode>(() => {
@@ -52,43 +63,62 @@ export default function MembersListPage() {
     const saved = localStorage.getItem(VIEW_KEY);
     return saved === "grid" ? "grid" : "list";
   });
+  const [gridCols, setGridCols] = useState<GridCols>(() => {
+    if (typeof window === "undefined") return 2;
+    const saved = localStorage.getItem(COLS_KEY);
+    if (saved === "3") return 3;
+    if (saved === "4") return 4;
+    return 2;
+  });
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, view);
   }, [view]);
 
   useEffect(() => {
+    localStorage.setItem(COLS_KEY, String(gridCols));
+  }, [gridCols]);
+
+  useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 300);
     return () => clearTimeout(t);
   }, [search]);
 
-  function toggleView() {
-    setView((v) => (v === "list" ? "grid" : "list"));
-  }
-
-  const filters: MemberFilters = useMemo(() => {
-    const f: MemberFilters = {};
-    if (debouncedSearch) f.search = debouncedSearch;
-    if (kategori) f.kategori = kategori;
-    if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
-    return f;
-  }, [debouncedSearch, kategori, jenisKelamin]);
-
   const {
-    data: members = [],
+    data: allMembers = [],
     isLoading,
     error,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.members(filters),
-    queryFn: () => {
-      const fn = role === "TIM_PNKB" ? memberApi.listPNKB : memberApi.list;
-      return fn(filters);
-    },
-    staleTime: 30_000,
-    placeholderData: (prev) => prev,
+    queryKey: queryKeys.members(),
+    queryFn: () =>
+      role === "TIM_PNKB" ? memberApi.listPNKB({}) : memberApi.list({}),
+    staleTime: 5 * 60_000,
   });
+
+  const members = useMemo(() => {
+    return allMembers.filter((m) => {
+      if (kategori && m.kategori !== kategori) return false;
+      if (jenisKelamin && m.jenis_kelamin !== jenisKelamin) return false;
+      if (deferredSearch) {
+        const q = deferredSearch.toLowerCase();
+        const namaMatch = m.nama_lengkap.toLowerCase().includes(q);
+        const panggilanMatch = (m.nama_panggilan || "")
+          .toLowerCase()
+          .includes(q);
+        if (!namaMatch && !panggilanMatch) return false;
+      }
+      return true;
+    });
+  }, [allMembers, kategori, jenisKelamin, deferredSearch]);
+
+  const deferredMembers = useDeferredValue(members);
+
+  const totalCount = allMembers.length;
 
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
@@ -98,6 +128,70 @@ export default function MembersListPage() {
   );
 
   const hasActiveSearch = search.length > 0;
+
+  const gridColsClass =
+    gridCols === 4
+      ? "grid-cols-4"
+      : gridCols === 3
+        ? "grid-cols-3"
+        : "grid-cols-2";
+
+  useEffect(() => {
+    if (allMembers.length === 0) {
+      setShowSkeleton(true);
+      return;
+    }
+    const t = setTimeout(() => setShowSkeleton(false), 120);
+    return () => clearTimeout(t);
+  }, [allMembers.length]);
+
+  const showInitialSkeleton = showSkeleton;
+
+  const rowHeight = view === "grid" ? 140 : 76;
+
+  const virtualizer = useVirtualizer({
+    count:
+      view === "grid"
+        ? Math.ceil(deferredMembers.length / gridCols)
+        : deferredMembers.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => rowHeight,
+    overscan: 6,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+  const handlePress = useCallback(
+    (id: string) => {
+      navigate(`/jamaah/${id}`);
+    },
+    [navigate],
+  );
+
+  const renderItem = useCallback(
+    (index: number) => {
+      if (view === "list") {
+        const m = deferredMembers[index];
+        if (!m) return null;
+        return <JamaahCard member={m} onPress={handlePress} />;
+      }
+      const start = index * gridCols;
+      const rowMembers = deferredMembers.slice(start, start + gridCols);
+      return (
+        <div className={`grid ${gridColsClass} gap-2`}>
+          {rowMembers.map((m) => (
+            <JamaahGridCard
+              key={m.member_id}
+              member={m}
+              cols={gridCols}
+              onPress={handlePress}
+            />
+          ))}
+        </div>
+      );
+    },
+    [deferredMembers, view, gridCols, gridColsClass, handlePress],
+  );
 
   return (
     <AppLayout
@@ -109,7 +203,12 @@ export default function MembersListPage() {
     >
       <Header
         title="Jamaah"
-        subtitle={`${members.length} jamaah${isLoading ? "" : " ditemukan"}`}
+        subtitle={
+          showInitialSkeleton
+            ? "Memuat..."
+            : `${members.length} dari ${totalCount} jamaah`
+        }
+        showSyncButton
       />
 
       <div
@@ -170,18 +269,18 @@ export default function MembersListPage() {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1">
-        {isLoading && (
+      <div className="flex flex-col flex-1 min-h-0">
+        {showInitialSkeleton && (
           <div className="px-4 py-2">
             {view === "grid" ? (
-              <JamaahGridSkeleton rows={6} />
+              <JamaahGridSkeleton rows={gridCols * 2} cols={gridCols} />
             ) : (
               <JamaahListSkeleton rows={8} />
             )}
           </div>
         )}
 
-        {!isLoading && error && (
+        {!isLoading && error && allMembers.length === 0 && (
           <ErrorState
             message={
               error instanceof ApiError
@@ -192,7 +291,7 @@ export default function MembersListPage() {
           />
         )}
 
-        {!isLoading && !error && members.length === 0 && (
+        {!showInitialSkeleton && !error && members.length === 0 && (
           <EmptyState
             title={hasActiveSearch ? "Tidak ditemukan" : "Belum ada jamaah"}
             description={
@@ -210,27 +309,40 @@ export default function MembersListPage() {
           />
         )}
 
-        {!isLoading && !error && members.length > 0 && view === "grid" && (
-          <div className="px-4 py-2 grid grid-cols-2 gap-3">
-            {members.map((m) => (
-              <JamaahGridCard
-                key={m.member_id}
-                member={m}
-                onClick={() => navigate(`/jamaah/${m.member_id}`)}
-              />
-            ))}
-          </div>
-        )}
+        {!showSkeleton && members.length > 0 && (
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-auto px-4 py-2"
+            style={{ height: "calc(100vh - 220px)" }}
+          >
+            <div
+              style={{
+                height: virtualizer.getTotalSize(),
+                width: "100%",
+                position: "relative",
+              }}
+            >
+              {virtualItems.map((virtualRow) => (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  {renderItem(virtualRow.index)}
+                </div>
+              ))}
+            </div>
 
-        {!isLoading && !error && members.length > 0 && view === "list" && (
-          <div className="px-4 py-2 space-y-2">
-            {members.map((m) => (
-              <JamaahCard
-                key={m.member_id}
-                member={m}
-                onClick={() => navigate(`/jamaah/${m.member_id}`)}
-              />
-            ))}
+            <p className="text-center text-ios-footnote text-surface-muted py-4">
+              Semua jamaah sudah ditampilkan ({members.length})
+            </p>
           </div>
         )}
       </div>
@@ -271,6 +383,32 @@ export default function MembersListPage() {
               </button>
             </div>
           </div>
+
+          {view === "grid" && (
+            <div>
+              <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
+                Jumlah Kolom
+              </p>
+              <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
+                {([2, 3, 4] as GridCols[]).map((n, idx) => (
+                  <div key={n} className="flex-1 flex">
+                    {idx > 0 && <div className="w-px bg-surface-border" />}
+                    <button
+                      onClick={() => setGridCols(n)}
+                      className={`flex-1 min-h-[44px] flex items-center justify-center gap-2 transition-all ${
+                        gridCols === n
+                          ? "bg-accent text-white"
+                          : "text-surface-muted hover:bg-surface-card"
+                      }`}
+                    >
+                      <GridIcon cols={n} />
+                      <span className="text-ios-subhead font-medium">{n}</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
@@ -334,13 +472,13 @@ export default function MembersListPage() {
                   Export CSV
                 </p>
                 <p className="text-ios-footnote text-surface-muted">
-                  Unduh {members.length} data jamaah
+                  Unduh {members.length} jamaah yang sudah dimuat
                 </p>
               </div>
             </button>
           </div>
 
-          {activeFilterCount > 0 && (
+          {(activeFilterCount > 0 || view === "grid") && (
             <button
               onClick={() => {
                 setJenisKelamin("");
@@ -358,15 +496,48 @@ export default function MembersListPage() {
   );
 }
 
-function JamaahCard({
+function GridIcon({ cols }: { cols: GridCols }) {
+  const gap = 1;
+  const size = 14;
+  const cellSize = (size - gap * (cols - 1)) / cols;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      {Array.from({ length: cols }).map((_, i) =>
+        Array.from({ length: cols }).map((_, j) => (
+          <rect
+            key={`${i}-${j}`}
+            x={j * (cellSize + gap)}
+            y={i * (cellSize + gap)}
+            width={cellSize}
+            height={cellSize}
+            rx={0.8}
+            fill="currentColor"
+          />
+        )),
+      )}
+    </svg>
+  );
+}
+
+const JamaahCard = memo(function JamaahCard({
   member,
-  onClick,
+  onPress,
 }: {
   member: Member;
-  onClick: () => void;
+  onPress: (id: string) => void;
 }) {
   return (
-    <Card onClick={onClick} className="flex items-center gap-3">
+    <Card
+      onClick={() => onPress(member.member_id)}
+      className="flex items-center gap-3 h-[68px]"
+    >
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
@@ -383,42 +554,54 @@ function JamaahCard({
       {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
     </Card>
   );
-}
+});
 
-function JamaahGridCard({
+const JamaahGridCard = memo(function JamaahGridCard({
   member,
-  onClick,
+  cols,
+  onPress,
 }: {
   member: Member;
-  onClick: () => void;
+  cols: GridCols;
+  onPress: (id: string) => void;
 }) {
+  const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
+  const padding =
+    cols === 2 ? "py-4 px-3" : cols === 3 ? "py-3 px-2" : "py-2.5 px-1.5";
+  const nameSize = cols === 2 ? "text-sm" : "text-xs";
+  const badgeSize = cols === 2 ? "text-[10px]" : "text-[9px]";
+
   return (
     <Card
-      onClick={onClick}
-      className="flex flex-col items-center text-center gap-2 py-4 px-3"
+      onClick={() => onPress(member.member_id)}
+      className={`flex flex-col items-center text-center gap-1.5 ${padding}`}
     >
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
-        size={56}
+        size={avatarSize}
         gender={normalizeGender(member?.jenis_kelamin)}
       />
       <div className="min-w-0 w-full">
-        <p className="font-medium text-sm text-surface-text truncate">
+        <p
+          className={`font-medium ${nameSize} text-surface-text truncate leading-tight`}
+        >
           {member.nama_lengkap}
         </p>
-        <p className="text-xs text-surface-muted truncate mt-0.5">
+        <p className="text-[10px] text-surface-muted truncate mt-0.5">
           {member.kelompok || "Belum ada kelompok"}
         </p>
       </div>
       {member.kategori && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-accent-soft text-accent">
+        <span
+          className={`inline-flex items-center px-1.5 py-0.5 rounded-full ${badgeSize} font-semibold tracking-wide bg-accent-soft text-accent truncate max-w-full`}
+        >
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
     </Card>
   );
-}
+});
 
 function CategoryChip({
   active,
@@ -443,18 +626,33 @@ function CategoryChip({
   );
 }
 
-function JamaahGridSkeleton({ rows = 6 }: { rows?: number }) {
+function JamaahGridSkeleton({
+  rows = 6,
+  cols = 2,
+}: {
+  rows?: number;
+  cols?: GridCols;
+}) {
+  const colsClass =
+    cols === 4 ? "grid-cols-4" : cols === 3 ? "grid-cols-3" : "grid-cols-2";
+  const avatarSize =
+    cols === 2 ? "w-14 h-14" : cols === 3 ? "w-11 h-11" : "w-9 h-9";
+  const padding = cols === 2 ? "p-3" : cols === 3 ? "p-2" : "p-1.5";
+  const gap = cols === 2 ? "gap-3" : cols === 3 ? "gap-2" : "gap-1.5";
+
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className={`grid ${colsClass} ${gap}`}>
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-3 flex flex-col items-center gap-2"
+          className={`bg-surface-card rounded-2xl border border-surface-border shadow-sm ${padding} flex flex-col items-center gap-2`}
         >
-          <div className="w-14 h-14 rounded-full bg-surface-card2 animate-pulse" />
-          <div className="h-4 w-3/4 rounded-md bg-surface-card2 animate-pulse" />
-          <div className="h-3 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
-          <div className="h-5 w-16 rounded-full bg-surface-card2 animate-pulse" />
+          <div
+            className={`${avatarSize} rounded-full bg-surface-card2 animate-pulse`}
+          />
+          <div className="h-3 w-3/4 rounded-md bg-surface-card2 animate-pulse" />
+          <div className="h-2.5 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
+          <div className="h-4 w-12 rounded-full bg-surface-card2 animate-pulse" />
         </div>
       ))}
     </div>

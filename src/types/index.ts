@@ -5,6 +5,7 @@ export type Role =
   | "ADMIN"
   | "TIM_PNKB"
   | "TIM_ABSENSI"
+  | "PENGAWAS"
   | "MEMBER";
 
 export type MemberCategory =
@@ -272,4 +273,9 @@ export interface AiUsageEntry {
   output_tokens: number;
   total_tokens: number;
   timestamp: string;
+}
+
+export interface MemberUserStatus {
+  has_user: boolean;
+  user: User | null;
 }

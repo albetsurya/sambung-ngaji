@@ -69,6 +69,7 @@ export default function DashboardPage() {
           />
         }
         showThemeToggle
+        showSyncButton
       />
 
       <div className="px-4 py-4 space-y-4">
