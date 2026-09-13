@@ -1,4 +1,5 @@
 import {
+  memo,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -160,30 +161,37 @@ export default function MembersListPage() {
 
   const virtualItems = virtualizer.getVirtualItems();
 
- const renderItem = useCallback(
-   (index: number) => {
-     if (view === "list") {
-       const m = deferredMembers[index];
-       if (!m) return null;
-       return <JamaahCard member={m} onPress={handlePress} />;
-     }
-     const start = index * gridCols;
-     const rowMembers = deferredMembers.slice(start, start + gridCols);
-     return (
-       <div className={`grid ${gridColsClass} gap-2`}>
-         {rowMembers.map((m) => (
-           <JamaahGridCard
-             key={m.member_id}
-             member={m}
-             cols={gridCols}
-             onClick={() => navigate(`/jamaah/${m.member_id}`)}
-           />
-         ))}
-       </div>
-     );
-   },
-   [deferredMembers, view, gridCols, gridColsClass, navigate],
- );
+  const handlePress = useCallback(
+    (id: string) => {
+      navigate(`/jamaah/${id}`);
+    },
+    [navigate],
+  );
+
+  const renderItem = useCallback(
+    (index: number) => {
+      if (view === "list") {
+        const m = deferredMembers[index];
+        if (!m) return null;
+        return <JamaahCard member={m} onPress={handlePress} />;
+      }
+      const start = index * gridCols;
+      const rowMembers = deferredMembers.slice(start, start + gridCols);
+      return (
+        <div className={`grid ${gridColsClass} gap-2`}>
+          {rowMembers.map((m) => (
+            <JamaahGridCard
+              key={m.member_id}
+              member={m}
+              cols={gridCols}
+              onPress={handlePress}
+            />
+          ))}
+        </div>
+      );
+    },
+    [deferredMembers, view, gridCols, gridColsClass, handlePress],
+  );
 
   return (
     <AppLayout
@@ -518,15 +526,18 @@ function GridIcon({ cols }: { cols: GridCols }) {
   );
 }
 
-function JamaahCard({
+const JamaahCard = memo(function JamaahCard({
   member,
-  onClick,
+  onPress,
 }: {
   member: Member;
-  onClick: () => void;
+  onPress: (id: string) => void;
 }) {
   return (
-    <Card onClick={onClick} className="flex items-center gap-3 h-[68px]">
+    <Card
+      onClick={() => onPress(member.member_id)}
+      className="flex items-center gap-3 h-[68px]"
+    >
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
@@ -543,16 +554,16 @@ function JamaahCard({
       {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
     </Card>
   );
-}
+});
 
-function JamaahGridCard({
+const JamaahGridCard = memo(function JamaahGridCard({
   member,
   cols,
-  onClick,
+  onPress,
 }: {
   member: Member;
   cols: GridCols;
-  onClick: () => void;
+  onPress: (id: string) => void;
 }) {
   const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
   const padding =
@@ -562,7 +573,7 @@ function JamaahGridCard({
 
   return (
     <Card
-      onClick={onClick}
+      onClick={() => onPress(member.member_id)}
       className={`flex flex-col items-center text-center gap-1.5 ${padding}`}
     >
       <Avatar
@@ -590,7 +601,7 @@ function JamaahGridCard({
       )}
     </Card>
   );
-}
+});
 
 function CategoryChip({
   active,
