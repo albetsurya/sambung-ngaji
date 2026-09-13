@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import { usePermission } from "../../hooks/usePermission";
+import { useEnvironment } from "../../hooks/useEnvironment";
 import {
   Home,
   Users,
@@ -6,69 +8,79 @@ import {
   Megaphone,
   MoreHorizontal,
 } from "../common/FontAwesomeIcons";
-import { usePermission } from "../../hooks/usePermission";
 
 const ITEMS = [
-  { key: "beranda", to: "/", icon: Home, label: "Beranda" },
-  { key: "jamaah", to: "/jamaah", icon: Users, label: "Jamaah" },
-  { key: "absensi", to: "/absensi", icon: CalendarCheck, label: "Absensi" },
+  { key: "beranda", label: "Beranda", to: "/", icon: Home },
+  { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
+  { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
   {
     key: "pengumuman",
+    label: "Pengumuman",
     to: "/pengumuman",
     icon: Megaphone,
-    label: "Pengumuman",
   },
-  { key: "lainnya", to: "/lainnya", icon: MoreHorizontal, label: "Lainnya" },
+  { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 
-/**
- * Bottom nav modern: floating pill dengan backdrop blur, item aktif
- * ditandai dengan pill background accent-soft — bukan hanya warna teks.
- * Lebih tegas secara visual dan terasa "hidup".
- */
 export function BottomNav() {
+  const { isDevelopment } = useEnvironment();
   const { canSeeNav } = usePermission();
   const visible = ITEMS.filter((i) => canSeeNav(i.key));
 
   return (
-    <nav className="w-full flex items-center gap-1 p-1.5 rounded-3xl bg-surface-card/90 backdrop-blur-xl border border-surface-border shadow-lg shadow-black/5">
-      {visible.map((item) => {
-        const Icon = item.icon;
-        return (
-          <NavLink
-            key={item.key}
-            to={item.to}
-            end={item.to === "/"}
-            className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200"
-          >
-            {({ isActive }) => (
-              <>
-                <Icon
-                  size={21}
-                  strokeWidth={isActive ? 2.4 : 1.9}
-                  className={`transition-colors duration-200 ${
-                    isActive ? "text-accent" : "text-surface-muted"
-                  }`}
-                />
-                <span
-                  className={`text-ios-tab transition-all duration-200 ${
-                    isActive
-                      ? "text-accent font-semibold"
-                      : "text-surface-muted"
-                  }`}
-                >
-                  {item.label}
-                </span>
-                <span
-                  className={`absolute bottom-1 w-1 h-1 rounded-full bg-accent transition-all duration-200 ${
-                    isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
-                  }`}
-                />
-              </>
-            )}
-          </NavLink>
-        );
-      })}
-    </nav>
+    <div className="relative w-full">
+      {isDevelopment && (
+        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 px-2.5 py-0.5 rounded-full bg-warning text-white text-[9px] font-bold uppercase tracking-wider shadow-md shadow-warning/30 whitespace-nowrap flex items-center gap-1">
+          <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+          DEV Server
+        </div>
+      )}
+
+      <nav
+        className={`w-full flex items-center gap-1 p-1.5 rounded-3xl bg-surface-card/90 backdrop-blur-xl shadow-lg shadow-black/5 ${
+          isDevelopment
+            ? "border-2 border-warning/40"
+            : "border border-surface-border"
+        }`}
+      >
+        {visible.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.key}
+              to={item.to}
+              end={item.to === "/"}
+              className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200"
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    size={21}
+                    strokeWidth={isActive ? 2.4 : 1.9}
+                    className={`transition-colors duration-200 ${
+                      isActive ? "text-accent" : "text-surface-muted"
+                    }`}
+                  />
+                  <span
+                    className={`text-ios-tab transition-all duration-200 ${
+                      isActive
+                        ? "text-accent font-semibold"
+                        : "text-surface-muted"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                  <span
+                    className={`absolute bottom-1 w-1 h-1 rounded-full bg-accent transition-all duration-200 ${
+                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                    }`}
+                  />
+                </>
+              )}
+            </NavLink>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

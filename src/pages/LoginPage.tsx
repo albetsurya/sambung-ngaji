@@ -13,6 +13,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/common";
 import { ApiError } from "../services/api";
+import { useEnvironment } from "../hooks/useEnvironment";
 
 /* -------------------------------------------------------------------------- */
 /*                       App icon — checklist / database                      */
@@ -92,6 +93,7 @@ export default function LoginPage() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDevelopment } = useEnvironment();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -156,6 +158,15 @@ export default function LoginPage() {
               <AppIcon size={80} />
             </div>
           </div>
+
+          {isDevelopment && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-soft border border-warning/30 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
+              <span className="text-ios-caption font-semibold text-warning uppercase tracking-wide">
+                Development Server
+              </span>
+            </div>
+          )}
 
           <h1 className="text-[26px] font-bold text-surface-text tracking-[-0.02em] leading-tight">
             Hai, Jamaah Latukan 👋
