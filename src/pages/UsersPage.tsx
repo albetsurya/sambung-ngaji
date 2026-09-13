@@ -36,6 +36,7 @@ const ROLE_LABEL: Record<Role, string> = {
   ADMIN: "Admin",
   TIM_PNKB: "Tim PNKB",
   TIM_ABSENSI: "Tim Absensi",
+  PENGAWAS: "Pengawas",
   MEMBER: "Member",
 };
 
@@ -44,6 +45,7 @@ const ROLE_DESCRIPTION: Record<Role, string> = {
   ADMIN: "Kelola jamaah, kelompok, dan absensi",
   TIM_PNKB: "Khusus pembinaan pra nikah",
   TIM_ABSENSI: "Khusus absensi pengajian",
+  PENGAWAS: "Lihat semua data + tulis pembinaan",
   MEMBER: "Hanya bisa lihat data sendiri",
 };
 

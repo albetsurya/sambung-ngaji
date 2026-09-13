@@ -18,19 +18,26 @@ export function usePermission() {
     return NAV_BY_ROLE[role]?.includes(key) || false;
   }
 
-  const isSuperAdmin = role === "SUPER_ADMIN";
   const isAdminLike = role === "SUPER_ADMIN" || role === "ADMIN";
-  const isPNKB = role === "TIM_PNKB";
-  const isAbsensi = role === "TIM_ABSENSI";
-  const isMember = role === "MEMBER";
+  const isSuperAdmin = role === "SUPER_ADMIN";
+  const isPengawas = role === "PENGAWAS";
+  const canViewAllMembers =
+    role === "SUPER_ADMIN" || role === "ADMIN" || role === "PENGAWAS";
+  const canEditMembers = role === "SUPER_ADMIN" || role === "ADMIN";
+  const canWriteMonitoring =
+    role === "SUPER_ADMIN" ||
+    role === "ADMIN" ||
+    role === "TIM_PNKB" ||
+    role === "PENGAWAS";
 
   return {
     role,
     canSeeNav,
     isSuperAdmin,
     isAdminLike,
-    isPNKB,
-    isAbsensi,
-    isMember,
+    isPengawas,
+    canViewAllMembers,
+    canEditMembers,
+    canWriteMonitoring,
   };
 }

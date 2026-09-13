@@ -390,11 +390,15 @@ export default function AttendancePage() {
                     </p>
                     <p className="text-ios-body font-medium text-surface-text truncate">
                       {selectedMeeting
-                        ? `${selectedMeeting.hari} — ${
-                            selectedMeeting.acara || "Pengajian"
-                          }`
+                        ? `${selectedMeeting.hari} — ${selectedMeeting.acara || "Pengajian"}`
                         : "Pilih jadwal"}
                     </p>
+                    {selectedMeeting && (
+                      <p className="text-ios-footnote text-surface-muted truncate">
+                        {formatDateShort(selectedMeeting.tanggal)} ·{" "}
+                        {selectedMeeting.jam || "—"}
+                      </p>
+                    )}
                     {selectedMeeting &&
                       normalizeTargets(selectedMeeting.kategori_target).length >
                         0 && (
@@ -404,14 +408,6 @@ export default function AttendancePage() {
                             .join(" · ")}
                         </p>
                       )}
-                    {normalizeTargets(selectedMeeting?.kategori_target).length >
-                      0 && (
-                      <p className="text-ios-caption text-accent truncate mt-0.5">
-                        {normalizeTargets(selectedMeeting?.kategori_target)
-                          .map((k) => CATEGORY_LABEL[k])
-                          .join(" · ")}
-                      </p>
-                    )}
                   </div>
                   <ChevronDown
                     size={18}

@@ -58,6 +58,7 @@ export default function MemberDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAdminLike, role } = usePermission();
+  const canEdit = role === "SUPER_ADMIN" || role === "ADMIN";
   const [tab, setTab] = useState<TabKey>("Biodata");
 
   const {
@@ -149,7 +150,7 @@ export default function MemberDetailPage() {
         title={member.nama_lengkap}
         onBack={() => navigate(-1)}
         right={
-          isAdminLike ? (
+          canEdit ? (
             <button
               onClick={() => navigate(`/jamaah/${member.member_id}/edit`)}
               className="text-ios-body font-semibold text-accent px-2 h-9 rounded-xl transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
@@ -256,7 +257,7 @@ export default function MemberDetailPage() {
           <MonitoringTab
             memberId={member.member_id}
             entries={monitoring}
-            canWrite={isAdminLike || role === "TIM_PNKB"}
+            canWrite={isAdminLike || role === "TIM_PNKB" || role === "PENGAWAS"}
             onSaved={refetch}
           />
         )}

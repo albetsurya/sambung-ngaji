@@ -5,6 +5,7 @@ export type Role =
   | "ADMIN"
   | "TIM_PNKB"
   | "TIM_ABSENSI"
+  | "PENGAWAS"
   | "MEMBER";
 
 export type MemberCategory =

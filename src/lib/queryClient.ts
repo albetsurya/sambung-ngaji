@@ -18,6 +18,8 @@ export const queryClient = new QueryClient({
 
 export const queryKeys = {
   members: (filters?: object) => (filters ? ["members", filters] : ["members"]),
+  membersPaged: (filters?: object) =>
+    filters ? ["members-paged", filters] : ["members-paged"],
   memberDetail: (id: string) => ["member", id],
   groups: () => ["groups"],
   pendingMembers: (status?: string) =>

@@ -1,14 +1,23 @@
-// memberApi.ts
 import { call } from "./api";
 import type { Member } from "../types";
 
 export interface MemberFilters {
   search?: string;
   kategori?: string;
-  kelompok?: string;
   jenis_kelamin?: string;
+  kelompok?: string;
   desa?: string;
   includeInactive?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface PagedResponse<T> {
+  items: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
 }
 
 export const memberApi = {
@@ -20,6 +29,16 @@ export const memberApi = {
   listPNKB: (filters: MemberFilters = {}) => {
     console.log("📋 Calling getPNKBMembers with filters:", filters);
     return call<Member[]>("getPNKBMembers", filters);
+  },
+
+  listPaged: (filters: MemberFilters = {}) => {
+    console.log("📋 Calling getMembersPaged with filters:", filters);
+    return call<PagedResponse<Member>>("getMembersPaged", filters);
+  },
+
+  listPNKBPaged: (filters: MemberFilters = {}) => {
+    console.log("📋 Calling getPNKBMembersPaged with filters:", filters);
+    return call<PagedResponse<Member>>("getPNKBMembersPaged", filters);
   },
 
   listForAttendance: (filters: MemberFilters = {}) => {
