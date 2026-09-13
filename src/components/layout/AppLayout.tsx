@@ -12,6 +12,7 @@ import {
 import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
+import { useEnvironment } from "../../hooks/useEnvironment";
 
 interface HeaderProps {
   title: string;
@@ -33,6 +34,7 @@ export function Header({
   showSyncButton = true,
 }: HeaderProps) {
   const navigate = useNavigate();
+  const { isDevelopment } = useEnvironment();
   const { theme, toggleTheme } = useTheme();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -71,9 +73,16 @@ export function Header({
         </div>
 
         <div className="flex flex-col items-center justify-center min-w-0 max-w-[60vw]">
-          <h1 className="w-full text-center text-ios-nav font-semibold text-surface-text truncate tracking-[-0.01em]">
-            {title}
-          </h1>
+          <div className="w-full flex items-center justify-center gap-1.5">
+            <h1 className="text-ios-nav font-semibold text-surface-text truncate tracking-[-0.01em]">
+              {title}
+            </h1>
+            {isDevelopment && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide shrink-0 bg-warning-soft text-warning border border-warning/20">
+                DEV
+              </span>
+            )}
+          </div>
           {subtitle && (
             <p className="w-full text-center text-ios-caption text-surface-muted truncate">
               {subtitle}

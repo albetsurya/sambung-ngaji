@@ -7,12 +7,17 @@
   --c-accent-2-light: 200 240 210;
 }
 [data-preset="whatsapp"].dark {
+  --c-bg: 0 0 0;
+  --c-card: 15 20 16;
+  --c-card2: 8 12 9;
+  --c-border: 35 45 38;
   --c-accent: 37 211 102;
   --c-accent-dark: 74 222 128;
   --c-accent-light: 18 60 35;
   --c-accent-2: 74 222 128;
   --c-accent-2-dark: 110 231 153;
   --c-accent-2-light: 25 80 45;
+  --c-text: 240 250 245;
 }
 
 [data-preset="instagram"] {
