@@ -13,6 +13,7 @@ import {
   ClipboardList,
   Sparkles,
   QrCode,
+  User,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -54,6 +55,14 @@ export default function OthersPage() {
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
   const menu = [
+    {
+      key: "profil-saya",
+      label: "Biodata Saya",
+      description: "Lihat & edit biodata pribadi Anda",
+      Icon: User,
+      to: "/profil-saya",
+      show: true,
+    },
     {
       key: "pendaftar",
       label: "Pendaftar",
@@ -124,7 +133,7 @@ export default function OthersPage() {
 
   return (
     <AppLayout>
-      <Header title="Lainnya" />
+      <Header title="Lainnya" showSyncButton />
 
       <div className="py-4">
         <GroupedList>
@@ -279,6 +288,7 @@ function roleLabel(role?: string) {
     ADMIN: "Admin",
     TIM_PNKB: "Tim PNKB",
     TIM_ABSENSI: "Tim Absensi",
+    PENGAWAS: "Pengawas",
     MEMBER: "Member",
   };
   return role ? map[role] || role : "";

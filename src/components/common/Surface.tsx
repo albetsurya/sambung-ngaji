@@ -174,8 +174,6 @@ export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
       ? "bg-accent-soft text-accent"
       : "bg-surface-card2 text-surface-muted";
 
-  console.log(src);
-
   if (showPhoto) {
     return (
       <img

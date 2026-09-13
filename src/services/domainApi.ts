@@ -121,10 +121,19 @@ export const dashboardApi = {
 
 export const userApi = {
   list: () => call<import("../types").User[]>("getUsers"),
+
+  detail: (user_id: string) =>
+    call<import("../types").User>("getUserDetail", { user_id }),
+
   create: (payload: Record<string, unknown>) =>
     call<import("../types").User>("createUser", payload),
+
   update: (user_id: string, payload: Record<string, unknown>) =>
     call<import("../types").User>("updateUser", { user_id, ...payload }),
+
+  updateRole: (user_id: string, role: string) =>
+    call<import("../types").User>("updateUserRole", { user_id, role }),
+
   changePassword: (payload: { old_password: string; new_password: string }) =>
     call<{ changed: boolean }>("changeMyPassword", payload),
 

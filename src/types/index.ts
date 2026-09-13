@@ -274,3 +274,8 @@ export interface AiUsageEntry {
   total_tokens: number;
   timestamp: string;
 }
+
+export interface MemberUserStatus {
+  has_user: boolean;
+  user: User | null;
+}

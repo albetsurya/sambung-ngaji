@@ -24,9 +24,11 @@ import { normalizePhoneNumber, formatDateShort } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import imageCompression from "browser-image-compression";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function MemberEditProfilePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [form, setForm] = useState<Partial<Member>>({});
   const [original, setOriginal] = useState<Member | null>(null);
@@ -148,7 +150,8 @@ export default function MemberEditProfilePage() {
       }
 
       showToast("Biodata diperbarui");
-      navigate("/member", { replace: true });
+      const returnPath = user?.role === "MEMBER" ? "/member" : "/profil-saya";
+      navigate(returnPath, { replace: true });
     } catch (err) {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menyimpan data",

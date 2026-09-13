@@ -21,6 +21,7 @@ export const queryKeys = {
   membersPaged: (filters?: object) =>
     filters ? ["members-paged", filters] : ["members-paged"],
   memberDetail: (id: string) => ["member", id],
+  memberUserStatus: (id: string) => ["member-user-status", id],
   groups: () => ["groups"],
   pendingMembers: (status?: string) =>
     status ? ["pending-members", { status }] : ["pending-members"],
@@ -31,6 +32,7 @@ export const queryKeys = {
   attendance: (meetingId: string) => ["attendance", meetingId],
   attendanceByMember: (memberId: string) => ["attendance-member", memberId],
   users: () => ["users"],
+  userDetail: (userId: string) => ["user-detail", userId],
   auditLogs: (limit: number) => ["audit-logs", { limit }],
   settings: () => ["settings"],
   aiUsage: () => ["ai-usage"],

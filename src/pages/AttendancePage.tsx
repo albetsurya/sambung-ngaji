@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Search,
   Plus,
@@ -21,7 +29,6 @@ import {
   BottomSheet,
   Select,
   Input,
-  LoadingOverlay,
   ConfirmDialog,
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
@@ -102,6 +109,7 @@ export default function AttendancePage() {
   >({});
 
   const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
   const [category, setCategory] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [meetingPickerOpen, setMeetingPickerOpen] = useState(false);
@@ -184,13 +192,13 @@ export default function AttendancePage() {
     return eligibleMembers.filter((m) => {
       if (category && m.kategori !== category) return false;
       if (
-        search &&
-        !m.nama_lengkap.toLowerCase().includes(search.toLowerCase())
+        deferredSearch &&
+        !m.nama_lengkap.toLowerCase().includes(deferredSearch.toLowerCase())
       )
         return false;
       return true;
     });
-  }, [eligibleMembers, category, search]);
+  }, [eligibleMembers, category, deferredSearch]);
 
   const hadirCount = useMemo(
     () => Object.values(records).filter((s) => s === "HADIR").length,
@@ -215,7 +223,11 @@ export default function AttendancePage() {
 
   const removeMutation = useMutation({
     mutationFn: attendanceApi.remove,
+    onSuccess: () => {
+      setDeleteTarget(null); // ← tutup modal setelah sukses
+    },
     onError: (err) => {
+      setDeleteTarget(null); // ← tutup modal juga kalau gagal
       showToast(
         err instanceof ApiError ? err.message : "Gagal menghapus absensi",
         "error",
@@ -225,19 +237,50 @@ export default function AttendancePage() {
 
   const resetMutation = useMutation({
     mutationFn: (meetingId: string) => attendanceApi.removeByMeeting(meetingId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.attendance(selectedMeeting?.meeting_id || ""),
+
+    // OPTIMASI: kosongkan cache SEBELUM request → UI update seketika
+    onMutate: async (meetingId: string) => {
+      // Cancel refetch yang sedang jalan biar tidak overwrite
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.attendance(meetingId),
       });
-      showToast("Semua absensi dihapus");
-      setConfirmResetAll(false);
+
+      // Simpan state lama untuk rollback
+      const previous = queryClient.getQueryData(
+        queryKeys.attendance(meetingId),
+      );
+
+      // Set cache jadi kosong → UI langsung update
+      queryClient.setQueryData(queryKeys.attendance(meetingId), []);
+
+      return { previous };
     },
-    onError: (err) => {
+
+    onError: (err, meetingId, context) => {
+      // Rollback kalau gagal
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(
+          queryKeys.attendance(meetingId),
+          context.previous,
+        );
+      }
       showToast(
         err instanceof ApiError ? err.message : "Gagal menghapus semua absensi",
         "error",
       );
       setConfirmResetAll(false);
+    },
+
+    onSuccess: () => {
+      showToast("Semua absensi dihapus");
+      setConfirmResetAll(false);
+    },
+
+    onSettled: (data, error, meetingId) => {
+      // Refetch untuk sinkron dengan backend
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance(meetingId),
+      });
     },
   });
 
@@ -312,14 +355,10 @@ export default function AttendancePage() {
     setOptimistic((o) => ({ ...o, ...optimisticPatch }));
 
     try {
-      await Promise.all(
-        targets.map((m) =>
-          attendanceApi.save({
-            meeting_id: selectedMeeting.meeting_id,
-            member_id: m.member_id,
-            status: "HADIR",
-          }),
-        ),
+      // OPTIMASI: 1 request bulkSave, bukan N request per-row
+      await attendanceApi.bulkSave(
+        selectedMeeting.meeting_id,
+        targets.map((m) => ({ member_id: m.member_id, status: "HADIR" })),
       );
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
@@ -343,6 +382,23 @@ export default function AttendancePage() {
     setOptimistic({});
     resetMutation.mutate(selectedMeeting.meeting_id);
   }
+
+  // OPTIMASI: useCallback biar tidak re-create tiap render
+  const handleStatusChange = useCallback(
+    (memberId: string, status: AttendanceStatus) => {
+      tapStatus(memberId, status);
+    },
+    // tapStatus stabil karena closure-nya hanya pakai records & selectedMeeting
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedMeeting?.meeting_id],
+  );
+
+  const handleRequestDelete = useCallback(
+    (memberId: string, memberName: string) => {
+      setDeleteTarget({ memberId, memberName });
+    },
+    [],
+  );
 
   const canCreate = isAdminLike || role === "TIM_ABSENSI";
 
@@ -368,6 +424,7 @@ export default function AttendancePage() {
         subtitle={
           selectedMeeting ? formatDateLong(selectedMeeting.tanggal) : undefined
         }
+        showSyncButton={false}
       />
 
       {isInitialLoading ? (
@@ -534,13 +591,8 @@ export default function AttendancePage() {
                     key={m.member_id}
                     member={m}
                     status={records[m.member_id]}
-                    onStatus={(s) => tapStatus(m.member_id, s)}
-                    onRequestDelete={() =>
-                      setDeleteTarget({
-                        memberId: m.member_id,
-                        memberName: m.nama_lengkap,
-                      })
-                    }
+                    onStatus={handleStatusChange}
+                    onRequestDelete={handleRequestDelete}
                     divider={i !== filteredMembers.length - 1}
                   />
                 ))}
@@ -595,11 +647,12 @@ export default function AttendancePage() {
         }
         confirmLabel="Hapus"
         danger
+        loading={removeMutation.isPending}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={() => {
           if (deleteTarget) {
             deleteAttendance(deleteTarget.memberId);
-            setDeleteTarget(null);
+            // setDeleteTarget(null) dipindah ke onSuccess removeMutation
           }
         }}
       />
@@ -612,19 +665,15 @@ export default function AttendancePage() {
         } akan dihapus. Tindakan ini tidak bisa dibatalkan.`}
         confirmLabel="Ya, Reset"
         danger
+        loading={resetMutation.isPending}
         onCancel={() => setConfirmResetAll(false)}
         onConfirm={resetAllAttendance}
-      />
-
-      <LoadingOverlay
-        open={resetMutation.isPending}
-        label="Menghapus absensi..."
       />
     </AppLayout>
   );
 }
 
-function CompactAttendanceRow({
+const CompactAttendanceRow = memo(function CompactAttendanceRow({
   member,
   status,
   onStatus,
@@ -633,8 +682,8 @@ function CompactAttendanceRow({
 }: {
   member: Member;
   status?: AttendanceStatus;
-  onStatus: (s: AttendanceStatus) => void;
-  onRequestDelete: () => void;
+  onStatus: (memberId: string, s: AttendanceStatus) => void;
+  onRequestDelete: (memberId: string, memberName: string) => void;
   divider?: boolean;
 }) {
   const longPressTimer = useRef<number | null>(null);
@@ -645,7 +694,7 @@ function CompactAttendanceRow({
     didLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
       didLongPress.current = true;
-      onRequestDelete();
+      onRequestDelete(member.member_id, member.nama_lengkap);
     }, 600);
   }
 
@@ -659,7 +708,7 @@ function CompactAttendanceRow({
   function handleContextMenu(e: React.MouseEvent) {
     if (status) {
       e.preventDefault();
-      onRequestDelete();
+      onRequestDelete(member.member_id, member.nama_lengkap);
     }
   }
 
@@ -696,7 +745,7 @@ function CompactAttendanceRow({
           return (
             <button
               key={s}
-              onClick={() => onStatus(s)}
+              onClick={() => onStatus(member.member_id, s)}
               aria-label={config.label}
               title={config.label}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 active:scale-[0.9] ${
@@ -710,7 +759,7 @@ function CompactAttendanceRow({
       </div>
     </div>
   );
-}
+});
 
 function normalizeTargets(raw: unknown): MemberCategory[] {
   if (!raw) return [];

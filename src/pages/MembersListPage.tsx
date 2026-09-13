@@ -1,6 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Search,
   SlidersHorizontal,
@@ -8,8 +16,6 @@ import {
   Download,
   LayoutGrid,
   List,
-  Loader2,
-  ChevronDown,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -25,7 +31,7 @@ import {
   BottomSheet,
   Button,
 } from "../components/common";
-import { memberApi, type MemberFilters } from "../services/memberApi";
+import { memberApi } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
 import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
@@ -41,7 +47,6 @@ type GridCols = 2 | 3 | 4;
 
 const VIEW_KEY = "members_view_mode";
 const COLS_KEY = "members_grid_cols";
-const PAGE_SIZE = 15;
 
 export default function MembersListPage() {
   const navigate = useNavigate();
@@ -49,6 +54,7 @@ export default function MembersListPage() {
   const { showToast } = useToast();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const deferredSearch = useDeferredValue(debouncedSearch);
   const [kategori, setKategori] = useState<MemberCategory | "">("");
   const [jenisKelamin, setJenisKelamin] = useState("");
   const [view, setView] = useState<ViewMode>(() => {
@@ -64,8 +70,9 @@ export default function MembersListPage() {
     return 2;
   });
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, view);
@@ -80,62 +87,37 @@ export default function MembersListPage() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const filters: MemberFilters = useMemo(() => {
-    const f: MemberFilters = {};
-    if (debouncedSearch) f.search = debouncedSearch;
-    if (kategori) f.kategori = kategori;
-    if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
-    return f;
-  }, [debouncedSearch, kategori, jenisKelamin]);
-
   const {
-    data,
+    data: allMembers = [],
     isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
     error,
     refetch,
-  } = useInfiniteQuery({
-    queryKey: queryKeys.membersPaged(filters),
-    queryFn: ({ pageParam = 0 }) => {
-      const fn =
-        role === "TIM_PNKB" ? memberApi.listPNKBPaged : memberApi.listPaged;
-      return fn({ ...filters, limit: PAGE_SIZE, offset: pageParam });
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage.has_more) return undefined;
-      const loaded = allPages.reduce((sum, p) => sum + p.items.length, 0);
-      return loaded;
-    },
-    staleTime: 30_000,
-    placeholderData: (prev) => prev,
+  } = useQuery({
+    queryKey: queryKeys.members(),
+    queryFn: () =>
+      role === "TIM_PNKB" ? memberApi.listPNKB({}) : memberApi.list({}),
+    staleTime: 5 * 60_000,
   });
 
   const members = useMemo(() => {
-    return data?.pages.flatMap((p) => p.items) ?? [];
-  }, [data]);
+    return allMembers.filter((m) => {
+      if (kategori && m.kategori !== kategori) return false;
+      if (jenisKelamin && m.jenis_kelamin !== jenisKelamin) return false;
+      if (deferredSearch) {
+        const q = deferredSearch.toLowerCase();
+        const namaMatch = m.nama_lengkap.toLowerCase().includes(q);
+        const panggilanMatch = (m.nama_panggilan || "")
+          .toLowerCase()
+          .includes(q);
+        if (!namaMatch && !panggilanMatch) return false;
+      }
+      return true;
+    });
+  }, [allMembers, kategori, jenisKelamin, deferredSearch]);
 
-  const totalCount = data?.pages[0]?.total ?? 0;
+  const deferredMembers = useDeferredValue(members);
 
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    if (!hasNextPage) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: "300px" },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const totalCount = allMembers.length;
 
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
@@ -153,7 +135,55 @@ export default function MembersListPage() {
         ? "grid-cols-3"
         : "grid-cols-2";
 
-  const showInitialSkeleton = isLoading && members.length === 0;
+  useEffect(() => {
+    if (allMembers.length === 0) {
+      setShowSkeleton(true);
+      return;
+    }
+    const t = setTimeout(() => setShowSkeleton(false), 120);
+    return () => clearTimeout(t);
+  }, [allMembers.length]);
+
+  const showInitialSkeleton = showSkeleton;
+
+  const rowHeight = view === "grid" ? 140 : 76;
+
+  const virtualizer = useVirtualizer({
+    count:
+      view === "grid"
+        ? Math.ceil(deferredMembers.length / gridCols)
+        : deferredMembers.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => rowHeight,
+    overscan: 6,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+ const renderItem = useCallback(
+   (index: number) => {
+     if (view === "list") {
+       const m = deferredMembers[index];
+       if (!m) return null;
+       return <JamaahCard member={m} onPress={handlePress} />;
+     }
+     const start = index * gridCols;
+     const rowMembers = deferredMembers.slice(start, start + gridCols);
+     return (
+       <div className={`grid ${gridColsClass} gap-2`}>
+         {rowMembers.map((m) => (
+           <JamaahGridCard
+             key={m.member_id}
+             member={m}
+             cols={gridCols}
+             onClick={() => navigate(`/jamaah/${m.member_id}`)}
+           />
+         ))}
+       </div>
+     );
+   },
+   [deferredMembers, view, gridCols, gridColsClass, navigate],
+ );
 
   return (
     <AppLayout
@@ -170,6 +200,7 @@ export default function MembersListPage() {
             ? "Memuat..."
             : `${members.length} dari ${totalCount} jamaah`
         }
+        showSyncButton
       />
 
       <div
@@ -230,7 +261,7 @@ export default function MembersListPage() {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 min-h-0">
         {showInitialSkeleton && (
           <div className="px-4 py-2">
             {view === "grid" ? (
@@ -241,7 +272,7 @@ export default function MembersListPage() {
           </div>
         )}
 
-        {!isLoading && error && members.length === 0 && (
+        {!isLoading && error && allMembers.length === 0 && (
           <ErrorState
             message={
               error instanceof ApiError
@@ -270,57 +301,40 @@ export default function MembersListPage() {
           />
         )}
 
-        {members.length > 0 && view === "grid" && (
-          <div className={`px-4 py-2 grid ${gridColsClass} gap-2`}>
-            {members.map((m) => (
-              <JamaahGridCard
-                key={m.member_id}
-                member={m}
-                cols={gridCols}
-                onClick={() => navigate(`/jamaah/${m.member_id}`)}
-              />
-            ))}
-          </div>
-        )}
+        {!showSkeleton && members.length > 0 && (
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-auto px-4 py-2"
+            style={{ height: "calc(100vh - 220px)" }}
+          >
+            <div
+              style={{
+                height: virtualizer.getTotalSize(),
+                width: "100%",
+                position: "relative",
+              }}
+            >
+              {virtualItems.map((virtualRow) => (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  {renderItem(virtualRow.index)}
+                </div>
+              ))}
+            </div>
 
-        {members.length > 0 && view === "list" && (
-          <div className="px-4 py-2 space-y-2">
-            {members.map((m) => (
-              <JamaahCard
-                key={m.member_id}
-                member={m}
-                onClick={() => navigate(`/jamaah/${m.member_id}`)}
-              />
-            ))}
-          </div>
-        )}
-
-        {members.length > 0 && (
-          <div ref={sentinelRef} className="px-4 py-4">
-            {isFetchingNextPage && (
-              <div className="flex items-center justify-center py-4">
-                <Loader2
-                  size={20}
-                  className="animate-spin text-surface-muted"
-                />
-              </div>
-            )}
-
-            {!isFetchingNextPage && hasNextPage && (
-              <button
-                onClick={() => fetchNextPage()}
-                className="w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-card text-ios-subhead font-medium text-accent flex items-center justify-center gap-2 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
-              >
-                <ChevronDown size={16} />
-                Muat Lebih Banyak
-              </button>
-            )}
-
-            {!isFetchingNextPage && !hasNextPage && (
-              <p className="text-center text-ios-footnote text-surface-muted py-2">
-                Semua jamaah sudah ditampilkan ({members.length})
-              </p>
-            )}
+            <p className="text-center text-ios-footnote text-surface-muted py-4">
+              Semua jamaah sudah ditampilkan ({members.length})
+            </p>
           </div>
         )}
       </div>
@@ -512,7 +526,7 @@ function JamaahCard({
   onClick: () => void;
 }) {
   return (
-    <Card onClick={onClick} className="flex items-center gap-3">
+    <Card onClick={onClick} className="flex items-center gap-3 h-[68px]">
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}

@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   Info,
   ChevronRight,
+  ChevronLeft,
   HelpCircle,
   Shield,
 } from "../components/common/FontAwesomeIcons";
@@ -48,6 +49,7 @@ import {
 } from "../utils/format";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import {
@@ -76,7 +78,11 @@ const STATUS_CONFIG: Record<
 
 export default function MemberSelfPage() {
   const navigate = useNavigate();
+  const { isMember } = usePermission();
   const [tab, setTab] = useState<TabKey>("profil");
+
+  const basePath = isMember ? "/member" : "/profil-saya";
+  const backPath = isMember ? undefined : "/lainnya";
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: queryKeys.memberSelfDashboard(),
@@ -87,7 +93,7 @@ export default function MemberSelfPage() {
   if (isLoading) {
     return (
       <AppLayout hideNav>
-        <Header title="Profil Saya" />
+        <Header title="Biodata Saya" />
         <MemberSelfSkeleton />
       </AppLayout>
     );
@@ -96,7 +102,7 @@ export default function MemberSelfPage() {
   if (error || !data) {
     return (
       <AppLayout hideNav>
-        <Header title="Profil Saya" />
+        <Header title="Biodata Saya" />
         <ErrorState
           message={
             error instanceof ApiError ? error.message : "Data tidak ditemukan"
@@ -119,14 +125,16 @@ export default function MemberSelfPage() {
       hideNav
       fab={
         <FloatingActionGroup>
+          {isMember && (
+            <FloatingActionButton
+              onClick={() => navigate(`${basePath}/ai`)}
+              label="Tanya AI"
+              variant="secondary"
+              icon={<Sparkles size={18} strokeWidth={2.2} />}
+            />
+          )}
           <FloatingActionButton
-            onClick={() => navigate("/member/ai")}
-            label="Tanya AI"
-            variant="secondary"
-            icon={<Sparkles size={18} strokeWidth={2.2} />}
-          />
-          <FloatingActionButton
-            onClick={() => navigate("/member/edit")}
+            onClick={() => navigate(`${basePath}/edit`)}
             label="Edit Biodata"
             variant="secondary"
             icon={<Pencil size={18} strokeWidth={2.2} />}
@@ -134,7 +142,13 @@ export default function MemberSelfPage() {
         </FloatingActionGroup>
       }
     >
-      <Header title="Profil Saya" subtitle={profile.kelompok || "Jamaah"} />
+      <Header
+        title={isMember ? "Profil Saya" : "Biodata Saya"}
+        subtitle={profile.kelompok || "Jamaah"}
+        onBack={backPath ? () => navigate(backPath) : undefined}
+        backLabel="Lainnya"
+        showSyncButton
+      />
 
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
@@ -452,6 +466,7 @@ function SettingsTabSelf() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
+  const { isMember } = usePermission();
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
@@ -497,6 +512,26 @@ function SettingsTabSelf() {
           insetDivider={false}
         />
       </GroupedList>
+
+      {!isMember && (
+        <GroupedList>
+          <ListRow
+            onClick={() => navigate("/lainnya")}
+            insetDivider={false}
+            leading={
+              <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                <ChevronLeft size={16} />
+              </span>
+            }
+          >
+            <ChevronRow>
+              <p className="text-ios-body font-medium text-surface-text truncate">
+                Kembali ke Halaman Admin
+              </p>
+            </ChevronRow>
+          </ListRow>
+        </GroupedList>
+      )}
 
       <GroupedList>
         <ListRow
