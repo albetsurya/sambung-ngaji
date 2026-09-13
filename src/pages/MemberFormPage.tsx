@@ -281,7 +281,7 @@ export default function MemberFormPage() {
           >
             <option value="">Pilih kelompok</option>
             {groups.map((g) => (
-              <option key={g.group_id} value={g.group_id}>
+              <option key={g.group_id} value={g.group_name}>
                 {g.group_name}
               </option>
             ))}
