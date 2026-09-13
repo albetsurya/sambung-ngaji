@@ -149,13 +149,16 @@ export default function MembersListPage() {
 
   const rowHeight = view === "grid" ? 140 : 76;
 
+  const getScrollElement = useCallback(() => scrollRef.current, []);
+  const estimateSize = useCallback(() => (view === "grid" ? 140 : 76), [view]);
+
   const virtualizer = useVirtualizer({
     count:
       view === "grid"
         ? Math.ceil(deferredMembers.length / gridCols)
         : deferredMembers.length,
-    getScrollElement: () => scrollRef.current,
-    estimateSize: () => rowHeight,
+    getScrollElement,
+    estimateSize,
     overscan: 6,
   });
 
@@ -316,6 +319,8 @@ export default function MembersListPage() {
             style={{ height: "calc(100vh - 220px)" }}
           >
             <div
+              key={`${view}-${gridCols}`}
+              className="animate-[fadeIn_0.15s_ease-out]"
               style={{
                 height: virtualizer.getTotalSize(),
                 width: "100%",
@@ -326,12 +331,12 @@ export default function MembersListPage() {
                 <div
                   key={virtualRow.key}
                   data-index={virtualRow.index}
-                  ref={virtualizer.measureElement}
                   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
                     width: "100%",
+                    height: view === "list" ? 68 : 140,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
