@@ -15,7 +15,7 @@ const NAV_BY_ROLE: Record<Role, string[]> = {
   ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
   TIM_ABSENSI: ["beranda", "absensi", "lainnya"],
-  PENGAWAS: ["beranda", "jamaah", "pengumuman", "lainnya"],
+  PENGAWAS: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   MEMBER: [],
 };
 

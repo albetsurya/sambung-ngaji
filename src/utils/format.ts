@@ -115,6 +115,10 @@ export function formatDateCustom(
   }
 }
 
+/**
+ * Hitung usia dari tanggal lahir (ISO date yyyy-mm-dd).
+ * Return null kalau tidak valid.
+ */
 export function getMemberAge(tanggalLahir?: string): number | null {
   const p = parseIsoParts(tanggalLahir);
   if (!p) return null;
@@ -135,9 +139,11 @@ export function getMemberCategory(
     return age !== null && age >= 60 ? "MANULA" : "DEWASA";
   }
   const jenjang = (latestEducation?.jenjang || "").toUpperCase();
-  if (jenjang === "TK" || jenjang === "SD") return "CABERAWIT";
+  if (jenjang === "PAUD" || jenjang === "TK" || jenjang === "SD")
+    return "CABERAWIT";
   if (jenjang === "SMP") return "PRA_REMAJA";
-  if (jenjang === "SMA" || jenjang === "SMK") return "REMAJA";
+  if (jenjang === "SMA" || jenjang === "SMK" || jenjang === "MA")
+    return "REMAJA";
 
   const age = getMemberAge(member.tanggal_lahir);
   if (age !== null && age >= 60) return "MANULA";
@@ -179,4 +185,18 @@ export const MONITORING_LABEL: Record<string, string> = {
 export function normalizeGender(value?: string | null): "L" | "P" | undefined {
   if (value === "L" || value === "P") return value;
   return undefined;
+}
+
+/**
+ * Display name dengan sapaan Bapak/Ibu untuk usia >= 35.
+ * Backend tetap pakai nama_lengkap — ini murni untuk tampilan.
+ */
+export function getDisplayName(member: Member): string {
+  const usia = getMemberAge(member.tanggal_lahir);
+  if (usia === null || usia < 35) return member.nama_lengkap;
+
+  const jk = (member.jenis_kelamin || "").toUpperCase();
+  if (jk === "L") return `Bapak ${member.nama_lengkap}`;
+  if (jk === "P") return `Ibu ${member.nama_lengkap}`;
+  return member.nama_lengkap;
 }

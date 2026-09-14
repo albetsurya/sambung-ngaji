@@ -103,7 +103,9 @@ export default function DashboardPage() {
         {!loading &&
           !error &&
           data &&
-          (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+          (user?.role === "SUPER_ADMIN" ||
+            user?.role === "ADMIN" ||
+            user?.role === "PENGAWAS") && (
             <GeneralDashboard
               data={data as DashboardGeneral}
               isSuperAdmin={user.role === "SUPER_ADMIN"}
