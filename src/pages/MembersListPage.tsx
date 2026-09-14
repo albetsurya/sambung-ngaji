@@ -34,17 +34,21 @@ import {
 } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
-import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
+import {
+  CATEGORY_LABEL,
+  getDisplayName,
+  normalizeGender,
+} from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { JamaahListSkeleton } from "../components/common/Skeleton";
+import { JamaahGridSkeleton, JamaahListSkeleton, JamaahRowSkeleton } from "../components/common/Skeleton";
 import { exportMembersToCsv } from "../utils/exportCsv";
 import { useToast } from "../contexts/ToastContext";
 import { queryKeys } from "../lib/queryClient";
 
 type ViewMode = "row" | "list" | "grid";
-type GridCols = 2 | 3 | 4;
+export type GridCols = 2 | 3 | 4;
 
 const VIEW_KEY = "members_view_mode";
 const COLS_KEY = "members_grid_cols";
@@ -291,7 +295,7 @@ export default function MembersListPage() {
             ) : view === "row" ? (
               <JamaahRowSkeleton rows={8} />
             ) : (
-              <JamaahListSkeleton rows={8} />
+              <JamaahListSkeleton rows={11} />
             )}
           </div>
         )}
@@ -625,7 +629,7 @@ const JamaahRow = memo(function JamaahRow({
       />
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-medium text-surface-text truncate">
-          {member.nama_lengkap}
+          {getDisplayName(member)}
         </p>
         <p className="text-[13px] text-surface-muted truncate">
           {member.kelompok || "Belum ada kelompok"}
@@ -660,7 +664,7 @@ const JamaahCard = memo(function JamaahCard({
         />
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm text-surface-text truncate">
-            {member.nama_lengkap}
+            {getDisplayName(member)}
           </p>
           <p className="text-xs text-surface-muted truncate">
             {member.kelompok || "Belum ada kelompok"}
@@ -702,7 +706,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
         <p
           className={`font-medium ${nameSize} text-surface-text truncate leading-tight`}
         >
-          {member.nama_lengkap}
+          {getDisplayName(member)}
         </p>
         <p className="text-[10px] text-surface-muted truncate mt-0.5">
           {member.kelompok || "Belum ada kelompok"}
@@ -739,62 +743,5 @@ function CategoryChip({
     >
       {label}
     </button>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                 Skeletons                                  */
-/* -------------------------------------------------------------------------- */
-
-function JamaahRowSkeleton({ rows = 8 }: { rows?: number }) {
-  return (
-    <div>
-      {Array.from({ length: rows }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-3 h-16 px-4 border-b border-surface-border/60"
-        >
-          <div className="w-10 h-10 rounded-full bg-surface-card2 animate-pulse flex-shrink-0" />
-          <div className="flex-1 space-y-2 min-w-0">
-            <div className="h-3.5 w-1/2 rounded bg-surface-card2 animate-pulse" />
-            <div className="h-2.5 w-1/3 rounded bg-surface-card2 animate-pulse" />
-          </div>
-          <div className="h-3 w-12 rounded bg-surface-card2 animate-pulse flex-shrink-0" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function JamaahGridSkeleton({
-  rows = 6,
-  cols = 2,
-}: {
-  rows?: number;
-  cols?: GridCols;
-}) {
-  const colsClass =
-    cols === 4 ? "grid-cols-4" : cols === 3 ? "grid-cols-3" : "grid-cols-2";
-  const avatarSize =
-    cols === 2 ? "w-14 h-14" : cols === 3 ? "w-11 h-11" : "w-9 h-9";
-  const padding = cols === 2 ? "p-3" : cols === 3 ? "p-2" : "p-1.5";
-  const gap = cols === 2 ? "gap-3" : cols === 3 ? "gap-2" : "gap-1.5";
-
-  return (
-    <div className={`grid ${colsClass} ${gap}`}>
-      {Array.from({ length: rows }).map((_, i) => (
-        <div
-          key={i}
-          className={`bg-surface-card rounded-2xl border border-surface-border shadow-sm ${padding} flex flex-col items-center gap-2`}
-        >
-          <div
-            className={`${avatarSize} rounded-full bg-surface-card2 animate-pulse`}
-          />
-          <div className="h-3 w-3/4 rounded-md bg-surface-card2 animate-pulse" />
-          <div className="h-2.5 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
-          <div className="h-4 w-12 rounded-full bg-surface-card2 animate-pulse" />
-        </div>
-      ))}
-    </div>
   );
 }

@@ -100,6 +100,7 @@ const STATUS_CONFIG: Record<
 
 export default function AttendancePage() {
   const { isAdminLike, role } = usePermission();
+  const isReadonly = role === "PENGAWAS";
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -426,7 +427,18 @@ export default function AttendancePage() {
         }
         showSyncButton={false}
       />
-
+      {isReadonly && (
+        <div
+          className="sticky z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20"
+          style={{ top: "calc(52px + var(--safe-top))" }}
+        >
+          <div className="px-4 py-2">
+            <p className="text-ios-caption text-info leading-relaxed">
+              Anda masuk sebagai pengawas — hanya bisa melihat data absensi.
+            </p>
+          </div>
+        </div>
+      )}
       {isInitialLoading ? (
         <AttendancePageSkeleton rows={8} />
       ) : (
@@ -493,7 +505,11 @@ export default function AttendancePage() {
             <>
               <div
                 className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-                style={{ top: "calc(52px + var(--safe-top))" }}
+                style={{
+                  top: isReadonly
+                    ? "calc(52px + var(--safe-top) + 34px)"
+                    : "calc(52px + var(--safe-top))",
+                }}
               >
                 <div className="px-4 pt-2 pb-2">
                   <div className="relative">
@@ -542,7 +558,7 @@ export default function AttendancePage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    {totalRecords > 0 && (
+                    {!isReadonly && totalRecords > 0 && (
                       <button
                         onClick={() => setConfirmResetAll(true)}
                         disabled={loadingAttendance || resetMutation.isPending}
@@ -553,16 +569,23 @@ export default function AttendancePage() {
                         <Trash2 size={14} />
                       </button>
                     )}
-                    <button
-                      onClick={markAllPresent}
-                      disabled={
-                        loadingAttendance ||
-                        hadirCount === filteredMembers.length
-                      }
-                      className="text-ios-footnote font-medium bg-accent-soft text-accent px-3 h-8 rounded-lg transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      Hadir semua
-                    </button>
+                    {!isReadonly && (
+                      <button
+                        onClick={markAllPresent}
+                        disabled={
+                          loadingAttendance ||
+                          hadirCount === filteredMembers.length
+                        }
+                        className="text-ios-footnote font-medium bg-accent-soft text-accent px-3 h-8 rounded-lg transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        Hadir semua
+                      </button>
+                    )}
+                    {isReadonly && (
+                      <span className="text-ios-caption text-surface-muted italic">
+                        Mode lihat
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -594,6 +617,7 @@ export default function AttendancePage() {
                     onStatus={handleStatusChange}
                     onRequestDelete={handleRequestDelete}
                     divider={i !== filteredMembers.length - 1}
+                    readonly={isReadonly}
                   />
                 ))}
               </div>
@@ -679,17 +703,20 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
   onStatus,
   onRequestDelete,
   divider,
+  readonly = false,
 }: {
   member: Member;
   status?: AttendanceStatus;
   onStatus: (memberId: string, s: AttendanceStatus) => void;
   onRequestDelete: (memberId: string, memberName: string) => void;
   divider?: boolean;
+  readonly?: boolean;
 }) {
   const longPressTimer = useRef<number | null>(null);
   const didLongPress = useRef(false);
 
   function startLongPress() {
+    if (readonly) return;
     if (!status) return;
     didLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
@@ -706,12 +733,52 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
   }
 
   function handleContextMenu(e: React.MouseEvent) {
+    if (readonly) return;
     if (status) {
       e.preventDefault();
       onRequestDelete(member.member_id, member.nama_lengkap);
     }
   }
 
+  // ── Mode readonly: tampilkan badge statis, bukan tombol ──
+  if (readonly) {
+    const config = status ? STATUS_CONFIG[status] : null;
+    const Icon = config?.Icon;
+
+    return (
+      <div
+        className={`flex items-center gap-2 px-4 min-h-[56px] ${
+          divider ? "border-b border-surface-border" : ""
+        }`}
+      >
+        <div className="flex-1 min-w-0 py-2">
+          <p className="text-ios-body font-medium text-surface-text truncate">
+            {member.nama_lengkap}
+          </p>
+          {member.kelompok && (
+            <p className="text-ios-caption text-surface-muted truncate">
+              {member.kelompok}
+            </p>
+          )}
+        </div>
+
+        {config && Icon ? (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-lg text-ios-footnote font-medium ${config.activeClass}`}
+          >
+            <Icon size={13} strokeWidth={2.4} />
+            {config.label}
+          </span>
+        ) : (
+          <span className="text-ios-footnote text-surface-muted italic px-2.5">
+            Belum diabsen
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  // ── Mode normal: tombol interaktif ──
   return (
     <div
       onTouchStart={startLongPress}

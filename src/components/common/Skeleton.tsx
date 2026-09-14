@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { GroupedList } from "./Surface";
+import { GridCols } from "../../pages/MembersListPage";
 
 /* -------------------------------------------------------------------------- */
 /*                              Skeleton Primitive                            */
@@ -74,18 +75,6 @@ export function DashboardSkeleton() {
  * - text-sm  → 20px
  * - text-xs  → 16px
  */
-export function JamaahRowSkeleton() {
-  return (
-    <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4 flex items-center gap-3">
-      <Skeleton variant="circle" width={44} height={44} />
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <Skeleton width="60%" height={20} />
-        <Skeleton width="40%" height={16} />
-      </div>
-      <Skeleton variant="rect" width={64} height={24} />
-    </div>
-  );
-}
 
 /**
  * Skeleton untuk list jamaah penuh (banyak baris).
@@ -95,6 +84,63 @@ export function JamaahListSkeleton({ rows = 5 }: { rows?: number }) {
     <div className="space-y-2">
       {Array.from({ length: rows }).map((_, i) => (
         <JamaahRowSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Skeletons                                  */
+/* -------------------------------------------------------------------------- */
+
+export function JamaahRowSkeleton({ rows = 11 }: { rows?: number }) {
+  return (
+    <div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-3 h-16 px-4 border-b border-surface-border/60"
+        >
+          <div className="w-10 h-10 rounded-full bg-surface-card2 animate-pulse flex-shrink-0" />
+          <div className="flex-1 space-y-2 min-w-0">
+            <div className="h-3.5 w-1/2 rounded bg-surface-card2 animate-pulse" />
+            <div className="h-2.5 w-1/3 rounded bg-surface-card2 animate-pulse" />
+          </div>
+          <div className="h-3 w-12 rounded bg-surface-card2 animate-pulse flex-shrink-0" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function JamaahGridSkeleton({
+  rows = 6,
+  cols = 2,
+}: {
+  rows?: number;
+  cols?: GridCols;
+}) {
+  const colsClass =
+    cols === 4 ? "grid-cols-4" : cols === 3 ? "grid-cols-3" : "grid-cols-2";
+  const avatarSize =
+    cols === 2 ? "w-14 h-14" : cols === 3 ? "w-11 h-11" : "w-9 h-9";
+  const padding = cols === 2 ? "p-3" : cols === 3 ? "p-2" : "p-1.5";
+  const gap = cols === 2 ? "gap-3" : cols === 3 ? "gap-2" : "gap-1.5";
+
+  return (
+    <div className={`grid ${colsClass} ${gap}`}>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div
+          key={i}
+          className={`bg-surface-card rounded-2xl border border-surface-border shadow-sm ${padding} flex flex-col items-center gap-2`}
+        >
+          <div
+            className={`${avatarSize} rounded-full bg-surface-card2 animate-pulse`}
+          />
+          <div className="h-3 w-3/4 rounded-md bg-surface-card2 animate-pulse" />
+          <div className="h-2.5 w-1/2 rounded-md bg-surface-card2 animate-pulse" />
+          <div className="h-4 w-12 rounded-full bg-surface-card2 animate-pulse" />
+        </div>
       ))}
     </div>
   );
