@@ -5,14 +5,12 @@ import {
   UserPlus,
   X,
   AlertTriangle,
-  Check,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Badge,
   Button,
   Card,
-  Input,
   Select,
   Textarea,
   BottomSheet,
@@ -23,7 +21,7 @@ import {
 } from "../components/common";
 import { pendingApi } from "../services/pendingApi";
 import { groupApi } from "../services/domainApi";
-import type { Group, PendingMember } from "../types";
+import type { PendingMember } from "../types";
 import { formatDateShort, normalizeGender } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
@@ -56,6 +54,7 @@ export default function PendingMemberDetailPage() {
       queryKey: queryKeys.pendingDetail(submission_id || ""),
     });
     queryClient.invalidateQueries({ queryKey: ["members"] });
+    queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 
   if (isLoading) {
@@ -152,6 +151,15 @@ export default function PendingMemberDetailPage() {
           </div>
         </Card>
 
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Akun Login
+          </p>
+          <div className="space-y-2.5">
+            <Field label="Username" value={data.username} />
+          </div>
+        </Card>
+
         {(data.pekerjaan || data.hobi) && (
           <Card>
             <p className="text-ios-footnote font-medium text-surface-muted mb-3">
@@ -241,6 +249,7 @@ export default function PendingMemberDetailPage() {
       <RejectSheet
         open={rejectOpen}
         submissionId={data.submission_id}
+        noWa={data.no_wa}
         onClose={() => setRejectOpen(false)}
         onSuccess={() => {
           invalidateAll();
@@ -251,6 +260,10 @@ export default function PendingMemberDetailPage() {
     </AppLayout>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                   Field                                    */
+/* -------------------------------------------------------------------------- */
 
 function Field({ label, value }: { label: string; value?: string }) {
   if (!value || value === "") {
@@ -277,6 +290,10 @@ function Field({ label, value }: { label: string; value?: string }) {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                ApproveSheet                                */
+/* -------------------------------------------------------------------------- */
+
 function ApproveSheet({
   open,
   data,
@@ -290,9 +307,6 @@ function ApproveSheet({
 }) {
   const { showToast } = useToast();
   const [kelompok, setKelompok] = useState("");
-  const [createUser, setCreateUser] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -304,19 +318,13 @@ function ApproveSheet({
   useEffect(() => {
     if (!open) return;
     setKelompok("");
-    setCreateUser(false);
-    setUsername(data.no_wa || "");
-    setPassword("");
-  }, [open, data]);
+  }, [open]);
 
   const mutation = useMutation({
     mutationFn: () =>
       pendingApi.approve({
         submission_id: data.submission_id,
         kelompok,
-        create_user: createUser,
-        username: createUser ? username : undefined,
-        password: createUser ? password : undefined,
       }),
     onSuccess: () => onSuccess(),
     onError: (err) => {
@@ -327,9 +335,6 @@ function ApproveSheet({
     },
   });
 
-  const canSubmit =
-    !createUser || (username.length >= 3 && password.length >= 6);
-
   return (
     <>
       <BottomSheet open={open} onClose={onClose} title="Setujui Pendaftar">
@@ -337,6 +342,16 @@ function ApproveSheet({
           <p className="text-ios-footnote text-accent/80 leading-relaxed">
             <strong>{data.nama_lengkap}</strong> akan ditambahkan sebagai jamaah
             aktif.
+            {data.username && (
+              <>
+                {" "}
+                Akun login dengan username{" "}
+                <span className="font-mono font-medium">
+                  {data.username}
+                </span>{" "}
+                akan langsung aktif.
+              </>
+            )}
           </p>
         </div>
 
@@ -348,71 +363,31 @@ function ApproveSheet({
         >
           <option value="">Pilih kelompok</option>
           {groups.map((g) => (
-            <option key={g.group_id} value={g.group_id}>
+            <option key={g.group_id} value={g.group_name}>
               {g.group_name}
             </option>
           ))}
         </Select>
 
-        <button
-          type="button"
-          onClick={() => setCreateUser(!createUser)}
-          className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 active:scale-[0.99] text-left mb-4 ${
-            createUser
-              ? "bg-accent-soft border-accent/40"
-              : "bg-surface-card border-surface-border hover:bg-surface-card2"
-          }`}
-        >
-          <div
-            className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-              createUser
-                ? "bg-accent text-white"
-                : "bg-surface-card2 border border-surface-border"
-            }`}
-          >
-            {createUser && <Check size={14} strokeWidth={3} />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-ios-body font-medium text-surface-text">
-              Buat akun login
-            </p>
-            <p className="text-ios-caption text-surface-muted">
-              Jamaah bisa login untuk lihat data sendiri
+        {data.no_wa && (
+          <div className="mb-4 p-3 rounded-xl bg-surface-card2 border border-surface-border">
+            <p className="text-ios-caption text-surface-muted leading-relaxed">
+              Notifikasi akun aktif akan dikirim ke WhatsApp{" "}
+              <span className="font-medium text-surface-text">
+                +{data.no_wa}
+              </span>
+              .
             </p>
           </div>
-        </button>
-
-        {createUser && (
-          <>
-            <Input
-              label="Username"
-              placeholder="Minimal 3 karakter"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="off"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-            />
-            <Input
-              label="Password"
-              type="password"
-              placeholder="Minimal 6 karakter"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              hint="Catat password ini dan berikan ke jamaah"
-            />
-          </>
         )}
 
         <Button
           fullWidth
           onClick={() => mutation.mutate()}
-          disabled={mutation.isPending || !canSubmit}
+          disabled={mutation.isPending}
           leftIcon={!mutation.isPending ? <UserPlus size={16} /> : undefined}
         >
-          {mutation.isPending ? "Memproses..." : "Setujui & Tambah Jamaah"}
+          {mutation.isPending ? "Memproses..." : "Setujui & Aktifkan Akun"}
         </Button>
       </BottomSheet>
 
@@ -421,14 +396,20 @@ function ApproveSheet({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                RejectSheet                                 */
+/* -------------------------------------------------------------------------- */
+
 function RejectSheet({
   open,
   submissionId,
+  noWa,
   onClose,
   onSuccess,
 }: {
   open: boolean;
   submissionId: string;
+  noWa?: string;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -461,6 +442,13 @@ function RejectSheet({
         <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/20">
           <p className="text-ios-footnote text-danger leading-relaxed">
             Pendaftar akan ditolak dan tidak akan ditambahkan sebagai jamaah.
+            {noWa && (
+              <>
+                {" "}
+                Alasan penolakan akan dikirim ke WhatsApp{" "}
+                <span className="font-medium">+{noWa}</span>.
+              </>
+            )}
           </p>
         </div>
 
