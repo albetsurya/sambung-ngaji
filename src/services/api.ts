@@ -3,7 +3,40 @@ import type { ApiResponse } from "../types";
 import { API_BASE_URL } from "../constants";
 
 const TOKEN_KEY = "pengajian_token";
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 30_000;
+const MAX_RETRIES = 1;
+const RETRY_DELAYS = [800];
+const MAX_CONCURRENT_REQUESTS = 3;
+
+/* -------------------------------------------------------------------------- */
+/*                              Request Queue                                 */
+/* -------------------------------------------------------------------------- */
+
+let activeRequests = 0;
+const pendingQueue: Array<() => void> = [];
+
+async function acquireSlot(): Promise<void> {
+  if (activeRequests < MAX_CONCURRENT_REQUESTS) {
+    activeRequests++;
+    return;
+  }
+  return new Promise((resolve) => {
+    pendingQueue.push(() => {
+      activeRequests++;
+      resolve();
+    });
+  });
+}
+
+function releaseSlot(): void {
+  activeRequests = Math.max(0, activeRequests - 1);
+  const next = pendingQueue.shift();
+  if (next) next();
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Token Management                              */
+/* -------------------------------------------------------------------------- */
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -40,15 +73,12 @@ export class ApiError extends Error {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              Retry Helper                                  */
+/*                              Helpers                                       */
 /* -------------------------------------------------------------------------- */
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
-const MAX_RETRIES = 2;
-const RETRY_DELAYS = [500, 1500];
 
 /* -------------------------------------------------------------------------- */
 /*                              Main API Call                                 */
@@ -72,7 +102,7 @@ export async function call<T>(
         throw error;
       }
 
-      const delay = RETRY_DELAYS[attempt] ?? 1500;
+      const delay = RETRY_DELAYS[attempt] ?? 800;
       console.warn(
         `⚠️ API [${action}] gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
         error instanceof Error ? error.message : error,
@@ -93,120 +123,128 @@ async function callOnce<T>(
   params: Record<string, any>,
   attempt: number,
 ): Promise<T> {
-  const token = getToken();
+  await acquireSlot();
 
-  const payload: Record<string, any> = {
-    action,
-    ...params,
-  };
-  if (token) payload.token = token;
-
-  const body = JSON.stringify(payload);
-
-  const cacheBuster = `_t=${Date.now()}`;
-  const url = API_BASE_URL.includes("?")
-    ? `${API_BASE_URL}&${cacheBuster}`
-    : `${API_BASE_URL}?${cacheBuster}`;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  let response: Response;
   try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      body,
-      redirect: "follow",
-      cache: "no-store",
-      signal: controller.signal,
-    });
-  } catch (err: any) {
-    clearTimeout(timeoutId);
+    const token = getToken();
 
-    if (err?.name === "AbortError") {
-      throw new ApiError(
-        `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Cek koneksi.`,
-        undefined,
-        { retryable: true },
-      );
-    }
+    const payload: Record<string, any> = {
+      action,
+      ...params,
+    };
+    if (token) payload.token = token;
 
-    const msg = String(err?.message || err);
-    if (
-      msg.includes("Failed to fetch") ||
-      msg.includes("NetworkError") ||
-      msg.includes("Load failed")
-    ) {
-      throw new ApiError(
-        "Koneksi gagal. Cek jaringan internet Anda.",
-        undefined,
-        { retryable: true },
-      );
-    }
+    const body = JSON.stringify(payload);
 
-    throw new ApiError(`Network error: ${msg}`, undefined, {
-      retryable: true,
-    });
-  }
+    const cacheBuster = `_t=${Date.now()}`;
+    const url = API_BASE_URL.includes("?")
+      ? `${API_BASE_URL}&${cacheBuster}`
+      : `${API_BASE_URL}?${cacheBuster}`;
 
-  clearTimeout(timeoutId);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  const text = await response.text();
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body,
+        redirect: "follow",
+        cache: "no-store",
+        signal: controller.signal,
+      });
+    } catch (err: any) {
+      clearTimeout(timeoutId);
 
-  if (
-    response.status === 404 ||
-    text.includes("<!DOCTYPE") ||
-    text.includes("<html")
-  ) {
-    const titleMatch = text.match(/<title>([^<]*)<\/title>/i);
-    const title = titleMatch ? titleMatch[1] : "";
+      if (err?.name === "AbortError") {
+        throw new ApiError(
+          `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Cek koneksi.`,
+          undefined,
+          { retryable: true },
+        );
+      }
 
-    throw new ApiError(
-      `Server tidak siap (${response.status}${title ? " · " + title : ""}). Cek deployment Web App.`,
-      undefined,
-      { retryable: false, statusCode: response.status },
-    );
-  }
+      const msg = String(err?.message || err);
+      if (
+        msg.includes("Failed to fetch") ||
+        msg.includes("NetworkError") ||
+        msg.includes("Load failed")
+      ) {
+        throw new ApiError(
+          "Koneksi gagal. Cek jaringan internet Anda.",
+          undefined,
+          { retryable: true },
+        );
+      }
 
-  if (response.status >= 500) {
-    throw new ApiError(
-      `Server error (${response.status}). Coba lagi nanti.`,
-      undefined,
-      { retryable: true, statusCode: response.status },
-    );
-  }
-
-  let data: ApiResponse<T>;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new ApiError("Response server tidak valid (bukan JSON).", undefined, {
-      retryable: false,
-    });
-  }
-
-  if (!data.success) {
-    const msg = data.message || "Terjadi kesalahan";
-
-    if (
-      msg.toLowerCase().includes("unauthorized") ||
-      msg.toLowerCase().includes("sesi tidak valid") ||
-      msg.toLowerCase().includes("session tidak ditemukan")
-    ) {
-      clearToken();
-      throw new ApiError("Sesi kadaluarsa, silakan login ulang", data, {
-        retryable: false,
-        statusCode: 401,
+      throw new ApiError(`Network error: ${msg}`, undefined, {
+        retryable: true,
       });
     }
 
-    throw new ApiError(msg, data, { retryable: false });
-  }
+    clearTimeout(timeoutId);
 
-  return data.data;
+    const text = await response.text();
+
+    if (
+      response.status === 404 ||
+      text.includes("<!DOCTYPE") ||
+      text.includes("<html")
+    ) {
+      const titleMatch = text.match(/<title>([^<]*)<\/title>/i);
+      const title = titleMatch ? titleMatch[1] : "";
+
+      throw new ApiError(
+        `Server tidak siap (${response.status}${title ? " · " + title : ""}). Cek deployment Web App.`,
+        undefined,
+        { retryable: false, statusCode: response.status },
+      );
+    }
+
+    if (response.status >= 500) {
+      throw new ApiError(
+        `Server error (${response.status}). Coba lagi nanti.`,
+        undefined,
+        { retryable: true, statusCode: response.status },
+      );
+    }
+
+    let data: ApiResponse<T>;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new ApiError(
+        "Response server tidak valid (bukan JSON).",
+        undefined,
+        { retryable: false },
+      );
+    }
+
+    if (!data.success) {
+      const msg = data.message || "Terjadi kesalahan";
+
+      if (
+        msg.toLowerCase().includes("unauthorized") ||
+        msg.toLowerCase().includes("sesi tidak valid") ||
+        msg.toLowerCase().includes("session tidak ditemukan")
+      ) {
+        clearToken();
+        throw new ApiError("Sesi kadaluarsa, silakan login ulang", data, {
+          retryable: false,
+          statusCode: 401,
+        });
+      }
+
+      throw new ApiError(msg, data, { retryable: false });
+    }
+
+    return data.data;
+  } finally {
+    releaseSlot();
+  }
 }
 
 /* -------------------------------------------------------------------------- */
