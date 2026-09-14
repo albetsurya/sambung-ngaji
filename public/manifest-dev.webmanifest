@@ -1,23 +1,23 @@
 {
-  "name": "Pengajian",
-  "short_name": "Pengajian",
+  "name": "Pengajian (DEV)",
+  "short_name": "Pengajian DEV",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#E7ECE8",
-  "theme_color": "#E7ECE8",
+  "theme_color": "#DC2626",
   "icons": [
     {
-      "src": "/apple-touch-icon.png",
+      "src": "/apple-touch-icon-dev.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/favicon-32x32.png",
+      "src": "/favicon-32x32-dev.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/favicon.svg",
+      "src": "/favicon-dev.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

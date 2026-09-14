@@ -35,7 +35,7 @@
     />
     <meta name="apple-mobile-web-app-title" content="Pengajian" />
 
-    <meta property="og:title" content="Pengajian - Manajemen Jamaah" />
+    <meta property="og:title" content="Pengajian" />
     <meta
       property="og:description"
       content="Aplikasi manajemen pengajian: biodata jamaah, absensi, monitoring, dan pengumuman."
@@ -50,7 +50,7 @@
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pengajian - Manajemen Jamaah" />
+    <meta name="twitter:title" content="Pengajian" />
     <meta
       name="twitter:description"
       content="Aplikasi manajemen pengajian: biodata jamaah, absensi, monitoring, dan pengumuman."
@@ -67,7 +67,69 @@
       rel="stylesheet"
     />
 
-    <title>Pengajian - Manajemen Jamaah</title>
+    <title>Pengajian</title>
+
+    <!--
+      Swap aset & meta ke versi DEV kalau host mengandung -dev (atau localhost).
+      Diletakkan paling bawah di <head> supaya semua tag target sudah ada di DOM.
+    -->
+    <script>
+      (function () {
+        var host = window.location.hostname || "";
+        var isDev =
+          host === "localhost" ||
+          host === "127.0.0.1" ||
+          host.indexOf("-dev") !== -1;
+        if (!isDev) return;
+
+        var setHref = function (selector, href) {
+          var el = document.querySelector(selector);
+          if (el) el.setAttribute("href", href);
+        };
+        var setContent = function (selector, content) {
+          var el = document.querySelector(selector);
+          if (el) el.setAttribute("content", content);
+        };
+
+        // --- Favicon / apple-touch-icon ---
+        setHref('link[rel="icon"][type="image/svg+xml"]', "/favicon-dev.svg");
+        setHref('link[rel="icon"][sizes="32x32"]', "/favicon-32x32-dev.png");
+        setHref('link[rel="icon"][sizes="16x16"]', "/favicon-16x16-dev.png");
+        setHref('link[rel="shortcut icon"]', "/favicon-dev.ico");
+        setHref(
+          'link[rel="apple-touch-icon"][sizes="180x180"]',
+          "/apple-touch-icon-dev.png",
+        );
+        setHref(
+          'link[rel="apple-touch-icon"][sizes="152x152"]',
+          "/apple-touch-icon-152x152-dev.png",
+        );
+        setHref(
+          'link[rel="apple-touch-icon"][sizes="120x120"]',
+          "/apple-touch-icon-120x120-dev.png",
+        );
+
+        // --- PWA manifest (dipakai saat "Add to Home Screen") ---
+        setHref('link[rel="manifest"]', "/manifest-dev.webmanifest");
+
+        // --- Warna & judul ---
+        setContent('meta[name="theme-color"]', "#DC2626");
+        document.title = "Pengajian (DEV)";
+        setContent('meta[name="apple-mobile-web-app-title"]', "Pengajian DEV");
+
+        // --- Open Graph / Twitter ---
+        setContent('meta[property="og:title"]', "Pengajian (DEV)");
+        setContent(
+          'meta[property="og:image"]',
+          "https://manajemen-pengajian-five.vercel.app/og-image-dev.png",
+        );
+        setContent('meta[name="twitter:title"]', "Pengajian (DEV)");
+        setContent(
+          'meta[name="twitter:image"]',
+          "https://manajemen-pengajian-five.vercel.app/og-image-dev.png",
+        );
+      })();
+    </script>
   </head>
   <body class="bg-surface-bg">
     <div id="root"></div>
