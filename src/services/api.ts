@@ -3,6 +3,7 @@ import type { ApiResponse } from "../types";
 import { API_BASE_URL } from "../constants";
 
 const TOKEN_KEY = "pengajian_token";
+const REQUEST_TIMEOUT_MS = 20_000;
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -17,45 +18,41 @@ export function clearToken() {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                              ApiError                                      */
+/* -------------------------------------------------------------------------- */
+
+export class ApiError extends Error {
+  response?: ApiResponse<unknown>;
+  retryable: boolean;
+  statusCode?: number;
+
+  constructor(
+    message: string,
+    response?: ApiResponse<unknown>,
+    options: { retryable?: boolean; statusCode?: number } = {},
+  ) {
+    super(message);
+    this.name = "ApiError";
+    this.response = response;
+    this.retryable = options.retryable ?? false;
+    this.statusCode = options.statusCode;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Retry Helper                                  */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Cek apakah error layak di-retry (network, 404, HTML response).
- */
-function isRetryableError(error: unknown): boolean {
-  if (error instanceof ApiError) {
-    const msg = error.message.toLowerCase();
-    return (
-      msg.includes("html") ||
-      msg.includes("404") ||
-      msg.includes("not found") ||
-      msg.includes("network") ||
-      msg.includes("failed to fetch")
-    );
-  }
-  if (error instanceof Error) {
-    return (
-      error.message.includes("Failed to fetch") ||
-      error.message.includes("NetworkError") ||
-      error.message.includes("404")
-    );
-  }
-  return false;
-}
-
-/**
- * Sleep helper.
- */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const MAX_RETRIES = 2;
+const RETRY_DELAYS = [500, 1500];
+
 /* -------------------------------------------------------------------------- */
 /*                              Main API Call                                 */
 /* -------------------------------------------------------------------------- */
-
-const MAX_RETRIES = 3;
 
 export async function call<T>(
   action: string,
@@ -69,15 +66,16 @@ export async function call<T>(
     } catch (error) {
       lastError = error;
 
-      // Hanya retry kalau error-nya layak
-      if (!isRetryableError(error) || attempt === MAX_RETRIES) {
+      const retryable = error instanceof ApiError && error.retryable === true;
+
+      if (!retryable || attempt === MAX_RETRIES) {
         throw error;
       }
 
-      // Exponential backoff: 300ms, 600ms
-      const delay = 500 * Math.pow(2, attempt);
+      const delay = RETRY_DELAYS[attempt] ?? 1500;
       console.warn(
-        `⚠️ API call gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
+        `⚠️ API [${action}] gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
+        error instanceof Error ? error.message : error,
       );
       await sleep(delay);
     }
@@ -86,9 +84,10 @@ export async function call<T>(
   throw lastError;
 }
 
-/**
- * Single API call — tanpa retry.
- */
+/* -------------------------------------------------------------------------- */
+/*                              Single API Call                               */
+/* -------------------------------------------------------------------------- */
+
 async function callOnce<T>(
   action: string,
   params: Record<string, any>,
@@ -102,71 +101,109 @@ async function callOnce<T>(
   };
   if (token) payload.token = token;
 
-  // ✅ Pakai JSON body dengan Content-Type text/plain
-  //    - text/plain = simple header → tidak trigger preflight
-  //    - Body tetap JSON → Apps Script bisa parse
   const body = JSON.stringify(payload);
 
-  // ✅ Cache-busting: tambahkan timestamp ke URL
-  //    Ini mencegah browser pakai cache URL redirect lama dari Apps Script
-  const cacheBuster = `_t=${Date.now()}_a=${attempt}`;
+  const cacheBuster = `_t=${Date.now()}`;
   const url = API_BASE_URL.includes("?")
     ? `${API_BASE_URL}&${cacheBuster}`
     : `${API_BASE_URL}?${cacheBuster}`;
 
-  console.log(
-    `📤 API call [${action}] attempt ${attempt + 1}, url: ${url.substring(0, 80)}...`,
-  );
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      // ✅ text/plain = simple header, tidak trigger OPTIONS preflight
-      "Content-Type": "text/plain;charset=utf-8",
-    },
-    body,
-    redirect: "follow", // Apps Script redirect setelah POST
-    // ✅ Cegah browser cache response
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body,
+      redirect: "follow",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+
+    if (err?.name === "AbortError") {
+      throw new ApiError(
+        `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Cek koneksi.`,
+        undefined,
+        { retryable: true },
+      );
+    }
+
+    const msg = String(err?.message || err);
+    if (
+      msg.includes("Failed to fetch") ||
+      msg.includes("NetworkError") ||
+      msg.includes("Load failed")
+    ) {
+      throw new ApiError(
+        "Koneksi gagal. Cek jaringan internet Anda.",
+        undefined,
+        { retryable: true },
+      );
+    }
+
+    throw new ApiError(`Network error: ${msg}`, undefined, {
+      retryable: true,
+    });
+  }
+
+  clearTimeout(timeoutId);
 
   const text = await response.text();
 
-  // Cek HTML error (redirect ke login page / error page)
-  if (text.includes("<!DOCTYPE") || text.includes("<html")) {
-    // Extract title kalau ada, untuk debugging
+  if (
+    response.status === 404 ||
+    text.includes("<!DOCTYPE") ||
+    text.includes("<html")
+  ) {
     const titleMatch = text.match(/<title>([^<]*)<\/title>/i);
-    const title = titleMatch ? titleMatch[1] : "unknown";
+    const title = titleMatch ? titleMatch[1] : "";
 
     throw new ApiError(
-      `Server mengembalikan HTML (${title}). Cek URL Web App (harus /exec) dan deployment.`,
+      `Server tidak siap (${response.status}${title ? " · " + title : ""}). Cek deployment Web App.`,
+      undefined,
+      { retryable: false, statusCode: response.status },
     );
   }
 
-  // Cek response 404 dari Google
-  if (response.status === 404) {
+  if (response.status >= 500) {
     throw new ApiError(
-      "Server mengembalikan 404. URL Web App mungkin sudah expired, coba redeploy.",
+      `Server error (${response.status}). Coba lagi nanti.`,
+      undefined,
+      { retryable: true, statusCode: response.status },
     );
   }
 
-  // Parse JSON
   let data: ApiResponse<T>;
   try {
     data = JSON.parse(text);
   } catch {
-    throw new ApiError("Server mengembalikan response tidak valid");
+    throw new ApiError("Response server tidak valid (bukan JSON).", undefined, {
+      retryable: false,
+    });
   }
 
   if (!data.success) {
+    const msg = data.message || "Terjadi kesalahan";
+
     if (
-      data.message?.toLowerCase().includes("unauthorized") ||
-      data.message?.toLowerCase().includes("sesi tidak valid")
+      msg.toLowerCase().includes("unauthorized") ||
+      msg.toLowerCase().includes("sesi tidak valid") ||
+      msg.toLowerCase().includes("session tidak ditemukan")
     ) {
       clearToken();
-      throw new ApiError("Sesi kadaluarsa, silakan login ulang", data);
+      throw new ApiError("Sesi kadaluarsa, silakan login ulang", data, {
+        retryable: false,
+        statusCode: 401,
+      });
     }
-    throw new ApiError(data.message || "Terjadi kesalahan", data);
+
+    throw new ApiError(msg, data, { retryable: false });
   }
 
   return data.data;
@@ -177,47 +214,24 @@ async function callOnce<T>(
 /* -------------------------------------------------------------------------- */
 
 export async function login(username: string, password: string) {
-  console.log("🔐 login called with:", { username });
-  try {
-    const result = await call<{ token: string; user: any }>("login", {
-      username,
-      password,
-    });
-    if (result?.token) {
-      console.log(
-        "✅ Login success, token:",
-        result.token.substring(0, 20) + "...",
-      );
-      setToken(result.token);
-    }
-    return result;
-  } catch (error) {
-    console.error("❌ Login failed:", error);
-    throw error;
+  const result = await call<{ token: string; user: any }>("login", {
+    username,
+    password,
+  });
+
+  if (result?.token) {
+    setToken(result.token);
   }
+  return result;
 }
 
 export async function logout() {
-  console.log("🔐 logout called");
   try {
     await call("logout", {});
   } catch (error) {
-    console.error("Logout error:", error);
+    console.warn("Logout error (diabaikan):", error);
   } finally {
     clearToken();
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              ApiError                                      */
-/* -------------------------------------------------------------------------- */
-
-export class ApiError extends Error {
-  response?: ApiResponse<unknown>;
-  constructor(message: string, response?: ApiResponse<unknown>) {
-    super(message);
-    this.name = "ApiError";
-    this.response = response;
   }
 }
 
@@ -225,15 +239,11 @@ export class ApiError extends Error {
 /*                              Debug Functions                               */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Test koneksi API — jalankan di browser console.
- */
 export async function testApiConnection() {
   console.log("=== 🧪 TEST API CONNECTION ===");
   console.log("📋 Environment:", {
     API_BASE_URL: API_BASE_URL,
     mode: import.meta.env.MODE,
-    VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   });
 
   if (!API_BASE_URL) {
@@ -241,49 +251,13 @@ export async function testApiConnection() {
     return { success: false, error: "API_BASE_URL empty" };
   }
 
-  console.log("📤 Testing login with superadmin...");
-
   try {
-    const url = `${API_BASE_URL}${API_BASE_URL.includes("?") ? "&" : "?"}_t=${Date.now()}`;
-
-    console.log("📤 Request URL:", url);
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      body: JSON.stringify({
-        action: "login",
-        username: "superadmin",
-        password: "ganti123",
-      }),
-      cache: "no-store",
-    });
-
-    console.log("📥 Status:", response.status);
-    console.log("📥 Headers:", Object.fromEntries(response.headers.entries()));
-
-    const text = await response.text();
-    console.log("📝 Response (first 1000 chars):", text.substring(0, 1000));
-
-    if (text.includes("<!DOCTYPE") || text.includes("<html")) {
-      console.error("❌ Response is HTML - Web App error");
-      return {
-        success: false,
-        error: "HTML response",
-        html: text.substring(0, 500),
-      };
-    }
-
-    try {
-      const json = JSON.parse(text);
-      console.log("✅ JSON parsed:", json);
-      return { success: true, data: json };
-    } catch {
-      console.error("❌ Not valid JSON");
-      return { success: false, error: "Not JSON", raw: text.substring(0, 200) };
-    }
+    const result = await call<{ available: boolean }>(
+      "checkUsernameAvailability",
+      { username: "test_connection_probe" },
+    );
+    console.log("✅ API reachable:", result);
+    return { success: true, data: result };
   } catch (error) {
     console.error("❌ Connection error:", error);
     return {
@@ -293,42 +267,16 @@ export async function testApiConnection() {
   }
 }
 
-/**
- * Test dengan GET request — untuk cek apakah backend bisa diakses.
- */
 export async function testApiGet() {
-  console.log("=== 🧪 TEST API CONNECTION (GET) ===");
-
+  console.log("=== 🧪 TEST API GET ===");
   try {
     const url = `${API_BASE_URL}${API_BASE_URL.includes("?") ? "&" : "?"}action=validateSession&_t=${Date.now()}`;
-
-    console.log("📤 GET URL:", url);
-
-    const response = await fetch(url, {
-      method: "GET",
-      cache: "no-store",
-    });
-
-    console.log("📥 Status:", response.status);
-
+    const response = await fetch(url, { method: "GET", cache: "no-store" });
     const text = await response.text();
-    console.log("📝 Response (first 500 chars):", text.substring(0, 500));
-
-    if (text.includes("<!DOCTYPE") || text.includes("<html")) {
-      console.error("❌ Response is HTML");
-      return { success: false, error: "HTML response" };
-    }
-
-    try {
-      const json = JSON.parse(text);
-      console.log("✅ JSON parsed:", json);
-      return { success: true, data: json };
-    } catch {
-      console.error("❌ Not valid JSON");
-      return { success: false, error: "Not JSON" };
-    }
+    console.log("📥 Status:", response.status);
+    console.log("📝 Response:", text.substring(0, 500));
+    return { success: true, raw: text };
   } catch (error) {
-    console.error("❌ Error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

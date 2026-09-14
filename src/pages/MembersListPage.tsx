@@ -42,7 +42,11 @@ import {
 import { MEMBER_CATEGORIES } from "../constants";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { JamaahGridSkeleton, JamaahListSkeleton, JamaahRowSkeleton } from "../components/common/Skeleton";
+import {
+  JamaahGridSkeleton,
+  JamaahListSkeleton,
+  JamaahRowSkeleton,
+} from "../components/common/Skeleton";
 import { exportMembersToCsv } from "../utils/exportCsv";
 import { useToast } from "../contexts/ToastContext";
 import { queryKeys } from "../lib/queryClient";
@@ -108,7 +112,9 @@ export default function MembersListPage() {
   } = useQuery({
     queryKey: queryKeys.members(),
     queryFn: () =>
-      role === "TIM_PNKB" ? memberApi.listPNKB({}) : memberApi.list({}),
+      role === "TIM_PNKB"
+        ? memberApi.listPNKB({ limit: 9999 })
+        : memberApi.list({ limit: 9999 }),
     staleTime: 5 * 60_000,
   });
 
@@ -487,14 +493,40 @@ export default function MembersListPage() {
               Aksi
             </p>
             <button
-              onClick={() => {
+              onClick={async () => {
                 setActionsOpen(false);
+
                 if (members.length === 0) {
                   showToast("Tidak ada data untuk di-export", "error");
                   return;
                 }
-                exportMembersToCsv(members);
-                showToast(`${members.length} jamaah di-export`);
+
+                try {
+                  showToast("Menyiapkan data export...");
+
+                  const filters: Record<string, unknown> = {};
+                  if (kategori) filters.kategori = kategori;
+                  if (jenisKelamin) filters.jenis_kelamin = jenisKelamin;
+
+                  const exportData = await memberApi.listForExport(
+                    role === "TIM_PNKB"
+                      ? { ...filters, kategori: "PRA_NIKAH" }
+                      : filters,
+                  );
+
+                  if (!exportData || exportData.length === 0) {
+                    showToast("Tidak ada data untuk di-export", "error");
+                    return;
+                  }
+
+                  exportMembersToCsv(exportData);
+                  showToast(`${exportData.length} jamaah di-export`);
+                } catch (err) {
+                  showToast(
+                    err instanceof ApiError ? err.message : "Gagal export data",
+                    "error",
+                  );
+                }
               }}
               className="w-full text-left rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 p-3.5 flex items-center gap-3 transition-all active:scale-[0.99]"
             >

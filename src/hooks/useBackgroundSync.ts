@@ -1,58 +1,31 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-
-const QUERY_KEYS_TO_SYNC = [
-  "members",
-  "member",
-  "dashboard",
-  "groups",
-  "meetings",
-  "announcements",
-  "pending-members",
-  "pending-member",
-  "users",
-  "user-detail",
-  "settings",
-  "monitoring",
-  "member-self-dashboard",
-  "member-self-profile",
-];
-
-const SYNC_THROTTLE_MS = 60_000;
+import { invalidateRouteQueries } from "../lib/routeQueries";
 
 export function useBackgroundSync() {
+  const location = useLocation();
   const queryClient = useQueryClient();
-  const lastSyncRef = useRef<number>(0);
 
   useEffect(() => {
-    function syncIfNeeded() {
+    let timer: number | null = null;
+
+    const run = () => {
       if (document.visibilityState !== "visible") return;
-
-      const now = Date.now();
-      if (now - lastSyncRef.current < SYNC_THROTTLE_MS) return;
-
-      lastSyncRef.current = now;
-
-      QUERY_KEYS_TO_SYNC.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: [key] });
-      });
-    }
-
-    document.addEventListener("visibilitychange", syncIfNeeded);
-    window.addEventListener("focus", syncIfNeeded);
-
-    return () => {
-      document.removeEventListener("visibilitychange", syncIfNeeded);
-      window.removeEventListener("focus", syncIfNeeded);
+      invalidateRouteQueries(queryClient, location.pathname);
     };
-  }, [queryClient]);
 
-  return {
-    syncNow: () => {
-      lastSyncRef.current = Date.now();
-      QUERY_KEYS_TO_SYNC.forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: [key] });
-      });
-    },
-  };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        if (timer) window.clearTimeout(timer);
+        timer = window.setTimeout(run, 800);
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [location.pathname, queryClient]);
 }

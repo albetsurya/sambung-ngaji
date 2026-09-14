@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ChevronLeft,
@@ -13,6 +13,7 @@ import { BottomNav } from "./BottomNav";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useEnvironment } from "../../hooks/useEnvironment";
+import { invalidateRouteQueries } from "../../lib/routeQueries";
 
 interface HeaderProps {
   title: string;
@@ -35,6 +36,7 @@ export function Header({
 }: HeaderProps) {
   const navigate = useNavigate();
   const { isDevelopment } = useEnvironment();
+  const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -44,7 +46,7 @@ export function Header({
     if (syncing) return;
     setSyncing(true);
     try {
-      await queryClient.invalidateQueries();
+      invalidateRouteQueries(queryClient, location.pathname);
       showToast("Data diperbarui");
     } finally {
       setTimeout(() => setSyncing(false), 500);

@@ -567,14 +567,24 @@ export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
           <div className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card" />
         </div>
 
-        <div className="pb-2 flex gap-2 overflow-hidden">
-          {[56, 72, 88, 64, 80].map((w, i) => (
-            <div
-              key={i}
-              className="h-7 rounded-full bg-surface-card2 animate-pulse flex-shrink-0"
-              style={{ width: `${w}px` }}
-            />
-          ))}
+        <div className="pb-3 space-y-3">
+          <div className="flex gap-2 overflow-hidden">
+            {[56, 72, 88, 64, 80].map((w, i) => (
+              <div
+                key={`cat-${i}`}
+                className="h-7 rounded-full bg-surface-card2 animate-pulse flex-shrink-0"
+                style={{ width: `${w}px` }}
+              />
+            ))}
+          </div>
+
+          <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
+            <div className="flex-1 h-9 bg-surface-card2 animate-pulse" />
+            <div className="w-px bg-surface-border" />
+            <div className="flex-1 h-9 bg-surface-card2 animate-pulse" />
+            <div className="w-px bg-surface-border" />
+            <div className="flex-1 h-9 bg-surface-card2 animate-pulse" />
+          </div>
         </div>
 
         <div className="py-2 flex items-center justify-between gap-2 border-t border-surface-border">

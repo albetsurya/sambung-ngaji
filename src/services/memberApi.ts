@@ -47,4 +47,7 @@ export const memberApi = {
 
   getUserStatus: (member_id: string) =>
     call<MemberUserStatus>("getMemberUserStatus", { member_id }),
+
+  listForExport: (filters: MemberFilters = {}) =>
+    call<Member[]>("getMembersForExport", filters),
 };

@@ -10,6 +10,7 @@ import type {
   DashboardGeneral,
   DashboardPNKB,
   DashboardAbsensi,
+  Member,
 } from "../types";
 
 export const educationApi = {
@@ -50,6 +51,12 @@ export const meetingApi = {
 };
 
 export const attendanceApi = {
+  getPage: (meeting_id: string) =>
+    call<{
+      meeting: Meeting;
+      members: Member[];
+      attendance: AttendanceRecord[];
+    }>("getAttendancePage", { meeting_id }),
   byMeeting: (meeting_id: string) =>
     call<AttendanceRecord[]>("getAttendance", { meeting_id }),
   byMember: (member_id: string) =>
@@ -72,9 +79,30 @@ export const attendanceApi = {
     call<{ deleted: number }>("deleteAttendanceByMember", { member_id }),
 };
 
+export interface PagedResponse<T> {
+  items: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
+}
+
 export const monitoringApi = {
-  list: (member_id: string) =>
-    call<MonitoringEntry[]>("getMonitoring", { member_id }),
+  list: (
+    member_id: string,
+    options: { limit?: number; offset?: number } = {},
+  ) => call<MonitoringEntry[]>("getMonitoring", { member_id, ...options }),
+
+  listPaged: (
+    member_id: string,
+    options: { limit?: number; offset?: number } = {},
+  ) =>
+    call<PagedResponse<MonitoringEntry>>("getMonitoring", {
+      member_id,
+      paged: true,
+      ...options,
+    }),
+
   create: (payload: Partial<MonitoringEntry>) =>
     call<MonitoringEntry>("createMonitoring", payload),
   update: (monitoring_id: string, payload: Partial<MonitoringEntry>) =>
@@ -103,6 +131,18 @@ export const announcementApi = {
     call<Announcement>("updateAnnouncement", { announcement_id, ...payload }),
   list: (params: { group_id?: string; status?: string } = {}) =>
     call<Announcement[]>("getAnnouncements", params),
+  listPaged: (
+    params: {
+      group_id?: string;
+      status?: string;
+      limit?: number;
+      offset?: number;
+    } = {},
+  ) =>
+    call<PagedResponse<Announcement>>("getAnnouncements", {
+      ...params,
+      paged: true,
+    }),
 };
 
 export const uploadApi = {
