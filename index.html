@@ -42,12 +42,9 @@
     />
     <meta
       property="og:image"
-      content="https://manajemen-pengajian-five.vercel.app/og-image.png"
+      content="https://sambung-ngaji.vercel.app/og-image.png"
     />
-    <meta
-      property="og:url"
-      content="https://manajemen-pengajian-five.vercel.app/"
-    />
+    <meta property="og:url" content="https://sambung-ngaji.vercel.app/" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Pengajian" />
@@ -57,7 +54,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://manajemen-pengajian-five.vercel.app/og-image.png"
+      content="https://sambung-ngaji.vercel.app/og-image.png"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -81,6 +78,8 @@
           host === "127.0.0.1" ||
           host.indexOf("-dev") !== -1;
         if (!isDev) return;
+
+        var DEV_ORIGIN = "https://sambung-ngaji-dev.vercel.app";
 
         var setHref = function (selector, href) {
           var el = document.querySelector(selector);
@@ -119,14 +118,15 @@
 
         // --- Open Graph / Twitter ---
         setContent('meta[property="og:title"]', "Pengajian (DEV)");
+        setContent('meta[property="og:url"]', DEV_ORIGIN + "/");
         setContent(
           'meta[property="og:image"]',
-          "https://manajemen-pengajian-five.vercel.app/og-image-dev.png",
+          DEV_ORIGIN + "/og-image-dev.png",
         );
         setContent('meta[name="twitter:title"]', "Pengajian (DEV)");
         setContent(
           'meta[name="twitter:image"]',
-          "https://manajemen-pengajian-five.vercel.app/og-image-dev.png",
+          DEV_ORIGIN + "/og-image-dev.png",
         );
       })();
     </script>

@@ -157,16 +157,13 @@ export default function LoginPage() {
             <div className="relative w-20 h-20 rounded-[26px] overflow-hidden shadow-xl">
               <AppIcon size={80} />
             </div>
-          </div>
 
-          {isDevelopment && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-soft border border-warning/30 mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-              <span className="text-ios-caption font-semibold text-warning uppercase tracking-wide">
-                Development Server
-              </span>
-            </div>
-          )}
+            {isDevelopment && (
+              <div className="absolute -top-1.5 -right-1.5 z-10 px-2 py-0.5 rounded-full bg-danger text-white text-[10px] font-bold uppercase tracking-wider shadow-md ring-2 ring-surface-bg">
+                DEV
+              </div>
+            )}
+          </div>
 
           <h1 className="text-[26px] font-bold text-surface-text tracking-[-0.02em] leading-tight">
             Hai, Jamaah Latukan 👋
