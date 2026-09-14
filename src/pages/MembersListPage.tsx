@@ -43,11 +43,18 @@ import { exportMembersToCsv } from "../utils/exportCsv";
 import { useToast } from "../contexts/ToastContext";
 import { queryKeys } from "../lib/queryClient";
 
-type ViewMode = "list" | "grid";
+type ViewMode = "row" | "list" | "grid";
 type GridCols = 2 | 3 | 4;
 
 const VIEW_KEY = "members_view_mode";
 const COLS_KEY = "members_grid_cols";
+const DEFAULT_VIEW: ViewMode = "row";
+
+const ROW_HEIGHTS: Record<ViewMode, number> = {
+  row: 64,
+  list: 76,
+  grid: 140,
+};
 
 export default function MembersListPage() {
   const navigate = useNavigate();
@@ -59,9 +66,10 @@ export default function MembersListPage() {
   const [kategori, setKategori] = useState<MemberCategory | "">("");
   const [jenisKelamin, setJenisKelamin] = useState("");
   const [view, setView] = useState<ViewMode>(() => {
-    if (typeof window === "undefined") return "list";
+    if (typeof window === "undefined") return DEFAULT_VIEW;
     const saved = localStorage.getItem(VIEW_KEY);
-    return saved === "grid" ? "grid" : "list";
+    if (saved === "row" || saved === "list" || saved === "grid") return saved;
+    return DEFAULT_VIEW;
   });
   const [gridCols, setGridCols] = useState<GridCols>(() => {
     if (typeof window === "undefined") return 2;
@@ -147,10 +155,8 @@ export default function MembersListPage() {
 
   const showInitialSkeleton = showSkeleton;
 
-  const rowHeight = view === "grid" ? 140 : 76;
-
   const getScrollElement = useCallback(() => scrollRef.current, []);
-  const estimateSize = useCallback(() => (view === "grid" ? 140 : 76), [view]);
+  const estimateSize = useCallback(() => ROW_HEIGHTS[view], [view]);
 
   const virtualizer = useVirtualizer({
     count:
@@ -173,6 +179,11 @@ export default function MembersListPage() {
 
   const renderItem = useCallback(
     (index: number) => {
+      if (view === "row") {
+        const m = deferredMembers[index];
+        if (!m) return null;
+        return <JamaahRow member={m} onPress={handlePress} />;
+      }
       if (view === "list") {
         const m = deferredMembers[index];
         if (!m) return null;
@@ -274,9 +285,11 @@ export default function MembersListPage() {
 
       <div className="flex flex-col flex-1 min-h-0">
         {showInitialSkeleton && (
-          <div className="px-4 py-2">
+          <div className={view === "grid" ? "px-4 py-2" : "py-2"}>
             {view === "grid" ? (
               <JamaahGridSkeleton rows={gridCols * 2} cols={gridCols} />
+            ) : view === "row" ? (
+              <JamaahRowSkeleton rows={8} />
             ) : (
               <JamaahListSkeleton rows={8} />
             )}
@@ -315,7 +328,9 @@ export default function MembersListPage() {
         {!showSkeleton && members.length > 0 && (
           <div
             ref={scrollRef}
-            className="flex-1 overflow-auto px-4 py-2"
+            className={`flex-1 overflow-auto py-2 ${
+              view === "grid" ? "px-4" : ""
+            }`}
             style={{ height: "calc(100vh - 220px)" }}
           >
             <div
@@ -327,22 +342,35 @@ export default function MembersListPage() {
                 position: "relative",
               }}
             >
-              {virtualItems.map((virtualRow) => (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: view === "list" ? 68 : 140,
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  {renderItem(virtualRow.index)}
-                </div>
-              ))}
+              {virtualItems.map((virtualRow) => {
+                const isLast =
+                  virtualRow.index ===
+                  (view === "grid"
+                    ? Math.ceil(deferredMembers.length / gridCols)
+                    : deferredMembers.length) -
+                    1;
+                return (
+                  <div
+                    key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: view === "grid" ? 140 : ROW_HEIGHTS[view],
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                    className={
+                      view === "row" && !isLast
+                        ? "border-b border-surface-border/60"
+                        : ""
+                    }
+                  >
+                    {renderItem(virtualRow.index)}
+                  </div>
+                );
+              })}
             </div>
 
             <p className="text-center text-ios-footnote text-surface-muted py-4">
@@ -363,29 +391,26 @@ export default function MembersListPage() {
               Tampilan
             </p>
             <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-              <button
-                onClick={() => setView("list")}
-                className={`flex-1 min-h-[44px] flex items-center justify-center gap-2 transition-all ${
-                  view === "list"
-                    ? "bg-accent text-white"
-                    : "text-surface-muted hover:bg-surface-card"
-                }`}
-              >
-                <List size={15} />
-                <span className="text-ios-subhead font-medium">List</span>
-              </button>
+              <ViewButton
+                active={view === "row"}
+                onClick={() => setView("row")}
+                icon={<RowsIcon size={15} />}
+                label="Row"
+              />
               <div className="w-px bg-surface-border" />
-              <button
+              <ViewButton
+                active={view === "list"}
+                onClick={() => setView("list")}
+                icon={<List size={15} />}
+                label="List"
+              />
+              <div className="w-px bg-surface-border" />
+              <ViewButton
+                active={view === "grid"}
                 onClick={() => setView("grid")}
-                className={`flex-1 min-h-[44px] flex items-center justify-center gap-2 transition-all ${
-                  view === "grid"
-                    ? "bg-accent text-white"
-                    : "text-surface-muted hover:bg-surface-card"
-                }`}
-              >
-                <LayoutGrid size={15} />
-                <span className="text-ios-subhead font-medium">Grid</span>
-              </button>
+                icon={<LayoutGrid size={15} />}
+                label="Grid"
+              />
             </div>
           </div>
 
@@ -501,6 +526,52 @@ export default function MembersListPage() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                              Icons & Buttons                               */
+/* -------------------------------------------------------------------------- */
+
+function ViewButton({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 min-h-[44px] flex items-center justify-center gap-2 transition-all ${
+        active
+          ? "bg-accent text-white"
+          : "text-surface-muted hover:bg-surface-card"
+      }`}
+    >
+      {icon}
+      <span className="text-ios-subhead font-medium">{label}</span>
+    </button>
+  );
+}
+
+function RowsIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect x="0" y="2" width="14" height="2" rx="1" fill="currentColor" />
+      <rect x="0" y="6" width="14" height="2" rx="1" fill="currentColor" />
+      <rect x="0" y="10" width="14" height="2" rx="1" fill="currentColor" />
+    </svg>
+  );
+}
+
 function GridIcon({ cols }: { cols: GridCols }) {
   const gap = 1;
   const size = 14;
@@ -531,6 +602,44 @@ function GridIcon({ cols }: { cols: GridCols }) {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                List Items                                  */
+/* -------------------------------------------------------------------------- */
+
+const JamaahRow = memo(function JamaahRow({
+  member,
+  onPress,
+}: {
+  member: Member;
+  onPress: (id: string) => void;
+}) {
+  return (
+    <button
+      onClick={() => onPress(member.member_id)}
+      className="w-full flex items-center gap-3 h-16 px-4 text-left bg-transparent active:bg-surface-card2 transition-colors"
+    >
+      <Avatar
+        src={member.foto_url}
+        name={member.nama_lengkap}
+        gender={normalizeGender(member?.jenis_kelamin)}
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-[15px] font-medium text-surface-text truncate">
+          {member.nama_lengkap}
+        </p>
+        <p className="text-[13px] text-surface-muted truncate">
+          {member.kelompok || "Belum ada kelompok"}
+        </p>
+      </div>
+      {member.kategori && (
+        <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+          {CATEGORY_LABEL[member.kategori]}
+        </span>
+      )}
+    </button>
+  );
+});
+
 const JamaahCard = memo(function JamaahCard({
   member,
   onPress,
@@ -539,25 +648,27 @@ const JamaahCard = memo(function JamaahCard({
   onPress: (id: string) => void;
 }) {
   return (
-    <Card
-      onClick={() => onPress(member.member_id)}
-      className="flex items-center gap-3 h-[68px]"
-    >
-      <Avatar
-        src={member.foto_url}
-        name={member.nama_lengkap}
-        gender={normalizeGender(member?.jenis_kelamin)}
-      />
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm text-surface-text truncate">
-          {member.nama_lengkap}
-        </p>
-        <p className="text-xs text-surface-muted truncate">
-          {member.kelompok || "Belum ada kelompok"}
-        </p>
-      </div>
-      {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
-    </Card>
+    <div className="px-4">
+      <Card
+        onClick={() => onPress(member.member_id)}
+        className="flex items-center gap-3 h-[68px]"
+      >
+        <Avatar
+          src={member.foto_url}
+          name={member.nama_lengkap}
+          gender={normalizeGender(member?.jenis_kelamin)}
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-sm text-surface-text truncate">
+            {member.nama_lengkap}
+          </p>
+          <p className="text-xs text-surface-muted truncate">
+            {member.kelompok || "Belum ada kelompok"}
+          </p>
+        </div>
+        {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
+      </Card>
+    </div>
   );
 });
 
@@ -628,6 +739,30 @@ function CategoryChip({
     >
       {label}
     </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Skeletons                                  */
+/* -------------------------------------------------------------------------- */
+
+function JamaahRowSkeleton({ rows = 8 }: { rows?: number }) {
+  return (
+    <div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-3 h-16 px-4 border-b border-surface-border/60"
+        >
+          <div className="w-10 h-10 rounded-full bg-surface-card2 animate-pulse flex-shrink-0" />
+          <div className="flex-1 space-y-2 min-w-0">
+            <div className="h-3.5 w-1/2 rounded bg-surface-card2 animate-pulse" />
+            <div className="h-2.5 w-1/3 rounded bg-surface-card2 animate-pulse" />
+          </div>
+          <div className="h-3 w-12 rounded bg-surface-card2 animate-pulse flex-shrink-0" />
+        </div>
+      ))}
+    </div>
   );
 }
 

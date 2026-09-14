@@ -1,6 +1,6 @@
 import { call } from "./api";
 
-interface SubmitRegistrationPayload {
+export interface SubmitRegistrationPayload {
   nama_lengkap: string;
   nama_panggilan?: string;
   jenis_kelamin: "L" | "P";
@@ -19,13 +19,20 @@ interface SubmitRegistrationPayload {
   tahun_mulai_pendidikan?: string;
   tahun_selesai_pendidikan?: string;
   foto_url?: string;
+  username: string;
+  password: string;
   _client_ip?: string;
 }
 
-interface SubmitRegistrationResponse {
+export interface SubmitRegistrationResponse {
   submission_id: string;
   nama_lengkap: string;
   submitted_at: string;
+}
+
+export interface CheckUsernameResult {
+  available: boolean;
+  reason?: "invalid" | "taken" | "pending";
 }
 
 /**
@@ -53,4 +60,7 @@ export const publicApi = {
       _client_ip: clientIp,
     });
   },
+
+  checkUsername: (username: string) =>
+    call<CheckUsernameResult>("checkUsernameAvailability", { username }),
 };

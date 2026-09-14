@@ -247,13 +247,14 @@ export interface PendingMember {
   daerah?: string;
   pekerjaan?: string;
   hobi?: string;
-  is_nikah?: boolean;
+  is_nikah: boolean;
   jenjang_pendidikan?: string;
   sekolah?: string;
   jurusan?: string;
   tahun_mulai_pendidikan?: string;
   tahun_selesai_pendidikan?: string;
   foto_url?: string;
+  username?: string;
   status: PendingStatus;
   submitted_at: string;
   submitted_ip?: string;

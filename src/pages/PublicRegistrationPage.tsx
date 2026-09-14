@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -7,7 +7,8 @@ import {
   User as UserIcon,
   MapPin,
   GraduationCap,
-  Camera,
+  Eye,
+  EyeOff,
 } from "../components/common/FontAwesomeIcons";
 import {
   Button,
@@ -43,6 +44,9 @@ interface FormData {
   jurusan: string;
   tahun_mulai_pendidikan: string;
   tahun_selesai_pendidikan: string;
+  username: string;
+  password: string;
+  passwordConfirm: string;
 }
 
 const EMPTY_FORM: FormData = {
@@ -63,15 +67,23 @@ const EMPTY_FORM: FormData = {
   jurusan: "",
   tahun_mulai_pendidikan: "",
   tahun_selesai_pendidikan: "",
+  username: "",
+  password: "",
+  passwordConfirm: "",
 };
 
 const STEPS = [
   { key: 1, label: "Data Diri", Icon: UserIcon },
   { key: 2, label: "Kontak & Alamat", Icon: MapPin },
-  { key: 3, label: "Pendidikan", Icon: GraduationCap },
+  { key: 3, label: "Pendidikan & Akun", Icon: GraduationCap },
 ] as const;
 
 const TOTAL_STEPS = 3;
+
+const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
+const MIN_PASSWORD_LENGTH = 6;
+
+type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
 /* -------------------------------------------------------------------------- */
 /*                              Main Component                                */
@@ -83,10 +95,48 @@ export default function PublicRegistrationPage() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  /* ---------------------- Cek ketersediaan username ---------------------- */
+
+  useEffect(() => {
+    const uname = form.username.trim().toLowerCase();
+
+    if (uname.length === 0) {
+      setUsernameStatus("idle");
+      return;
+    }
+    if (!USERNAME_REGEX.test(uname)) {
+      setUsernameStatus("invalid");
+      return;
+    }
+
+    setUsernameStatus("checking");
+    let cancelled = false;
+
+    const t = setTimeout(async () => {
+      try {
+        const res = await publicApi.checkUsername(uname);
+        if (cancelled) return;
+        setUsernameStatus(res.available ? "available" : "taken");
+      } catch {
+        if (cancelled) return;
+        setUsernameStatus("idle");
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [form.username]);
+
+  /* ----------------------------- Validasi step --------------------------- */
 
   function canProceed(): { ok: boolean; message?: string } {
     if (step === 1) {
@@ -97,6 +147,7 @@ export default function PublicRegistrationPage() {
         return { ok: false, message: "Jenis kelamin wajib dipilih" };
       }
     }
+
     if (step === 2) {
       if (!form.no_wa.trim()) {
         return { ok: false, message: "Nomor WhatsApp wajib diisi" };
@@ -106,6 +157,39 @@ export default function PublicRegistrationPage() {
         return { ok: false, message: "Nomor WhatsApp tidak valid" };
       }
     }
+
+    if (step === 3) {
+      const uname = form.username.trim().toLowerCase();
+      if (!USERNAME_REGEX.test(uname)) {
+        return {
+          ok: false,
+          message:
+            "Username tidak valid. Gunakan huruf kecil, angka, atau underscore (3-20 karakter).",
+        };
+      }
+      if (usernameStatus === "checking") {
+        return {
+          ok: false,
+          message: "Sedang memeriksa username, tunggu sebentar.",
+        };
+      }
+      if (usernameStatus === "taken") {
+        return {
+          ok: false,
+          message: "Username sudah dipakai. Coba yang lain.",
+        };
+      }
+      if (form.password.length < MIN_PASSWORD_LENGTH) {
+        return {
+          ok: false,
+          message: `Password minimal ${MIN_PASSWORD_LENGTH} karakter`,
+        };
+      }
+      if (form.password !== form.passwordConfirm) {
+        return { ok: false, message: "Konfirmasi password tidak sama" };
+      }
+    }
+
     return { ok: true };
   }
 
@@ -133,6 +217,7 @@ export default function PublicRegistrationPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
+
     const validation = canProceed();
     if (!validation.ok) {
       setError(validation.message || "Data belum lengkap");
@@ -159,6 +244,8 @@ export default function PublicRegistrationPage() {
         jurusan: form.jurusan.trim(),
         tahun_mulai_pendidikan: form.tahun_mulai_pendidikan,
         tahun_selesai_pendidikan: form.tahun_selesai_pendidikan,
+        username: form.username.trim().toLowerCase(),
+        password: form.password,
       });
 
       navigate("/daftar/sukses", {
@@ -179,8 +266,6 @@ export default function PublicRegistrationPage() {
     }
   }
 
-  const progress = (step / TOTAL_STEPS) * 100;
-
   return (
     <div className="min-h-screen bg-surface-bg relative overflow-x-hidden">
       {/* Decorative circles */}
@@ -193,7 +278,6 @@ export default function PublicRegistrationPage() {
         style={{ background: "rgb(var(--c-accent) / 0.06)" }}
       />
 
-      {/* Content wrapper */}
       <div className="app-shell flex flex-col relative">
         {/* Header */}
         <div className="sticky top-0 z-20 backdrop-blur-xl bg-surface-bg/80 pt-safe border-b border-surface-border/50">
@@ -358,10 +442,10 @@ export default function PublicRegistrationPage() {
             <div className="animate-[fadeIn_0.2s_ease-out]">
               <div className="mb-5">
                 <h2 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
-                  Pendidikan & Lainnya
+                  Pendidikan & Akun
                 </h2>
                 <p className="text-ios-footnote text-surface-muted">
-                  Opsional — bisa dilengkapi nanti
+                  Data pendidikan opsional, akun login wajib diisi
                 </p>
               </div>
 
@@ -437,6 +521,93 @@ export default function PublicRegistrationPage() {
                 onChange={(v) => update("is_nikah", v)}
                 label="Sudah menikah"
               />
+
+              {/* ---------------------- Section Akun Login ---------------------- */}
+
+              <div className="mt-6 pt-5 border-t border-surface-border">
+                <h2 className="text-[18px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
+                  Akun Login
+                </h2>
+                <p className="text-ios-footnote text-surface-muted mb-4 leading-relaxed">
+                  Username dan password ini dipakai untuk masuk setelah
+                  pendaftaran disetujui admin.
+                </p>
+
+                <Input
+                  label="Username *"
+                  placeholder="Contoh: ahmad_01"
+                  value={form.username}
+                  onChange={(e) =>
+                    update(
+                      "username",
+                      e.target.value.toLowerCase().replace(/\s/g, ""),
+                    )
+                  }
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  hint="Huruf kecil, angka, underscore (3-20 karakter)"
+                  required
+                />
+
+                {usernameStatus === "checking" && (
+                  <p className="text-ios-caption text-surface-muted mt-1 px-1">
+                    Memeriksa ketersediaan...
+                  </p>
+                )}
+                {usernameStatus === "available" && (
+                  <p className="text-ios-caption text-success mt-1 px-1 flex items-center gap-1">
+                    <Check size={12} /> Username tersedia
+                  </p>
+                )}
+                {usernameStatus === "taken" && (
+                  <p className="text-ios-caption text-danger mt-1 px-1">
+                    Username sudah dipakai, coba yang lain
+                  </p>
+                )}
+                {usernameStatus === "invalid" && (
+                  <p className="text-ios-caption text-danger mt-1 px-1">
+                    Format username tidak valid
+                  </p>
+                )}
+
+                <Input
+                  label="Password *"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={`Minimal ${MIN_PASSWORD_LENGTH} karakter`}
+                  value={form.password}
+                  onChange={(e) => update("password", e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+
+                <Input
+                  label="Konfirmasi Password *"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ulangi password"
+                  value={form.passwordConfirm}
+                  onChange={(e) => update("passwordConfirm", e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="inline-flex items-center gap-1.5 text-ios-footnote text-accent mt-1 mb-2 px-1"
+                >
+                  {showPassword ? <EyeOff size={13} /> : <Eye size={13} />}
+                  {showPassword ? "Sembunyikan password" : "Lihat password"}
+                </button>
+
+                {form.passwordConfirm &&
+                  form.password !== form.passwordConfirm && (
+                    <p className="text-ios-caption text-danger mt-1 px-1">
+                      Password tidak sama
+                    </p>
+                  )}
+              </div>
             </div>
           )}
 
@@ -452,10 +623,8 @@ export default function PublicRegistrationPage() {
 
       {/* Bottom action */}
       <div className="fixed bottom-0 left-0 right-0 z-30">
-        {/* Gradient fade di atas */}
         <div className="pointer-events-none h-6 bg-gradient-to-t from-surface-bg to-transparent" />
 
-        {/* Panel */}
         <div className="bg-surface-bg backdrop-blur-xl border-t border-surface-border pb-safe">
           <div className="app-shell px-5 pt-3 pb-4">
             {step < TOTAL_STEPS ? (
