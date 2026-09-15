@@ -21,3 +21,8 @@ Untuk install PWA di Android dari perangkat lain melalui LAN, gunakan HTTPS pada
 ## Setelah deployment
 
 Jika PWA pernah terpasang dari versi lama, hapus instalasi aplikasi lama dan clear site data untuk domain DEV sebelum pengujian ulang. Kemudian buka domain DEV di Chrome Android dan cek menu browser untuk `Install app` / `Tambahkan ke layar utama`.
+
+
+## DEV PWA Icon
+
+Development builds now use PNG icons generated directly from `public/favicon-dev.svg`: `favicon-dev-192x192.png`, `favicon-dev-512x512.png`, and `favicon-dev-180x180.png`. Production continues using the production PWA PNG assets.
