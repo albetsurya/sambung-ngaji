@@ -1,6 +1,13 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, Copy, Share2 } from "../components/common/FontAwesomeIcons";
+import {
+  Megaphone,
+  Copy,
+  Share2,
+  ScrollText,
+  Check,
+} from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -19,7 +26,11 @@ import {
   GroupedList,
   ListRow,
 } from "../components/common";
-import { announcementApi, groupApi } from "../services/domainApi";
+import {
+  announcementApi,
+  announcementTemplateApi,
+  groupApi,
+} from "../services/domainApi";
 import type { Announcement, AnnouncementTemplate, Group } from "../types";
 import { formatDateShort, getHariFromDate } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
@@ -37,9 +48,12 @@ const STATUS_CONFIG: Record<
 };
 
 export default function AnnouncementsPage() {
+  const navigate = useNavigate();
   const { isAdminLike } = usePermission();
   const [createOpen, setCreateOpen] = useState(false);
   const [preview, setPreview] = useState<Announcement | null>(null);
+  const [saveTemplateSource, setSaveTemplateSource] =
+    useState<Announcement | null>(null);
   const queryClient = useQueryClient();
 
   const {
@@ -61,7 +75,25 @@ export default function AnnouncementsPage() {
         ) : undefined
       }
     >
-      <Header title="Pengumuman" subtitle="Template WhatsApp pengajian" />
+      <Header
+        title="Pengumuman"
+        subtitle="Template WhatsApp pengajian"
+        right={
+          isAdminLike ? (
+            <button
+              onClick={() => navigate("/pengumuman/templates")}
+              aria-label="Kelola template"
+              title="Kelola template"
+              className="flex items-center gap-1 h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-accent transition-all hover:bg-surface-card2 active:scale-[0.97]"
+            >
+              <ScrollText size={14} strokeWidth={2.4} />
+              <span className="text-ios-footnote font-medium hidden xs:inline">
+                Template
+              </span>
+            </button>
+          ) : undefined
+        }
+      />
 
       <div className="flex flex-col flex-1">
         {isLoading && <AnnouncementListSkeleton rows={5} />}
@@ -139,8 +171,35 @@ export default function AnnouncementsPage() {
           setPreview(a);
         }}
       />
+      <PreviewModal
+        announcement={preview}
+        onClose={() => setPreview(null)}
+        onSaveAsTemplate={
+          isAdminLike
+            ? (a) => {
+                setPreview(null);
+                setSaveTemplateSource(a);
+              }
+            : undefined
+        }
+      />
 
-      <PreviewModal announcement={preview} onClose={() => setPreview(null)} />
+      {/* Sheet: Simpan sebagai Template */}
+      {saveTemplateSource && (
+        <SaveAsTemplateSheet
+          announcement={saveTemplateSource}
+          onClose={() => setSaveTemplateSource(null)}
+          onSaved={() => {
+            setSaveTemplateSource(null);
+            queryClient.invalidateQueries({
+              queryKey: ["announcement-templates"],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ["announcement-templates-all"],
+            });
+          }}
+        />
+      )}
     </AppLayout>
   );
 }
@@ -148,13 +207,14 @@ export default function AnnouncementsPage() {
 function PreviewModal({
   announcement,
   onClose,
+  onSaveAsTemplate,
 }: {
   announcement: Announcement | null;
   onClose: () => void;
+  onSaveAsTemplate?: (a: Announcement) => void;
 }) {
   const { showToast } = useToast();
   if (!announcement) return null;
-
   const status = STATUS_CONFIG[announcement.status] || {
     label: announcement.status,
     color: "ink" as const,
@@ -197,18 +257,31 @@ function PreviewModal({
         </pre>
       </div>
 
-      <div className="flex gap-3">
-        <Button
-          variant="secondary"
-          iconOnly
-          aria-label="Salin teks pengumuman"
-          onClick={copyText}
-        >
-          <Copy size={18} />
-        </Button>
-        <Button fullWidth leftIcon={<Share2 size={16} />} onClick={shareWA}>
-          Bagikan
-        </Button>
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          <Button
+            variant="secondary"
+            iconOnly
+            aria-label="Salin teks pengumuman"
+            onClick={copyText}
+          >
+            <Copy size={18} />
+          </Button>
+          <Button fullWidth leftIcon={<Share2 size={16} />} onClick={shareWA}>
+            Bagikan
+          </Button>
+        </div>
+
+        {onSaveAsTemplate && (
+          <Button
+            variant="secondary"
+            fullWidth
+            leftIcon={<Check size={16} />}
+            onClick={() => onSaveAsTemplate(announcement)}
+          >
+            Simpan sebagai Template
+          </Button>
+        )}
       </div>
     </Modal>
   );
@@ -349,6 +422,99 @@ function CreateAnnouncementSheet({
         disabled={mutation.isPending || !groupId || !templateId}
       >
         {mutation.isPending ? "Membuat..." : "Generate & Preview"}
+      </Button>
+    </BottomSheet>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          SAVE AS TEMPLATE SHEET                            */
+/* -------------------------------------------------------------------------- */
+
+function SaveAsTemplateSheet({
+  announcement,
+  onClose,
+  onSaved,
+}: {
+  announcement: Announcement;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const { showToast } = useToast();
+  const [nama, setNama] = useState("");
+  const [kode, setKode] = useState("");
+
+  // Sinkronisasi saat sheet dibuka
+  useMemo(() => {
+    setNama("");
+    setKode("");
+  }, [announcement.announcement_id]);
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      announcementTemplateApi.createFromAnnouncement({
+        source_announcement_id: announcement.announcement_id,
+        nama_template: nama.trim(),
+        kode: kode.trim().toUpperCase(),
+      }),
+    onSuccess: () => {
+      showToast("Template dibuat dari pengumuman");
+      onSaved();
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal membuat template",
+        "error",
+      );
+    },
+  });
+
+  const canSubmit = nama.trim().length >= 3 && kode.trim().length >= 3;
+
+  return (
+    <BottomSheet
+      open={!!announcement}
+      onClose={onClose}
+      title="Simpan sebagai Template"
+    >
+      <div className="mb-4 p-3 rounded-xl bg-accent-soft/60 border border-accent/15">
+        <p className="text-ios-caption text-accent/80 leading-relaxed">
+          Teks pengumuman akan disimpan sebagai template baru. Bisa dipakai
+          ulang nanti.
+        </p>
+      </div>
+
+      <Input
+        label="Nama Template"
+        placeholder="Undangan Sambung Kelompok"
+        value={nama}
+        onChange={(e) => setNama(e.target.value)}
+      />
+
+      <Input
+        label="Kode"
+        placeholder="UNDANGAN_SAMBUNG"
+        value={kode}
+        onChange={(e) => setKode(e.target.value.toUpperCase())}
+        hint="Huruf kapital, angka, underscore"
+      />
+
+      <div className="rounded-xl border border-surface-border bg-surface-card2/40 p-3 mb-4 max-h-40 overflow-y-auto">
+        <p className="text-ios-caption text-surface-muted mb-1.5">
+          Preview teks:
+        </p>
+        <pre className="whitespace-pre-wrap text-[13px] leading-relaxed text-surface-text font-sans">
+          {announcement.generated_text}
+        </pre>
+      </div>
+
+      <Button
+        fullWidth
+        onClick={() => mutation.mutate()}
+        disabled={mutation.isPending || !canSubmit}
+        leftIcon={!mutation.isPending ? <Check size={16} /> : undefined}
+      >
+        {mutation.isPending ? "Menyimpan..." : "Simpan Template"}
       </Button>
     </BottomSheet>
   );
