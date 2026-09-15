@@ -2,20 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import {
   Send,
   Sparkles,
-  User as UserIcon,
   Loader2,
+  ChevronLeft,
   ChevronDown,
   Zap,
   Copy,
   Check,
   Share2,
   RefreshCw,
+  Trash2,
 } from "../components/common/FontAwesomeIcons";
-import { AppLayout, Header } from "../components/layout/AppLayout";
+import { AppLayout } from "../components/layout/AppLayout";
 import { BottomSheet, LoadingOverlay } from "../components/common";
 import { aiApi } from "../services/aiApi";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useEnvironment } from "../hooks/useEnvironment";
 import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
 
 /* -------------------------------------------------------------------------- */
@@ -85,12 +87,10 @@ function AiAvatar({ size = 32 }: { size?: number }) {
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
-        {/* Sparkle utama */}
         <path
           d="M12 2 L13.5 9 L20.5 10.5 L13.5 12 L12 19 L10.5 12 L3.5 10.5 L10.5 9 Z"
           fill="white"
         />
-        {/* Sparkle kecil */}
         <path
           d="M19 17 L19.7 19.3 L22 20 L19.7 20.7 L19 23 L18.3 20.7 L16 20 L18.3 19.3 Z"
           fill="white"
@@ -108,8 +108,8 @@ function AiAvatar({ size = 32 }: { size?: number }) {
 export default function AiChatPage() {
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { isDevelopment } = useEnvironment();
 
-  // ✅ Pakai hook untuk history
   const { messages, setMessages, clearHistory, hydrated } = useAiChatHistory();
 
   const [input, setInput] = useState("");
@@ -118,6 +118,7 @@ export default function AiChatPage() {
   const [activeProvider, setActiveProvider] = useState<string>("");
   const [providerSheetOpen, setProviderSheetOpen] = useState(false);
   const [switchingProvider, setSwitchingProvider] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   /* ----------------------------- Load provider ----------------------------- */
@@ -129,7 +130,7 @@ export default function AiChatPage() {
         setActiveProvider(info.active);
       })
       .catch(() => {
-        // ignore — pakai default
+        // ignore
       });
   }, []);
 
@@ -253,6 +254,16 @@ export default function AiChatPage() {
     }
   }
 
+  function handleResetClick() {
+    setConfirmResetOpen(true);
+  }
+
+  function confirmReset() {
+    clearHistory();
+    setConfirmResetOpen(false);
+    showToast("Percakapan direset");
+  }
+
   const placeholder =
     PLACEHOLDER_BY_ROLE[user?.role || ""] || "Tanya data pengajian...";
 
@@ -261,50 +272,70 @@ export default function AiChatPage() {
 
   return (
     <AppLayout hideNav>
-      <Header
-        title="Asisten Pengajian"
-        subtitle={`Model: ${currentProviderLabel}`}
-        onBack={() => history.back()}
-        right={
-          <div className="flex items-center gap-1">
+      {/* -------------------- Custom Header (compact) -------------------- */}
+      <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
+        <div className="flex items-center gap-1 h-[56px] px-2">
+          <button
+            onClick={() => history.back()}
+            aria-label="Kembali"
+            className="flex items-center justify-center w-10 h-10 rounded-xl text-accent transition-colors hover:bg-accent-soft/60 active:scale-[0.97] flex-shrink-0"
+          >
+            <ChevronLeft size={24} strokeWidth={2.2} />
+          </button>
+
+          <div className="flex-1 min-w-0 flex flex-col justify-center px-1">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h1 className="text-ios-nav font-semibold text-surface-text truncate min-w-0">
+                Asisten Pengajian
+              </h1>
+              {isDevelopment && (
+                <span className="inline-flex items-center px-1 py-[1px] rounded text-[8px] font-bold uppercase tracking-wide bg-warning-soft text-warning border border-warning/20 flex-shrink-0 leading-none">
+                  DEV
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-surface-muted truncate leading-tight mt-0.5">
+              Model: {currentProviderLabel}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={() => setProviderSheetOpen(true)}
               aria-label="Ganti model AI"
-              className="flex items-center gap-1 h-9 px-2.5 rounded-xl text-ios-footnote font-medium text-accent transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
+              title="Ganti model AI"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-card border border-surface-border text-accent transition-all hover:bg-surface-card2 active:scale-95"
             >
-              <Zap size={14} strokeWidth={2.4} />
-              <span className="hidden xs:inline">Model</span>
-              <ChevronDown size={12} strokeWidth={2.5} />
+              <Zap size={16} strokeWidth={2.3} />
             </button>
 
             {messages.length > 0 && (
               <button
-                onClick={clearHistory}
-                className="text-ios-body font-medium text-accent px-2 h-9 rounded-xl transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
+                onClick={handleResetClick}
+                aria-label="Reset percakapan"
+                title="Reset percakapan"
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
               >
-                Reset
+                <Trash2 size={16} strokeWidth={2.2} />
               </button>
             )}
           </div>
-        }
-      />
+        </div>
+      </header>
 
       <div className="flex-1 flex flex-col min-h-0">
         {/* Chat area */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-          {/* Loading saat history belum load */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
           {!hydrated && (
             <div className="flex items-center justify-center py-12">
               <Loader2 size={20} className="animate-spin text-surface-muted" />
             </div>
           )}
 
-          {/* Empty state */}
           {hydrated && messages.length === 0 && !loading && (
             <EmptyChat onSuggest={handleSend} />
           )}
 
-          {/* Messages */}
           {hydrated &&
             messages.map((msg, i) => {
               const isLastAssistant =
@@ -393,7 +424,7 @@ export default function AiChatPage() {
                       {p.label}
                     </p>
                     {isReallyActive && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-accent-soft text-accent text-[9px] font-bold uppercase tracking-wide">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-accent-soft text-accent text-[9px] font-bold uppercase tracking-wide flex-shrink-0">
                         Aktif
                       </span>
                     )}
@@ -416,6 +447,45 @@ export default function AiChatPage() {
           Model aktif akan dipakai untuk chat berikutnya. Jika model utama
           gagal, sistem otomatis beralih ke model lain.
         </p>
+      </BottomSheet>
+
+      {/* ------------------ Reset Confirmation Sheet ------------------ */}
+      <BottomSheet
+        open={confirmResetOpen}
+        onClose={() => setConfirmResetOpen(false)}
+        title="Reset Percakapan?"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-danger-soft border border-danger/20">
+            <div className="w-9 h-9 rounded-xl bg-danger text-white flex items-center justify-center flex-shrink-0">
+              <Trash2 size={16} strokeWidth={2.3} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-ios-body font-medium text-danger mb-0.5">
+                Semua riwayat akan dihapus
+              </p>
+              <p className="text-ios-footnote text-danger/80 leading-relaxed">
+                Percakapan Anda dengan AI akan dihapus permanen. Tindakan ini
+                tidak bisa dibatalkan.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={() => setConfirmResetOpen(false)}
+              className="flex-1 min-h-[46px] rounded-2xl border border-surface-border bg-surface-card text-surface-text text-ios-body font-medium transition-all hover:bg-surface-card2 active:scale-[0.98]"
+            >
+              Batal
+            </button>
+            <button
+              onClick={confirmReset}
+              className="flex-1 min-h-[46px] rounded-2xl bg-danger text-white text-ios-body font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
       </BottomSheet>
 
       <LoadingOverlay open={switchingProvider} label="Mengganti model..." />
@@ -493,52 +563,54 @@ function ChatBubble({
     }
   }
 
-  return (
-    <div className={`flex gap-2.5 ${isUser ? "flex-row-reverse" : ""}`}>
-      {isUser ? (
-        <div className="w-8 h-8 rounded-full bg-surface-card2 text-surface-muted flex items-center justify-center flex-shrink-0">
-          <UserIcon size={15} />
-        </div>
-      ) : (
-        <AiAvatar size={32} />
-      )}
-
-      <div
-        className={`max-w-[78%] flex flex-col gap-1 ${
-          isUser ? "items-end" : "items-start"
-        }`}
-      >
+  /* WhatsApp-style: runcing ke arah pengirim, tanpa avatar */
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
         <div
-          className={`rounded-2xl px-3.5 py-2.5 text-[14.5px] leading-relaxed ${
-            isUser
-              ? "bg-accent text-white rounded-tr-sm"
-              : "bg-surface-card border border-surface-border text-surface-text rounded-tl-sm"
-          }`}
+          className="max-w-[82%] bg-accent text-white px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
+          style={{
+            borderRadius: "16px 0 16px 16px",
+          }}
+        >
+          <MessageContent text={message.text} />
+        </div>
+      </div>
+    );
+  }
+
+  /* AI bubble: runcing ke kiri */
+  return (
+    <div className="flex justify-start">
+      <div className="max-w-[82%]">
+        <div
+          className="bg-surface-card border border-surface-border text-surface-text px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
+          style={{
+            borderRadius: "0 16px 16px 16px",
+          }}
         >
           <MessageContent text={message.text} />
         </div>
 
-        {!isUser && (
-          <div className="flex items-center gap-0.5 px-1">
+        <div className="flex items-center gap-0.5 mt-1 px-1">
+          <ActionButton
+            icon={copied ? <Check size={12} /> : <Copy size={12} />}
+            label={copied ? "Tersalin" : "Salin"}
+            onClick={handleCopy}
+          />
+          <ActionButton
+            icon={<Share2 size={12} />}
+            label="Bagikan"
+            onClick={handleShare}
+          />
+          {isLastAssistant && onRegenerate && (
             <ActionButton
-              icon={copied ? <Check size={12} /> : <Copy size={12} />}
-              label={copied ? "Tersalin" : "Salin"}
-              onClick={handleCopy}
+              icon={<RefreshCw size={12} />}
+              label="Ulangi"
+              onClick={onRegenerate}
             />
-            <ActionButton
-              icon={<Share2 size={12} />}
-              label="Bagikan"
-              onClick={handleShare}
-            />
-            {isLastAssistant && onRegenerate && (
-              <ActionButton
-                icon={<RefreshCw size={12} />}
-                label="Ulangi"
-                onClick={onRegenerate}
-              />
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -555,7 +627,10 @@ function ActionButton({
 }) {
   return (
     <button
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-[0.95]"
     >
       {icon}
@@ -585,8 +660,11 @@ function MessageContent({ text }: { text: string }) {
 
 type MdBlock =
   | { type: "text"; content: string }
-  | { type: "heading"; level: 1 | 2 | 3; content: string }
+  | { type: "heading"; level: 1 | 2 | 3 | 4; content: string }
   | { type: "bullet"; content: string }
+  | { type: "numbered"; number: string; content: string }
+  | { type: "quote"; content: string }
+  | { type: "divider" }
   | { type: "code"; language: string; content: string }
   | { type: "table"; headers: string[]; rows: string[][] };
 
@@ -597,9 +675,11 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
 
   while (i < lines.length) {
     const line = lines[i];
+    const trimmed = line.trim();
 
-    if (/^```/.test(line.trim())) {
-      const language = line.trim().slice(3).trim();
+    /* ----------------------------- Code fence ----------------------------- */
+    if (/^```/.test(trimmed)) {
+      const language = trimmed.slice(3).trim();
       const codeLines: string[] = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i].trim())) {
@@ -611,25 +691,34 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    const headingMatch = line.match(/^(#{1,3})\s+(.+)$/);
+    /* ------------------------ Horizontal rule ------------------------ */
+    /* ---, ***, ___ (min 3 karakter) */
+    if (/^([-*_])\1{2,}$/.test(trimmed)) {
+      blocks.push({ type: "divider" });
+      i++;
+      continue;
+    }
+
+    /* ------------------------------ Heading ------------------------------ */
+    const headingMatch = trimmed.match(/^(#{1,4})\s+(.+?)\s*#*$/);
     if (headingMatch) {
       blocks.push({
         type: "heading",
-        level: headingMatch[1].length as 1 | 2 | 3,
+        level: headingMatch[1].length as 1 | 2 | 3 | 4,
         content: headingMatch[2].trim(),
       });
       i++;
       continue;
     }
 
-    if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length) {
-      const headerLine = line.trim();
+    /* ------------------------------- Table ------------------------------- */
+    if (/^\|.*\|$/.test(trimmed) && i + 1 < lines.length) {
       const sepLine = lines[i + 1].trim();
       if (/^\|[\s:|-]+\|$/.test(sepLine)) {
-        const headers = splitTableRow(headerLine);
+        const headers = splitTableRow(trimmed);
         const rows: string[][] = [];
         i += 2;
-        while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) {
+        while (i < lines.length && /^\|.*\|$/.test(lines[i].trim())) {
           rows.push(splitTableRow(lines[i].trim()));
           i++;
         }
@@ -638,6 +727,27 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       }
     }
 
+    /* ---------------------------- Blockquote ---------------------------- */
+    if (/^>\s?/.test(trimmed)) {
+      const content = trimmed.replace(/^>\s?/, "");
+      blocks.push({ type: "quote", content });
+      i++;
+      continue;
+    }
+
+    /* ------------------------- Numbered list ------------------------- */
+    const numberedMatch = line.match(/^\s*(\d+)\.\s+(.+)$/);
+    if (numberedMatch) {
+      blocks.push({
+        type: "numbered",
+        number: numberedMatch[1],
+        content: numberedMatch[2].trim(),
+      });
+      i++;
+      continue;
+    }
+
+    /* --------------------------- Bullet list --------------------------- */
     if (/^\s*[-•*]\s+/.test(line)) {
       const content = line.replace(/^\s*[-•*]\s+/, "").trim();
       blocks.push({ type: "bullet", content });
@@ -645,20 +755,25 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    if (!line.trim()) {
+    /* ---------------------------- Empty line ---------------------------- */
+    if (!trimmed) {
       i++;
       continue;
     }
 
+    /* ----------------------------- Paragraph ----------------------------- */
     const textLines: string[] = [line];
     i++;
     while (
       i < lines.length &&
       lines[i].trim() &&
       !/^```/.test(lines[i].trim()) &&
-      !/^#{1,3}\s/.test(lines[i]) &&
+      !/^#{1,4}\s/.test(lines[i]) &&
+      !/^([-*_])\1{2,}$/.test(lines[i].trim()) &&
       !/^\s*[-•*]\s+/.test(lines[i]) &&
-      !/^\s*\|.*\|\s*$/.test(lines[i])
+      !/^\s*\d+\.\s+/.test(lines[i]) &&
+      !/^>\s?/.test(lines[i].trim()) &&
+      !/^\|.*\|$/.test(lines[i].trim())
     ) {
       textLines.push(lines[i]);
       i++;
@@ -687,9 +802,10 @@ function BlockRenderer({ block }: { block: MdBlock }) {
         1: "text-[17px] font-bold",
         2: "text-[16px] font-semibold",
         3: "text-[15px] font-semibold",
+        4: "text-[14.5px] font-semibold",
       };
       return (
-        <p className={`${sizes[block.level]} text-surface-text`}>
+        <p className={`${sizes[block.level]} leading-snug`}>
           {renderInline(block.content)}
         </p>
       );
@@ -697,10 +813,46 @@ function BlockRenderer({ block }: { block: MdBlock }) {
 
     case "bullet":
       return (
-        <div className="flex gap-2">
-          <span className="text-accent flex-shrink-0 mt-0.5">•</span>
-          <span className="flex-1">{renderInline(block.content)}</span>
+        <div className="flex gap-2 items-start">
+          <span className="mt-[7px] w-1.5 h-1.5 rounded-full bg-current opacity-60 flex-shrink-0" />
+          <span className="flex-1 min-w-0">{renderInline(block.content)}</span>
         </div>
+      );
+
+    case "numbered":
+      return (
+        <div className="flex gap-2 items-start">
+          <span className="opacity-70 flex-shrink-0 font-medium min-w-[1.5em]">
+            {block.number}.
+          </span>
+          <span className="flex-1 min-w-0">{renderInline(block.content)}</span>
+        </div>
+      );
+
+    case "quote":
+      return (
+        <div
+          className="pl-3 py-0.5 opacity-90"
+          style={{
+            borderLeft: "3px solid currentColor",
+            borderLeftColor: "currentColor",
+          }}
+        >
+          <span className="opacity-70 italic">
+            {renderInline(block.content)}
+          </span>
+        </div>
+      );
+
+    case "divider":
+      return (
+        <hr
+          className="my-2 border-0"
+          style={{
+            borderTop: "1px solid currentColor",
+            opacity: 0.2,
+          }}
+        />
       );
 
     case "code":
@@ -712,7 +864,7 @@ function BlockRenderer({ block }: { block: MdBlock }) {
     case "text":
     default:
       return (
-        <p className="whitespace-pre-wrap break-words">
+        <p className="whitespace-pre-wrap break-words leading-relaxed">
           {renderInline(block.content)}
         </p>
       );
@@ -724,22 +876,42 @@ function BlockRenderer({ block }: { block: MdBlock }) {
 /* -------------------------------------------------------------------------- */
 
 function renderInline(text: string): React.ReactNode[] {
-  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+  /* Order matters: bold-italic dulu, baru bold, baru italic */
+  const pattern =
+    /(\*\*\*[^*\n]+\*\*\*|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_|~~[^~\n]+~~|`[^`\n]+`|\[[^\]]+\]\([^)]+\))/g;
   const parts = text.split(pattern);
 
   return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
+    /* ***bold italic*** atau ___bold italic___ */
+    if (
+      (part.startsWith("***") && part.endsWith("***") && part.length > 6) ||
+      (part.startsWith("___") && part.endsWith("___") && part.length > 6)
+    ) {
+      const inner = part.slice(3, -3);
+      return (
+        <strong key={i} className="font-semibold">
+          <em>{inner}</em>
+        </strong>
+      );
+    }
+    /* **bold** atau __bold__ */
+    if (
+      (part.startsWith("**") && part.endsWith("**") && part.length > 4) ||
+      (part.startsWith("__") && part.endsWith("__") && part.length > 4)
+    ) {
       return (
         <strong key={i} className="font-semibold">
           {part.slice(2, -2)}
         </strong>
       );
     }
+    /* *italic* atau _italic_ */
     if (
-      part.startsWith("*") &&
-      part.endsWith("*") &&
-      part.length > 2 &&
-      !part.startsWith("**")
+      ((part.startsWith("*") && part.endsWith("*") && !part.startsWith("**")) ||
+        (part.startsWith("_") &&
+          part.endsWith("_") &&
+          !part.startsWith("__"))) &&
+      part.length > 2
     ) {
       return (
         <em key={i} className="italic">
@@ -747,16 +919,29 @@ function renderInline(text: string): React.ReactNode[] {
         </em>
       );
     }
-    if (part.startsWith("`") && part.endsWith("`")) {
+    /* ~~strike~~ */
+    if (part.startsWith("~~") && part.endsWith("~~") && part.length > 4) {
+      return (
+        <span key={i} className="line-through opacity-70">
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    /* `code` */
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
       return (
         <code
           key={i}
-          className="px-1.5 py-0.5 rounded-md bg-surface-card2 text-[13px] font-mono text-accent"
+          className="px-1.5 py-0.5 rounded-md text-[0.9em] font-mono"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.1)",
+          }}
         >
           {part.slice(1, -1)}
         </code>
       );
     }
+    /* [text](url) */
     const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (linkMatch) {
       return (
@@ -765,7 +950,7 @@ function renderInline(text: string): React.ReactNode[] {
           href={linkMatch[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-accent underline underline-offset-2 break-all"
+          className="underline underline-offset-2 break-all"
         >
           {linkMatch[1]}
         </a>
@@ -799,22 +984,26 @@ function CodeBlock({
   }
 
   return (
-    <div className="relative rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-border bg-surface-card">
-        <span className="text-[10px] font-mono text-surface-muted uppercase tracking-wide">
+    <div
+      className="rounded-xl overflow-hidden my-1"
+      style={{ backgroundColor: "rgba(0,0,0,0.08)" }}
+    >
+      <div
+        className="flex items-center justify-between px-3 py-1.5 border-b"
+        style={{ borderColor: "rgba(0,0,0,0.08)" }}
+      >
+        <span className="text-[10px] font-mono opacity-70 uppercase tracking-wide">
           {language || "code"}
         </span>
         <button
           onClick={handleCopy}
-          className="text-[10px] font-medium text-surface-muted hover:text-accent transition-colors px-2 py-0.5 rounded-md hover:bg-accent-soft"
+          className="text-[10px] font-medium opacity-70 hover:opacity-100 transition-opacity px-2 py-0.5 rounded-md"
         >
           {copied ? "Tersalin" : "Salin"}
         </button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
-        <code className="font-mono text-surface-text whitespace-pre">
-          {content}
-        </code>
+        <code className="font-mono whitespace-pre">{content}</code>
       </pre>
     </div>
   );
@@ -832,15 +1021,19 @@ function MarkdownTable({
   rows: string[][];
 }) {
   return (
-    <div className="rounded-xl border border-surface-border overflow-hidden bg-surface-card">
+    <div
+      className="rounded-xl overflow-hidden my-1"
+      style={{ border: "1px solid rgba(0,0,0,0.1)" }}
+    >
       <div className="overflow-x-auto">
         <table className="w-full text-[13px]">
-          <thead className="bg-surface-card2">
+          <thead style={{ backgroundColor: "rgba(0,0,0,0.05)" }}>
             <tr>
               {headers.map((h, i) => (
                 <th
                   key={i}
-                  className="px-3 py-2 text-left font-semibold text-surface-text border-b border-surface-border whitespace-nowrap"
+                  className="px-3 py-2 text-left font-semibold whitespace-nowrap"
+                  style={{ borderBottom: "1px solid rgba(0,0,0,0.1)" }}
                 >
                   {renderInline(h)}
                 </th>
@@ -851,13 +1044,15 @@ function MarkdownTable({
             {rows.map((row, ri) => (
               <tr
                 key={ri}
-                className="border-b border-surface-border last:border-b-0"
+                style={{
+                  borderBottom:
+                    ri < rows.length - 1
+                      ? "1px solid rgba(0,0,0,0.08)"
+                      : "none",
+                }}
               >
                 {row.map((cell, ci) => (
-                  <td
-                    key={ci}
-                    className="px-3 py-2 text-surface-text align-top"
-                  >
+                  <td key={ci} className="px-3 py-2 align-top">
                     {renderInline(cell)}
                   </td>
                 ))}
@@ -876,9 +1071,11 @@ function MarkdownTable({
 
 function TypingIndicator() {
   return (
-    <div className="flex gap-2.5">
-      <AiAvatar size={32} />
-      <div className="bg-surface-card border border-surface-border rounded-2xl rounded-tl-sm px-4 py-3">
+    <div className="flex justify-start">
+      <div
+        className="bg-surface-card border border-surface-border px-4 py-3 shadow-sm"
+        style={{ borderRadius: "0 16px 16px 16px" }}
+      >
         <div className="flex gap-1">
           <span
             className="w-2 h-2 rounded-full bg-surface-muted animate-bounce"

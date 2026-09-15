@@ -14,11 +14,19 @@ import {
   CircleAlert,
   ArrowUpRight,
   ChevronRight,
+  Sun,
+  Moon,
+  RefreshCw,
+  LogOut,
+  User,
+  X,
   type LucideIcon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Card, Avatar, ErrorState } from "../components/common";
+import { Card, Avatar, ErrorState, BottomSheet } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
+import { useToast } from "../contexts/ToastContext";
 import { dashboardApi } from "../services/domainApi";
 import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
 import type {
@@ -28,13 +36,14 @@ import type {
 } from "../types";
 import { ApiError } from "../services/api";
 import { DashboardSkeleton } from "../components/common/Skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryClient";
 
 type IconType = LucideIcon;
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const {
     data,
@@ -62,14 +71,20 @@ export default function DashboardPage() {
       <Header
         title="Dashboard"
         right={
-          <Avatar
-            name={user?.nama || "?"}
-            size={32}
-            gender={normalizeGender(user?.jenis_kelamin)}
-          />
+          <button
+            onClick={() => setProfileMenuOpen(true)}
+            aria-label="Menu profil"
+            className="rounded-full overflow-hidden transition-all hover:opacity-80 active:scale-95"
+          >
+            <Avatar
+              name={user?.nama || "?"}
+              size={32}
+              gender={normalizeGender(user?.jenis_kelamin)}
+            />
+          </button>
         }
-        showThemeToggle
-        showSyncButton
+        showThemeToggle={false}
+        showSyncButton={false}
       />
 
       <div className="px-4 py-4 space-y-4">
@@ -114,9 +129,224 @@ export default function DashboardPage() {
             />
           )}
       </div>
+
+      {/* ------------------ Profile Menu Sheet ------------------ */}
+      <ProfileMenuSheet
+        open={profileMenuOpen}
+        onClose={() => setProfileMenuOpen(false)}
+        onSync={() => refetch()}
+      />
     </AppLayout>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                          Profile Menu Sheet                                */
+/* -------------------------------------------------------------------------- */
+
+function ProfileMenuSheet({
+  open,
+  onClose,
+  onSync,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSync: () => void;
+}) {
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [syncing, setSyncing] = useState(false);
+
+  async function handleSync() {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      await queryClient.invalidateQueries();
+      onSync();
+      showToast("Data diperbarui");
+      onClose();
+    } finally {
+      setTimeout(() => setSyncing(false), 500);
+    }
+  }
+
+  function handleProfile() {
+    onClose();
+    navigate("/profil-saya");
+  }
+
+  function handleThemeToggle() {
+    toggleTheme();
+  }
+
+  async function handleLogout() {
+    onClose();
+    await logout();
+    navigate("/login");
+  }
+
+  const roleLabel = (user?.role || "").replace(/_/g, " ");
+
+  return (
+    <BottomSheet open={open} onClose={onClose} title="Menu">
+      {/* Profile Header */}
+      <div className="mb-4 flex items-center gap-3.5 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
+        <Avatar
+          name={user?.nama || "?"}
+          size={56}
+          gender={normalizeGender(user?.jenis_kelamin)}
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-semibold text-surface-text truncate">
+            {user?.nama || "Pengguna"}
+          </p>
+          <p className="text-ios-footnote text-surface-muted truncate">
+            @{user?.username || "-"}
+          </p>
+          <span className="inline-block mt-1 text-[10px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase">
+            {roleLabel}
+          </span>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="space-y-1.5">
+        <MenuButton
+          icon={<User size={18} strokeWidth={2.2} />}
+          iconBg="bg-info-soft text-info"
+          label="Profil Saya"
+          description="Lihat dan edit biodata"
+          onClick={handleProfile}
+        />
+
+        <MenuButton
+          icon={
+            theme === "dark" ? (
+              <Sun size={18} strokeWidth={2.2} />
+            ) : (
+              <Moon size={18} strokeWidth={2.2} />
+            )
+          }
+          iconBg="bg-warning-soft text-warning"
+          label={theme === "dark" ? "Mode Terang" : "Mode Gelap"}
+          description="Ubah tampilan aplikasi"
+          onClick={handleThemeToggle}
+          trailing={
+            <div
+              className={`w-10 h-6 rounded-full p-0.5 transition-colors ${
+                theme === "dark" ? "bg-accent" : "bg-surface-card2"
+              }`}
+            >
+              <div
+                className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                  theme === "dark" ? "translate-x-4" : "translate-x-0"
+                }`}
+              />
+            </div>
+          }
+        />
+
+        <MenuButton
+          icon={
+            <RefreshCw
+              size={18}
+              strokeWidth={2.2}
+              className={syncing ? "animate-spin" : ""}
+            />
+          }
+          iconBg="bg-accent-soft text-accent"
+          label="Sinkronisasi Data"
+          description="Muat ulang data terbaru"
+          onClick={handleSync}
+          disabled={syncing}
+        />
+      </div>
+
+      {/* Logout */}
+      <div className="mt-4 pt-4 border-t border-surface-border">
+        <MenuButton
+          icon={<LogOut size={18} strokeWidth={2.2} />}
+          iconBg="bg-danger-soft text-danger"
+          label="Keluar"
+          description="Keluar dari akun ini"
+          onClick={handleLogout}
+          danger
+        />
+      </div>
+    </BottomSheet>
+  );
+}
+
+function MenuButton({
+  icon,
+  iconBg,
+  label,
+  description,
+  onClick,
+  trailing,
+  disabled,
+  danger,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  label: string;
+  description?: string;
+  onClick: () => void;
+  trailing?: React.ReactNode;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full text-left rounded-2xl border p-3 flex items-center gap-3 transition-all active:scale-[0.99] disabled:opacity-50 ${
+        danger
+          ? "border-danger/20 bg-danger-soft hover:bg-danger-soft/80"
+          : "border-surface-border bg-surface-card hover:bg-surface-card2"
+      }`}
+    >
+      <div
+        className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}
+      >
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p
+          className={`text-ios-body font-medium ${
+            danger ? "text-danger" : "text-surface-text"
+          }`}
+        >
+          {label}
+        </p>
+        {description && (
+          <p
+            className={`text-ios-footnote ${
+              danger ? "text-danger/70" : "text-surface-muted"
+            }`}
+          >
+            {description}
+          </p>
+        )}
+      </div>
+      {trailing || (
+        <ChevronRight
+          size={16}
+          className={`flex-shrink-0 ${
+            danger ? "text-danger/60" : "text-surface-muted"
+          }`}
+        />
+      )}
+    </button>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        SECTION HEADER                                      */
+/* -------------------------------------------------------------------------- */
 
 function SectionHeader({
   title,
@@ -146,6 +376,10 @@ function SectionHeader({
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                        HERO STAT CARD                                      */
+/* -------------------------------------------------------------------------- */
 
 function HeroStatCard({
   label,
@@ -206,6 +440,10 @@ function HeroStatCard({
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                        STAT TILE                                           */
+/* -------------------------------------------------------------------------- */
 
 type StatTone = "default" | "accent" | "warning" | "danger" | "info";
 
@@ -271,6 +509,10 @@ function StatTile({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                        MEETING CARD                                        */
+/* -------------------------------------------------------------------------- */
+
 function MeetingCard({
   meeting,
   onClick,
@@ -308,6 +550,10 @@ function MeetingCard({
     </Card>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                       ATTENTION LIST                                       */
+/* -------------------------------------------------------------------------- */
 
 function AttentionListSection({
   items,
@@ -376,6 +622,10 @@ function AttentionListSection({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                     GENERAL DASHBOARD                                      */
+/* -------------------------------------------------------------------------- */
+
 function GeneralDashboard({
   data,
   isSuperAdmin,
@@ -437,6 +687,7 @@ function GeneralDashboard({
         </div>
       )}
 
+      {/* ============ FIX: kategori → button, navigate ke /jamaah?kategori=X ============ */}
       <Card>
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs text-surface-muted font-medium">
@@ -453,21 +704,30 @@ function GeneralDashboard({
         ) : (
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(data.per_kategori).map(([k, v]) => (
-              <div
+              <button
                 key={k}
-                className="flex items-center justify-between bg-surface-card2 rounded-xl px-3 py-2.5"
+                onClick={() => navigate(`/jamaah?kategori=${k}`)}
+                aria-label={`Lihat jamaah kategori ${
+                  CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]
+                }`}
+                className="flex items-center justify-between gap-2 bg-surface-card2 rounded-xl px-3 py-2.5 transition-all hover:bg-accent-soft active:scale-[0.97] text-left min-h-[44px]"
               >
-                <span className="text-ios-footnote text-surface-text">
+                <span className="text-ios-footnote text-surface-text truncate">
                   {CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]}
                 </span>
-                <span className="text-xs font-semibold text-surface-text tabular-nums">
+                <span className="text-xs font-semibold text-surface-text tabular-nums flex-shrink-0 flex items-center gap-1">
                   {v}
+                  <ChevronRight
+                    size={12}
+                    className="text-surface-muted opacity-60"
+                  />
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}
       </Card>
+      {/* ========================================================================== */}
 
       <div className="space-y-2">
         <SectionHeader
@@ -502,6 +762,10 @@ function GeneralDashboard({
     </>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                       PNKB DASHBOARD                                       */
+/* -------------------------------------------------------------------------- */
 
 function PNKBDashboard({
   data,
@@ -547,6 +811,10 @@ function PNKBDashboard({
     </>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                      ABSENSI DASHBOARD                                     */
+/* -------------------------------------------------------------------------- */
 
 function AbsensiDashboard({
   data,

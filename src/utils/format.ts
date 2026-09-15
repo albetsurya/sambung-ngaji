@@ -129,25 +129,59 @@ export function getMemberAge(tanggalLahir?: string): number | null {
   return age;
 }
 
-/** Cermin dari getMemberCategory() backend — dipakai untuk preview UI sebelum submit ke server. */
+/**
+ * Cermin dari getMemberCategory() backend — dipakai untuk preview UI
+ * sebelum submit ke server.
+ *
+ * Logika (urutan prioritas):
+ *  1. Sudah menikah:
+ *     - 60+ tahun          → ISTIMEWA
+ *     - < 60 tahun         → DEWASA
+ *  2. Berdasarkan jenjang pendidikan:
+ *     - PAUD / TK / SD     → CABERAWIT  (PAUD/TK selalu CABERAWIT apapun usia)
+ *     - SMP                → PRA_REMAJA
+ *     - SMA / SMK / MA     → REMAJA
+ *  3. Fallback berdasarkan usia (untuk yang belum sekolah / jenjang kosong):
+ *     - < 6 tahun          → BALITA
+ *     - 6–12 tahun         → CABERAWIT
+ *     - 13–15 tahun        → PRA_REMAJA
+ *     - 16–18 tahun        → REMAJA
+ *     - 60+ tahun          → ISTIMEWA
+ *     - else               → PRA_NIKAH
+ */
 export function getMemberCategory(
   member: Partial<Member>,
   latestEducation?: Partial<Education>,
 ): MemberCategory | null {
+  /* -------- 1. Sudah menikah -------- */
   if (member.is_nikah) {
     const age = getMemberAge(member.tanggal_lahir);
-    return age !== null && age >= 60 ? "MANULA" : "DEWASA";
+    return age !== null && age >= 60 ? "ISTIMEWA" : "DEWASA";
   }
-  const jenjang = (latestEducation?.jenjang || "").toUpperCase();
-  if (jenjang === "PAUD" || jenjang === "TK" || jenjang === "SD")
-    return "CABERAWIT";
+
+  /* -------- 2. Berdasarkan jenjang pendidikan -------- */
+  /* Prioritas: latestEducation.jenjang → member.jenjang_pendidikan */
+  const jenjang = (
+    latestEducation?.jenjang ||
+    member.jenjang_pendidikan ||
+    ""
+  ).toUpperCase();
+
+  if (jenjang === "PAUD" || jenjang === "TK") return "CABERAWIT";
+  if (jenjang === "SD") return "CABERAWIT";
   if (jenjang === "SMP") return "PRA_REMAJA";
   if (jenjang === "SMA" || jenjang === "SMK" || jenjang === "MA")
     return "REMAJA";
 
+  /* -------- 3. Fallback berdasarkan usia -------- */
   const age = getMemberAge(member.tanggal_lahir);
-  if (age !== null && age >= 60) return "MANULA";
+  if (age !== null && age >= 60) return "ISTIMEWA";
+  if (age !== null && age < 6) return "BALITA";
   if (age !== null && age < 13) return "CABERAWIT";
+  if (age !== null && age < 16) return "PRA_REMAJA";
+  if (age !== null && age < 19) return "REMAJA";
+
+  /* -------- 4. Default -------- */
   return "PRA_NIKAH";
 }
 
@@ -160,12 +194,13 @@ export function normalizePhoneNumber(raw?: string): string {
 }
 
 export const CATEGORY_LABEL: Record<MemberCategory, string> = {
+  BALITA: "Balita",
   CABERAWIT: "Caberawit",
   PRA_REMAJA: "Pra Remaja",
   REMAJA: "Remaja",
   PRA_NIKAH: "Pra Nikah",
   DEWASA: "Dewasa",
-  MANULA: "Manula",
+  ISTIMEWA: "Istimewa",
 };
 
 export const ATTENDANCE_LABEL: Record<string, string> = {

@@ -17,6 +17,9 @@ import {
   ChevronDown,
   Calendar,
   Trash2,
+  MoreVertical,
+  Pencil,
+  AlertTriangle,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -54,6 +57,10 @@ import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
+
+/* -------------------------------------------------------------------------- */
+/*                              Types & State                                 */
+/* -------------------------------------------------------------------------- */
 
 const STATUS_CONFIG: Record<
   AttendanceStatus,
@@ -100,6 +107,17 @@ interface AttendancePageData {
   attendance: AttendanceRecord[];
 }
 
+type SheetState =
+  | { view: "closed" }
+  | { view: "picker" }
+  | { view: "action"; meeting: Meeting }
+  | { view: "form"; mode: "create"; from: "picker" | "fab" }
+  | { view: "form"; mode: "edit"; meeting: Meeting };
+
+/* -------------------------------------------------------------------------- */
+/*                              Main Component                                */
+/* -------------------------------------------------------------------------- */
+
 export default function AttendancePage() {
   const { isAdminLike, role } = usePermission();
   const isReadonly = role === "PENGAWAS";
@@ -115,14 +133,18 @@ export default function AttendancePage() {
   const deferredSearch = useDeferredValue(search);
   const [category, setCategory] = useState("");
   const [gender, setGender] = useState<"" | "L" | "P">("");
-  const [createOpen, setCreateOpen] = useState(false);
-  const [meetingPickerOpen, setMeetingPickerOpen] = useState(false);
 
+  const [sheet, setSheet] = useState<SheetState>({ view: "closed" });
+
+  const [deleteMeetingTarget, setDeleteMeetingTarget] =
+    useState<Meeting | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{
     memberId: string;
     memberName: string;
   } | null>(null);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
+
+  /* -------------------------------- Data --------------------------------- */
 
   const meetingsQuery = useQuery({
     queryKey: queryKeys.meetings({ range: "recent" }),
@@ -212,6 +234,8 @@ export default function AttendancePage() {
     ? (hadirCount / filteredMembers.length) * 100
     : 0;
 
+  /* ------------------------------- Mutations ------------------------------- */
+
   const saveMutation = useMutation({
     mutationFn: attendanceApi.save,
     onError: (err) => {
@@ -283,6 +307,46 @@ export default function AttendancePage() {
       });
     },
   });
+
+  /* ================= FIX: deleteMeetingMutation ================= */
+  const deleteMeetingMutation = useMutation({
+    mutationFn: (meetingId: string) => meetingApi.remove(meetingId),
+    onSuccess: (_data, meetingId) => {
+      showToast("Jadwal dihapus");
+      setDeleteMeetingTarget(null);
+
+      // ✅ FIX: optimistic remove dari cache `meetings` — supaya card
+      // "Jadwal dipilih" langsung hilang tanpa nunggu refetch.
+      queryClient.setQueryData<Meeting[]>(
+        queryKeys.meetings({ range: "recent" }),
+        (old = []) => old.filter((m) => m.meeting_id !== meetingId),
+      );
+
+      // ✅ FIX: kalau yang dihapus = pinned, reset supaya fallback ke meeting lain.
+      if (pinnedMeetingId === meetingId) {
+        setPinnedMeetingId(null);
+      }
+
+      // Refetch di background untuk konsistensi dengan server.
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.meetings({ range: "recent" }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendancePage(meetingId),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+    onError: (err) => {
+      setDeleteMeetingTarget(null);
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus jadwal",
+        "error",
+      );
+    },
+  });
+  /* ============================================================= */
+
+  /* -------------------------- Attendance Handlers ------------------------- */
 
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
@@ -382,6 +446,8 @@ export default function AttendancePage() {
     resetMutation.mutate(selectedMeeting.meeting_id);
   }
 
+  /* ------------------------------- Callbacks ------------------------------ */
+
   const handleStatusChange = useCallback(
     (memberId: string, status: AttendanceStatus) => {
       tapStatus(memberId, status);
@@ -402,11 +468,114 @@ export default function AttendancePage() {
   const isInitialLoading =
     loadingMeetings || (!!selectedMeetingId && !attendanceReady);
 
+  /* ------------------------ Sheet Navigation Logic ------------------------ */
+
+  function openPicker() {
+    setSheet({ view: "picker" });
+  }
+
+  function openAction(m: Meeting) {
+    setSheet({ view: "action", meeting: m });
+  }
+
+  function openCreateForm(from: "picker" | "fab") {
+    setSheet({ view: "form", mode: "create", from });
+  }
+
+  function openEditForm() {
+    if (sheet.view !== "action") return;
+    setSheet({ view: "form", mode: "edit", meeting: sheet.meeting });
+  }
+
+  function closeSheet() {
+    setSheet({ view: "closed" });
+  }
+
+  function handleSheetClose() {
+    if (sheet.view === "picker") {
+      closeSheet();
+    } else if (sheet.view === "action") {
+      setSheet({ view: "picker" });
+    } else if (sheet.view === "form") {
+      if (sheet.mode === "edit") {
+        setSheet({ view: "action", meeting: sheet.meeting });
+      } else if (sheet.from === "picker") {
+        setSheet({ view: "picker" });
+      } else {
+        closeSheet();
+      }
+    }
+  }
+
+  /* ================= FIX: handleFormSaved ================= */
+  function handleFormSaved(m: Meeting, mode: "create" | "edit") {
+    // ✅ FIX: optimistic update cache `meetings` — supaya card
+    // "Jadwal dipilih" langsung update tanpa nunggu refetch.
+    if (mode === "create") {
+      queryClient.setQueryData<Meeting[]>(
+        queryKeys.meetings({ range: "recent" }),
+        (old = []) => {
+          const exists = old.some((x) => x.meeting_id === m.meeting_id);
+          if (exists) {
+            return old.map((x) => (x.meeting_id === m.meeting_id ? m : x));
+          }
+          return [m, ...old];
+        },
+      );
+      setPinnedMeetingId(m.meeting_id);
+    } else {
+      // mode === "edit"
+      queryClient.setQueryData<Meeting[]>(
+        queryKeys.meetings({ range: "recent" }),
+        (old = []) => old.map((x) => (x.meeting_id === m.meeting_id ? m : x)),
+      );
+    }
+
+    // Refetch di background untuk konsistensi.
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.meetings({ range: "recent" }),
+    });
+    if (mode === "edit") {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendancePage(m.meeting_id),
+      });
+    }
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+
+    // Navigasi
+    if (mode === "edit") {
+      closeSheet();
+    } else if (sheet.view === "form" && sheet.from === "picker") {
+      setSheet({ view: "picker" });
+    } else {
+      closeSheet();
+    }
+  }
+  /* ============================================================= */
+
+  function handleDeleteFromAction(meeting: Meeting) {
+    closeSheet();
+    setDeleteMeetingTarget(meeting);
+  }
+
+  const sheetTitle = (() => {
+    if (sheet.view === "picker") return "Pilih Jadwal Pengajian";
+    if (sheet.view === "action") return "Aksi Jadwal";
+    if (sheet.view === "form") {
+      return sheet.mode === "edit"
+        ? "Edit Jadwal Pengajian"
+        : "Jadwal Pengajuan Baru";
+    }
+    return "";
+  })();
+
+  /* --------------------------------- Render -------------------------------- */
+
   return (
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => setCreateOpen(true)} />
+          <FloatingActionButton onClick={() => openCreateForm("fab")} />
         ) : undefined
       }
     >
@@ -438,43 +607,45 @@ export default function AttendancePage() {
           <div className="pt-3 pb-2">
             {meetings.length > 0 ? (
               <div className="px-4">
-                <button
-                  onClick={() => setMeetingPickerOpen(true)}
-                  className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 text-left transition-all hover:border-accent/40 hover:shadow-md active:scale-[0.99]"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0">
-                    <Calendar size={18} className="text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
-                      Jadwal dipilih
-                    </p>
-                    <p className="text-ios-body font-medium text-surface-text truncate">
-                      {selectedMeeting
-                        ? `${selectedMeeting.hari} — ${selectedMeeting.acara || "Pengajian"}`
-                        : "Pilih jadwal"}
-                    </p>
-                    {selectedMeeting && (
-                      <p className="text-ios-footnote text-surface-muted truncate">
-                        {formatDateShort(selectedMeeting.tanggal)} ·{" "}
-                        {selectedMeeting.jam || "—"}
+                <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 transition-all hover:border-accent/40">
+                  <button
+                    onClick={openPicker}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left active:scale-[0.99] transition-transform"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0">
+                      <Calendar size={18} className="text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
+                        Jadwal dipilih
                       </p>
-                    )}
-                    {selectedMeeting &&
-                      normalizeTargets(selectedMeeting.kategori_target).length >
-                        0 && (
-                        <p className="text-ios-caption text-accent truncate mt-0.5">
-                          {normalizeTargets(selectedMeeting.kategori_target)
-                            .map((k) => CATEGORY_LABEL[k])
-                            .join(" · ")}
+                      <p className="text-ios-body font-medium text-surface-text truncate">
+                        {selectedMeeting
+                          ? `${selectedMeeting.hari} — ${selectedMeeting.acara || "Pengajian"}`
+                          : "Pilih jadwal"}
+                      </p>
+                      {selectedMeeting && (
+                        <p className="text-ios-footnote text-surface-muted truncate">
+                          {formatDateShort(selectedMeeting.tanggal)} ·{" "}
+                          {selectedMeeting.jam || "—"}
                         </p>
                       )}
-                  </div>
-                  <ChevronDown
-                    size={18}
-                    className="text-surface-muted flex-shrink-0"
-                  />
-                </button>
+                      {selectedMeeting &&
+                        normalizeTargets(selectedMeeting.kategori_target)
+                          .length > 0 && (
+                          <p className="text-ios-caption text-accent truncate mt-0.5">
+                            {normalizeTargets(selectedMeeting.kategori_target)
+                              .map((k) => CATEGORY_LABEL[k])
+                              .join(" · ")}
+                          </p>
+                        )}
+                    </div>
+                    <ChevronDown
+                      size={18}
+                      className="text-surface-muted flex-shrink-0"
+                    />
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
@@ -483,7 +654,7 @@ export default function AttendancePage() {
                 </p>
                 {canCreate && (
                   <button
-                    onClick={() => setCreateOpen(true)}
+                    onClick={() => openCreateForm("picker")}
                     className="mt-2 inline-flex items-center gap-1 text-ios-subhead font-medium text-accent transition-colors hover:text-accent-dark"
                   >
                     <Plus size={14} /> Buat jadwal pengajian
@@ -622,38 +793,61 @@ export default function AttendancePage() {
         </>
       )}
 
-      <MeetingPickerSheet
-        open={meetingPickerOpen}
-        meetings={meetings}
-        selectedId={selectedMeeting?.meeting_id}
-        onSelect={(m) => {
-          setPinnedMeetingId(m.meeting_id);
-          setMeetingPickerOpen(false);
-        }}
-        onClose={() => setMeetingPickerOpen(false)}
-        onCreateNew={() => {
-          setMeetingPickerOpen(false);
-          setCreateOpen(true);
-        }}
-        canCreate={canCreate}
-      />
+      {/* ------------------ SINGLE BOTTOM SHEET ------------------ */}
+      <BottomSheet
+        open={sheet.view !== "closed"}
+        onClose={handleSheetClose}
+        title={sheetTitle}
+      >
+        {sheet.view === "picker" && (
+          <MeetingPickerContent
+            meetings={meetings}
+            selectedId={selectedMeeting?.meeting_id}
+            canCreate={canCreate}
+            onSelect={(m) => {
+              setPinnedMeetingId(m.meeting_id);
+              closeSheet();
+            }}
+            onRequestAction={openAction}
+            onCreateNew={() => openCreateForm("picker")}
+          />
+        )}
 
-      <CreateMeetingSheet
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCreated={(m) => {
-          queryClient.setQueryData(
-            queryKeys.meetings({ range: "recent" }),
-            (old: Meeting[] = []) => {
-              const exists = old.some((x) => x.meeting_id === m.meeting_id);
-              if (exists) return old;
-              return [m, ...old];
-            },
-          );
-          setPinnedMeetingId(m.meeting_id);
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.meetings({ range: "recent" }),
-          });
+        {sheet.view === "action" && (
+          <MeetingActionContent
+            meeting={sheet.meeting}
+            onEdit={openEditForm}
+            onDelete={() => handleDeleteFromAction(sheet.meeting)}
+          />
+        )}
+
+        {sheet.view === "form" && (
+          <MeetingFormContent
+            mode={sheet.mode}
+            meeting={sheet.mode === "edit" ? sheet.meeting : null}
+            onClose={handleSheetClose}
+            onSaved={handleFormSaved}
+          />
+        )}
+      </BottomSheet>
+
+      {/* ------------------ Confirm Dialogs ------------------ */}
+      <ConfirmDialog
+        open={!!deleteMeetingTarget}
+        title="Hapus jadwal pengajian?"
+        description={
+          deleteMeetingTarget
+            ? `Jadwal "${deleteMeetingTarget.acara || "Pengajian"}" pada ${formatDateShort(deleteMeetingTarget.tanggal)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
+            : ""
+        }
+        confirmLabel="Ya, Hapus"
+        danger
+        loading={deleteMeetingMutation.isPending}
+        onCancel={() => setDeleteMeetingTarget(null)}
+        onConfirm={() => {
+          if (deleteMeetingTarget) {
+            deleteMeetingMutation.mutate(deleteMeetingTarget.meeting_id);
+          }
         }}
       />
 
@@ -691,6 +885,10 @@ export default function AttendancePage() {
     </AppLayout>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                          Compact Attendance Row                            */
+/* -------------------------------------------------------------------------- */
 
 const CompactAttendanceRow = memo(function CompactAttendanceRow({
   member,
@@ -821,6 +1019,10 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
   );
 });
 
+/* -------------------------------------------------------------------------- */
+/*                                 Helpers                                    */
+/* -------------------------------------------------------------------------- */
+
 function normalizeTargets(raw: unknown): MemberCategory[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw as MemberCategory[];
@@ -834,6 +1036,10 @@ function normalizeTargets(raw: unknown): MemberCategory[] {
   }
   return [];
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              Gender Segmented                              */
+/* -------------------------------------------------------------------------- */
 
 function GenderSegmented({
   value,
@@ -895,72 +1101,92 @@ function CategoryChip({
   );
 }
 
-function MeetingPickerSheet({
-  open,
+/* -------------------------------------------------------------------------- */
+/*                      Sheet Content: PICKER VIEW                            */
+/* -------------------------------------------------------------------------- */
+
+function MeetingPickerContent({
   meetings,
   selectedId,
-  onSelect,
-  onClose,
-  onCreateNew,
   canCreate,
+  onSelect,
+  onRequestAction,
+  onCreateNew,
 }: {
-  open: boolean;
   meetings: Meeting[];
   selectedId?: string;
-  onSelect: (m: Meeting) => void;
-  onClose: () => void;
-  onCreateNew: () => void;
   canCreate: boolean;
+  onSelect: (m: Meeting) => void;
+  onRequestAction: (m: Meeting) => void;
+  onCreateNew: () => void;
 }) {
   return (
-    <BottomSheet open={open} onClose={onClose} title="Pilih Jadwal Pengajian">
+    <>
       <div className="space-y-2">
         {meetings.map((m) => {
           const active = m.meeting_id === selectedId;
           const targets = normalizeTargets(m.kategori_target);
           return (
-            <button
+            <div
               key={m.meeting_id}
-              onClick={() => onSelect(m)}
-              className={`w-full text-left rounded-2xl border p-3.5 flex items-center gap-3 transition-all active:scale-[0.99] ${
+              className={`w-full rounded-2xl border p-3.5 flex items-center gap-3 transition-all ${
                 active
                   ? "border-accent bg-accent-soft"
                   : "border-surface-border bg-surface-card hover:bg-surface-card2"
               }`}
             >
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  active
-                    ? "bg-accent text-white"
-                    : "bg-surface-card2 text-surface-muted"
-                }`}
+              <button
+                onClick={() => onSelect(m)}
+                className="flex items-center gap-3 flex-1 min-w-0 text-left active:scale-[0.99] transition-transform"
               >
-                <Calendar size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-ios-body font-medium text-surface-text truncate">
-                  {m.hari} — {m.acara || "Pengajian"}
-                </p>
-                <p className="text-ios-footnote text-surface-muted truncate">
-                  {formatDateShort(m.tanggal)} · {m.jam || "—"}
-                </p>
-                {targets.length > 0 && (
-                  <div className="flex items-center gap-1 mt-1 flex-wrap">
-                    {targets.map((k) => (
-                      <span
-                        key={k}
-                        className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
-                      >
-                        {CATEGORY_LABEL[k]}
-                      </span>
-                    ))}
-                  </div>
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    active
+                      ? "bg-accent text-white"
+                      : "bg-surface-card2 text-surface-muted"
+                  }`}
+                >
+                  <Calendar size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-ios-body font-medium text-surface-text truncate">
+                    {m.hari} — {m.acara || "Pengajian"}
+                  </p>
+                  <p className="text-ios-footnote text-surface-muted truncate">
+                    {formatDateShort(m.tanggal)} · {m.jam || "—"}
+                  </p>
+                  {targets.length > 0 && (
+                    <div className="flex items-center gap-1 mt-1 flex-wrap">
+                      {targets.map((k) => (
+                        <span
+                          key={k}
+                          className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
+                        >
+                          {CATEGORY_LABEL[k]}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {active && (
+                  <Check size={18} className="text-accent flex-shrink-0" />
                 )}
-              </div>
-              {active && (
-                <Check size={18} className="text-accent flex-shrink-0" />
+              </button>
+
+              {canCreate && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRequestAction(m);
+                  }}
+                  aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
+                  title="Aksi jadwal"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
+                >
+                  <MoreVertical size={16} strokeWidth={2.2} />
+                </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -973,20 +1199,108 @@ function MeetingPickerSheet({
           <Plus size={16} /> Buat jadwal baru
         </button>
       )}
-    </BottomSheet>
+    </>
   );
 }
 
-function CreateMeetingSheet({
-  open,
-  onClose,
-  onCreated,
+/* -------------------------------------------------------------------------- */
+/*                      Sheet Content: ACTION VIEW                            */
+/* -------------------------------------------------------------------------- */
+
+function MeetingActionContent({
+  meeting,
+  onEdit,
+  onDelete,
 }: {
-  open: boolean;
+  meeting: Meeting;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <>
+      <div className="mb-4 flex items-center gap-3 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
+        <div className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0">
+          <Calendar size={18} className="text-accent" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-surface-text truncate">
+            {meeting.hari} — {meeting.acara || "Pengajian"}
+          </p>
+          <p className="text-ios-footnote text-surface-muted truncate">
+            {formatDateShort(meeting.tanggal)} · {meeting.jam || "—"}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <button
+          onClick={onEdit}
+          className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
+        >
+          <div className="w-10 h-10 rounded-xl bg-info-soft text-info flex items-center justify-center flex-shrink-0">
+            <Pencil size={18} strokeWidth={2.2} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-ios-body font-medium text-surface-text">
+              Edit Jadwal
+            </p>
+            <p className="text-ios-footnote text-surface-muted">
+              Ubah tanggal, jam, acara, atau kategori
+            </p>
+          </div>
+        </button>
+
+        <button
+          onClick={onDelete}
+          className="w-full text-left rounded-2xl border border-danger/20 bg-danger-soft p-3.5 flex items-center gap-3 transition-all hover:bg-danger-soft/80 active:scale-[0.99]"
+        >
+          <div className="w-10 h-10 rounded-xl bg-danger text-white flex items-center justify-center flex-shrink-0">
+            <Trash2 size={18} strokeWidth={2.2} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-ios-body font-medium text-danger">
+              Hapus Jadwal
+            </p>
+            <p className="text-ios-footnote text-danger/80">
+              Absensi terkait juga akan dihapus
+            </p>
+          </div>
+        </button>
+      </div>
+
+      <div className="mt-4 flex items-start gap-2.5 p-3 rounded-xl bg-warning-soft/60 border border-warning/20">
+        <AlertTriangle
+          size={16}
+          strokeWidth={2.2}
+          className="text-warning flex-shrink-0 mt-0.5"
+        />
+        <p className="text-ios-caption text-warning leading-relaxed">
+          Menghapus jadwal akan menghapus <strong>semua catatan absensi</strong>{" "}
+          yang terkait. Pastikan Anda sudah yakin.
+        </p>
+      </div>
+    </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                      Sheet Content: FORM VIEW                              */
+/* -------------------------------------------------------------------------- */
+
+function MeetingFormContent({
+  mode,
+  meeting,
+  onClose,
+  onSaved,
+}: {
+  mode: "create" | "edit";
+  meeting: Meeting | null;
   onClose: () => void;
-  onCreated: (m: Meeting) => void;
+  onSaved: (m: Meeting, mode: "create" | "edit") => void;
 }) {
   const { showToast } = useToast();
+  const isEdit = mode === "edit";
+
   const [tanggal, setTanggal] = useState(getTodayIso());
   const [jam, setJam] = useState("Isya di tempat");
   const [groupId, setGroupId] = useState("");
@@ -996,36 +1310,57 @@ function CreateMeetingSheet({
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
     queryFn: () => groupApi.list(),
-    enabled: open,
     staleTime: 5 * 60_000,
   });
 
   useEffect(() => {
-    if (!open) return;
-    setTanggal(getTodayIso());
-    setJam("Isya di tempat");
-    setGroupId("");
-    setAcara("Sambung Kelompok");
-    setKategoriTarget([]);
-  }, [open]);
+    if (isEdit && meeting) {
+      setTanggal(meeting.tanggal || getTodayIso());
+      setJam(meeting.jam || "Isya di tempat");
+      setGroupId(meeting.group_id || "");
+      setAcara(meeting.acara || "Sambung Kelompok");
+      setKategoriTarget(
+        Array.isArray(meeting.kategori_target)
+          ? (meeting.kategori_target as MemberCategory[])
+          : [],
+      );
+    } else {
+      setTanggal(getTodayIso());
+      setJam("Isya di tempat");
+      setGroupId("");
+      setAcara("Sambung Kelompok");
+      setKategoriTarget([]);
+    }
+  }, [isEdit, meeting]);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      meetingApi.create({
+    mutationFn: async () => {
+      const payload = {
         tanggal,
         jam,
         group_id: groupId,
         acara,
         kategori_target: kategoriTarget,
-      }),
-    onSuccess: (meeting) => {
-      showToast("Jadwal pengajian dibuat");
-      onCreated(meeting);
-      onClose();
+      };
+      if (isEdit && meeting) {
+        return meetingApi.update({
+          ...payload,
+          meeting_id: meeting.meeting_id,
+        });
+      }
+      return meetingApi.create(payload);
+    },
+    onSuccess: (result) => {
+      showToast(isEdit ? "Jadwal diperbarui" : "Jadwal pengajian dibuat");
+      onSaved(result as Meeting, mode);
     },
     onError: (err) => {
       showToast(
-        err instanceof ApiError ? err.message : "Gagal membuat jadwal",
+        err instanceof ApiError
+          ? err.message
+          : isEdit
+            ? "Gagal memperbarui jadwal"
+            : "Gagal membuat jadwal",
         "error",
       );
     },
@@ -1038,7 +1373,7 @@ function CreateMeetingSheet({
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="Jadwal Pengajian Baru">
+    <>
       <DateInput
         label="Tanggal"
         value={tanggal}
@@ -1097,8 +1432,12 @@ function CreateMeetingSheet({
         onClick={() => mutation.mutate()}
         disabled={mutation.isPending}
       >
-        {mutation.isPending ? "Menyimpan..." : "Buat Jadwal"}
+        {mutation.isPending
+          ? "Menyimpan..."
+          : isEdit
+            ? "Simpan Perubahan"
+            : "Buat Jadwal"}
       </Button>
-    </BottomSheet>
+    </>
   );
 }

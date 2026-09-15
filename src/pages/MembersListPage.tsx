@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
@@ -68,10 +68,11 @@ export default function MembersListPage() {
   const navigate = useNavigate();
   const { role } = usePermission();
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const deferredSearch = useDeferredValue(debouncedSearch);
-  const [kategori, setKategori] = useState<MemberCategory | "">("");
   const [jenisKelamin, setJenisKelamin] = useState("");
   const [view, setView] = useState<ViewMode>(() => {
     if (typeof window === "undefined") return DEFAULT_VIEW;
@@ -90,6 +91,31 @@ export default function MembersListPage() {
   const [showSkeleton, setShowSkeleton] = useState(true);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  /* ---------------------------------------------------------------------- */
+  /*  KATEGORI — URL sebagai single source of truth                          */
+  /* ---------------------------------------------------------------------- */
+
+  /** Baca kategori dari URL, validasi terhadap MEMBER_CATEGORIES. */
+  const kategori: MemberCategory | "" = useMemo(() => {
+    const fromUrl = searchParams.get("kategori") || "";
+    return (MEMBER_CATEGORIES as readonly string[]).includes(fromUrl)
+      ? (fromUrl as MemberCategory)
+      : "";
+  }, [searchParams]);
+
+  /** Set kategori + update URL. */
+  const setKategori = useCallback(
+    (k: MemberCategory | "") => {
+      const next = new URLSearchParams(searchParams);
+      if (k) next.set("kategori", k);
+      else next.delete("kategori");
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  /* ---------------------------------------------------------------------- */
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, view);
@@ -141,8 +167,8 @@ export default function MembersListPage() {
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
   const activeFilterCount = useMemo(
-    () => (jenisKelamin ? 1 : 0),
-    [jenisKelamin],
+    () => (jenisKelamin ? 1 : 0) + (kategori ? 1 : 0),
+    [jenisKelamin, kategori],
   );
 
   const hasActiveSearch = search.length > 0;
@@ -319,14 +345,20 @@ export default function MembersListPage() {
 
         {!showInitialSkeleton && !error && members.length === 0 && (
           <EmptyState
-            title={hasActiveSearch ? "Tidak ditemukan" : "Belum ada jamaah"}
+            title={
+              hasActiveSearch || kategori
+                ? "Tidak ditemukan"
+                : "Belum ada jamaah"
+            }
             description={
               hasActiveSearch
                 ? `Tidak ada jamaah dengan nama "${search}". Coba kata kunci lain.`
-                : "Tambahkan jamaah pertama untuk memulai pembinaan."
+                : kategori
+                  ? `Tidak ada jamaah dengan kategori ${CATEGORY_LABEL[kategori]}.`
+                  : "Tambahkan jamaah pertama untuk memulai pembinaan."
             }
             action={
-              canCreate && !hasActiveSearch ? (
+              canCreate && !hasActiveSearch && !kategori ? (
                 <Button onClick={() => navigate("/jamaah/baru")}>
                   Tambah Jamaah
                 </Button>

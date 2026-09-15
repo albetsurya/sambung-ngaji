@@ -27,9 +27,21 @@ export const groupApi = {
   save: (payload: Partial<Group>) => call<Group>("saveGroup", payload),
 };
 
+/* -------------------------------------------------------------------------- */
+/*                              MEETING API                                   */
+/* -------------------------------------------------------------------------- */
+/*
+ * Backend actions (dari Code.js):
+ * - getMeetings   → list
+ * - createMeeting → create
+ * - updateMeeting → update  (terima: meeting_id, tanggal, jam, group_id, acara, materi, status, catatan, kategori_target)
+ * - deleteMeeting → remove  (terima: meeting_id)
+ */
+
 export const meetingApi = {
   list: (params?: { from?: string; to?: string; group_id?: string }) =>
     call<Meeting[]>("getMeetings", params || {}),
+
   create: (payload: {
     tanggal: string;
     jam: string;
@@ -38,8 +50,10 @@ export const meetingApi = {
     materi?: string;
     kategori_target?: string[];
   }) => call<Meeting>("createMeeting", payload),
+
   update: (payload: {
     meeting_id: string;
+    tanggal?: string;
     jam?: string;
     group_id?: string;
     acara?: string;
@@ -48,6 +62,12 @@ export const meetingApi = {
     catatan?: string;
     kategori_target?: string[];
   }) => call<Meeting>("updateMeeting", payload),
+
+  // ✅ FIX: ini yang hilang sebelumnya — menyebabkan delete tidak terkirim ke backend.
+  remove: (meeting_id: string) =>
+    call<{ meeting_id: string; deleted_attendance: number }>("deleteMeeting", {
+      meeting_id,
+    }),
 };
 
 export const attendanceApi = {
