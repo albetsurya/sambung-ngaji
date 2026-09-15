@@ -47,7 +47,6 @@ export function BiodataTab({ member }: { member: Member }) {
     ["Pekerjaan", member.pekerjaan],
   ];
 
-  console.log(member);
   return (
     <div className="-mx-4">
       <GroupedList>
