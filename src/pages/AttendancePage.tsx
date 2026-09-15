@@ -160,8 +160,6 @@ export default function AttendancePage() {
   const meetings = meetingsQuery.data ?? [];
   const loadingMeetings = meetingsQuery.isLoading;
 
-  console.log(meetings);
-
   const selectedMeeting = useMemo(() => {
     if (meetings.length === 0) return null;
     if (pinnedMeetingId) {
