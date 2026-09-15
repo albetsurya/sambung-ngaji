@@ -162,18 +162,24 @@ export function AppLayout({
       {showFloating && (
         <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe pointer-events-none">
           <div
-            className={`app-shell px-3 ${containerPadding} flex flex-col items-end gap-2.5 pointer-events-auto`}
+            className={`app-shell px-3 ${containerPadding} flex flex-col items-end gap-2.5`}
           >
             {showAiChatFab && (
-              <FloatingActionButton
-                onClick={() => navigate("/ai-chat")}
-                label="Tanya AI"
-                variant="secondary"
-                icon={<Sparkles size={18} strokeWidth={2.2} />}
-              />
+              <div className="pointer-events-auto">
+                <FloatingActionButton
+                  onClick={() => navigate("/ai-chat")}
+                  label="Tanya AI"
+                  variant="secondary"
+                  icon={<Sparkles size={18} strokeWidth={2.2} />}
+                />
+              </div>
             )}
-            {fab}
-            {!hideNav && <BottomNav />}
+            {fab && <div className="pointer-events-auto">{fab}</div>}
+            {!hideNav && (
+              <div className="pointer-events-auto w-full">
+                <BottomNav />
+              </div>
+            )}
           </div>
         </div>
       )}
