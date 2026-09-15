@@ -19,7 +19,6 @@ import {
 /* -------------------------------------------------------------------------- */
 
 export function BiodataTab({ member }: { member: Member }) {
-  console.log(member);
   const rows: [string, string | undefined][] = [
     ["Nama Panggilan", member.nama_panggilan],
     [
@@ -48,7 +47,6 @@ export function BiodataTab({ member }: { member: Member }) {
     ["Pekerjaan", member.pekerjaan],
   ];
 
-  console.log(member);
   return (
     <div className="-mx-4">
       <GroupedList>
