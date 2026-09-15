@@ -57,9 +57,9 @@ import {
   BiodataTab,
   EducationTab,
   AttendanceTab,
-  MonitoringTab,
   type AttendanceItem,
 } from "../components/member/MemberTabs";
+import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
 const TABS = [
   { key: "profil", label: "Profil", Icon: User },

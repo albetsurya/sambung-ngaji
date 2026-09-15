@@ -543,14 +543,21 @@ export default function AttendancePage() {
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
 
     // Navigasi
+    // ✅ FIX TS: cek `sheet.mode === "create"` dulu sebelum akses `sheet.from`
+    // karena `from` hanya ada pada discriminated union mode "create".
     if (mode === "edit") {
       closeSheet();
-    } else if (sheet.view === "form" && sheet.from === "picker") {
+    } else if (
+      sheet.view === "form" &&
+      sheet.mode === "create" &&
+      sheet.from === "picker"
+    ) {
       setSheet({ view: "picker" });
     } else {
       closeSheet();
     }
   }
+  /* ============================================================= */
   /* ============================================================= */
 
   function handleDeleteFromAction(meeting: Meeting) {
