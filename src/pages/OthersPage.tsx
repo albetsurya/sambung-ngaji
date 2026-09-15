@@ -14,6 +14,7 @@ import {
   Sparkles,
   QrCode,
   User,
+  Calendar,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -38,7 +39,7 @@ import { queryKeys } from "../lib/queryClient";
 export default function OthersPage() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { isAdminLike, isSuperAdmin } = usePermission();
+  const { isAdminLike, isSuperAdmin, role } = usePermission();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -104,6 +105,14 @@ export default function OthersPage() {
       Icon: KeyRound,
       to: "/lainnya/users",
       show: isSuperAdmin,
+    },
+    {
+      key: "bulk-meeting",
+      label: "Buat Jadwal Massal",
+      description: "Buat jadwal sekaligus untuk sebulan",
+      Icon: Calendar,
+      to: "/lainnya/bulk-meeting",
+      show: isAdminLike || role === "TIM_ABSENSI",
     },
     {
       key: "ai-usage",

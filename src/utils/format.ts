@@ -124,7 +124,7 @@ export function formatDateLong(dateStr?: string): string {
   const d = new Date(p.year, p.month - 1, p.day);
   if (isNaN(d.getTime())) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${HARI_ID[d.getDay()]}, ${pad(p.day)}-${pad(p.month)}-${p.year}`;
+  return `${HARI_ID[d.getDay()]}, ${p.day} ${BULAN_ID_FULL[p.month - 1]} ${p.year}`;
 }
 
 export function getHariFromDate(dateStr?: string): string {

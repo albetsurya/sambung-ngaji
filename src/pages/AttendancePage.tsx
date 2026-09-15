@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -119,6 +120,7 @@ type SheetState =
 /* -------------------------------------------------------------------------- */
 
 export default function AttendancePage() {
+  const navigate = useNavigate();
   const { isAdminLike, role } = usePermission();
   const isReadonly = role === "PENGAWAS";
   const { showToast } = useToast();
@@ -817,9 +819,12 @@ export default function AttendancePage() {
             }}
             onRequestAction={openAction}
             onCreateNew={() => openCreateForm("picker")}
+            onCreateBulk={() => {
+              closeSheet();
+              navigate("/lainnya/bulk-meeting");
+            }}
           />
         )}
-
         {sheet.view === "action" && (
           <MeetingActionContent
             meeting={sheet.meeting}
@@ -1119,6 +1124,7 @@ function MeetingPickerContent({
   onSelect,
   onRequestAction,
   onCreateNew,
+  onCreateBulk,
 }: {
   meetings: Meeting[];
   selectedId?: string;
@@ -1126,6 +1132,7 @@ function MeetingPickerContent({
   onSelect: (m: Meeting) => void;
   onRequestAction: (m: Meeting) => void;
   onCreateNew: () => void;
+  onCreateBulk: () => void;
 }) {
   return (
     <>
@@ -1199,12 +1206,23 @@ function MeetingPickerContent({
       </div>
 
       {canCreate && (
-        <button
-          onClick={onCreateNew}
-          className="mt-3 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-surface-border text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
-        >
-          <Plus size={16} /> Buat jadwal baru
-        </button>
+        <>
+          {/* Tambah 1 jadwal (existing) */}
+          <button
+            onClick={onCreateNew}
+            className="mt-3 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-surface-border text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
+          >
+            <Plus size={16} /> Buat jadwal baru
+          </button>
+
+          {/* Tambah massal (BARU) */}
+          <button
+            onClick={onCreateBulk}
+            className="mt-2 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
+          >
+            <Calendar size={16} /> Buat jadwal massal
+          </button>
+        </>
       )}
     </>
   );
