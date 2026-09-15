@@ -9,6 +9,8 @@ const HARI_ID = [
   "Jumat",
   "Sabtu",
 ];
+
+/* Bulan singkat 3 huruf (Indonesia). */
 const BULAN_ID = [
   "Jan",
   "Feb",
@@ -23,6 +25,8 @@ const BULAN_ID = [
   "Nov",
   "Des",
 ];
+
+/* Bulan panjang (Indonesia). */
 const BULAN_ID_FULL = [
   "Januari",
   "Februari",
@@ -59,6 +63,15 @@ function parseIsoParts(
   return { year: y, month: m, day: d };
 }
 
+/* -------------------------------------------------------------------------- */
+/*                          FORMAT TANGGAL                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Format ISO: YYYY-MM-DD.
+ * Dipakai untuk payload API / internal state (bukan display).
+ * Contoh: "2026-09-15"
+ */
 export function formatDate(dateStr?: string): string {
   const p = parseIsoParts(dateStr);
   if (!p) return "";
@@ -67,8 +80,9 @@ export function formatDate(dateStr?: string): string {
 }
 
 /**
- * Format tanggal untuk display: DD-MM-YYYY.
- * Contoh: "15-09-2026"
+ * Format: DD-MM-YYYY (ringkas, angka).
+ * Dipakai untuk badge, sub-label, list item.
+ * Contoh: "15-09-2026", "06-01-1998"
  */
 export function formatDateShort(dateStr?: string): string {
   const p = parseIsoParts(dateStr);
@@ -77,6 +91,33 @@ export function formatDateShort(dateStr?: string): string {
   return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
 }
 
+/**
+ * Format: D MMM YYYY (bulan singkat, day tanpa leading zero).
+ * Dipakai untuk display compact yang butuh nama bulan.
+ * Contoh: "6 Jun 1998", "15 Sep 2026"
+ */
+export function formatDateMedium(dateStr?: string): string {
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  return `${p.day} ${BULAN_ID[p.month - 1]} ${p.year}`;
+}
+
+/**
+ * Format: D MMMM YYYY (bulan panjang, day tanpa leading zero).
+ * Dipakai untuk display formal / biodata / laporan.
+ * Contoh: "6 Januari 2016", "15 September 2026"
+ */
+export function formatDateLongText(dateStr?: string): string {
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  return `${p.day} ${BULAN_ID_FULL[p.month - 1]} ${p.year}`;
+}
+
+/**
+ * Format: HARI, DD-MM-YYYY.
+ * Dipakai untuk header / judul.
+ * Contoh: "Senin, 15-09-2026"
+ */
 export function formatDateLong(dateStr?: string): string {
   const p = parseIsoParts(dateStr);
   if (!p) return "";
@@ -94,6 +135,10 @@ export function getHariFromDate(dateStr?: string): string {
   return HARI_ID[d.getDay()];
 }
 
+/**
+ * Format custom (flexible).
+ * Tersedia: dd-mm-yyyy | dd/mm/yyyy | yyyy-mm-dd | dd MMM yyyy
+ */
 export function formatDateCustom(
   dateStr: string | undefined,
   format:
@@ -119,6 +164,10 @@ export function formatDateCustom(
       return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                          USIA & KATEGORI                                   */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Hitung usia dari tanggal lahir (ISO date yyyy-mm-dd).
@@ -189,6 +238,10 @@ export function getMemberCategory(
   /* -------- 4. Default -------- */
   return "PRA_NIKAH";
 }
+
+/* -------------------------------------------------------------------------- */
+/*                          HELPERS                                           */
+/* -------------------------------------------------------------------------- */
 
 export function normalizePhoneNumber(raw?: string): string {
   if (!raw) return "";

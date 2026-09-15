@@ -11,6 +11,7 @@ import {
   CATEGORY_LABEL,
   formatDateShort,
   ATTENDANCE_LABEL,
+  formatDateLongText,
 } from "../../utils/format";
 
 /* -------------------------------------------------------------------------- */
@@ -18,6 +19,7 @@ import {
 /* -------------------------------------------------------------------------- */
 
 export function BiodataTab({ member }: { member: Member }) {
+  console.log(member);
   const rows: [string, string | undefined][] = [
     ["Nama Panggilan", member.nama_panggilan],
     [
@@ -32,7 +34,7 @@ export function BiodataTab({ member }: { member: Member }) {
       "Tempat, Tgl Lahir",
       [
         member.tempat_lahir,
-        member.tanggal_lahir ? formatDateShort(member.tanggal_lahir) : "",
+        member.tanggal_lahir ? formatDateLongText(member.tanggal_lahir) : "",
       ]
         .filter(Boolean)
         .join(", "),
@@ -45,6 +47,8 @@ export function BiodataTab({ member }: { member: Member }) {
     ["No. WhatsApp", member.no_wa],
     ["Pekerjaan", member.pekerjaan],
   ];
+
+  console.log(member);
   return (
     <div className="-mx-4">
       <GroupedList>
