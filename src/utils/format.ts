@@ -66,11 +66,15 @@ export function formatDate(dateStr?: string): string {
   return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
 }
 
+/**
+ * Format tanggal untuk display: DD-MM-YYYY.
+ * Contoh: "15-09-2026"
+ */
 export function formatDateShort(dateStr?: string): string {
   const p = parseIsoParts(dateStr);
   if (!p) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(p.day)} ${BULAN_ID[p.month - 1]} ${p.year}`;
+  return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
 }
 
 export function formatDateLong(dateStr?: string): string {
@@ -78,7 +82,8 @@ export function formatDateLong(dateStr?: string): string {
   if (!p) return "";
   const d = new Date(p.year, p.month - 1, p.day);
   if (isNaN(d.getTime())) return "";
-  return `${HARI_ID[d.getDay()]}, ${p.day} ${BULAN_ID_FULL[p.month - 1]} ${p.year}`;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${HARI_ID[d.getDay()]}, ${pad(p.day)}-${pad(p.month)}-${p.year}`;
 }
 
 export function getHariFromDate(dateStr?: string): string {
@@ -202,6 +207,13 @@ export const CATEGORY_LABEL: Record<MemberCategory, string> = {
   DEWASA: "Dewasa",
   ISTIMEWA: "Istimewa",
 };
+
+export function getCategoryLabel(
+  category: MemberCategory | null | undefined,
+): string {
+  if (!category) return "-";
+  return CATEGORY_LABEL[category] ?? "-";
+}
 
 export const ATTENDANCE_LABEL: Record<string, string> = {
   HADIR: "Hadir",

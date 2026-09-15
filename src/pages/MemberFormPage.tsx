@@ -15,7 +15,7 @@ import { Button, Input, Select, Textarea } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import { uploadApi, groupApi } from "../services/domainApi";
 import type { Group, Member } from "../types";
-import { getMemberCategory, normalizePhoneNumber } from "../utils/format";
+import { getCategoryLabel, getMemberCategory, normalizePhoneNumber } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import imageCompression from "browser-image-compression";
@@ -221,7 +221,7 @@ export default function MemberFormPage() {
           {previewCategory && !compressing && (
             <div className="mt-3 inline-flex items-center gap-1.5 text-ios-footnote font-medium text-accent bg-accent-soft px-3 py-1.5 rounded-full">
               <Check size={12} strokeWidth={3} />
-              Kategori: {previewCategory}
+              Kategori: {getCategoryLabel(previewCategory)}
             </div>
           )}
         </div>
