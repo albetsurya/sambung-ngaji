@@ -44,7 +44,7 @@ import type {
 } from "../types";
 import {
   formatDateLong,
-  formatDateShort,
+  formatDateLongText,
   getHariFromDate,
   getTodayIso,
 } from "../utils/format";
@@ -159,6 +159,8 @@ export default function AttendancePage() {
 
   const meetings = meetingsQuery.data ?? [];
   const loadingMeetings = meetingsQuery.isLoading;
+
+  console.log(meetings);
 
   const selectedMeeting = useMemo(() => {
     if (meetings.length === 0) return null;
@@ -633,7 +635,7 @@ export default function AttendancePage() {
                       </p>
                       {selectedMeeting && (
                         <p className="text-ios-footnote text-surface-muted truncate">
-                          {formatDateShort(selectedMeeting.tanggal)} ·{" "}
+                          {formatDateLongText(selectedMeeting.tanggal)} ·{" "}
                           {selectedMeeting.jam || "—"}
                         </p>
                       )}
@@ -844,7 +846,7 @@ export default function AttendancePage() {
         title="Hapus jadwal pengajian?"
         description={
           deleteMeetingTarget
-            ? `Jadwal "${deleteMeetingTarget.acara || "Pengajian"}" pada ${formatDateShort(deleteMeetingTarget.tanggal)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
+            ? `Jadwal "${deleteMeetingTarget.acara || "Pengajian"}" pada ${formatDateLongText(deleteMeetingTarget.tanggal)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
             : ""
         }
         confirmLabel="Ya, Hapus"
@@ -1160,7 +1162,7 @@ function MeetingPickerContent({
                     {m.hari} — {m.acara || "Pengajian"}
                   </p>
                   <p className="text-ios-footnote text-surface-muted truncate">
-                    {formatDateShort(m.tanggal)} · {m.jam || "—"}
+                    {formatDateLongText(m.tanggal)} · {m.jam || "—"}
                   </p>
                   {targets.length > 0 && (
                     <div className="flex items-center gap-1 mt-1 flex-wrap">
@@ -1234,7 +1236,7 @@ function MeetingActionContent({
             {meeting.hari} — {meeting.acara || "Pengajian"}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
-            {formatDateShort(meeting.tanggal)} · {meeting.jam || "—"}
+            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "—"}
           </p>
         </div>
       </div>

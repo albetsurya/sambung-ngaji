@@ -325,9 +325,9 @@ export default function MembersListPage() {
             {view === "grid" ? (
               <JamaahGridSkeleton rows={gridCols * 2} cols={gridCols} />
             ) : view === "row" ? (
-              <JamaahRowSkeleton rows={8} />
+              <JamaahRowSkeleton rows={11} />
             ) : (
-              <JamaahListSkeleton rows={11} />
+              <JamaahListSkeleton rows={8} />
             )}
           </div>
         )}
