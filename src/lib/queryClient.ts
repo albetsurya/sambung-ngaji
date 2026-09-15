@@ -30,6 +30,8 @@ export const queryKeys = {
   meetings: (filters?: Record<string, unknown>) =>
     filters ? ["meetings", filters] : ["meetings"],
   attendance: (meetingId: string) => ["attendance", meetingId],
+  attendancePage: (meetingId: string) => ["attendance-page", meetingId],
+  attendanceMembers: () => ["attendance-members"],
   attendanceByMember: (memberId: string) => ["attendance-member", memberId],
   users: () => ["users"],
   userDetail: (userId: string) => ["user-detail", userId],
@@ -37,7 +39,13 @@ export const queryKeys = {
   settings: () => ["settings"],
   aiUsage: () => ["ai-usage"],
   monitoring: (memberId: string) => ["monitoring", memberId],
+  monitoringPaged: (memberId: string, filters?: object) =>
+    filters
+      ? ["monitoring-paged", memberId, filters]
+      : ["monitoring-paged", memberId],
   announcements: () => ["announcements"],
+  announcementsPaged: (filters?: object) =>
+    filters ? ["announcements-paged", filters] : ["announcements-paged"],
   memberSelfDashboard: () => ["member-self-dashboard"],
   memberSelfProfile: () => ["member-self-profile"],
 };

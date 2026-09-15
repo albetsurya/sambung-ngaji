@@ -32,12 +32,11 @@ import {
   ConfirmDialog,
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
-import { memberApi } from "../services/memberApi";
 import type {
   Meeting,
   Member,
   AttendanceStatus,
-  Group,
+  AttendanceRecord,
   MemberCategory,
 } from "../types";
 import {
@@ -51,10 +50,7 @@ import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import {
-  AttendanceListSkeleton,
-  AttendancePageSkeleton,
-} from "../components/common/Skeleton";
+import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
@@ -98,6 +94,12 @@ const STATUS_CONFIG: Record<
   },
 };
 
+interface AttendancePageData {
+  meeting: Meeting;
+  members: Member[];
+  attendance: AttendanceRecord[];
+}
+
 export default function AttendancePage() {
   const { isAdminLike, role } = usePermission();
   const isReadonly = role === "PENGAWAS";
@@ -112,6 +114,7 @@ export default function AttendancePage() {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [category, setCategory] = useState("");
+  const [gender, setGender] = useState<"" | "L" | "P">("");
   const [createOpen, setCreateOpen] = useState(false);
   const [meetingPickerOpen, setMeetingPickerOpen] = useState(false);
 
@@ -121,11 +124,7 @@ export default function AttendancePage() {
   } | null>(null);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
 
-  const {
-    data: meetings = [],
-    isLoading: loadingMeetings,
-    error: meetingsError,
-  } = useQuery({
+  const meetingsQuery = useQuery({
     queryKey: queryKeys.meetings({ range: "recent" }),
     queryFn: () => {
       const from = new Date(Date.now() - 14 * 86400000)
@@ -136,6 +135,9 @@ export default function AttendancePage() {
     staleTime: 2 * 60_000,
   });
 
+  const meetings = meetingsQuery.data ?? [];
+  const loadingMeetings = meetingsQuery.isLoading;
+
   const selectedMeeting = useMemo(() => {
     if (meetings.length === 0) return null;
     if (pinnedMeetingId) {
@@ -145,37 +147,34 @@ export default function AttendancePage() {
     return meetings.find((m) => m.tanggal === today) || meetings[0] || null;
   }, [meetings, pinnedMeetingId]);
 
+  const selectedMeetingId = selectedMeeting?.meeting_id || "";
+
   useEffect(() => {
     setOptimistic({});
-  }, [selectedMeeting?.meeting_id]);
+    setGender("");
+    setCategory("");
+  }, [selectedMeetingId]);
 
-  const memberQuery = useQuery({
-    queryKey: ["attendance-members"],
-    queryFn: () => memberApi.listForAttendance({}),
-    enabled: !!selectedMeeting,
-    staleTime: 5 * 60_000,
+  const pageQuery = useQuery<AttendancePageData>({
+    queryKey: queryKeys.attendancePage(selectedMeetingId),
+    queryFn: () =>
+      attendanceApi.getPage(selectedMeetingId) as Promise<AttendancePageData>,
+    enabled: !!selectedMeetingId,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
   });
 
-  const members = memberQuery.data ?? [];
-  const loadingMembers = memberQuery.isLoading;
-  const membersError = memberQuery.error;
+  const pageData = pageQuery.data;
+  const members = pageData?.members ?? [];
+  const attendanceRows = pageData?.attendance ?? [];
+  const loadingAttendance = pageQuery.isLoading;
+  const attendanceReady = !selectedMeetingId || pageData !== undefined;
 
   const eligibleMembers = useMemo(() => {
     const targets = normalizeTargets(selectedMeeting?.kategori_target);
     if (targets.length === 0) return members;
     return members.filter((m) => m.kategori && targets.includes(m.kategori));
   }, [members, selectedMeeting?.kategori_target]);
-
-  const attendanceQuery = useQuery({
-    queryKey: queryKeys.attendance(selectedMeeting?.meeting_id || ""),
-    queryFn: () => attendanceApi.byMeeting(selectedMeeting!.meeting_id),
-    enabled: !!selectedMeeting,
-    staleTime: 30_000,
-  });
-
-  const attendanceRows = attendanceQuery.data ?? [];
-  const loadingAttendance = attendanceQuery.isLoading;
-  const attendanceError = attendanceQuery.error;
 
   const records = useMemo(() => {
     const base: Record<string, AttendanceStatus> = {};
@@ -191,6 +190,7 @@ export default function AttendancePage() {
 
   const filteredMembers = useMemo(() => {
     return eligibleMembers.filter((m) => {
+      if (gender && m.jenis_kelamin !== gender) return false;
       if (category && m.kategori !== category) return false;
       if (
         deferredSearch &&
@@ -199,7 +199,7 @@ export default function AttendancePage() {
         return false;
       return true;
     });
-  }, [eligibleMembers, category, deferredSearch]);
+  }, [eligibleMembers, category, gender, deferredSearch]);
 
   const hadirCount = useMemo(
     () => Object.values(records).filter((s) => s === "HADIR").length,
@@ -225,10 +225,10 @@ export default function AttendancePage() {
   const removeMutation = useMutation({
     mutationFn: attendanceApi.remove,
     onSuccess: () => {
-      setDeleteTarget(null); // ← tutup modal setelah sukses
+      setDeleteTarget(null);
     },
     onError: (err) => {
-      setDeleteTarget(null); // ← tutup modal juga kalau gagal
+      setDeleteTarget(null);
       showToast(
         err instanceof ApiError ? err.message : "Gagal menghapus absensi",
         "error",
@@ -239,29 +239,29 @@ export default function AttendancePage() {
   const resetMutation = useMutation({
     mutationFn: (meetingId: string) => attendanceApi.removeByMeeting(meetingId),
 
-    // OPTIMASI: kosongkan cache SEBELUM request → UI update seketika
     onMutate: async (meetingId: string) => {
-      // Cancel refetch yang sedang jalan biar tidak overwrite
       await queryClient.cancelQueries({
-        queryKey: queryKeys.attendance(meetingId),
+        queryKey: queryKeys.attendancePage(meetingId),
       });
 
-      // Simpan state lama untuk rollback
-      const previous = queryClient.getQueryData(
-        queryKeys.attendance(meetingId),
+      const previous = queryClient.getQueryData<AttendancePageData>(
+        queryKeys.attendancePage(meetingId),
       );
 
-      // Set cache jadi kosong → UI langsung update
-      queryClient.setQueryData(queryKeys.attendance(meetingId), []);
+      if (previous) {
+        queryClient.setQueryData<AttendancePageData>(
+          queryKeys.attendancePage(meetingId),
+          { ...previous, attendance: [] },
+        );
+      }
 
       return { previous };
     },
 
     onError: (err, meetingId, context) => {
-      // Rollback kalau gagal
       if (context?.previous !== undefined) {
         queryClient.setQueryData(
-          queryKeys.attendance(meetingId),
+          queryKeys.attendancePage(meetingId),
           context.previous,
         );
       }
@@ -278,9 +278,8 @@ export default function AttendancePage() {
     },
 
     onSettled: (data, error, meetingId) => {
-      // Refetch untuk sinkron dengan backend
       queryClient.invalidateQueries({
-        queryKey: queryKeys.attendance(meetingId),
+        queryKey: queryKeys.attendancePage(meetingId),
       });
     },
   });
@@ -306,7 +305,7 @@ export default function AttendancePage() {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+        queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
     } catch {
       setOptimistic((o) => {
@@ -330,7 +329,7 @@ export default function AttendancePage() {
         member_id: memberId,
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+        queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
       showToast("Absensi dihapus");
     } catch {
@@ -356,13 +355,12 @@ export default function AttendancePage() {
     setOptimistic((o) => ({ ...o, ...optimisticPatch }));
 
     try {
-      // OPTIMASI: 1 request bulkSave, bukan N request per-row
       await attendanceApi.bulkSave(
         selectedMeeting.meeting_id,
         targets.map((m) => ({ member_id: m.member_id, status: "HADIR" })),
       );
       queryClient.invalidateQueries({
-        queryKey: queryKeys.attendance(selectedMeeting.meeting_id),
+        queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
       showToast(`${targets.length} jamaah ditandai hadir`);
     } catch (err) {
@@ -384,14 +382,12 @@ export default function AttendancePage() {
     resetMutation.mutate(selectedMeeting.meeting_id);
   }
 
-  // OPTIMASI: useCallback biar tidak re-create tiap render
   const handleStatusChange = useCallback(
     (memberId: string, status: AttendanceStatus) => {
       tapStatus(memberId, status);
     },
-    // tapStatus stabil karena closure-nya hanya pakai records & selectedMeeting
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedMeeting?.meeting_id],
+    [selectedMeetingId],
   );
 
   const handleRequestDelete = useCallback(
@@ -403,14 +399,8 @@ export default function AttendancePage() {
 
   const canCreate = isAdminLike || role === "TIM_ABSENSI";
 
-  const attendanceReady =
-    !selectedMeeting || attendanceQuery.data !== undefined;
-
-  const membersReady = !selectedMeeting || memberQuery.data !== undefined;
-
   const isInitialLoading =
-    loadingMeetings ||
-    (!!selectedMeeting && (!attendanceReady || !membersReady));
+    loadingMeetings || (!!selectedMeetingId && !attendanceReady);
 
   return (
     <AppLayout
@@ -427,6 +417,7 @@ export default function AttendancePage() {
         }
         showSyncButton={false}
       />
+
       {isReadonly && (
         <div
           className="sticky z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20"
@@ -439,6 +430,7 @@ export default function AttendancePage() {
           </div>
         </div>
       )}
+
       {isInitialLoading ? (
         <AttendancePageSkeleton rows={8} />
       ) : (
@@ -526,20 +518,24 @@ export default function AttendancePage() {
                   </div>
                 </div>
 
-                <div className="px-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
-                  <CategoryChip
-                    active={category === ""}
-                    label="Semua"
-                    onClick={() => setCategory("")}
-                  />
-                  {MEMBER_CATEGORIES.map((c) => (
+                <div className="px-4 pb-3 space-y-3">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
                     <CategoryChip
-                      key={c}
-                      active={category === c}
-                      label={CATEGORY_LABEL[c]}
-                      onClick={() => setCategory(c)}
+                      active={category === ""}
+                      label="Semua"
+                      onClick={() => setCategory("")}
                     />
-                  ))}
+                    {MEMBER_CATEGORIES.map((c) => (
+                      <CategoryChip
+                        key={c}
+                        active={category === c}
+                        label={CATEGORY_LABEL[c]}
+                        onClick={() => setCategory(c)}
+                      />
+                    ))}
+                  </div>
+
+                  <GenderSegmented value={gender} onChange={setGender} />
                 </div>
 
                 <div className="px-4 py-2 flex items-center justify-between gap-2 border-t border-surface-border">
@@ -595,8 +591,8 @@ export default function AttendancePage() {
                   <EmptyState
                     title="Tidak ada jamaah"
                     description={
-                      search || category
-                        ? "Coba ubah kata kunci atau filter kategori."
+                      search || category || gender
+                        ? "Coba ubah kata kunci atau filter."
                         : normalizeTargets(selectedMeeting?.kategori_target)
                               .length > 0
                           ? `Tidak ada jamaah dengan kategori ${normalizeTargets(
@@ -676,7 +672,6 @@ export default function AttendancePage() {
         onConfirm={() => {
           if (deleteTarget) {
             deleteAttendance(deleteTarget.memberId);
-            // setDeleteTarget(null) dipindah ke onSuccess removeMutation
           }
         }}
       />
@@ -740,7 +735,6 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
     }
   }
 
-  // ── Mode readonly: tampilkan badge statis, bukan tombol ──
   if (readonly) {
     const config = status ? STATUS_CONFIG[status] : null;
     const Icon = config?.Icon;
@@ -778,7 +772,6 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
     );
   }
 
-  // ── Mode normal: tombol interaktif ──
   return (
     <div
       onTouchStart={startLongPress}
@@ -840,6 +833,66 @@ function normalizeTargets(raw: unknown): MemberCategory[] {
     }
   }
   return [];
+}
+
+function GenderSegmented({
+  value,
+  onChange,
+}: {
+  value: "" | "L" | "P";
+  onChange: (v: "" | "L" | "P") => void;
+}) {
+  const options: { value: "" | "L" | "P"; label: string }[] = [
+    { value: "", label: "Semua" },
+    { value: "L", label: "Laki-laki" },
+    { value: "P", label: "Perempuan" },
+  ];
+
+  return (
+    <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
+      {options.map((opt, idx) => {
+        const active = value === opt.value;
+        return (
+          <div key={opt.value} className="flex-1 flex">
+            {idx > 0 && <div className="w-px bg-surface-border" />}
+            <button
+              onClick={() => onChange(opt.value)}
+              className={`flex-1 min-h-[36px] flex items-center justify-center text-ios-footnote font-medium transition-all duration-200 active:scale-[0.98] ${
+                active
+                  ? "bg-accent text-white"
+                  : "text-surface-muted hover:bg-surface-card"
+              }`}
+            >
+              {opt.label}
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CategoryChip({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-ios-footnote font-medium border transition-all duration-200 active:scale-[0.97] ${
+        active
+          ? "bg-accent text-white border-accent shadow-sm shadow-accent/30"
+          : "bg-surface-card text-surface-text/80 border-surface-border hover:bg-surface-card2"
+      }`}
+    >
+      {label}
+    </button>
+  );
 }
 
 function MeetingPickerSheet({
@@ -921,29 +974,6 @@ function MeetingPickerSheet({
         </button>
       )}
     </BottomSheet>
-  );
-}
-
-function CategoryChip({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-ios-footnote font-medium border transition-all duration-200 active:scale-[0.97] ${
-        active
-          ? "bg-accent text-white border-accent shadow-sm shadow-accent/30"
-          : "bg-surface-card text-surface-text/80 border-surface-border hover:bg-surface-card2"
-      }`}
-    >
-      {label}
-    </button>
   );
 }
 
