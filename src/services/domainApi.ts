@@ -210,6 +210,7 @@ export const settingsApi = {
 export interface AuditLogEntry {
   log_id: string;
   user_id: string;
+  user_nama?: string; // ← BARU
   action: string;
   target_type: string;
   target_id: string;
