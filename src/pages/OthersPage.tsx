@@ -106,6 +106,14 @@ export default function OthersPage() {
       show: isSuperAdmin,
     },
     {
+      key: "bulk-meeting",
+      label: "Buat Jadwal Massal",
+      description: "Buat jadwal sekaligus untuk sebulan",
+      Icon: Calendar,
+      to: "/lainnya/bulk-meeting",
+      show: isAdminLike || role === "TIM_ABSENSI",
+    },
+    {
       key: "ai-usage",
       label: "Monitoring AI",
       description: "Statistik pemakaian AI",

@@ -254,3 +254,58 @@ export interface AiUsageStats {
 export const aiUsageApi = {
   stats: () => call<AiUsageStats>("getAiUsageStats", {}),
 };
+
+/* -------------------------------------------------------------------------- */
+/*                          BULK MEETING API                                  */
+/* -------------------------------------------------------------------------- */
+
+export interface BulkMeetingPreviewItem {
+  tanggal: string;
+  tanggal_display: string;
+  hari: string;
+  sudah_ada: boolean;
+}
+
+export interface BulkMeetingPreviewResponse {
+  total_dates: number;
+  total_new: number;
+  total_existing: number;
+  meetings: BulkMeetingPreviewItem[];
+}
+
+export interface BulkMeetingCreateResponse {
+  created: number;
+  skipped: number;
+  meetings: {
+    meeting_id: string;
+    tanggal: string;
+    tanggal_display: string;
+    hari: string;
+  }[];
+}
+
+export const bulkMeetingApi = {
+  preview: (params: {
+    tahun: number;
+    bulan: number;
+    hari: string[];
+    jam: string;
+    group_id: string;
+    acara: string;
+    materi?: string;
+    catatan?: string;
+    kategori_target?: string[];
+  }) => call<BulkMeetingPreviewResponse>("previewBulkMeetings", params),
+
+  create: (params: {
+    tahun: number;
+    bulan: number;
+    hari: string[];
+    jam: string;
+    group_id: string;
+    acara: string;
+    materi?: string;
+    catatan?: string;
+    kategori_target?: string[];
+  }) => call<BulkMeetingCreateResponse>("bulkCreateMeetings", params),
+};
