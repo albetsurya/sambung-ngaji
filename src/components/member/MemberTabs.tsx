@@ -19,7 +19,6 @@ import {
 /* -------------------------------------------------------------------------- */
 
 export function BiodataTab({ member }: { member: Member }) {
-  console.log(member);
   const rows: [string, string | undefined][] = [
     ["Nama Panggilan", member.nama_panggilan],
     [
