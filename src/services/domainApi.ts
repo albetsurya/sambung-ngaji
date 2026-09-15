@@ -309,3 +309,58 @@ export const bulkMeetingApi = {
     kategori_target?: string[];
   }) => call<BulkMeetingCreateResponse>("bulkCreateMeetings", params),
 };
+
+/* -------------------------------------------------------------------------- */
+/*                      ANNOUNCEMENT TEMPLATE CRUD                            */
+/* -------------------------------------------------------------------------- */
+
+export const announcementTemplateApi = {
+  /** List template aktif (untuk dropdown create announcement). */
+  list: () => call<AnnouncementTemplate[]>("getAnnouncementTemplates", {}),
+
+  /** List semua template (termasuk inactive) — untuk halaman kelola. */
+  listAll: (includeInactive = true) =>
+    call<AnnouncementTemplate[]>("getAllAnnouncementTemplates", {
+      include_inactive: includeInactive ? "true" : "false",
+    }),
+
+  /** Detail 1 template (untuk edit). */
+  detail: (template_id: string) =>
+    call<AnnouncementTemplate>("getAnnouncementTemplateDetail", {
+      template_id,
+    }),
+
+  create: (payload: {
+    nama_template: string;
+    kode: string;
+    isi_template: string;
+    status_aktif?: boolean;
+  }) => call<AnnouncementTemplate>("createAnnouncementTemplate", payload),
+
+  update: (
+    template_id: string,
+    payload: {
+      nama_template?: string;
+      kode?: string;
+      isi_template?: string;
+      status_aktif?: boolean;
+    },
+  ) =>
+    call<AnnouncementTemplate>("updateAnnouncementTemplate", {
+      template_id,
+      ...payload,
+    }),
+
+  remove: (template_id: string) =>
+    call<{ deleted: boolean; template_id: string }>(
+      "deleteAnnouncementTemplate",
+      { template_id },
+    ),
+
+  createFromAnnouncement: (payload: {
+    source_announcement_id?: string;
+    isi_template?: string;
+    nama_template: string;
+    kode: string;
+  }) => call<AnnouncementTemplate>("createTemplateFromAnnouncement", payload),
+};

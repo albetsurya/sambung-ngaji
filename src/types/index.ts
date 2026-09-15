@@ -157,6 +157,9 @@ export interface AnnouncementTemplate {
   nama_template: string;
   kode: string;
   isi_template: string;
+  status_aktif?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Announcement {
