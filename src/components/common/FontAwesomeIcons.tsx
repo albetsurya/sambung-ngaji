@@ -14,6 +14,7 @@ import {
   faCalendarCheck,
   faBullhorn,
   faEllipsis,
+  faEllipsisVertical,
   faChevronLeft,
   faPlus,
   faSun,
@@ -107,6 +108,7 @@ export const Users = createIcon(faUsers);
 export const CalendarCheck = createIcon(faCalendarCheck);
 export const Megaphone = createIcon(faBullhorn);
 export const MoreHorizontal = createIcon(faEllipsis);
+export const MoreVertical = createIcon(faEllipsisVertical);
 export const ChevronLeft = createIcon(faChevronLeft);
 export const Plus = createIcon(faPlus);
 export const Sun = createIcon(faSun);

@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   User,
+  GraduationCap,
   Calendar,
   Heart,
-  TrendingUp,
-  Pencil,
   Sparkles,
+  Pencil,
   LogOut,
   Sun,
   Moon,
@@ -16,7 +16,6 @@ import {
   Users,
   CalendarCheck,
   Info,
-  ChevronRight,
   ChevronLeft,
   HelpCircle,
   Shield,
@@ -30,9 +29,7 @@ import {
 import {
   Avatar,
   Card,
-  EmptyState,
   ErrorState,
-  Badge,
   ConfirmDialog,
   GroupedList,
   ListRow,
@@ -41,7 +38,7 @@ import {
 } from "../components/common";
 import { MemberSelfSkeleton } from "../components/common/Skeleton";
 import { memberSelfApi } from "../services/memberSelfApi";
-import type { Member, MonitoringEntry, Meeting } from "../types";
+import type { Member, MonitoringEntry, Meeting, Education } from "../types";
 import {
   CATEGORY_LABEL,
   normalizeGender,
@@ -56,25 +53,23 @@ import {
   ThemePickerRow,
   ThemePickerSheet,
 } from "../components/common/ThemePickerSheet";
+import {
+  BiodataTab,
+  EducationTab,
+  AttendanceTab,
+  type AttendanceItem,
+} from "../components/member/MemberTabs";
+import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
 const TABS = [
   { key: "profil", label: "Profil", Icon: User },
+  { key: "pendidikan", label: "Pendidikan", Icon: GraduationCap },
   { key: "absensi", label: "Absensi", Icon: Calendar },
-  { key: "monitoring", label: "Pembinaan", Icon: Heart },
+  { key: "pembinaan", label: "Pembinaan", Icon: Heart },
   { key: "pengaturan", label: "Pengaturan", Icon: Settings },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
-
-const STATUS_CONFIG: Record<
-  string,
-  { label: string; color: "emerald" | "amber" | "red" | "ink" }
-> = {
-  HADIR: { label: "Hadir", color: "emerald" },
-  IJIN: { label: "Ijin", color: "amber" },
-  SAKIT: { label: "Sakit", color: "amber" },
-  TANPA_KETERANGAN: { label: "Alpa", color: "red" },
-};
 
 export default function MemberSelfPage() {
   const navigate = useNavigate();
@@ -115,10 +110,20 @@ export default function MemberSelfPage() {
 
   const { profile, attendance, monitoring, upcoming } = data;
 
-  const hadirCount = attendance.filter((a) => a.status === "HADIR").length;
-  const persentase = attendance.length
-    ? Math.round((hadirCount / attendance.length) * 100)
-    : 0;
+  /* Normalize attendance untuk AttendanceTab */
+  const attendanceItems: AttendanceItem[] = attendance
+    .map(
+      (a): AttendanceItem => ({
+        id: a.attendance_id,
+        date: a.tanggal,
+        label: a.acara || "Pengajian",
+        sublabel: [a.hari, a.tanggal ? formatDateShort(a.tanggal) : "", a.jam]
+          .filter(Boolean)
+          .join(" · "),
+        status: a.status,
+      }),
+    )
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   return (
     <AppLayout
@@ -150,6 +155,7 @@ export default function MemberSelfPage() {
         showSyncButton
       />
 
+      {/* Header profile */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
           src={profile.foto_url}
@@ -163,7 +169,9 @@ export default function MemberSelfPage() {
           </p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {profile.kategori && (
-              <Badge>{CATEGORY_LABEL[profile.kategori]}</Badge>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-accent-soft text-accent uppercase">
+                {CATEGORY_LABEL[profile.kategori]}
+              </span>
             )}
             {profile.kelompok && (
               <span className="text-ios-footnote text-surface-muted truncate">
@@ -174,44 +182,62 @@ export default function MemberSelfPage() {
         </div>
       </div>
 
-      <div className="px-3 flex gap-1 overflow-x-auto no-scrollbar border-b border-surface-border pb-2">
-        {TABS.map((t) => {
-          const Icon = t.Icon;
-          const active = tab === t.key;
-          return (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 px-3.5 h-9 rounded-xl text-ios-footnote font-medium whitespace-nowrap transition-all duration-200 active:scale-[0.97] ${
-                active
-                  ? "bg-accent text-white shadow-sm shadow-accent/30"
-                  : "bg-surface-card text-surface-muted border border-surface-border hover:bg-surface-card2"
-              }`}
-            >
-              <Icon size={14} strokeWidth={active ? 2.5 : 2.2} />
-              {t.label}
-            </button>
-          );
-        })}
+      {/* Sticky tab bar */}
+      <div
+        className="sticky z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
+        style={{ top: "calc(52px + var(--safe-top))" }}
+      >
+        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+          {TABS.map((t) => {
+            const Icon = t.Icon;
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`flex items-center gap-1.5 px-3.5 h-9 rounded-xl text-ios-footnote font-medium whitespace-nowrap transition-all duration-200 active:scale-[0.97] ${
+                  active
+                    ? "bg-accent text-white shadow-sm shadow-accent/30"
+                    : "bg-surface-card text-surface-muted border border-surface-border hover:bg-surface-card2"
+                }`}
+              >
+                <Icon size={14} strokeWidth={active ? 2.5 : 2.2} />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="py-4" key={tab}>
+      {/* Tab content */}
+      <div className="px-4 py-4" key={tab}>
         {tab === "profil" && (
           <ProfileTab profile={profile} upcoming={upcoming} />
         )}
-        {tab === "absensi" && (
-          <AttendanceTab
-            attendance={attendance}
-            hadirCount={hadirCount}
-            persentase={persentase}
+        {tab === "pendidikan" && (
+          <EducationTab education={profile.pendidikan || []} />
+        )}
+        {tab === "absensi" && <AttendanceTab items={attendanceItems} />}
+        {tab === "pembinaan" && (
+          <MonitoringTab
+            memberId={profile.member_id}
+            entries={monitoring}
+            attendance={attendanceItems
+              .filter((a) => a.date)
+              .map((a) => ({ date: a.date!, status: a.status }))}
+            canWrite={false}
+            onSaved={refetch}
           />
         )}
-        {tab === "monitoring" && <MonitoringTabSelf entries={monitoring} />}
         {tab === "pengaturan" && <SettingsTabSelf />}
       </div>
     </AppLayout>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              PROFILE TAB                                   */
+/* -------------------------------------------------------------------------- */
 
 function ProfileTab({
   profile,
@@ -220,62 +246,15 @@ function ProfileTab({
   profile: Member;
   upcoming: Meeting[];
 }) {
-  const fields = [
-    { label: "Nama Panggilan", value: profile.nama_panggilan },
-    {
-      label: "Jenis Kelamin",
-      value:
-        profile.jenis_kelamin === "L"
-          ? "Laki-laki"
-          : profile.jenis_kelamin === "P"
-            ? "Perempuan"
-            : "-",
-    },
-    { label: "Tempat Lahir", value: profile.tempat_lahir },
-    {
-      label: "Tanggal Lahir",
-      value: profile.tanggal_lahir
-        ? formatDateShort(profile.tanggal_lahir)
-        : "-",
-    },
-    {
-      label: "Usia",
-      value: profile.usia ? `${profile.usia} tahun` : "-",
-    },
-    { label: "Kelompok", value: profile.kelompok },
-    { label: "Desa", value: profile.desa },
-    { label: "Daerah", value: profile.daerah },
-    { label: "Alamat", value: profile.alamat_rumah },
-    { label: "No. WhatsApp", value: profile.no_wa },
-    { label: "Pekerjaan", value: profile.pekerjaan },
-    { label: "Hobi", value: profile.hobi },
-    { label: "Status Pembinaan", value: profile.status_pembinaan },
-  ].filter((f) => f.value && f.value !== "" && f.value !== "-");
-
   return (
-    <div className="px-4 space-y-4">
-      <Card>
-        <p className="text-ios-footnote font-medium text-surface-muted mb-3 px-0.5">
-          Biodata
-        </p>
-        <div className="space-y-2.5">
-          {fields.map((f, i) => (
-            <div
-              key={i}
-              className="flex justify-between gap-3 py-1.5 border-b border-surface-border last:border-b-0"
-            >
-              <span className="text-ios-footnote text-surface-muted flex-shrink-0">
-                {f.label}
-              </span>
-              <span className="text-ios-body text-surface-text text-right truncate">
-                {f.value}
-              </span>
-            </div>
-          ))}
-        </div>
-      </Card>
+    <div className="-mx-4 space-y-4">
+      {/* Biodata section — pakai shared component di dalam padding */}
+      <div className="px-4">
+        <BiodataTab member={profile} />
+      </div>
 
-      <div>
+      {/* Jadwal Mendatang */}
+      <div className="px-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Jadwal Pengajian Mendatang
         </p>
@@ -317,150 +296,9 @@ function ProfileTab({
   );
 }
 
-function AttendanceTab({
-  attendance,
-  hadirCount,
-  persentase,
-}: {
-  attendance: import("../types").MyAttendanceEntry[];
-  hadirCount: number;
-  persentase: number;
-}) {
-  const counts = {
-    HADIR: attendance.filter((a) => a.status === "HADIR").length,
-    IJIN: attendance.filter((a) => a.status === "IJIN").length,
-    SAKIT: attendance.filter((a) => a.status === "SAKIT").length,
-    TANPA_KETERANGAN: attendance.filter((a) => a.status === "TANPA_KETERANGAN")
-      .length,
-  };
-
-  return (
-    <div className="px-4 space-y-4">
-      <div className="grid grid-cols-4 gap-2">
-        {Object.entries(counts).map(([key, val]) => {
-          const config = STATUS_CONFIG[key];
-          return (
-            <div
-              key={key}
-              className="rounded-2xl border border-surface-border bg-surface-card shadow-sm p-3 flex flex-col items-center justify-center gap-1 min-h-[80px]"
-            >
-              <p className="text-[19px] font-semibold text-surface-text tabular-nums tracking-[-0.02em] leading-none">
-                {val}
-              </p>
-              <p className="text-ios-caption text-surface-muted leading-none">
-                {config.label}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      <Card>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
-            <TrendingUp size={20} className="text-accent" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-ios-footnote text-surface-muted">
-              Persentase kehadiran
-            </p>
-            <p className="text-[22px] font-semibold text-surface-text tabular-nums tracking-[-0.02em]">
-              {persentase}%
-            </p>
-          </div>
-          <div className="w-20 h-2 rounded-full bg-surface-card2 overflow-hidden flex-shrink-0">
-            <div
-              className="h-full bg-accent transition-all duration-500"
-              style={{ width: `${persentase}%` }}
-            />
-          </div>
-        </div>
-      </Card>
-
-      <div>
-        <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
-          Riwayat Absensi
-        </p>
-        {attendance.length === 0 ? (
-          <Card>
-            <p className="text-ios-subhead text-surface-muted text-center py-4">
-              Belum ada riwayat absensi
-            </p>
-          </Card>
-        ) : (
-          <div className="space-y-2">
-            {attendance.map((a) => {
-              const config = STATUS_CONFIG[a.status] || {
-                label: a.status,
-                color: "ink" as const,
-              };
-              return (
-                <Card key={a.attendance_id} className="flex items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-surface-text truncate">
-                      {a.acara || "Pengajian"}
-                    </p>
-                    <p className="text-xs text-surface-muted truncate">
-                      {a.hari}, {a.tanggal ? formatDateShort(a.tanggal) : "-"}
-                      {a.jam ? ` · ${a.jam}` : ""}
-                    </p>
-                  </div>
-                  <Badge color={config.color}>{config.label}</Badge>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MonitoringTabSelf({ entries }: { entries: MonitoringEntry[] }) {
-  if (entries.length === 0) {
-    return (
-      <div className="px-4 space-y-4">
-        <Card>
-          <p className="text-ios-subhead text-surface-muted text-center py-4">
-            Belum ada catatan pembinaan
-          </p>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="px-4 space-y-4">
-      {entries.map((m) => (
-        <Card key={m.monitoring_id}>
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <Badge color={m.status === "AKTIF" ? "emerald" : "amber"}>
-              {m.status}
-            </Badge>
-            <span className="text-ios-caption text-surface-muted">
-              {m.tanggal ? formatDateShort(m.tanggal) : "-"}
-            </span>
-          </div>
-          {m.catatan && (
-            <p className="text-ios-body text-surface-text leading-relaxed">
-              {m.catatan}
-            </p>
-          )}
-          {m.tindak_lanjut && (
-            <div className="mt-2 pt-2 border-t border-surface-border">
-              <p className="text-ios-caption text-surface-muted mb-1">
-                Tindak Lanjut
-              </p>
-              <p className="text-ios-footnote text-surface-text leading-relaxed">
-                {m.tindak_lanjut}
-              </p>
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
+/* -------------------------------------------------------------------------- */
+/*                              SETTINGS TAB                                  */
+/* -------------------------------------------------------------------------- */
 
 function SettingsTabSelf() {
   const navigate = useNavigate();
@@ -472,7 +310,7 @@ function SettingsTabSelf() {
   const [themePickerOpen, setThemePickerOpen] = useState(false);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 -mx-4">
       <GroupedList>
         <ListRow
           onClick={toggleTheme}
@@ -624,6 +462,10 @@ function SettingsTabSelf() {
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              ABOUT MODAL                                   */
+/* -------------------------------------------------------------------------- */
 
 function AboutAppModal({
   open,

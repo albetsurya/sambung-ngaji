@@ -9,12 +9,13 @@ export type Role =
   | "MEMBER";
 
 export type MemberCategory =
+  | "BALITA"
   | "CABERAWIT"
   | "PRA_REMAJA"
   | "REMAJA"
   | "PRA_NIKAH"
   | "DEWASA"
-  | "MANULA";
+  | "ISTIMEWA";
 
 export type AttendanceStatus = "HADIR" | "IJIN" | "SAKIT" | "TANPA_KETERANGAN";
 

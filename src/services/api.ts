@@ -3,26 +3,40 @@ import type { ApiResponse } from "../types";
 import { API_BASE_URL } from "../constants";
 
 const TOKEN_KEY = "pengajian_token";
-const REQUEST_TIMEOUT_MS = 30_000;
-const MAX_RETRIES = 1;
-const RETRY_DELAYS = [800];
-const MAX_CONCURRENT_REQUESTS = 3;
+const REQUEST_TIMEOUT_MS = 45_000;
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [2000, 5000, 10000];
+const MAX_CONCURRENT_REQUESTS = 2;
+const MIN_DELAY_BETWEEN_REQUESTS_MS = 200;
 
 /* -------------------------------------------------------------------------- */
 /*                              Request Queue                                 */
 /* -------------------------------------------------------------------------- */
 
 let activeRequests = 0;
+let lastRequestTime = 0;
 const pendingQueue: Array<() => void> = [];
 
 async function acquireSlot(): Promise<void> {
+  // Delay minimum antar request supaya tidak spam GAS
+  const now = Date.now();
+  const elapsed = now - lastRequestTime;
+  if (elapsed < MIN_DELAY_BETWEEN_REQUESTS_MS) {
+    await new Promise((r) =>
+      setTimeout(r, MIN_DELAY_BETWEEN_REQUESTS_MS - elapsed),
+    );
+  }
+
   if (activeRequests < MAX_CONCURRENT_REQUESTS) {
     activeRequests++;
+    lastRequestTime = Date.now();
     return;
   }
+
   return new Promise((resolve) => {
     pendingQueue.push(() => {
       activeRequests++;
+      lastRequestTime = Date.now();
       resolve();
     });
   });
@@ -80,6 +94,30 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isHtmlResponse(text: string): boolean {
+  const head = text.slice(0, 200).toLowerCase();
+  return (
+    head.includes("<!doctype") ||
+    head.includes("<html") ||
+    head.includes("<head>")
+  );
+}
+
+/**
+ * Deteksi 404 dari GAS redirect expired.
+ * Ciri: status 404, body kosong atau pesan generik Google (bukan JSON project).
+ */
+function isGasRedirectExpired(status: number, text: string): boolean {
+  if (status !== 404) return false;
+  // Body kosong atau pendek → kemungkinan besar redirect expired
+  if (text.length < 500) return true;
+  // Body HTML error Google
+  if (text.includes("Halaman Tidak Ditemukan")) return true;
+  if (text.includes("Page Not Found")) return true;
+  if (text.includes("Error 404")) return true;
+  return false;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                              Main API Call                                 */
 /* -------------------------------------------------------------------------- */
@@ -102,7 +140,7 @@ export async function call<T>(
         throw error;
       }
 
-      const delay = RETRY_DELAYS[attempt] ?? 800;
+      const delay = RETRY_DELAYS[attempt] ?? 10000;
       console.warn(
         `⚠️ API [${action}] gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
         error instanceof Error ? error.message : error,
@@ -136,10 +174,13 @@ async function callOnce<T>(
 
     const body = JSON.stringify(payload);
 
-    const cacheBuster = `_t=${Date.now()}`;
-    const url = API_BASE_URL.includes("?")
-      ? `${API_BASE_URL}&${cacheBuster}`
-      : `${API_BASE_URL}?${cacheBuster}`;
+    // Cache buster hanya di attempt 0. Retry tanpa buster (pakai cache GAS).
+    const url =
+      attempt === 0
+        ? API_BASE_URL.includes("?")
+          ? `${API_BASE_URL}&_t=${Date.now()}`
+          : `${API_BASE_URL}?_t=${Date.now()}`
+        : API_BASE_URL;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -161,7 +202,7 @@ async function callOnce<T>(
 
       if (err?.name === "AbortError") {
         throw new ApiError(
-          `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Cek koneksi.`,
+          `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Coba lagi.`,
           undefined,
           { retryable: true },
         );
@@ -176,7 +217,9 @@ async function callOnce<T>(
         throw new ApiError(
           "Koneksi gagal. Cek jaringan internet Anda.",
           undefined,
-          { retryable: true },
+          {
+            retryable: true,
+          },
         );
       }
 
@@ -188,44 +231,82 @@ async function callOnce<T>(
     clearTimeout(timeoutId);
 
     const text = await response.text();
+    const status = response.status;
 
-    if (
-      response.status === 404 ||
-      text.includes("<!DOCTYPE") ||
-      text.includes("<html")
-    ) {
+    /* ---------------- HTML response (deployment error) ---------------- */
+    if (isHtmlResponse(text)) {
       const titleMatch = text.match(/<title>([^<]*)<\/title>/i);
       const title = titleMatch ? titleMatch[1] : "";
 
       throw new ApiError(
-        `Server tidak siap (${response.status}${title ? " · " + title : ""}). Cek deployment Web App.`,
+        `Server belum siap${title ? " · " + title : ""}. Mencoba ulang...`,
         undefined,
-        { retryable: false, statusCode: response.status },
+        { retryable: true, statusCode: status },
       );
     }
 
-    if (response.status >= 500) {
+    /* ---------------- 404 dari GAS redirect expired ---------------- */
+    if (isGasRedirectExpired(status, text)) {
       throw new ApiError(
-        `Server error (${response.status}). Coba lagi nanti.`,
+        "Server sementara tidak tersedia. Mencoba ulang...",
         undefined,
-        { retryable: true, statusCode: response.status },
+        { retryable: true, statusCode: 404 },
       );
     }
 
+    /* ---------------- 404 dengan body tidak dikenal ---------------- */
+    if (status === 404) {
+      throw new ApiError(
+        "Server tidak merespon dengan benar. Mencoba ulang...",
+        undefined,
+        { retryable: true, statusCode: 404 },
+      );
+    }
+
+    /* ---------------- 5xx ---------------- */
+    if (status >= 500) {
+      throw new ApiError(
+        `Server error (${status}). Mencoba ulang...`,
+        undefined,
+        { retryable: true, statusCode: status },
+      );
+    }
+
+    /* ---------------- 429 ---------------- */
+    if (status === 429) {
+      throw new ApiError("Server sedang sibuk. Mencoba ulang...", undefined, {
+        retryable: true,
+        statusCode: 429,
+      });
+    }
+
+    /* ---------------- Parse JSON ---------------- */
     let data: ApiResponse<T>;
     try {
       data = JSON.parse(text);
     } catch {
       throw new ApiError(
-        "Response server tidak valid (bukan JSON).",
+        "Response server tidak valid. Mencoba ulang...",
         undefined,
-        { retryable: false },
+        { retryable: true },
       );
     }
 
+    /* ---------------- Cek response GAS ---------------- */
     if (!data.success) {
       const msg = data.message || "Terjadi kesalahan";
 
+      // Deteksi "action wajib diisi" (redirect gagal) → retry
+      if (
+        msg.toLowerCase().includes("action wajib diisi") ||
+        msg.toLowerCase().includes("action tidak dikenal")
+      ) {
+        throw new ApiError("Sesi request terganggu. Mencoba ulang...", data, {
+          retryable: true,
+        });
+      }
+
+      // Unauthorized → clear token, no retry
       if (
         msg.toLowerCase().includes("unauthorized") ||
         msg.toLowerCase().includes("sesi tidak valid") ||
