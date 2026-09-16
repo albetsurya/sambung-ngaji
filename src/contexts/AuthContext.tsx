@@ -9,6 +9,7 @@ import {
 import type { User } from "../types";
 import { authApi } from "../services/authApi";
 import { getToken, clearToken, ApiError } from "../services/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 /* -------------------------------------------------------------------------- */
 /*                              Module-level Cache                            */
@@ -49,6 +50,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -113,7 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     console.log("🔐 AuthProvider.logout called");
 
-    // 1. Clear state & token DULU — biar UI instant redirect
+    // 1. Clear query cache + state + token DULU — biar UI instant redirect
+    queryClient.clear();
     clearToken();
     setUser(null);
 

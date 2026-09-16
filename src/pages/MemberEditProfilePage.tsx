@@ -144,9 +144,14 @@ export default function MemberEditProfilePage() {
 
       await memberSelfApi.updateProfile(payload);
 
-      if (photoFile && original?.member_id) {
+      if (photoFile) {
         const base64 = await fileToBase64(photoFile);
-        await uploadApi.photo(original.member_id, base64, photoFile.type);
+        await uploadApi.photo(
+          undefined,
+          base64,
+          photoFile.type,
+          original?.foto_url,
+        );
       }
 
       showToast("Biodata diperbarui");
@@ -519,12 +524,13 @@ function ModernCheckbox({
   );
 }
 
-function fileToBase64(file: File): Promise<string> {
+async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      resolve(result.split(",")[1]);
+      const base64 = result.split(",")[1] || "";
+      resolve(base64);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);

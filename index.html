@@ -16,7 +16,11 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/apple-touch-icon-180x180.png"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
@@ -55,6 +59,7 @@
 
     <title>Pengajian</title>
 
+
     <script>
       (function () {
         var host = window.location.hostname || "";
@@ -77,6 +82,8 @@
 
         setHref('link[rel="icon"][type="image/svg+xml"]', "/favicon-dev.svg");
         setHref('link[rel="apple-touch-icon"]', "/favicon-dev-180x180.png");
+        setHref('link[rel="manifest"]', "/manifest-dev.webmanifest"); // ← TAMBAH INI
+
         setContent('meta[name="theme-color"]', "#DC2626");
         document.title = "Pengajian (DEV)";
         setContent('meta[name="apple-mobile-web-app-title"]', "Pengajian DEV");

@@ -12,7 +12,6 @@ import type {
   DashboardAbsensi,
   Member,
 } from "../types";
-
 export const educationApi = {
   list: (member_id: string) => call<Education[]>("getEducation", { member_id }),
   save: (payload: Partial<Education>) =>
@@ -166,8 +165,19 @@ export const announcementApi = {
 };
 
 export const uploadApi = {
-  photo: (member_id: string, base64: string, mime_type: string) =>
-    call<{ foto_url: string }>("uploadPhoto", { member_id, base64, mime_type }),
+  photo: async (
+    member_id: string | undefined,
+    base64: string,
+    mime_type: string,
+    old_foto_url?: string,
+  ) => {
+    return call<{ foto_url: string }>("uploadPhoto", {
+      member_id: member_id || "",
+      base64,
+      mime_type,
+      _old_foto_url: old_foto_url || "",
+    });
+  },
 
   delete: (member_id?: string) =>
     call<{ deleted: boolean }>("deletePhoto", member_id ? { member_id } : {}),
