@@ -46,6 +46,8 @@ export const queryKeys = {
   announcements: () => ["announcements"],
   announcementsPaged: (filters?: object) =>
     filters ? ["announcements-paged", filters] : ["announcements-paged"],
-  memberSelfDashboard: () => ["member-self-dashboard"],
-  memberSelfProfile: () => ["member-self-profile"],
+  memberSelfDashboard: (userId: string) =>
+    ["member-self-dashboard", userId] as const,
+  memberSelfProfile: (userId: string) =>
+    ["member-self-profile", userId] as const,
 };

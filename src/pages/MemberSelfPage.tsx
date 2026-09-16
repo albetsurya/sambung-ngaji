@@ -74,15 +74,17 @@ type TabKey = (typeof TABS)[number]["key"];
 export default function MemberSelfPage() {
   const navigate = useNavigate();
   const { isMember } = usePermission();
+  const { user } = useAuth();
   const [tab, setTab] = useState<TabKey>("profil");
 
   const basePath = isMember ? "/member" : "/profil-saya";
   const backPath = isMember ? undefined : "/lainnya";
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: queryKeys.memberSelfDashboard(),
+    queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
     queryFn: () => memberSelfApi.getDashboard(),
     staleTime: 60_000,
+    enabled: !!user?.user_id,
   });
 
   if (isLoading) {
