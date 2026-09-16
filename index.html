@@ -70,7 +70,8 @@
         if (!isDev && !isStaging) return;
 
         var ORIGIN = isStaging
-          ? "https://sambung-ngaji-staging.vercel.app"
+          ? "https://sambung-ngaji-staging.vercel.app" ||
+            "https://sambung-ngaji-stag.vercel.app"
           : "https://sambung-ngaji-dev.vercel.app";
 
         var suffix = isStaging ? "-staging" : "-dev";
