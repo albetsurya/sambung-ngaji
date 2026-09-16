@@ -1,23 +1,23 @@
 {
-  "name": "Sambung Ngaji (DEV)",
-  "short_name": "Sambung Ngaji DEV",
+  "name": "Sambung Ngaji (STAGING)",
+  "short_name": "Sambung Ngaji STAGING",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#E7ECE8",
-  "theme_color": "#DC2626",
+  "theme_color": "#FBBF24",
   "icons": [
     {
-      "src": "favicon-dev.svg",
+      "src": "favicon-staging.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     },
     {
-      "src": "pwa-192x192-dev.png",
+      "src": "pwa-192x192-staging.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "pwa-512x512-dev.png",
+      "src": "pwa-512x512-staging.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

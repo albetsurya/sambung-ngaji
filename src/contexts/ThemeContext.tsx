@@ -22,11 +22,6 @@ export type ThemePreset =
 const STORAGE_KEY = "pengajian_theme";
 const PRESET_KEY = "pengajian_preset";
 
-const THEME_COLORS: Record<Theme, string> = {
-  light: "#E7ECE8",
-  dark: "#1A1F1D",
-};
-
 export const THEME_PRESETS: {
   key: ThemePreset;
   label: string;
@@ -142,10 +137,45 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, theme);
     localStorage.setItem(PRESET_KEY, preset);
 
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute("content", THEME_COLORS[theme]);
+    // Tentukan theme-color untuk meta tag berdasarkan environment + theme
+    const host = window.location.hostname || "";
+    const isDev =
+      host === "localhost" || host === "127.0.0.1" || host.includes("-dev");
+    const isStaging = host.includes("-staging");
+
+    let metaColor = "";
+
+    if (isDev) {
+      // DEV: merah
+      metaColor = theme === "dark" ? "#7F1D1D" : "#F87171";
+    } else if (isStaging) {
+      // STAGING: oranye
+      metaColor = theme === "dark" ? "#78350F" : "#FBBF24";
+    } else {
+      // PRODUCTION: match --c-bg (putih / navy dark)
+      const computed = getComputedStyle(root);
+      const bg = computed.getPropertyValue("--c-bg").trim();
+      const parts = bg.split(/\s+/).map(Number);
+      if (parts.length === 3 && parts.every((n) => !isNaN(n))) {
+        metaColor =
+          "#" +
+          parts
+            .map((n) =>
+              Math.max(0, Math.min(255, n)).toString(16).padStart(2, "0"),
+            )
+            .join("");
+      } else {
+        metaColor = theme === "dark" ? "#0F172A" : "#FFFFFF";
+      }
     }
+
+    // Delay sedikit biar CSS variable sudah ke-apply
+    requestAnimationFrame(() => {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && metaColor) {
+        meta.setAttribute("content", metaColor);
+      }
+    });
   }, [theme, preset]);
 
   function setTheme(t: Theme) {
