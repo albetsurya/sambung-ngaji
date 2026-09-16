@@ -9,7 +9,8 @@ type QueryKey = readonly unknown[];
 export function getQueryKeysForRoute(pathname: string): QueryKey[] {
   // Dashboard
   if (pathname === "/" || pathname === "/dashboard") {
-    return [queryKeys.dashboard(), queryKeys.memberSelfDashboard()];
+    // Prefix key — akan match ["member-self-dashboard", *] untuk semua user
+    return [queryKeys.dashboard(), ["member-self-dashboard"]];
   }
 
   // Member detail (prioritas — cek dulu sebelum /jamaah)
@@ -51,12 +52,12 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
 
   // Profil saya
   if (pathname.startsWith("/profil-saya")) {
-    return [queryKeys.memberSelfDashboard(), queryKeys.memberSelfProfile()];
+    return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
   // Member self (mode member)
   if (pathname.startsWith("/member")) {
-    return [queryKeys.memberSelfDashboard(), queryKeys.memberSelfProfile()];
+    return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
   // Lainnya — sub-routes
