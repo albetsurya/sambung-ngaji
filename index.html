@@ -59,7 +59,6 @@
 
     <title>Pengajian</title>
 
-
     <script>
       (function () {
         var host = window.location.hostname || "";
@@ -67,9 +66,16 @@
           host === "localhost" ||
           host === "127.0.0.1" ||
           host.indexOf("-dev") !== -1;
-        if (!isDev) return;
+        var isStaging = host.indexOf("-staging") !== -1;
+        if (!isDev && !isStaging) return;
 
-        var DEV_ORIGIN = "https://sambung-ngaji-dev.vercel.app";
+        var ORIGIN = isStaging
+          ? "https://sambung-ngaji-staging.vercel.app"
+          : "https://sambung-ngaji-dev.vercel.app";
+
+        var suffix = isStaging ? "-staging" : "-dev";
+        var badge = isStaging ? "STAGING" : "DEV";
+        var themeColor = isStaging ? "#F59E0B" : "#DC2626";
 
         var setHref = function (selector, href) {
           var el = document.querySelector(selector);
@@ -80,23 +86,31 @@
           if (el) el.setAttribute("content", content);
         };
 
-        setHref('link[rel="icon"][type="image/svg+xml"]', "/favicon-dev.svg");
-        setHref('link[rel="apple-touch-icon"]', "/favicon-dev-180x180.png");
-        setHref('link[rel="manifest"]', "/manifest-dev.webmanifest"); // ← TAMBAH INI
+        setHref(
+          'link[rel="icon"][type="image/svg+xml"]',
+          "/favicon" + suffix + ".svg",
+        );
+        setHref(
+          'link[rel="apple-touch-icon"]',
+          "/favicon" + suffix + "-180x180.png",
+        );
+        setHref('link[rel="manifest"]', "/manifest" + suffix + ".webmanifest");
 
-        setContent('meta[name="theme-color"]', "#DC2626");
-        document.title = "Pengajian (DEV)";
-        setContent('meta[name="apple-mobile-web-app-title"]', "Pengajian DEV");
-        setContent('meta[property="og:title"]', "Pengajian (DEV)");
-        setContent('meta[property="og:url"]', DEV_ORIGIN + "/");
+        document.title = "Pengajian (" + badge + ")";
+        setContent(
+          'meta[name="apple-mobile-web-app-title"]',
+          "Pengajian " + badge,
+        );
+        setContent('meta[property="og:title"]', "Pengajian (" + badge + ")");
+        setContent('meta[property="og:url"]', ORIGIN + "/");
         setContent(
           'meta[property="og:image"]',
-          DEV_ORIGIN + "/og-image-dev.png",
+          ORIGIN + "/og-image" + suffix + ".png",
         );
-        setContent('meta[name="twitter:title"]', "Pengajian (DEV)");
+        setContent('meta[name="twitter:title"]', "Pengajian (" + badge + ")");
         setContent(
           'meta[name="twitter:image"]',
-          DEV_ORIGIN + "/og-image-dev.png",
+          ORIGIN + "/og-image" + suffix + ".png",
         );
       })();
     </script>
