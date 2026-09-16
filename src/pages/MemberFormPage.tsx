@@ -15,7 +15,11 @@ import { Button, Input, Select, Textarea } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import { uploadApi, groupApi } from "../services/domainApi";
 import type { Group, Member } from "../types";
-import { getCategoryLabel, getMemberCategory, normalizePhoneNumber } from "../utils/format";
+import {
+  getCategoryLabel,
+  getMemberCategory,
+  normalizePhoneNumber,
+} from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import imageCompression from "browser-image-compression";
@@ -539,12 +543,13 @@ function MemberFormSkeleton() {
 /*                              Helper Functions                              */
 /* -------------------------------------------------------------------------- */
 
-function fileToBase64(file: File): Promise<string> {
+async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      resolve(result.split(",")[1]);
+      const base64 = result.split(",")[1] || "";
+      resolve(base64);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
