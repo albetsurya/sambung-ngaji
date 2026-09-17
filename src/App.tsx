@@ -29,6 +29,12 @@ const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
 const MemberDoaPage = lazy(() => import("./pages/MemberDoaPage"));
 const MemberDzikirPage = lazy(() => import("./pages/MemberDzikirPage"));
 const MemberQuranPage = lazy(() => import("./pages/MemberQuranPage"));
+const MemberQuranSurahPage = lazy(
+  () => import("./pages/MemberQuranSurahPage"),
+);
+const MemberQuranMushafPage = lazy(
+  () => import("./pages/MemberQuranMushafPage"),
+);
 const MemberDzikirCounterPage = lazy(
   () => import("./pages/MemberDzikirCounterPage"),
 );
@@ -107,6 +113,22 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberQuranPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/quran/mushaf"
+          element={
+            <PersonalRoute>
+              <MemberQuranMushafPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/quran/:nomor"
+          element={
+            <PersonalRoute>
+              <MemberQuranSurahPage />
             </PersonalRoute>
           }
         />

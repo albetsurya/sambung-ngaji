@@ -64,6 +64,14 @@ import {
   faList,
   faStar,
   faBookmark,
+  faPlay,
+  faPause,
+  faBackwardStep,
+  faForwardStep,
+  faVolumeHigh,
+  faAlignLeft,
+  faFont,
+  faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -162,3 +170,19 @@ export const List = createIcon(faList);
 export const Star = createIcon(faStar);
 
 export const Bookmark = createIcon(faBookmark);
+
+export const Play = createIcon(faPlay);
+
+export const Pause = createIcon(faPause);
+
+export const SkipBack = createIcon(faBackwardStep);
+
+export const SkipForward = createIcon(faForwardStep);
+
+export const Volume2 = createIcon(faVolumeHigh);
+
+export const AlignLeft = createIcon(faAlignLeft);
+
+export const Type = createIcon(faFont);
+
+export const BookOpen = createIcon(faBookOpen);

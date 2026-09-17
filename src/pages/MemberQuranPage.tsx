@@ -7,6 +7,7 @@ import {
   ScrollText,
   Bookmark,
   ChevronRight,
+  BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ErrorState } from "../components/common";
@@ -70,19 +71,29 @@ export default function MemberQuranPage() {
         backLabel="Home"
         showSyncButton={false}
         right={
-          bookmarkCount > 0 ? (
+          <div className="flex items-center gap-1">
             <button
-              onClick={() => navigate("/member/quran/bookmark")}
-              aria-label="Bookmark"
-              title="Ayat yang di-bookmark"
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+              onClick={() => navigate("/member/quran/mushaf")}
+              aria-label="Baca mushaf"
+              title="Baca mushaf (halaman per halaman)"
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-accent-soft border border-accent/30 text-accent transition-all duration-200 hover:bg-accent-soft/80 active:scale-95"
             >
-              <Bookmark size={15} />
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
-                {bookmarkCount}
-              </span>
+              <BookOpen size={15} />
             </button>
-          ) : undefined
+            {bookmarkCount > 0 && (
+              <button
+                onClick={() => navigate("/member/quran/bookmark")}
+                aria-label="Bookmark"
+                title="Ayat yang di-bookmark"
+                className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+              >
+                <Bookmark size={15} />
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
+                  {bookmarkCount}
+                </span>
+              </button>
+            )}
+          </div>
         }
       />
 

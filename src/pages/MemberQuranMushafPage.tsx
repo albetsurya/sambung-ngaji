@@ -1,0 +1,347 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  List,
+  Bookmark,
+  Type as TypeIcon,
+} from "../components/common/FontAwesomeIcons";
+import { AppLayout, Header } from "../components/layout/AppLayout";
+import { ErrorState } from "../components/common";
+import { MushafPageView } from "../components/member/MushafPageView";
+import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
+import { fetchSurahList } from "../data/quran";
+import {
+  fetchMushafPage,
+  surahToStartPage,
+  type MushafPage,
+} from "../data/quran-mushaf";
+import { useMushafBookmark } from "../hooks/useMushafBookmark";
+import { useDoaFontSize } from "../hooks/useDoaFontSize";
+
+const TOTAL_PAGES = 604;
+
+export default function MemberQuranMushafPage() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+
+  const pageParam = Number(searchParams.get("hal"));
+  const currentPage = useMemo(() => {
+    if (Number.isInteger(pageParam) && pageParam >= 1 && pageParam <= TOTAL_PAGES) {
+      return pageParam;
+    }
+    return 1;
+  }, [pageParam]);
+
+  const [navSheetOpen, setNavSheetOpen] = useState(false);
+  const [jumpInput, setJumpInput] = useState("");
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [scale, setScale] = useState<number>(() => {
+    try {
+      const v = Number(localStorage.getItem("mushaf-scale"));
+      if (v >= 0.8 && v <= 1.4) return v;
+    } catch {
+      // ignore
+    }
+    return 1;
+  });
+
+  const { lastPage, setLastPage } = useMushafBookmark();
+  const { size: fontSize } = useDoaFontSize();
+
+  const swipeRef = useRef({ x: 0, y: 0, active: false });
+  const hideTimer = useRef<number | null>(null);
+
+  // Surah list (untuk render judul surah)
+  const { data: surahList = [] } = useQuery({
+    queryKey: ["quran", "surah-list"],
+    queryFn: fetchSurahList,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+
+  // Fetch halaman aktif
+  const {
+    data: pageData,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<MushafPage>({
+    queryKey: ["mushaf", "page", currentPage],
+    queryFn: () => fetchMushafPage(currentPage),
+    staleTime: Infinity,
+    gcTime: 60 * 60 * 1000,
+  });
+
+  // Preload tetangga
+  useEffect(() => {
+    if (!pageData) return;
+    const neighbors = [currentPage - 2, currentPage - 1, currentPage + 1, currentPage + 2];
+    const t = setTimeout(() => {
+      for (const p of neighbors) {
+        if (p >= 1 && p <= TOTAL_PAGES && p !== currentPage) {
+          queryClient.prefetchQuery({
+            queryKey: ["mushaf", "page", p],
+            queryFn: () => fetchMushafPage(p),
+            staleTime: Infinity,
+          });
+        }
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [currentPage, pageData, queryClient]);
+
+  // Auto-save bookmark
+  useEffect(() => {
+    if (pageData) setLastPage(currentPage);
+  }, [currentPage, pageData, setLastPage]);
+
+  // Persist scale
+  useEffect(() => {
+    try {
+      localStorage.setItem("mushaf-scale", String(scale));
+    } catch {
+      // ignore
+    }
+  }, [scale]);
+
+  // Auto-hide controls setelah 3 detik idle
+  useEffect(() => {
+    if (!controlsVisible) return;
+    if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    hideTimer.current = window.setTimeout(() => setControlsVisible(false), 3000);
+    return () => {
+      if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    };
+  }, [controlsVisible, currentPage]);
+
+  function goToPage(p: number) {
+    if (p < 1 || p > TOTAL_PAGES) return;
+    const next = new URLSearchParams(searchParams);
+    next.set("hal", String(p));
+    setSearchParams(next, { replace: true });
+    setControlsVisible(true);
+  }
+
+  function nextPage() {
+    goToPage(currentPage + 1);
+  }
+
+  function prevPage() {
+    goToPage(currentPage - 1);
+  }
+
+  // Gesture swipe
+  function onPointerDown(x: number, y: number) {
+    swipeRef.current = { x, y, active: true };
+  }
+
+  function onPointerUp(x: number, y: number) {
+    if (!swipeRef.current.active) return;
+    const dx = x - swipeRef.current.x;
+    const dy = y - swipeRef.current.y;
+    swipeRef.current.active = false;
+
+    // Harus swipe horizontal (dx lebih besar dari dy), min 60px
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+
+    // RTL: swipe dari kanan ke kiri (dx negatif) = next page
+    if (dx < 0) nextPage();
+    else prevPage();
+  }
+
+  // Keyboard
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft") nextPage();
+      else if (e.key === "ArrowRight") prevPage();
+      else if (e.key === "ArrowUp") goToPage(currentPage - 1);
+      else if (e.key === "ArrowDown") goToPage(currentPage + 1);
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
+  function cycleScale() {
+    const next = scale < 1 ? 1 : scale < 1.2 ? 1.2 : 0.85;
+    setScale(next);
+  }
+
+  function handleJumpInput(e: React.FormEvent) {
+    e.preventDefault();
+    const n = Number(jumpInput);
+    if (Number.isInteger(n) && n >= 1 && n <= TOTAL_PAGES) {
+      goToPage(n);
+      setJumpInput("");
+    }
+  }
+
+  const pageIndicator = currentPage + " / " + TOTAL_PAGES;
+
+  return (
+    <AppLayout hideNav showAiChat={false}>
+      <Header
+        title={pageData && surahList.length > 0
+          ? (surahList.find((s) => s.nomor === pageData.verses[0]?.surah)?.namaLatin ?? "Al-Quran")
+          : "Al-Quran Mushaf"}
+        subtitle={"Halaman " + pageIndicator}
+        onBack={() => navigate("/member/quran")}
+        backLabel="Al-Quran"
+        showSyncButton={false}
+        right={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={cycleScale}
+              aria-label="Ubah ukuran"
+              title="Ukuran teks"
+              className="flex items-center justify-center h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+            >
+              <TypeIcon size={14} />
+            </button>
+            <button
+              onClick={() => setNavSheetOpen(true)}
+              aria-label="Lompat ke surah / halaman"
+              title="Lompat ke..."
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+            >
+              <List size={15} />
+            </button>
+          </div>
+        }
+      />
+
+      {/* Reader area */}
+      <div
+        className="relative flex-1 overflow-hidden select-none"
+        style={{ height: "calc(100vh - 52px - var(--safe-top) - 60px)" }}
+        onPointerDown={(e) => onPointerDown(e.clientX, e.clientY)}
+        onPointerUp={(e) => onPointerUp(e.clientX, e.clientY)}
+        onPointerCancel={() => (swipeRef.current.active = false)}
+      >
+        {isLoading && (
+          <div className="h-full flex items-center justify-center">
+            <span className="w-6 h-6 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+          </div>
+        )}
+
+        {!isLoading && error && (
+          <div className="h-full flex items-center justify-center p-4">
+            <ErrorState
+              message={error instanceof Error ? error.message : "Gagal memuat halaman"}
+              onRetry={refetch}
+            />
+          </div>
+        )}
+
+        {!isLoading && !error && pageData && (
+          <div
+            key={currentPage}
+            className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl animate-[fadeIn_0.15s_ease-out]"
+          >
+            <MushafPageView
+              page={pageData}
+              surahList={surahList}
+              fontSize={fontSize}
+              scale={scale}
+            />
+          </div>
+        )}
+
+        {/* Floating page indicator (auto-hide) */}
+        <div
+          className={
+            "absolute left-1/2 -translate-x-1/2 bottom-3 pointer-events-none transition-opacity duration-300 " +
+            (controlsVisible ? "opacity-100" : "opacity-0")
+          }
+        >
+          <div className="px-3 py-1.5 rounded-full bg-surface-bg/90 backdrop-blur border border-surface-border shadow-sm text-[11px] text-surface-text tabular-nums">
+            Hal. {pageIndicator}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom controls */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe bg-surface-bg/95 backdrop-blur border-t border-surface-border">
+        <div className="app-shell px-3 py-2.5 flex items-center gap-2">
+          <button
+            onClick={nextPage}
+            disabled={currentPage >= TOTAL_PAGES}
+            aria-label="Halaman berikutnya"
+            title="Halaman berikutnya"
+            className="w-11 h-11 rounded-xl border border-surface-border bg-surface-card flex items-center justify-center text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <form
+            onSubmit={handleJumpInput}
+            className="flex-1 flex items-center gap-2"
+          >
+            <input
+              type="number"
+              min={1}
+              max={TOTAL_PAGES}
+              value={jumpInput}
+              onChange={(e) => setJumpInput(e.target.value)}
+              placeholder={"Hal. " + currentPage}
+              className="flex-1 min-h-[44px] rounded-xl border border-surface-border bg-surface-card px-3 text-center text-[16px] text-surface-text placeholder:text-surface-muted focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 tabular-nums"
+            />
+            {jumpInput && (
+              <button
+                type="submit"
+                className="min-h-[44px] px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-dark active:scale-95"
+              >
+                Go
+              </button>
+            )}
+          </form>
+
+          <button
+            onClick={prevPage}
+            disabled={currentPage <= 1}
+            aria-label="Halaman sebelumnya"
+            title="Halaman sebelumnya"
+            className="w-11 h-11 rounded-xl border border-surface-border bg-surface-card flex items-center justify-center text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+
+        {/* Resume last page hint */}
+        {lastPage && lastPage !== currentPage && (
+          <div className="app-shell px-3 pb-2">
+            <button
+              onClick={() => goToPage(lastPage)}
+              className="w-full min-h-[34px] rounded-xl bg-accent-soft text-accent text-ios-caption font-medium transition-all duration-200 hover:bg-accent-soft/80 active:scale-[0.99] flex items-center justify-center gap-1.5"
+            >
+              <Bookmark size={11} />
+              Lanjutkan dari hal. {lastPage}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <QuranNavigationSheet
+        open={navSheetOpen}
+        onClose={() => setNavSheetOpen(false)}
+        currentSurah={pageData?.verses[0]?.surah ?? 1}
+        onSelectSurah={(s) => {
+          goToPage(surahToStartPage(s));
+        }}
+        onSelectJuz={(s, _a) => {
+          goToPage(surahToStartPage(s));
+        }}
+      />
+    </AppLayout>
+  );
+}
+
+/* Suppress unused */
+void ChevronDown;
