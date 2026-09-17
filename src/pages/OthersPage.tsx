@@ -109,7 +109,7 @@ export default function OthersPage() {
     {
       key: "jadwal",
       label: "Kelola Jadwal",
-      description: "Kalender, bulk create, import PDF",
+      description: "Kalender, tambah massal, import PDF",
       Icon: Calendar,
       to: "/lainnya/jadwal",
       show: isAdminLike || role === "TIM_ABSENSI",

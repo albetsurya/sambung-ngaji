@@ -12,7 +12,7 @@ import { ImportPdfTab } from "../components/jadwal/ImportPdfTab";
 
 const TABS = [
   { key: "kalender", label: "Kalender", Icon: Calendar },
-  { key: "bulk", label: "Bulk Create", Icon: Plus },
+  { key: "bulk", label: "Tambah Massal", Icon: Plus },
   { key: "import", label: "Import PDF", Icon: ScrollText },
 ] as const;
 

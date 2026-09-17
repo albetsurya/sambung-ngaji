@@ -472,3 +472,101 @@ select {
   -webkit-text-fill-color: rgb(var(--c-text)) !important;
   caret-color: rgb(var(--c-text)) !important;
 }
+
+/* ========================================================================
+   FullCalendar override — match Tailwind theme
+   ======================================================================== */
+
+.fc {
+  --fc-border-color: rgb(var(--c-border));
+  --fc-page-bg-color: rgb(var(--c-card));
+  --fc-neutral-bg-color: rgb(var(--c-card2));
+  --fc-today-bg-color: rgb(var(--c-accent-light));
+  --fc-event-bg-color: rgb(var(--c-accent));
+  --fc-event-border-color: rgb(var(--c-accent));
+  --fc-event-text-color: #fff;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.fc .fc-toolbar {
+  padding: 0.75rem 0.5rem;
+  margin-bottom: 0 !important;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1rem !important;
+  font-weight: 600;
+  color: rgb(var(--c-text));
+  text-transform: capitalize;
+}
+
+.fc .fc-button {
+  background: transparent !important;
+  border: 1px solid rgb(var(--c-border)) !important;
+  color: rgb(var(--c-text)) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  text-transform: capitalize !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+.fc .fc-button:hover {
+  background: rgb(var(--c-card2)) !important;
+}
+
+.fc .fc-button:focus {
+  box-shadow: 0 0 0 3px rgb(var(--c-accent) / 0.2) !important;
+}
+
+.fc .fc-button-active,
+.fc .fc-button:active {
+  background: rgb(var(--c-accent)) !important;
+  color: #fff !important;
+  border-color: rgb(var(--c-accent)) !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: rgb(var(--c-muted));
+  font-weight: 500;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  padding: 6px 4px !important;
+}
+
+.fc .fc-daygrid-day-number {
+  color: rgb(var(--c-text));
+  font-size: 0.8rem;
+  padding: 4px 6px !important;
+}
+
+.fc .fc-day-today {
+  background: rgb(var(--c-accent-light) / 0.5) !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+  color: rgb(var(--c-accent));
+  font-weight: 700;
+}
+
+.fc .fc-event {
+  border-radius: 0.375rem !important;
+  padding: 1px 4px !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+  cursor: pointer;
+}
+
+.fc .fc-daygrid-event-dot {
+  display: none;
+}
+
+.fc .fc-daygrid-more-link {
+  font-size: 0.7rem;
+  color: rgb(var(--c-accent));
+  font-weight: 500;
+}

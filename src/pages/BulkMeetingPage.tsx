@@ -355,7 +355,7 @@ export default function BulkMeetingPage() {
 
       <ConfirmDialog
         open={showConfirm}
-        title="Konfirmasi Bulk Create"
+        title="Konfirmasi Tambah Massal"
         description={
           preview
             ? `Akan dibuat ${preview.total_new} jadwal pengajian. Lanjutkan?`

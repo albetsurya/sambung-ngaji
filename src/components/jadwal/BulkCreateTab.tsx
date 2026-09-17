@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../contexts/ToastContext";
-import { bulkMeetingApi, BulkMeetingPreviewResponse, groupApi } from "../../services/domainApi";
+import {
+  bulkMeetingApi,
+  BulkMeetingPreviewResponse,
+  groupApi,
+} from "../../services/domainApi";
 import { queryKeys } from "../../lib/queryClient";
 import { ApiError } from "../../services/api";
 import { Badge, Button, Card, ConfirmDialog, Input, Select } from "../common";
@@ -331,7 +335,7 @@ export function BulkCreateTab() {
       )}
       <ConfirmDialog
         open={showConfirm}
-        title="Konfirmasi Bulk Create"
+        title="Konfirmasi Tambah Massal"
         description={
           preview
             ? `Akan dibuat ${preview.total_new} jadwal pengajian. Lanjutkan?`
