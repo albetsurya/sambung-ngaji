@@ -5,9 +5,16 @@ import type { DoaEntry } from "../../data/doa";
 interface DoaCardProps {
   doa: DoaEntry;
   index: number;
+  isRead?: boolean;
+  onToggleRead?: () => void;
 }
 
-export function DoaCard({ doa, index }: DoaCardProps) {
+export function DoaCard({
+  doa,
+  index,
+  isRead = false,
+  onToggleRead,
+}: DoaCardProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -20,8 +27,9 @@ export function DoaCard({ doa, index }: DoaCardProps) {
       "",
       doa.latin,
       "",
-      `Artinya: ${doa.arti}`,
-      doa.sumber ? `\n(${doa.sumber})` : "",
+      "Artinya: " + doa.arti,
+      doa.sumber ? "\n(" + doa.sumber + ")" : "",
+      doa.dalil ? "Dalil keutamaan: " + doa.dalil : "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -35,63 +43,81 @@ export function DoaCard({ doa, index }: DoaCardProps) {
     }
   }
 
-  return (
-    <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden transition-all">
-      {/* Header — klik untuk expand */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all hover:bg-surface-card2 active:scale-[0.995]"
-      >
-        <span className="w-8 h-8 rounded-xl bg-accent-soft text-accent flex items-center justify-center text-[12px] font-bold flex-shrink-0 tabular-nums">
-          {index + 1}
-        </span>
+  const isQuran = doa.sumber?.startsWith("Al-Quran") ?? false;
 
-        <div className="flex-1 min-w-0">
+  return (
+    <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden transition-all duration-200">
+      <div className="w-full flex items-center gap-3 px-4 py-3.5">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleRead?.();
+          }}
+          disabled={!onToggleRead}
+          aria-label={isRead ? "Tandai belum dibaca" : "Tandai sudah dibaca"}
+          title={isRead ? "Sudah dibaca — klik untuk batalkan" : "Tandai sudah dibaca"}
+          className={
+            "w-9 h-9 rounded-xl flex items-center justify-center text-[12px] font-bold flex-shrink-0 tabular-nums transition-all duration-200 active:scale-[0.92] " +
+            (isRead
+              ? "bg-success-soft text-success hover:bg-success/20"
+              : "bg-accent-soft text-accent hover:bg-accent/20")
+          }
+        >
+          {isRead ? <Check size={15} strokeWidth={3} /> : index + 1}
+        </button>
+
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex-1 min-w-0 text-left transition-colors duration-200"
+        >
           <p className="text-ios-body font-medium text-surface-text truncate">
             {doa.judul}
           </p>
-          {doa.sumber && (
+          {(doa.catatan || doa.sumber) && (
             <p className="text-ios-caption text-surface-muted truncate">
-              {doa.sumber}
+              {[doa.catatan, doa.sumber].filter(Boolean).join(" · ")}
             </p>
           )}
-        </div>
+        </button>
 
-        <ChevronDown
-          size={18}
-          className={`text-surface-muted flex-shrink-0 transition-transform duration-200 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? "Tutup" : "Buka"}
+          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-surface-muted transition-colors duration-200 hover:bg-surface-card2"
+        >
+          <ChevronDown
+            size={18}
+            className={"transition-transform duration-200 " + (open ? "rotate-180" : "")}
+          />
+        </button>
+      </div>
 
-      {/* Body — expand */}
       {open && (
         <div className="px-4 pb-4 pt-1 border-t border-surface-border space-y-3">
-          {/* Arab */}
           <div
-            className="text-surface-text"
+            className="border-r-2 border-accent/30 pr-4 py-2 text-surface-text"
             style={{
-              fontFamily: doa.sumber?.startsWith("Al-Quran")
-                ? '"Amiri Quran", "Amiri", "Scheherazade New", serif'
+              fontFamily: isQuran
+                ? '"Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif'
                 : '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
-              fontSize: "21px",
-              lineHeight: 1.9,
+              fontSize: "22px",
+              fontWeight: 400,
+              lineHeight: 2.2,
+              wordSpacing: "0.1em",
               direction: "rtl",
               textAlign: "right",
+              overflowWrap: "break-word",
             }}
           >
             {doa.arab}
           </div>
 
-          {/* Latin */}
           <p className="text-ios-footnote italic text-surface-muted leading-relaxed">
             {doa.latin}
           </p>
 
-          {/* Arti */}
           <div className="rounded-xl bg-accent-soft/50 border border-accent/10 px-3.5 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/70 mb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-1">
               Artinya
             </p>
             <p className="text-ios-footnote text-surface-text leading-relaxed">
@@ -99,30 +125,52 @@ export function DoaCard({ doa, index }: DoaCardProps) {
             </p>
           </div>
 
-          {/* Keutamaan */}
           {doa.keutamaan && (
-            <div className="rounded-xl bg-warning-soft/60 border border-warning/20 px-3.5 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-warning mb-1">
+            <div className="rounded-xl bg-success-soft border border-success/20 px-3.5 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-success mb-1">
                 Keutamaan
               </p>
-              <p className="text-ios-caption text-warning leading-relaxed">
+              <p className="text-ios-caption text-success/90 leading-relaxed">
                 {doa.keutamaan}
               </p>
             </div>
           )}
 
-          {/* Dalil keutamaan (kalau ada) */}
           {doa.dalil && (
             <p className="text-ios-caption text-surface-muted">
               <span className="font-medium">Dalil keutamaan:</span> {doa.dalil}
             </p>
           )}
 
-          {/* Actions */}
-          <div className="flex justify-end pt-1">
+          <div className="flex items-center justify-between gap-2 pt-1">
+            {onToggleRead && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleRead();
+                }}
+                className={
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-ios-caption font-medium transition-colors duration-200 active:scale-[0.97] " +
+                  (isRead
+                    ? "text-success hover:bg-success-soft"
+                    : "text-surface-muted hover:bg-surface-card2")
+                }
+              >
+                {isRead ? (
+                  <>
+                    <Check size={12} /> Sudah dibaca
+                  </>
+                ) : (
+                  <>
+                    <Check size={12} /> Tandai sudah dibaca
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-ios-caption font-medium text-accent transition-colors hover:bg-accent-soft active:scale-[0.97]"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-ios-caption font-medium text-accent transition-colors duration-200 hover:bg-accent-soft active:scale-[0.97]"
             >
               {copied ? <Check size={12} /> : <Copy size={12} />}
               {copied ? "Tersalin" : "Salin doa"}
