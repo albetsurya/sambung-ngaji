@@ -58,6 +58,11 @@ import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
+import {
+  GenderTargetPicker,
+  getGenderTarget,
+} from "../components/jadwal/GenderTargetPicker";
+import type { GenderTarget } from "../components/jadwal/GenderTargetPicker";
 
 /* -------------------------------------------------------------------------- */
 /*                              Types & State                                 */
@@ -195,10 +200,24 @@ export default function AttendancePage() {
   const attendanceReady = !selectedMeetingId || pageData !== undefined;
 
   const eligibleMembers = useMemo(() => {
+    let list = members;
+
     const targets = normalizeTargets(selectedMeeting?.kategori_target);
-    if (targets.length === 0) return members;
-    return members.filter((m) => m.kategori && targets.includes(m.kategori));
-  }, [members, selectedMeeting?.kategori_target]);
+    if (targets.length > 0) {
+      list = list.filter((m) => m.kategori && targets.includes(m.kategori));
+    }
+
+    const gt = getGenderTarget(selectedMeeting);
+    if (gt) {
+      list = list.filter((m) => m.jenis_kelamin === gt);
+    }
+
+    return list;
+  }, [
+    members,
+    selectedMeeting?.kategori_target,
+    selectedMeeting?.gender_target,
+  ]);
 
   const records = useMemo(() => {
     const base: Record<string, AttendanceStatus> = {};
@@ -1331,6 +1350,7 @@ function MeetingFormContent({
   const [groupId, setGroupId] = useState("");
   const [acara, setAcara] = useState("Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>([]);
+  const [genderTarget, setGenderTarget] = useState<GenderTarget>("");
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -1349,12 +1369,14 @@ function MeetingFormContent({
           ? (meeting.kategori_target as MemberCategory[])
           : [],
       );
+      setGenderTarget(getGenderTarget(meeting));
     } else {
       setTanggal(getTodayIso());
       setJam("Isya di tempat");
       setGroupId("");
       setAcara("Sambung Kelompok");
       setKategoriTarget([]);
+      setGenderTarget("");
     }
   }, [isEdit, meeting]);
 
@@ -1366,6 +1388,7 @@ function MeetingFormContent({
         group_id: groupId,
         acara,
         kategori_target: kategoriTarget,
+        gender_target: genderTarget,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -1451,6 +1474,11 @@ function MeetingFormContent({
           })}
         </div>
       </div>
+
+      <GenderTargetPicker
+        value={genderTarget}
+        onChange={setGenderTarget}
+      />
 
       <Button
         fullWidth

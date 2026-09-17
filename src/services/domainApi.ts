@@ -49,6 +49,7 @@ export const meetingApi = {
     materi?: string;
     catatan?: string;
     kategori_target?: string[];
+    gender_target?: "" | "L" | "P";
   }) => call<Meeting>("createMeeting", payload),
 
   update: (payload: {
@@ -61,9 +62,9 @@ export const meetingApi = {
     status?: string;
     catatan?: string;
     kategori_target?: string[];
+    gender_target?: "" | "L" | "P";
   }) => call<Meeting>("updateMeeting", payload),
 
-  // ✅ FIX: ini yang hilang sebelumnya — menyebabkan delete tidak terkirim ke backend.
   remove: (meeting_id: string) =>
     call<{ meeting_id: string; deleted_attendance: number }>("deleteMeeting", {
       meeting_id,

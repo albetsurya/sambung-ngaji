@@ -116,6 +116,7 @@ export interface Meeting {
   status: string;
   catatan?: string;
   kategori_target?: MemberCategory[];
+  gender_target?: "" | "L" | "P";
   created_by?: string;
   created_at?: string;
   updated_at?: string;

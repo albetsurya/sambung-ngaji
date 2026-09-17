@@ -10,6 +10,8 @@ import { queryKeys } from "../../lib/queryClient";
 import { useToast } from "../../contexts/ToastContext";
 
 import { DateInput } from "../common/DateInput";
+import { GenderTargetPicker, getGenderTarget } from "./GenderTargetPicker";
+import type { GenderTarget } from "./GenderTargetPicker";
 import { MEMBER_CATEGORIES } from "../../constants";
 import {
   CATEGORY_LABEL,
@@ -439,6 +441,9 @@ function MeetingFormContent({
       ? (meeting?.kategori_target as MemberCategory[])
       : [],
   );
+  const [genderTarget, setGenderTarget] = useState<GenderTarget>(
+    getGenderTarget(meeting),
+  );
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -454,6 +459,7 @@ function MeetingFormContent({
         group_id: groupId,
         acara,
         kategori_target: kategoriTarget,
+        gender_target: genderTarget,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -547,6 +553,11 @@ function MeetingFormContent({
           })}
         </div>
       </div>
+
+      <GenderTargetPicker
+        value={genderTarget}
+        onChange={setGenderTarget}
+      />
 
       <Button
         fullWidth

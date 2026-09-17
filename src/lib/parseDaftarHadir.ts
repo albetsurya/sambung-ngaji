@@ -17,6 +17,8 @@ export interface ParsedMeetingDraft {
   hari: string;
   jam: string;
   catatan: string;
+  genderTarget: "" | "L" | "P";
+  kategoriTarget: string[];
   confidence: number;
   warning?: string;
 }
@@ -223,6 +225,77 @@ function splitSections(lines: string[]): RawSection[] {
   return sections;
 }
 
+/* ============================== Gender Detection ============================== */
+
+function detectGenderFromTitle(text: string): "" | "L" | "P" {
+  const upper = text.toUpperCase();
+
+  // Cek perempuan dulu (kata kunci lebih spesifik)
+  if (
+    /\b(IBU|IBU-IBU|IBU2|MUSLIMAH|PUTRI|AKHWAT|PEREMPUAN|WANITA|KEPUTRIAN)\b/.test(
+      upper,
+    )
+  ) {
+    return "P";
+  }
+
+  // Cek laki-laki
+  if (
+    /\b(BAPAK|PUTRA|IKHWAN|PRIA|LAKI-LAKI|LAKI LAKI|MUBALIGH)\b/.test(upper)
+  ) {
+    return "L";
+  }
+
+  return "";
+}
+
+/* ============================== Kategori Detection ============================== */
+
+function detectKategoriFromTitle(text: string): string[] {
+  const upper = text.toUpperCase();
+  const found: string[] = [];
+
+  // Mapping keyword → kategori
+  const rules: { kategori: string; patterns: RegExp[] }[] = [
+    {
+      kategori: "BALITA",
+      patterns: [/\bBALITA\b/, /\bPAUD\b/, /\bTK\b/],
+    },
+    {
+      kategori: "CABERAWIT",
+      patterns: [/\bCABERAWIT\b/, /\bSD\b/],
+    },
+    {
+      kategori: "PRA_REMAJA",
+      patterns: [/\bPRA[\s_-]?REMAJA\b/, /\bSMP\b/],
+    },
+    {
+      kategori: "REMAJA",
+      patterns: [/\bREMAJA\b/, /\bSMA\b/, /\bSMK\b/],
+    },
+    {
+      kategori: "PRA_NIKAH",
+      patterns: [/\bPRA[\s_-]?NIKAH\b/, /\bPNKB\b/],
+    },
+    {
+      kategori: "DEWASA",
+      patterns: [/\bDEWASA\b/],
+    },
+    {
+      kategori: "ISTIMEWA",
+      patterns: [/\bISTIMEWA\b/, /\bLANSIA\b/],
+    },
+  ];
+
+  for (const rule of rules) {
+    if (rule.patterns.some((re) => re.test(upper))) {
+      found.push(rule.kategori);
+    }
+  }
+
+  return found;
+}
+
 /* ============================== Parse Section ============================== */
 
 function parseSection(section: RawSection): ParsedMeetingDraft {
@@ -272,6 +345,8 @@ function parseSection(section: RawSection): ParsedMeetingDraft {
     hari: tgl.hari,
     jam,
     catatan,
+    genderTarget: detectGenderFromTitle(acara + " " + bodyText),
+    kategoriTarget: detectKategoriFromTitle(acara + " " + bodyText),
     confidence,
     warning: warnings.length > 0 ? warnings.join("; ") : undefined,
   };

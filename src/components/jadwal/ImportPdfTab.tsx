@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { meetingApi } from "../../services/domainApi";
+import { MEMBER_CATEGORIES } from "../../constants";
+import { CATEGORY_LABEL } from "../../utils/format";
 import { queryKeys } from "../../lib/queryClient";
 import { useToast } from "../../contexts/ToastContext";
 import { Button, BottomSheet, Input, Card } from "../common";
@@ -20,6 +22,8 @@ import {
   AlertTriangle,
 } from "../common/FontAwesomeIcons";
 import { formatDateShort } from "../../utils/format";
+import { GenderTargetPicker } from "./GenderTargetPicker";
+import type { GenderTarget } from "./GenderTargetPicker";
 
 /* -------------------------------------------------------------------------- */
 /*                              PDF Extract                                    */
@@ -75,7 +79,8 @@ export function ImportPdfTab() {
             acara: item.acara,
             materi: "",
             catatan: item.catatan || "",
-            kategori_target: [],
+            kategori_target: item.kategoriTarget,
+            gender_target: item.genderTarget,
           });
           success++;
         } catch (err) {
@@ -353,6 +358,24 @@ function DraftCard({
             )}
           </div>
 
+          {(draft.genderTarget || draft.kategoriTarget.length > 0) && (
+            <div className="flex flex-wrap gap-1 mb-1">
+              {draft.genderTarget && (
+                <span className="inline-block text-[9px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase">
+                  {draft.genderTarget === "L" ? "Laki-laki" : "Perempuan"}
+                </span>
+              )}
+              {draft.kategoriTarget.map((k) => (
+                <span
+                  key={k}
+                  className="inline-block text-[9px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
+                >
+                  {CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL] || k}
+                </span>
+              ))}
+            </div>
+          )}
+
           {draft.catatan && (
             <p className="text-ios-caption text-surface-muted whitespace-pre-line leading-relaxed">
               {draft.catatan}
@@ -404,6 +427,12 @@ function EditDraftForm({
   const [tanggal, setTanggal] = useState(draft.tanggal);
   const [jam, setJam] = useState(draft.jam);
   const [catatan, setCatatan] = useState(draft.catatan);
+  const [genderTarget, setGenderTarget] = useState<GenderTarget>(
+    draft.genderTarget,
+  );
+  const [kategoriTarget, setKategoriTarget] = useState<string[]>(
+    draft.kategoriTarget,
+  );
 
   function handleSave() {
     onSave({
@@ -412,6 +441,8 @@ function EditDraftForm({
       tanggal,
       jam: jam.trim(),
       catatan: catatan.trim(),
+      genderTarget,
+      kategoriTarget,
     });
   }
 
@@ -453,6 +484,42 @@ function EditDraftForm({
           placeholder="Tempat: ...&#10;Peserta: ..."
         />
       </div>
+
+      <div className="mb-4">
+        <label className="block text-ios-footnote font-medium text-surface-text mb-2 px-1">
+          Kategori Jamaah
+        </label>
+        <p className="text-ios-caption text-surface-muted mb-3 px-1">
+          Kosongkan untuk semua kategori
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {MEMBER_CATEGORIES.map((c) => {
+            const active = kategoriTarget.includes(c);
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() =>
+                  setKategoriTarget((prev) =>
+                    prev.includes(c)
+                      ? prev.filter((x) => x !== c)
+                      : [...prev, c],
+                  )
+                }
+                className={`px-3.5 py-1.5 rounded-full text-ios-footnote font-medium border transition-all duration-200 active:scale-[0.97] ${
+                  active
+                    ? "bg-accent text-white border-accent shadow-sm shadow-accent/30"
+                    : "bg-surface-card text-surface-text/80 border-surface-border hover:bg-surface-card2"
+                }`}
+              >
+                {CATEGORY_LABEL[c]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <GenderTargetPicker value={genderTarget} onChange={setGenderTarget} />
 
       <div className="flex gap-2">
         <button
