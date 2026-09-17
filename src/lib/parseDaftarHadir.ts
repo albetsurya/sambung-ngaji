@@ -115,20 +115,25 @@ function getHariFromIso(iso: string): string {
   }
 }
 
-function extractTanggal(text: string): { iso: string; hari: string } {
-  const result = { iso: "", hari: "" };
+function extractTanggal(text: string): { iso: string; isoEnd: string; hari: string } {
+  const result = { iso: "", isoEnd: "", hari: "" };
 
-  // Pattern 1: DD NamaBulan YYYY (termasuk range "17-19 Juli 2026")
-  // Ambil angka PERTAMA dari range (start date)
+  // Pattern 1: DD NamaBulan YYYY atau range "17-19 Juli 2026"
+  // Capture group: [1]=start day, [2]=end day (opsional), [3]=bulan, [4]=tahun
   let m = text.match(
     new RegExp(
-      `(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
+      `(\\d{1,2})(?:\\s*[-–]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
       "i",
     ),
   );
   if (m) {
-    const mm = BULAN_MAP[m[2].toLowerCase()];
-    if (mm) result.iso = toIso(m[1], mm, m[3]);
+    const mm = BULAN_MAP[m[3].toLowerCase()];
+    if (mm) {
+      result.iso = toIso(m[1], mm, m[4]);
+      if (m[2]) {
+        result.isoEnd = toIso(m[2], mm, m[4]);
+      }
+    }
   }
 
   // Pattern 2: DD-MM-YYYY atau DD/MM/YYYY
