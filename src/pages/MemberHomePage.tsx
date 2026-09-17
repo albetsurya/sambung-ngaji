@@ -81,8 +81,7 @@ const IBADAH_MENU: MenuItem[] = [
     key: "mood",
     label: "Tenangkan Hati",
     Icon: Heart,
-    disabled: true,
-    badge: "Soon",
+    to: "/member/mood",
   },
   {
     key: "puasa",

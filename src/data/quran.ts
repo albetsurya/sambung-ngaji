@@ -79,3 +79,26 @@ export function getSurahAudioUrl(
 ): string {
   return surah.audioFull[qariKey] || surah.audioFull["01"] || "";
 }
+
+
+/* -------------------------------------------------------------------------- */
+/*                              Qari List                                     */
+/* -------------------------------------------------------------------------- */
+
+export interface QariInfo {
+  key: string;
+  nama: string;
+}
+
+export const QARI_LIST: QariInfo[] = [
+  { key: "01", nama: "Misyari Rasyid Al-Afasy" },
+  { key: "02", nama: "Abdurrahman As-Sudais" },
+  { key: "03", nama: "Fares Abbad" },
+  { key: "04", nama: "Maher Al-Muaiqly" },
+  { key: "05", nama: "Sa\'ud As-Syuraim" },
+  { key: "06", nama: "Yasser Ad-Dussary" },
+];
+
+export function getQariName(key: string): string {
+  return QARI_LIST.find((q) => q.key === key)?.nama ?? "Qari";
+}
