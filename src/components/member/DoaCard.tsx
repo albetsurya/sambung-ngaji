@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ChevronDown, Copy, Check } from "../common/FontAwesomeIcons";
 import type { DoaEntry } from "../../data/doa";
+import { FONT_SIZE_SPECS, type DoaFontSize } from "../../hooks/useDoaFontSize";
 
 interface DoaCardProps {
   doa: DoaEntry;
   index: number;
   isRead?: boolean;
   onToggleRead?: () => void;
+  fontSize?: DoaFontSize;
 }
 
 export function DoaCard({
@@ -14,9 +16,11 @@ export function DoaCard({
   index,
   isRead = false,
   onToggleRead,
+  fontSize = "medium",
 }: DoaCardProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const spec = FONT_SIZE_SPECS[fontSize];
 
   async function handleCopy(e: React.MouseEvent) {
     e.stopPropagation();
@@ -55,7 +59,11 @@ export function DoaCard({
           }}
           disabled={!onToggleRead}
           aria-label={isRead ? "Tandai belum dibaca" : "Tandai sudah dibaca"}
-          title={isRead ? "Sudah dibaca — klik untuk batalkan" : "Tandai sudah dibaca"}
+          title={
+            isRead
+              ? "Sudah dibaca — klik untuk batalkan"
+              : "Tandai sudah dibaca"
+          }
           className={
             "w-9 h-9 rounded-xl flex items-center justify-center text-[12px] font-bold flex-shrink-0 tabular-nums transition-all duration-200 active:scale-[0.92] " +
             (isRead
@@ -87,7 +95,9 @@ export function DoaCard({
         >
           <ChevronDown
             size={18}
-            className={"transition-transform duration-200 " + (open ? "rotate-180" : "")}
+            className={
+              "transition-transform duration-200 " + (open ? "rotate-180" : "")
+            }
           />
         </button>
       </div>
@@ -100,9 +110,9 @@ export function DoaCard({
               fontFamily: isQuran
                 ? '"Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif'
                 : '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
-              fontSize: "22px",
+              fontSize: spec.arab + "px",
               fontWeight: 400,
-              lineHeight: 2.2,
+              lineHeight: spec.arabLineHeight,
               wordSpacing: "0.1em",
               direction: "rtl",
               textAlign: "right",
@@ -112,7 +122,10 @@ export function DoaCard({
             {doa.arab}
           </div>
 
-          <p className="text-ios-footnote italic text-surface-muted leading-relaxed">
+          <p
+            className="text-ios-footnote italic text-surface-muted leading-relaxed"
+            style={{ fontSize: spec.body + "px", lineHeight: spec.bodyLineHeight }}
+          >
             {doa.latin}
           </p>
 
@@ -120,7 +133,13 @@ export function DoaCard({
             <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-1">
               Artinya
             </p>
-            <p className="text-ios-footnote text-surface-text leading-relaxed">
+            <p
+              className="text-ios-footnote text-surface-text leading-relaxed"
+              style={{
+                fontSize: spec.body + "px",
+                lineHeight: spec.bodyLineHeight,
+              }}
+            >
               {doa.arti}
             </p>
           </div>
@@ -130,7 +149,13 @@ export function DoaCard({
               <p className="text-[10px] font-semibold uppercase tracking-wide text-success mb-1">
                 Keutamaan
               </p>
-              <p className="text-ios-caption text-success/90 leading-relaxed">
+              <p
+                className="text-ios-caption text-success/90 leading-relaxed"
+                style={{
+                  fontSize: spec.body - 1 + "px",
+                  lineHeight: spec.bodyLineHeight,
+                }}
+              >
                 {doa.keutamaan}
               </p>
             </div>
@@ -156,15 +181,8 @@ export function DoaCard({
                     : "text-surface-muted hover:bg-surface-card2")
                 }
               >
-                {isRead ? (
-                  <>
-                    <Check size={12} /> Sudah dibaca
-                  </>
-                ) : (
-                  <>
-                    <Check size={12} /> Tandai sudah dibaca
-                  </>
-                )}
+                <Check size={12} />
+                {isRead ? "Sudah dibaca" : "Tandai sudah dibaca"}
               </button>
             )}
 

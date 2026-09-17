@@ -1,17 +1,22 @@
+import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Sun, Moon, CheckCircle2, RefreshCw } from "../components/common/FontAwesomeIcons";
+import {
+  Sun,
+  Moon,
+  CheckCircle2,
+  RefreshCw,
+} from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { DoaCard } from "../components/member/DoaCard";
+import { DoaFontSizeSheet } from "../components/member/DoaFontSizeSheet";
 import { useDoaProgress } from "../hooks/useDoaProgress";
-import {
-  DOA_KATEGORI,
-  getDoaKategori,
-  type DoaWaktu,
-} from "../data/doa";
+import { useDoaFontSize } from "../hooks/useDoaFontSize";
+import { DOA_KATEGORI, getDoaKategori, type DoaWaktu } from "../data/doa";
 
 export default function MemberDoaPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [fontSheetOpen, setFontSheetOpen] = useState(false);
 
   const waktuParam = searchParams.get("waktu");
   const waktu: DoaWaktu = waktuParam === "sore" ? "sore" : "pagi";
@@ -22,6 +27,7 @@ export default function MemberDoaPage() {
     waktu,
     total,
   );
+  const { size: fontSize, spec: fontSizeSpec } = useDoaFontSize();
 
   function switchWaktu(w: DoaWaktu) {
     setSearchParams({ waktu: w }, { replace: true });
@@ -35,6 +41,25 @@ export default function MemberDoaPage() {
         onBack={() => navigate("/member")}
         backLabel="Home"
         showSyncButton={false}
+        right={
+          <button
+            onClick={() => setFontSheetOpen(true)}
+            aria-label="Ubah ukuran teks"
+            title="Ubah ukuran teks"
+            className="flex items-center gap-1 h-9 px-3 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+          >
+            <span
+              className="text-[11px] font-bold"
+              style={{
+                fontFamily:
+                  '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
+                fontSize: 16,
+              }}
+            >
+              Aa
+            </span>
+          </button>
+        }
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
@@ -67,7 +92,9 @@ export default function MemberDoaPage() {
             <div className="flex items-center gap-2">
               <CheckCircle2
                 size={14}
-                className={count === total && total > 0 ? "text-success" : "text-accent"}
+                className={
+                  count === total && total > 0 ? "text-success" : "text-accent"
+                }
               />
               <span className="text-ios-footnote font-medium text-surface-text">
                 Progress hari ini
@@ -117,7 +144,7 @@ export default function MemberDoaPage() {
             style={{
               fontFamily:
                 '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
-              fontSize: "26px",
+              fontSize: fontSizeSpec.labelArabic + "px",
               fontWeight: 400,
               lineHeight: 2,
               wordSpacing: "0.1em",
@@ -138,6 +165,7 @@ export default function MemberDoaPage() {
               index={i}
               isRead={readIds.has(doa.id)}
               onToggleRead={() => toggle(doa.id)}
+              fontSize={fontSize}
             />
           ))}
         </div>
@@ -154,6 +182,11 @@ export default function MemberDoaPage() {
           </p>
         </div>
       </div>
+
+      <DoaFontSizeSheet
+        open={fontSheetOpen}
+        onClose={() => setFontSheetOpen(false)}
+      />
     </AppLayout>
   );
 }
