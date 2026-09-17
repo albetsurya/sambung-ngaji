@@ -47,6 +47,7 @@ export const meetingApi = {
     group_id: string;
     acara: string;
     materi?: string;
+    catatan?: string;
     kategori_target?: string[];
   }) => call<Meeting>("createMeeting", payload),
 
