@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Rule-based parser untuk PDF agenda rapat pengajian multi-section.
-   Setiap section (nomor) = 1 meeting draft.
+   Rule-based parser — PDF agenda rapat pengajian multi-section.
+   Handle: section `## N.`, field inline, tanggal range, tahun 2-digit.
    ========================================================================== */
 
 export interface PdfTextItem {
@@ -14,6 +14,7 @@ export interface ParsedMeetingDraft {
   id: string;
   acara: string;
   tanggal: string;
+  tanggalSelesai?: string;
   hari: string;
   jam: string;
   catatan: string;
@@ -94,12 +95,15 @@ const BULAN_MAP: Record<string, string> = {
 
 const BULAN_ALT = Object.keys(BULAN_MAP).join("|");
 
+function normalizeYear(y: string): string {
+  if (y.length === 2) return "20" + y;
+  return y;
+}
+
 function toIso(day: string, month: string, year: string): string {
   const d = day.padStart(2, "0");
   const m = month.padStart(2, "0");
-  let y = year;
-  if (y.length === 2) y = "20" + y;
-  return `${y}-${m}-${d}`;
+  return `${normalizeYear(year)}-${m}-${d}`;
 }
 
 function getHariFromIso(iso: string): string {
@@ -114,17 +118,32 @@ function getHariFromIso(iso: string): string {
 function extractTanggal(text: string): { iso: string; hari: string } {
   const result = { iso: "", hari: "" };
 
-  // 1. DD-MM-YYYY atau DD/MM/YYYY (termasuk range "17-19 Juli 2026")
-  let m = text.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+  // Pattern 1: DD NamaBulan YYYY (termasuk range "17-19 Juli 2026")
+  // Ambil angka PERTAMA dari range (start date)
+  let m = text.match(
+    new RegExp(
+      `(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
+      "i",
+    ),
+  );
   if (m) {
-    result.iso = toIso(m[1], m[2], m[3]);
+    const mm = BULAN_MAP[m[2].toLowerCase()];
+    if (mm) result.iso = toIso(m[1], mm, m[3]);
   }
 
-  // 2. DD NamaBulan YYYY (termasuk range "17-19 Juli 2026")
+  // Pattern 2: DD-MM-YYYY atau DD/MM/YYYY
+  if (!result.iso) {
+    m = text.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+    if (m) {
+      result.iso = toIso(m[1], m[2], m[3]);
+    }
+  }
+
+  // Pattern 3: "TGL 17-23 ... SEPTEMBER 2026" — range dengan bulan di akhir
   if (!result.iso) {
     m = text.match(
       new RegExp(
-        `(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s+(${BULAN_ALT})\\s+(\\d{4})`,
+        `TGL\\s+(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s*\\/?\\s*[A-Z]*[-\\s]*(${BULAN_ALT})\\s+(\\d{4})`,
         "i",
       ),
     );
@@ -134,30 +153,19 @@ function extractTanggal(text: string): { iso: string; hari: string } {
     }
   }
 
-  // 3. "TGL 17-23 ... SEPTEMBER 2026" atau "17 ... SEPTEMBER 2026"
-  if (!result.iso) {
-    const bulanMatch = text.match(
-      new RegExp(`(${BULAN_ALT})\\s+(\\d{4})`, "i"),
-    );
-    if (bulanMatch) {
-      const mm = BULAN_MAP[bulanMatch[1].toLowerCase()];
-      const year = bulanMatch[2];
-      // cari angka 1-2 digit sebelum posisi bulan
-      const before = text.slice(0, bulanMatch.index || 0);
-      const dayMatch = before.match(/(\d{1,2})(?:\s*[-–]\s*\d{1,2})?\s*$/);
-      if (dayMatch && mm) {
-        result.iso = toIso(dayMatch[1], mm, year);
-      }
-    }
-  }
-
-  // Nama hari dari text (untuk override kalau ada)
+  // Hari
   for (const h of HARI_LIST) {
     if (new RegExp("\\b" + h + "\\b", "i").test(text)) {
       result.hari = h;
       break;
     }
   }
+
+  // Normalize "Jum'at" / "Jumat"
+  if (!result.hari && /jum['']?at/i.test(text)) {
+    result.hari = "Jumat";
+  }
+
   if (!result.hari && result.iso) {
     result.hari = getHariFromIso(result.iso);
   }
@@ -165,29 +173,109 @@ function extractTanggal(text: string): { iso: string; hari: string } {
   return result;
 }
 
-/* ============================== Field Extract ============================== */
+/* ============================== Field Extraction ============================== */
+
+const FIELD_LABELS = [
+  "Hari\\s*/\\s*Tanggal",
+  "Hari\\s*/\\s*Tgl",
+  "Tanggal",
+  "Jam",
+  "Tempat",
+  "Peserta",
+  "Materi",
+  "Ket\\.?",
+  "Keterangan",
+  "Pakaian",
+  "NB\\.?",
+  "Catatan",
+];
 
 /**
- * Cari value untuk label tertentu.
- * Contoh: "Hari/Tanggal : Sabtu/ 12 September 2026" → "Sabtu/ 12 September 2026"
+ * Extract semua field dari section body dalam 1 pass.
+ * Handle field inline (` - Jam : ...`) dan multiline.
  */
-function extractField(text: string, label: string): string {
-  // handle "Hari/Tanggal", "Tempat", "Jam", "Peserta", "Materi"
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(
-    `(?:^|\\n)\\s*(?:[•\\-*]\\s*)?${escaped}\\s*[:\\-]\\s*(.+)`,
-    "i",
+function extractAllFields(text: string): Record<string, string> {
+  const labelPattern = FIELD_LABELS.join("|");
+  const fieldRegex = new RegExp(
+    `(?:^|[\\s\\-•\\n])(${labelPattern})\\s*[:\\-]\\s*`,
+    "gi",
   );
-  const m = text.match(re);
-  if (m) return m[1].trim();
+
+  const matches: { label: string; start: number; valueStart: number }[] = [];
+  let m;
+  while ((m = fieldRegex.exec(text)) !== null) {
+    matches.push({
+      label: m[1].replace(/\s+/g, " ").toLowerCase().replace(/\.$/, ""),
+      start: m.index,
+      valueStart: fieldRegex.lastIndex,
+    });
+  }
+
+  const result: Record<string, string> = {};
+  for (let i = 0; i < matches.length; i++) {
+    const cur = matches[i];
+    const next = matches[i + 1];
+    const rawEnd = next ? next.start : text.length;
+    let value = text.slice(cur.valueStart, rawEnd).trim();
+
+    // Buang trailing `-` atau `•` yang mungkin jadi awal field berikutnya
+    value = value.replace(/[\s\-•]+$/, "").trim();
+    value = value.replace(/\s+/g, " ");
+
+    if (!result[cur.label]) {
+      result[cur.label] = value;
+    }
+  }
+  return result;
+}
+
+function getField(fields: Record<string, string>, ...keys: string[]): string {
+  for (const k of keys) {
+    if (fields[k]) return fields[k];
+  }
   return "";
 }
 
-function extractJam(text: string): string {
-  const raw = extractField(text, "Jam");
-  if (!raw) return "";
-  // Normalize "19.30 WIB – Selesai" → ambil apa adanya
-  return raw;
+/* ============================== Gender / Kategori ============================== */
+
+function detectGenderFromTitle(text: string): "" | "L" | "P" {
+  const upper = text.toUpperCase();
+
+  if (
+    /\b(IBU|IBU-IBU|IBU2|MUSLIMAH|PUTRI|AKHWAT|PEREMPUAN|WANITA|KEPUTRIAN)\b/.test(
+      upper,
+    )
+  ) {
+    return "P";
+  }
+  if (
+    /\b(BAPAK|PUTRA|IKHWAN|PRIA|LAKI-LAKI|LAKI LAKI|MUBALIGH)\b/.test(upper)
+  ) {
+    return "L";
+  }
+  return "";
+}
+
+function detectKategoriFromTitle(text: string): string[] {
+  const upper = text.toUpperCase();
+  const found: string[] = [];
+
+  const rules: { kategori: string; patterns: RegExp[] }[] = [
+    { kategori: "BALITA", patterns: [/\bBALITA\b/, /\bPAUD\b/, /\bTK\b/] },
+    { kategori: "CABERAWIT", patterns: [/\bCABERAWIT\b/, /\bSD\b/] },
+    { kategori: "PRA_REMAJA", patterns: [/\bPRA[\s_-]?REMAJA\b/, /\bSMP\b/] },
+    { kategori: "REMAJA", patterns: [/\bREMAJA\b/, /\bSMA\b/, /\bSMK\b/] },
+    { kategori: "PRA_NIKAH", patterns: [/\bPRA[\s_-]?NIKAH\b/, /\bPNKB\b/] },
+    { kategori: "DEWASA", patterns: [/\bDEWASA\b/] },
+    { kategori: "ISTIMEWA", patterns: [/\bISTIMEWA\b/, /\bLANSIA\b/] },
+  ];
+
+  for (const rule of rules) {
+    if (rule.patterns.some((re) => re.test(upper))) {
+      found.push(rule.kategori);
+    }
+  }
+  return found;
 }
 
 /* ============================== Section Split ============================== */
@@ -204,11 +292,13 @@ function splitSections(lines: string[]): RawSection[] {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Deteksi header section: "1. NAMA ACARA" atau "1) NAMA ACARA"
-    const m = trimmed.match(/^(\d{1,2})[\.\)]\s+(.+)$/);
+    // Handle optional prefix "##", "#", "- " sebelum nomor
+    const cleaned = trimmed.replace(/^[#\-\*•]+\s*/, "");
+
+    // Deteksi header section: "N. JUDUL" atau "N) JUDUL"
+    const m = cleaned.match(/^(\d{1,2})[\.\)]\s+(.+)$/);
     if (m) {
       const title = m[2].trim();
-      // Validasi: judul minimal 5 karakter dan bukan angka/digit dominan
       if (title.length >= 5 && /[A-Za-z]{3,}/.test(title)) {
         if (current) sections.push(current);
         current = { header: title, body: [] };
@@ -225,101 +315,39 @@ function splitSections(lines: string[]): RawSection[] {
   return sections;
 }
 
-/* ============================== Gender Detection ============================== */
-
-function detectGenderFromTitle(text: string): "" | "L" | "P" {
-  const upper = text.toUpperCase();
-
-  // Cek perempuan dulu (kata kunci lebih spesifik)
-  if (
-    /\b(IBU|IBU-IBU|IBU2|MUSLIMAH|PUTRI|AKHWAT|PEREMPUAN|WANITA|KEPUTRIAN)\b/.test(
-      upper,
-    )
-  ) {
-    return "P";
-  }
-
-  // Cek laki-laki
-  if (
-    /\b(BAPAK|PUTRA|IKHWAN|PRIA|LAKI-LAKI|LAKI LAKI|MUBALIGH)\b/.test(upper)
-  ) {
-    return "L";
-  }
-
-  return "";
-}
-
-/* ============================== Kategori Detection ============================== */
-
-function detectKategoriFromTitle(text: string): string[] {
-  const upper = text.toUpperCase();
-  const found: string[] = [];
-
-  // Mapping keyword → kategori
-  const rules: { kategori: string; patterns: RegExp[] }[] = [
-    {
-      kategori: "BALITA",
-      patterns: [/\bBALITA\b/, /\bPAUD\b/, /\bTK\b/],
-    },
-    {
-      kategori: "CABERAWIT",
-      patterns: [/\bCABERAWIT\b/, /\bSD\b/],
-    },
-    {
-      kategori: "PRA_REMAJA",
-      patterns: [/\bPRA[\s_-]?REMAJA\b/, /\bSMP\b/],
-    },
-    {
-      kategori: "REMAJA",
-      patterns: [/\bREMAJA\b/, /\bSMA\b/, /\bSMK\b/],
-    },
-    {
-      kategori: "PRA_NIKAH",
-      patterns: [/\bPRA[\s_-]?NIKAH\b/, /\bPNKB\b/],
-    },
-    {
-      kategori: "DEWASA",
-      patterns: [/\bDEWASA\b/],
-    },
-    {
-      kategori: "ISTIMEWA",
-      patterns: [/\bISTIMEWA\b/, /\bLANSIA\b/],
-    },
-  ];
-
-  for (const rule of rules) {
-    if (rule.patterns.some((re) => re.test(upper))) {
-      found.push(rule.kategori);
-    }
-  }
-
-  return found;
-}
-
 /* ============================== Parse Section ============================== */
 
 function parseSection(section: RawSection): ParsedMeetingDraft {
+  // Gabung body jadi 1 text, tapi pertahankan newline untuk multiline fields
   const bodyText = section.body.join("\n");
   const fullText = section.header + "\n" + bodyText;
 
-  // Acara: dari header
-  let acara = section.header.replace(/\s+/g, " ").trim();
+  // Extract semua field
+  const fields = extractAllFields(fullText);
 
-  // Tanggal: prioritas dari field "Hari/Tanggal", fallback ke seluruh text
-  const hariTanggalField = extractField(bodyText, "Hari/Tanggal");
-  const tanggalSource = hariTanggalField || fullText;
-  const tgl = extractTanggal(tanggalSource);
+  // Acara dari header
+  const acara = section.header.replace(/\s+/g, " ").trim();
+
+  // Tanggal: prioritas dari field Hari/Tanggal
+  const hariTanggal = getField(
+    fields,
+    "hari / tanggal",
+    "hari / tgl",
+    "tanggal",
+  );
+  const tglSource = hariTanggal || fullText;
+  const tgl = extractTanggal(tglSource);
 
   // Jam
-  const jam = extractJam(bodyText);
+  const jam = getField(fields, "jam");
 
   // Tempat
-  const tempat = extractField(bodyText, "Tempat");
+  const tempat = getField(fields, "tempat");
 
   // Peserta
-  const peserta = extractField(bodyText, "Peserta");
+  const peserta = getField(fields, "peserta");
 
-  // Catatan = gabungan
+  // Catatan = gabungan tempat + peserta
   const catatanParts: string[] = [];
   if (tempat) catatanParts.push(`Tempat: ${tempat}`);
   if (peserta) catatanParts.push(`Peserta: ${peserta}`);
@@ -338,10 +366,14 @@ function parseSection(section: RawSection): ParsedMeetingDraft {
   if (!tgl.iso) warnings.push("tanggal tidak terdeteksi");
   if (!jam) warnings.push("jam tidak terdeteksi");
 
+  const tanggalSelesai =
+    tgl.isoEnd && tgl.isoEnd !== tgl.iso ? tgl.isoEnd : undefined;
+
   return {
     id: cryptoId(),
     acara,
     tanggal: tgl.iso,
+    tanggalSelesai,
     hari: tgl.hari,
     jam,
     catatan,
@@ -368,6 +400,5 @@ export function parseMeetingsFromPdf(rawItems: any[]): ParsedMeetingDraft[] {
   const sections = splitSections(lines);
   const parsed = sections.map(parseSection);
 
-  // Filter: hanya yang punya acara valid
   return parsed.filter((p) => p.acara && p.acara.length >= 3);
 }

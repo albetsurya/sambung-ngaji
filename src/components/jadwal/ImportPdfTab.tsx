@@ -350,6 +350,9 @@ function DraftCard({
                   <Calendar size={11} />
                   {draft.hari && `${draft.hari}, `}
                   {formatDateShort(draft.tanggal)}
+                  {draft.tanggalSelesai && (
+                    <> – {formatDateShort(draft.tanggalSelesai)}</>
+                  )}
                 </span>
                 {draft.jam && <span>· {draft.jam}</span>}
               </>
