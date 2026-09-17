@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Check } from "../common/FontAwesomeIcons";
+import { ChevronDown, Copy, Check, Star } from "../common/FontAwesomeIcons";
 import type { DoaEntry } from "../../data/doa";
 import { FONT_SIZE_SPECS, type DoaFontSize } from "../../hooks/useDoaFontSize";
 
@@ -8,6 +8,8 @@ interface DoaCardProps {
   index: number;
   isRead?: boolean;
   onToggleRead?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
   fontSize?: DoaFontSize;
 }
 
@@ -16,6 +18,8 @@ export function DoaCard({
   index,
   isRead = false,
   onToggleRead,
+  isFavorite = false,
+  onToggleFavorite,
   fontSize = "medium",
 }: DoaCardProps) {
   const [open, setOpen] = useState(false);
@@ -51,7 +55,7 @@ export function DoaCard({
 
   return (
     <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden transition-all duration-200">
-      <div className="w-full flex items-center gap-3 px-4 py-3.5">
+      <div className="w-full flex items-center gap-2 px-4 py-3.5">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -59,11 +63,7 @@ export function DoaCard({
           }}
           disabled={!onToggleRead}
           aria-label={isRead ? "Tandai belum dibaca" : "Tandai sudah dibaca"}
-          title={
-            isRead
-              ? "Sudah dibaca — klik untuk batalkan"
-              : "Tandai sudah dibaca"
-          }
+          title={isRead ? "Sudah dibaca — klik untuk batalkan" : "Tandai sudah dibaca"}
           className={
             "w-9 h-9 rounded-xl flex items-center justify-center text-[12px] font-bold flex-shrink-0 tabular-nums transition-all duration-200 active:scale-[0.92] " +
             (isRead
@@ -88,10 +88,35 @@ export function DoaCard({
           )}
         </button>
 
+        {onToggleFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            aria-label={
+              isFavorite ? "Hapus dari favorit" : "Tambah ke favorit"
+            }
+            title={isFavorite ? "Favorit" : "Tandai favorit"}
+            className={
+              "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-200 active:scale-[0.92] " +
+              (isFavorite
+                ? "text-warning hover:bg-warning-soft"
+                : "text-surface-muted hover:bg-surface-card2")
+            }
+          >
+            <Star
+              size={17}
+              strokeWidth={2.2}
+              className={isFavorite ? "fill-warning" : ""}
+            />
+          </button>
+        )}
+
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Tutup" : "Buka"}
-          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-surface-muted transition-colors duration-200 hover:bg-surface-card2"
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-surface-muted transition-colors duration-200 hover:bg-surface-card2"
         >
           <ChevronDown
             size={18}
@@ -135,10 +160,7 @@ export function DoaCard({
             </p>
             <p
               className="text-ios-footnote text-surface-text leading-relaxed"
-              style={{
-                fontSize: spec.body + "px",
-                lineHeight: spec.bodyLineHeight,
-              }}
+              style={{ fontSize: spec.body + "px", lineHeight: spec.bodyLineHeight }}
             >
               {doa.arti}
             </p>

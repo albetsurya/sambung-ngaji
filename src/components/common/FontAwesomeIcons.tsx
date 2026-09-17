@@ -62,6 +62,7 @@ import {
   faPalette,
   faTableCells,
   faList,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -156,3 +157,5 @@ export const Download = createIcon(faDownload);
 export const Palette = createIcon(faPalette);
 export const LayoutGrid = createIcon(faTableCells);
 export const List = createIcon(faList);
+
+export const Star = createIcon(faStar);
