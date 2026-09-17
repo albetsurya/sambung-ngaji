@@ -25,6 +25,7 @@ const AnnouncementTemplatesPage = lazy(
 );
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
+const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
 const MemberGuidePage = lazy(() => import("./pages/MemberGuidePage"));
 const MemberPrivacyPage = lazy(() => import("./pages/MemberPrivacyPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
@@ -76,6 +77,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberHomePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/prayer"
+          element={
+            <PersonalRoute>
+              <MemberPrayerPage />
             </PersonalRoute>
           }
         />

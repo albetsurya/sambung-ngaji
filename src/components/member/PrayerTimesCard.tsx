@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, ChevronRight } from "../common/FontAwesomeIcons";
 import {
   getNextPrayer,
@@ -8,7 +9,10 @@ import {
 } from "../../utils/prayerTimes";
 
 interface PrayerTimesCardProps {
+  /** Kalau tidak di-override, klik akan navigate ke /member/prayer */
   onClick?: () => void;
+  /** Path tujuan saat klik (default: /member/prayer) */
+  to?: string;
 }
 
 /**
@@ -17,13 +21,22 @@ interface PrayerTimesCardProps {
  * - 5 waktu sholat hari ini (highlight yang sedang aktif)
  * - Lokasi
  */
-export function PrayerTimesCard({ onClick }: PrayerTimesCardProps) {
+export function PrayerTimesCard({ onClick, to = "/member/prayer" }: PrayerTimesCardProps) {
+  const navigate = useNavigate();
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  function handleClick() {
+    if (onClick) {
+      onClick();
+    } else if (to) {
+      navigate(to);
+    }
+  }
 
   const next = getNextPrayer(now);
   const current = getCurrentPrayer(now);
@@ -34,9 +47,8 @@ export function PrayerTimesCard({ onClick }: PrayerTimesCardProps) {
 
   return (
     <button
-      onClick={onClick}
-      disabled={!onClick}
-      className="w-full text-left rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 shadow-sm overflow-hidden transition-all active:scale-[0.99] hover:shadow-md disabled:active:scale-100 disabled:cursor-default"
+      onClick={handleClick}
+      className="w-full text-left rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 shadow-sm overflow-hidden transition-all active:scale-[0.99] hover:shadow-md"
     >
       {/* Header: lokasi + countdown */}
       <div className="px-4 pt-4 pb-3">
@@ -106,13 +118,11 @@ export function PrayerTimesCard({ onClick }: PrayerTimesCardProps) {
         })}
       </div>
 
-      {/* Footer hint (kalau clickable) */}
-      {onClick && (
-        <div className="px-4 pb-3 flex items-center justify-end gap-1 text-[11px] text-accent/70">
-          <span>Lihat jadwal lengkap</span>
-          <ChevronRight size={12} />
-        </div>
-      )}
+      {/* Footer hint */}
+      <div className="px-4 pb-3 flex items-center justify-end gap-1 text-[11px] text-accent/70">
+        <span>Lihat jadwal lengkap</span>
+        <ChevronRight size={12} />
+      </div>
     </button>
   );
 }
