@@ -14,7 +14,12 @@ import {
   Shield,
   Home,
 } from "../components/common/FontAwesomeIcons";
-import { AppLayout, Header } from "../components/layout/AppLayout";
+import {
+  AppLayout,
+  Header,
+  FloatingActionButton,
+  FloatingActionGroup,
+} from "../components/layout/AppLayout";
 import { Avatar } from "../components/common";
 import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
 import { useAuth } from "../contexts/AuthContext";
@@ -44,15 +49,13 @@ const IBADAH_MENU: MenuItem[] = [
     key: "doa-pagi",
     label: "Doa Pagi",
     Icon: Sun,
-    disabled: true,
-    badge: "Soon",
+    to: "/member/doa?waktu=pagi",
   },
   {
-    key: "doa-petang",
-    label: "Doa Petang",
+    key: "doa-sore",
+    label: "Doa Sore",
     Icon: Moon,
-    disabled: true,
-    badge: "Soon",
+    to: "/member/doa?waktu=sore",
   },
   {
     key: "quran",
@@ -65,8 +68,7 @@ const IBADAH_MENU: MenuItem[] = [
     key: "dzikir",
     label: "Dzikir",
     Icon: RefreshCw,
-    disabled: true,
-    badge: "Soon",
+    to: "/member/dzikir",
   },
 ];
 
@@ -98,13 +100,6 @@ const DATA_MENU: MenuItem[] = [
 ];
 
 const LAINNYA_MENU: MenuItem[] = [
-  {
-    key: "ai",
-    label: "Tanya AI",
-    description: "Asisten pribadi untuk data Anda",
-    Icon: Sparkles,
-    to: "/member/ai",
-  },
   {
     key: "pengumuman",
     label: "Pengumuman",
@@ -161,7 +156,19 @@ export default function MemberHomePage() {
   }
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout
+      hideNav
+      fab={
+        <FloatingActionGroup>
+          <FloatingActionButton
+            onClick={() => navigate("/member/ai")}
+            label="Tanya AI"
+            variant="secondary"
+            icon={<Sparkles size={18} strokeWidth={2.2} />}
+          />
+        </FloatingActionGroup>
+      }
+    >
       <Header
         title="Assalamu'alaikum"
         subtitle={

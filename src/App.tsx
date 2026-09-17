@@ -26,6 +26,11 @@ const AnnouncementTemplatesPage = lazy(
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
 const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
+const MemberDoaPage = lazy(() => import("./pages/MemberDoaPage"));
+const MemberDzikirPage = lazy(() => import("./pages/MemberDzikirPage"));
+const MemberDzikirCounterPage = lazy(
+  () => import("./pages/MemberDzikirCounterPage"),
+);
 const MemberGuidePage = lazy(() => import("./pages/MemberGuidePage"));
 const MemberPrivacyPage = lazy(() => import("./pages/MemberPrivacyPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
@@ -85,6 +90,30 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberPrayerPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/doa"
+          element={
+            <PersonalRoute>
+              <MemberDoaPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/dzikir"
+          element={
+            <PersonalRoute>
+              <MemberDzikirPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/dzikir/:id"
+          element={
+            <PersonalRoute>
+              <MemberDzikirCounterPage />
             </PersonalRoute>
           }
         />
