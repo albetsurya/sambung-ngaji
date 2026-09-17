@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   User,
@@ -75,10 +75,22 @@ export default function MemberSelfPage() {
   const navigate = useNavigate();
   const { isMember } = usePermission();
   const { user } = useAuth();
-  const [tab, setTab] = useState<TabKey>("profil");
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as TabKey | null;
+  const isValidTab = (t: string | null): t is TabKey =>
+    t !== null && TABS.some((x) => x.key === t);
+  const [tab, setTab] = useState<TabKey>(
+    isValidTab(tabFromUrl) ? tabFromUrl : "profil",
+  );
+
+  useEffect(() => {
+    if (isValidTab(tabFromUrl)) {
+      setTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
 
   const basePath = isMember ? "/member" : "/profil-saya";
-  const backPath = isMember ? undefined : "/lainnya";
+  const backPath = isMember ? "/member" : "/lainnya";
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),

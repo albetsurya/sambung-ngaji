@@ -15,6 +15,7 @@ import {
   QrCode,
   User,
   Calendar,
+  Home,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -56,6 +57,14 @@ export default function OthersPage() {
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
   const menu = [
+    {
+      key: "tampilan-jamaah",
+      label: "Tampilan Jamaah",
+      description: "Mode personal — waktu sholat, doa, data pribadi",
+      Icon: Home,
+      to: "/member",
+      show: !!user?.member_id,
+    },
     {
       key: "profil-saya",
       label: "Biodata Saya",

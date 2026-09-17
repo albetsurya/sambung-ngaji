@@ -4,7 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
-import { MemberRoute } from "./components/layout/MemberRoute";
+import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -24,6 +24,9 @@ const AnnouncementTemplatesPage = lazy(
   () => import("./pages/AnnouncementTemplatesPage"),
 );
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
+const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
+const MemberGuidePage = lazy(() => import("./pages/MemberGuidePage"));
+const MemberPrivacyPage = lazy(() => import("./pages/MemberPrivacyPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
   () => import("./pages/MemberEditProfilePage"),
@@ -71,25 +74,49 @@ function AppRoutes() {
         <Route
           path="/member"
           element={
-            <MemberRoute>
+            <PersonalRoute>
+              <MemberHomePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/profil"
+          element={
+            <PersonalRoute>
               <MemberSelfPage />
-            </MemberRoute>
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/panduan"
+          element={
+            <PersonalRoute>
+              <MemberGuidePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/privasi"
+          element={
+            <PersonalRoute>
+              <MemberPrivacyPage />
+            </PersonalRoute>
           }
         />
         <Route
           path="/member/edit"
           element={
-            <MemberRoute>
+            <PersonalRoute>
               <MemberEditProfilePage />
-            </MemberRoute>
+            </PersonalRoute>
           }
         />
         <Route
           path="/member/ai"
           element={
-            <MemberRoute>
+            <PersonalRoute>
               <MemberAiChatPage />
-            </MemberRoute>
+            </PersonalRoute>
           }
         />
 
