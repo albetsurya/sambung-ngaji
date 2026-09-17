@@ -821,7 +821,7 @@ export default function AttendancePage() {
             onCreateNew={() => openCreateForm("picker")}
             onCreateBulk={() => {
               closeSheet();
-              navigate("/lainnya/bulk-meeting");
+              navigate("/lainnya/jadwal");
             }}
           />
         )}

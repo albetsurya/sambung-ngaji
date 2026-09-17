@@ -20,11 +20,10 @@ const UsersPage = lazy(() => import("./pages/UsersPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const AiChatPage = lazy(() => import("./pages/AiChatPage"));
-const BulkMeetingPage = lazy(() => import("./pages/BulkMeetingPage"));
 const AnnouncementTemplatesPage = lazy(
   () => import("./pages/AnnouncementTemplatesPage"),
 );
-
+const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
   () => import("./pages/MemberEditProfilePage"),
@@ -122,7 +121,11 @@ function AppRoutes() {
             <Route path="users" element={<UsersPage />} />
             <Route path="pengaturan" element={<SettingsPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
-            <Route path="bulk-meeting" element={<BulkMeetingPage />} />
+            <Route path="jadwal" element={<JadwalPage />} />
+            <Route
+              path="bulk-meeting"
+              element={<Navigate to="/lainnya/jadwal" replace />}
+            />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />

@@ -107,11 +107,11 @@ export default function OthersPage() {
       show: isSuperAdmin,
     },
     {
-      key: "bulk-meeting",
-      label: "Buat Jadwal Massal",
-      description: "Buat jadwal sekaligus untuk sebulan",
+      key: "jadwal",
+      label: "Kelola Jadwal",
+      description: "Kalender, bulk create, import PDF",
       Icon: Calendar,
-      to: "/lainnya/bulk-meeting",
+      to: "/lainnya/jadwal",
       show: isAdminLike || role === "TIM_ABSENSI",
     },
     {
