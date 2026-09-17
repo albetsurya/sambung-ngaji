@@ -13,6 +13,8 @@ import {
   HelpCircle,
   Shield,
   Home,
+  Compass,
+  Star,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -68,6 +70,33 @@ const IBADAH_MENU: MenuItem[] = [
     label: "Dzikir",
     Icon: RefreshCw,
     to: "/member/dzikir",
+  },
+  {
+    key: "kiblat",
+    label: "Arah Kiblat",
+    Icon: Compass,
+    to: "/member/kiblat",
+  },
+  {
+    key: "mood",
+    label: "Tenangkan Hati",
+    Icon: Heart,
+    disabled: true,
+    badge: "Soon",
+  },
+  {
+    key: "puasa",
+    label: "Puasa Sunnah",
+    Icon: Calendar,
+    disabled: true,
+    badge: "Soon",
+  },
+  {
+    key: "doa-harian",
+    label: "Doa Harian",
+    Icon: Star,
+    disabled: true,
+    badge: "Soon",
   },
 ];
 

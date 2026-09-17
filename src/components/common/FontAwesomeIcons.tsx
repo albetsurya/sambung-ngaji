@@ -72,6 +72,8 @@ import {
   faAlignLeft,
   faFont,
   faBookOpen,
+  faCompass,
+  faLocationArrow,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -186,3 +188,7 @@ export const AlignLeft = createIcon(faAlignLeft);
 export const Type = createIcon(faFont);
 
 export const BookOpen = createIcon(faBookOpen);
+
+export const Compass = createIcon(faCompass);
+
+export const Navigation = createIcon(faLocationArrow);
