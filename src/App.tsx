@@ -28,6 +28,7 @@ const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
 const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
 const MemberDoaPage = lazy(() => import("./pages/MemberDoaPage"));
 const MemberDzikirPage = lazy(() => import("./pages/MemberDzikirPage"));
+const MemberQuranPage = lazy(() => import("./pages/MemberQuranPage"));
 const MemberDzikirCounterPage = lazy(
   () => import("./pages/MemberDzikirCounterPage"),
 );
@@ -98,6 +99,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberDoaPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/quran"
+          element={
+            <PersonalRoute>
+              <MemberQuranPage />
             </PersonalRoute>
           }
         />

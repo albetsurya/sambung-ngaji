@@ -63,6 +63,7 @@ import {
   faTableCells,
   faList,
   faStar,
+  faBookmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -159,3 +160,5 @@ export const LayoutGrid = createIcon(faTableCells);
 export const List = createIcon(faList);
 
 export const Star = createIcon(faStar);
+
+export const Bookmark = createIcon(faBookmark);

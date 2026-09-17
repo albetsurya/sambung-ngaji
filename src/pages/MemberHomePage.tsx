@@ -61,8 +61,7 @@ const IBADAH_MENU: MenuItem[] = [
     key: "quran",
     label: "Al-Quran",
     Icon: ScrollText,
-    disabled: true,
-    badge: "Soon",
+    to: "/member/quran",
   },
   {
     key: "dzikir",
