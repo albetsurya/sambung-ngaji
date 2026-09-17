@@ -31,6 +31,9 @@ const MemberDzikirPage = lazy(() => import("./pages/MemberDzikirPage"));
 const MemberQuranPage = lazy(() => import("./pages/MemberQuranPage"));
 const MemberKiblatPage = lazy(() => import("./pages/MemberKiblatPage"));
 const MemberMoodPage = lazy(() => import("./pages/MemberMoodPage"));
+const MemberSholatJournalPage = lazy(
+  () => import("./pages/MemberSholatJournalPage"),
+);
 const MemberQuranSurahPage = lazy(
   () => import("./pages/MemberQuranSurahPage"),
 );
@@ -115,6 +118,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberKiblatPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/sholat-jurnal"
+          element={
+            <PersonalRoute>
+              <MemberSholatJournalPage />
             </PersonalRoute>
           }
         />

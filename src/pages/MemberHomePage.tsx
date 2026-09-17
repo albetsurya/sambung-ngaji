@@ -84,11 +84,10 @@ const IBADAH_MENU: MenuItem[] = [
     to: "/member/mood",
   },
   {
-    key: "puasa",
-    label: "Puasa Sunnah",
-    Icon: Calendar,
-    disabled: true,
-    badge: "Soon",
+    key: "sholat-jurnal",
+    label: "Jurnal Sholat",
+    Icon: CalendarCheck,
+    to: "/member/sholat-jurnal",
   },
   {
     key: "doa-harian",
