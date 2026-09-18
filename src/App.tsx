@@ -43,6 +43,9 @@ const MemberTahfidzSurahPage = lazy(
 const MemberQuranSurahPage = lazy(
   () => import("./pages/MemberQuranSurahPage"),
 );
+const MemberQuranBookmarkPage = lazy(
+  () => import("./pages/MemberQuranBookmarkPage"),
+);
 const MemberQuranMushafPage = lazy(
   () => import("./pages/MemberQuranMushafPage"),
 );
@@ -175,6 +178,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberQuranMushafPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/quran/bookmark"
+          element={
+            <PersonalRoute>
+              <MemberQuranBookmarkPage />
             </PersonalRoute>
           }
         />
