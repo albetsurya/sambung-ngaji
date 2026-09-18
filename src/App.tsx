@@ -302,10 +302,6 @@ function AppRoutes() {
             <Route path="pengaturan" element={<SettingsPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
             <Route path="jadwal" element={<JadwalPage />} />
-            <Route
-              path="bulk-meeting"
-              element={<Navigate to="/lainnya/jadwal" replace />}
-            />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />
