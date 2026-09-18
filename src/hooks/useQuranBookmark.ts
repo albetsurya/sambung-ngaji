@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { scopedKey, migrateKey } from "../lib/scopedStorage";
 
-const LAST_READ_KEY = "quran-last-read";
-const BOOKMARK_KEY = "quran-bookmarks";
+const LAST_READ_BASE = "quran-last-read";
+const BOOKMARK_BASE = "quran-bookmarks";
 
 export interface LastRead {
   surahNomor: number;
@@ -18,11 +20,11 @@ export interface BookmarkEntry {
   timestamp: number;
 }
 
-/* ---------- Last Read ---------- */
+/* ---------- Load / Save ---------- */
 
-function loadLastRead(): LastRead | null {
+function loadLastRead(key: string): LastRead | null {
   try {
-    const raw = localStorage.getItem(LAST_READ_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (
@@ -37,20 +39,18 @@ function loadLastRead(): LastRead | null {
   }
 }
 
-function persistLastRead(v: LastRead | null) {
+function persistLastRead(key: string, v: LastRead | null) {
   try {
-    if (v === null) localStorage.removeItem(LAST_READ_KEY);
-    else localStorage.setItem(LAST_READ_KEY, JSON.stringify(v));
+    if (v === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(v));
   } catch {
     // ignore
   }
 }
 
-/* ---------- Bookmarks ---------- */
-
-function loadBookmarks(): BookmarkEntry[] {
+function loadBookmarks(key: string): BookmarkEntry[] {
   try {
-    const raw = localStorage.getItem(BOOKMARK_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -66,9 +66,9 @@ function loadBookmarks(): BookmarkEntry[] {
   }
 }
 
-function persistBookmarks(list: BookmarkEntry[]) {
+function persistBookmarks(key: string, list: BookmarkEntry[]) {
   try {
-    localStorage.setItem(BOOKMARK_KEY, JSON.stringify(list));
+    localStorage.setItem(key, JSON.stringify(list));
   } catch {
     // ignore
   }
@@ -77,31 +77,51 @@ function persistBookmarks(list: BookmarkEntry[]) {
 /* ---------- Hook ---------- */
 
 export function useQuranBookmark() {
+  const { user } = useAuth();
+  const userId = user?.user_id ?? null;
+
+  const lastReadKey = scopedKey(LAST_READ_BASE, userId);
+  const bookmarkKey = scopedKey(BOOKMARK_BASE, userId);
+
   const [lastRead, setLastReadState] = useState<LastRead | null>(() =>
-    loadLastRead(),
+    loadLastRead(lastReadKey),
   );
   const [bookmarks, setBookmarks] = useState<BookmarkEntry[]>(() =>
-    loadBookmarks(),
+    loadBookmarks(bookmarkKey),
   );
 
+  // Reload saat user berubah + migrasi key lama
+  useEffect(() => {
+    if (userId) {
+      migrateKey(LAST_READ_BASE, lastReadKey);
+      migrateKey(BOOKMARK_BASE, bookmarkKey);
+    }
+    setLastReadState(loadLastRead(lastReadKey));
+    setBookmarks(loadBookmarks(bookmarkKey));
+  }, [lastReadKey, bookmarkKey, userId]);
+
+  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
-      if (e.key === LAST_READ_KEY) setLastReadState(loadLastRead());
-      if (e.key === BOOKMARK_KEY) setBookmarks(loadBookmarks());
+      if (e.key === lastReadKey) setLastReadState(loadLastRead(lastReadKey));
+      if (e.key === bookmarkKey) setBookmarks(loadBookmarks(bookmarkKey));
     }
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
-  }, []);
+  }, [lastReadKey, bookmarkKey]);
 
-  const setLastRead = useCallback((v: LastRead) => {
-    setLastReadState(v);
-    persistLastRead(v);
-  }, []);
+  const setLastRead = useCallback(
+    (v: LastRead) => {
+      setLastReadState(v);
+      persistLastRead(lastReadKey, v);
+    },
+    [lastReadKey],
+  );
 
   const clearLastRead = useCallback(() => {
     setLastReadState(null);
-    persistLastRead(null);
-  }, []);
+    persistLastRead(lastReadKey, null);
+  }, [lastReadKey]);
 
   const isBookmarked = useCallback(
     (surahNomor: number, ayatNomor: number) =>
@@ -111,31 +131,34 @@ export function useQuranBookmark() {
     [bookmarks],
   );
 
-  const toggleBookmark = useCallback((entry: BookmarkEntry) => {
-    setBookmarks((prev) => {
-      const exists = prev.some(
-        (b) =>
-          b.surahNomor === entry.surahNomor &&
-          b.ayatNomor === entry.ayatNomor,
-      );
-      const next = exists
-        ? prev.filter(
-            (b) =>
-              !(
-                b.surahNomor === entry.surahNomor &&
-                b.ayatNomor === entry.ayatNomor
-              ),
-          )
-        : [entry, ...prev];
-      persistBookmarks(next);
-      return next;
-    });
-  }, []);
+  const toggleBookmark = useCallback(
+    (entry: BookmarkEntry) => {
+      setBookmarks((prev) => {
+        const exists = prev.some(
+          (b) =>
+            b.surahNomor === entry.surahNomor &&
+            b.ayatNomor === entry.ayatNomor,
+        );
+        const next = exists
+          ? prev.filter(
+              (b) =>
+                !(
+                  b.surahNomor === entry.surahNomor &&
+                  b.ayatNomor === entry.ayatNomor
+                ),
+            )
+          : [entry, ...prev];
+        persistBookmarks(bookmarkKey, next);
+        return next;
+      });
+    },
+    [bookmarkKey],
+  );
 
   const clearBookmarks = useCallback(() => {
     setBookmarks([]);
-    persistBookmarks([]);
-  }, []);
+    persistBookmarks(bookmarkKey, []);
+  }, [bookmarkKey]);
 
   return {
     lastRead,

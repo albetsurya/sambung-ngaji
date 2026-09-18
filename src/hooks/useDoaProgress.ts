@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { scopedKey } from "../lib/scopedStorage";
 import type { DoaWaktu } from "../data/doa";
 
-const STORAGE_PREFIX = "doa-read";
+const BASE_PREFIX = "doa-read";
 
 function todayIso(): string {
   const d = new Date();
@@ -11,13 +13,14 @@ function todayIso(): string {
   return y + "-" + m + "-" + day;
 }
 
-function storageKey(waktu: DoaWaktu): string {
-  return STORAGE_PREFIX + "-" + waktu + "-" + todayIso();
+function buildKey(waktu: DoaWaktu, userId: string | null): string {
+  const base = BASE_PREFIX + "-" + waktu + "-" + todayIso();
+  return scopedKey(base, userId);
 }
 
-function load(waktu: DoaWaktu): Set<string> {
+function load(key: string): Set<string> {
   try {
-    const raw = localStorage.getItem(storageKey(waktu));
+    const raw = localStorage.getItem(key);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
@@ -27,21 +30,25 @@ function load(waktu: DoaWaktu): Set<string> {
   }
 }
 
-function save(waktu: DoaWaktu, ids: Set<string>) {
+function save(key: string, ids: Set<string>) {
   try {
-    localStorage.setItem(storageKey(waktu), JSON.stringify([...ids]));
+    localStorage.setItem(key, JSON.stringify([...ids]));
   } catch {
-    // ignore quota errors
+    // ignore
   }
 }
 
 export function useDoaProgress(waktu: DoaWaktu, total: number) {
-  const [readIds, setReadIds] = useState<Set<string>>(() => load(waktu));
+  const { user } = useAuth();
+  const userId = user?.user_id ?? null;
+  const storageKey = buildKey(waktu, userId);
 
-  // Reset state kalau waktu berganti (pagi <-> sore)
+  const [readIds, setReadIds] = useState<Set<string>>(() => load(storageKey));
+
+  // Reload saat user / waktu berubah
   useEffect(() => {
-    setReadIds(load(waktu));
-  }, [waktu]);
+    setReadIds(load(storageKey));
+  }, [storageKey]);
 
   const toggle = useCallback(
     (id: string) => {
@@ -49,18 +56,18 @@ export function useDoaProgress(waktu: DoaWaktu, total: number) {
         const next = new Set(prev);
         if (next.has(id)) next.delete(id);
         else next.add(id);
-        save(waktu, next);
+        save(storageKey, next);
         return next;
       });
     },
-    [waktu],
+    [storageKey],
   );
 
   const reset = useCallback(() => {
     const empty = new Set<string>();
     setReadIds(empty);
-    save(waktu, empty);
-  }, [waktu]);
+    save(storageKey, empty);
+  }, [storageKey]);
 
   const count = readIds.size;
   const percentage = total > 0 ? Math.round((count / total) * 100) : 0;

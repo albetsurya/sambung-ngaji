@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { scopedKey, migrateKey } from "../lib/scopedStorage";
 
-const STORAGE_KEY = "doa-favorites";
+const BASE_KEY = "doa-favorites";
 
-function load(): Set<string> {
+function load(key: string): Set<string> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return new Set();
@@ -14,35 +16,52 @@ function load(): Set<string> {
   }
 }
 
-function persist(ids: Set<string>) {
+function persist(key: string, ids: Set<string>) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+    localStorage.setItem(key, JSON.stringify([...ids]));
   } catch {
     // ignore
   }
 }
 
 export function useDoaFavorites() {
-  const [favorites, setFavorites] = useState<Set<string>>(() => load());
+  const { user } = useAuth();
+  const userId = user?.user_id ?? null;
+  const storageKey = scopedKey(BASE_KEY, userId);
+
+  const [favorites, setFavorites] = useState<Set<string>>(() =>
+    load(storageKey),
+  );
+
+  // Reload saat user berubah + migrasi key lama (kalau ada)
+  useEffect(() => {
+    if (userId) {
+      migrateKey(BASE_KEY, storageKey);
+    }
+    setFavorites(load(storageKey));
+  }, [storageKey, userId]);
 
   // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
-      if (e.key === STORAGE_KEY) setFavorites(load());
+      if (e.key === storageKey) setFavorites(load(storageKey));
     }
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
-  }, []);
+  }, [storageKey]);
 
-  const toggle = useCallback((id: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      persist(next);
-      return next;
-    });
-  }, []);
+  const toggle = useCallback(
+    (id: string) => {
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        persist(storageKey, next);
+        return next;
+      });
+    },
+    [storageKey],
+  );
 
   const isFavorite = useCallback(
     (id: string) => favorites.has(id),
@@ -51,8 +70,8 @@ export function useDoaFavorites() {
 
   const reset = useCallback(() => {
     setFavorites(new Set());
-    persist(new Set());
-  }, []);
+    persist(storageKey, new Set());
+  }, [storageKey]);
 
   return { favorites, isFavorite, toggle, reset, count: favorites.size };
 }
