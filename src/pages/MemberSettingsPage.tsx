@@ -12,6 +12,7 @@ import {
   LogOut,
   ChevronRight,
   Pencil,
+  Download,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -22,6 +23,7 @@ import {
   ChevronRow,
   ChangePasswordSheet,
   ChangeUsernameSheet,
+  BackupDataSheet,
 } from "../components/common";
 import {
   ThemePickerRow,
@@ -41,6 +43,7 @@ export default function MemberSettingsPage() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
@@ -187,6 +190,30 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
+        {/* Data */}
+        <section>
+          <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
+            Data
+          </p>
+          <GroupedList>
+            <ListRow
+              onClick={() => setBackupOpen(true)}
+              insetDivider={false}
+              leading={
+                <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                  <Download size={16} />
+                </span>
+              }
+            >
+              <ChevronRow>
+                <p className="text-ios-body font-medium text-surface-text truncate">
+                  Backup Data
+                </p>
+              </ChevronRow>
+            </ListRow>
+          </GroupedList>
+        </section>
+
         {/* Info */}
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
@@ -276,6 +303,10 @@ export default function MemberSettingsPage() {
       <ThemePickerSheet
         open={themePickerOpen}
         onClose={() => setThemePickerOpen(false)}
+      />
+      <BackupDataSheet
+        open={backupOpen}
+        onClose={() => setBackupOpen(false)}
       />
       <AboutAppModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
       <ConfirmDialog
