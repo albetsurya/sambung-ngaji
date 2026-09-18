@@ -10,9 +10,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   Search,
+  X,
   Plus,
   Check,
-  X,
   Thermometer,
   CircleAlert,
   ChevronDown,
@@ -1172,102 +1172,237 @@ function MeetingPickerContent({
   onCreateNew: () => void;
   onCreateBulk: () => void;
 }) {
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  const today = getTodayIso();
+
+  /* --------------------------- Filter & Group --------------------------- */
+
+  const filtered = useMemo(() => {
+    if (!deferredSearch.trim()) return meetings;
+    const q = deferredSearch.toLowerCase().trim();
+    return meetings.filter((m) => {
+      const hay =
+        (m.acara || "").toLowerCase() +
+        " " +
+        (m.hari || "").toLowerCase() +
+        " " +
+        (m.tanggal || "") +
+        " " +
+        (m.jam || "").toLowerCase();
+      return hay.includes(q);
+    });
+  }, [meetings, deferredSearch]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, Meeting[]>();
+    for (const m of filtered) {
+      const monthKey = m.tanggal.slice(0, 7); // YYYY-MM
+      const list = map.get(monthKey) ?? [];
+      list.push(m);
+      map.set(monthKey, list);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => b[0].localeCompare(a[0])) // descending (terbaru dulu)
+      .map(([monthKey, items]) => ({
+        monthKey,
+        label: formatMonthLabel(monthKey),
+        items: [...items].sort((a, b) =>
+          b.tanggal.localeCompare(a.tanggal),
+        ),
+      }));
+  }, [filtered]);
+
+  const hasSearch = search.trim().length > 0;
+
   return (
     <>
-      <div className="space-y-2">
-        {meetings.map((m) => {
-          const active = m.meeting_id === selectedId;
-          const targets = normalizeTargets(m.kategori_target);
-          return (
-            <div
-              key={m.meeting_id}
-              className={`w-full rounded-2xl border p-3.5 flex items-center gap-3 transition-all ${
-                active
-                  ? "border-accent bg-accent-soft"
-                  : "border-surface-border bg-surface-card hover:bg-surface-card2"
-              }`}
+      {/* Search bar */}
+      {meetings.length > 0 && (
+        <div className="relative mb-3">
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari acara, tanggal, atau jam..."
+            className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+          />
+          {hasSearch && (
+            <button
+              onClick={() => setSearch("")}
+              aria-label="Hapus pencarian"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2"
             >
-              <button
-                onClick={() => onSelect(m)}
-                className="flex items-center gap-3 flex-1 min-w-0 text-left active:scale-[0.99] transition-transform"
-              >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Empty search */}
+      {meetings.length > 0 && filtered.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-6 text-center mb-3">
+          <p className="text-ios-body font-medium text-surface-text mb-1">
+            Tidak ditemukan
+          </p>
+          <p className="text-ios-footnote text-surface-muted">
+            Coba kata kunci lain
+          </p>
+        </div>
+      )}
+
+      {/* Grouped compact list */}
+      {grouped.map(({ monthKey, label, items }) => (
+        <section key={monthKey} className="mb-4">
+          {/* Sticky month header */}
+          <div className="sticky top-0 z-10 -mx-4 px-4 py-2 bg-surface-bg/95 backdrop-blur-sm border-b border-surface-border/60">
+            <div className="flex items-center justify-between">
+              <p className="text-ios-footnote font-semibold text-surface-text">
+                {label}
+              </p>
+              <span className="text-ios-caption text-surface-muted tabular-nums">
+                {items.length} jadwal
+              </span>
+            </div>
+          </div>
+
+          {/* Rows */}
+          <div className="mt-2 rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+            {items.map((m, i) => {
+              const active = m.meeting_id === selectedId;
+              const isToday = m.tanggal === today;
+              const targets = normalizeTargets(m.kategori_target);
+
+              return (
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    active
-                      ? "bg-accent text-white"
-                      : "bg-surface-card2 text-surface-muted"
+                  key={m.meeting_id}
+                  className={`flex items-center gap-2 px-3 ${
+                    i !== items.length - 1
+                      ? "border-b border-surface-border"
+                      : ""
+                  } ${active ? "bg-accent-soft/60" : ""} ${
+                    isToday && !active ? "bg-success-soft/20" : ""
                   }`}
                 >
-                  <Calendar size={18} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-ios-body font-medium text-surface-text truncate">
-                    {m.hari} — {m.acara || "Pengajian"}
-                  </p>
-                  <p className="text-ios-footnote text-surface-muted truncate">
-                    {formatDateLongText(m.tanggal)} · {m.jam || "—"}
-                  </p>
-                  {targets.length > 0 && (
-                    <div className="flex items-center gap-1 mt-1 flex-wrap">
-                      {targets.map((k) => (
-                        <span
-                          key={k}
-                          className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
-                        >
-                          {CATEGORY_LABEL[k]}
-                        </span>
-                      ))}
+                  <button
+                    onClick={() => onSelect(m)}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left py-2.5 active:scale-[0.995] transition-transform"
+                  >
+                    {/* Date badge — compact */}
+                    <div
+                      className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${
+                        active
+                          ? "bg-accent text-white"
+                          : isToday
+                            ? "bg-success text-white"
+                            : "bg-surface-card2 text-surface-muted"
+                      }`}
+                    >
+                      <span className="text-[8px] font-semibold uppercase tracking-wide leading-none">
+                        {m.hari.slice(0, 3)}
+                      </span>
+                      <span className="text-[13px] font-bold leading-none mt-0.5 tabular-nums">
+                        {parseInt(m.tanggal.slice(8, 10), 10)}
+                      </span>
                     </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <p
+                          className={`text-ios-footnote font-medium truncate ${
+                            active ? "text-accent" : "text-surface-text"
+                          }`}
+                        >
+                          {m.acara || "Pengajian"}
+                        </p>
+                        {isToday && !active && (
+                          <span className="text-[8px] font-bold tracking-wide text-success bg-success-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
+                            Hari ini
+                          </span>
+                        )}
+                        {active && (
+                          <Check
+                            size={12}
+                            className="text-accent flex-shrink-0"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </div>
+                      <p className="text-ios-caption text-surface-muted truncate">
+                        {m.jam || "—"}
+                        {targets.length > 0 &&
+                          " · " +
+                            targets
+                              .slice(0, 2)
+                              .map((k) => CATEGORY_LABEL[k])
+                              .join(", ")}
+                        {targets.length > 2 && " +" + (targets.length - 2)}
+                      </p>
+                    </div>
+                  </button>
+
+                  {canCreate && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRequestAction(m);
+                      }}
+                      aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
+                      title="Aksi jadwal"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
+                    >
+                      <MoreVertical size={16} strokeWidth={2.2} />
+                    </button>
                   )}
                 </div>
-                {active && (
-                  <Check size={18} className="text-accent flex-shrink-0" />
-                )}
-              </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
 
-              {canCreate && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRequestAction(m);
-                  }}
-                  aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
-                  title="Aksi jadwal"
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
-                >
-                  <MoreVertical size={16} strokeWidth={2.2} />
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
+      {/* Create buttons — sticky di bawah */}
       {canCreate && (
-        <>
-          {/* Tambah 1 jadwal (existing) */}
+        <div className="pt-2 space-y-2">
           <button
             onClick={onCreateNew}
-            className="mt-3 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-surface-border text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
+            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-surface-border text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
           >
-            <Plus size={16} /> Buat jadwal baru
+            <Plus size={14} /> Buat 1 jadwal
           </button>
 
-          {/* Tambah massal (BARU) */}
           <button
             onClick={onCreateBulk}
-            className="mt-2 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
+            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
           >
-            <Calendar size={16} /> Buat jadwal massal
+            <Calendar size={14} /> Buat jadwal massal
           </button>
-        </>
+        </div>
       )}
     </>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                  Sheet Content: CREATE PICKER                              */
+/*                              Helpers                                       */
+/* -------------------------------------------------------------------------- */
+
+function formatMonthLabel(monthKey: string): string {
+  // monthKey: "2026-09"
+  const [y, m] = monthKey.split("-").map(Number);
+  const BULAN = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+  ];
+  if (!y || !m || m < 1 || m > 12) return monthKey;
+  return BULAN[m - 1] + " " + y;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                      Sheet Content: ACTION VIEW                            */
 /* -------------------------------------------------------------------------- */
 
 function CreatePickerContent({
@@ -1285,7 +1420,6 @@ function CreatePickerContent({
         </p>
       </div>
 
-      {/* Buat 1 jadwal */}
       <button
         onClick={onSingle}
         className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
@@ -1304,7 +1438,6 @@ function CreatePickerContent({
         <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
       </button>
 
-      {/* Buat massal */}
       <button
         onClick={onBulk}
         className="w-full text-left rounded-2xl border border-accent/25 bg-accent-soft p-4 flex items-center gap-3 transition-all hover:bg-accent-soft/80 active:scale-[0.99]"
@@ -1325,10 +1458,6 @@ function CreatePickerContent({
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                      Sheet Content: ACTION VIEW                            */
-/* -------------------------------------------------------------------------- */
 
 function MeetingActionContent({
   meeting,

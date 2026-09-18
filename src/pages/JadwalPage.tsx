@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Calendar,
@@ -47,7 +47,11 @@ function TabFallback() {
 
 export default function JadwalPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<TabKey>("kalender");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const initialTab: TabKey =
+    tabParam === "bulk" || tabParam === "import" ? tabParam : "kalender";
+  const [tab, setTab] = useState<TabKey>(initialTab);
 
   return (
     <AppLayout hideNav>
