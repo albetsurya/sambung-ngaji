@@ -8,6 +8,7 @@ import {
   RefreshCw,
   LogOut,
   User,
+  Home,
 } from "../common/FontAwesomeIcons";
 import { Avatar, BottomSheet } from "../common";
 import { useAuth } from "../../contexts/AuthContext";
@@ -161,6 +162,20 @@ export function ProfileMenuSheet({
           onClick={handleSync}
           disabled={syncing}
         />
+
+        {/* Mode jamaah — hanya kalau user punya member_id */}
+        {user?.member_id && user.role !== "MEMBER" && (
+          <MenuButton
+            icon={<Home size={18} strokeWidth={2.2} />}
+            iconBg="bg-accent-soft text-accent"
+            label="Tampilan sebagai Jamaah"
+            description="Masuk mode personal"
+            onClick={() => {
+              onClose();
+              navigate("/member");
+            }}
+          />
+        )}
 
         {extraItems.map((item) => (
           <MenuButton

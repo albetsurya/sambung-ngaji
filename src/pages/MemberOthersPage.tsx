@@ -20,6 +20,7 @@ import {
   Sun,
   Moon,
   User,
+  Home,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -217,6 +218,18 @@ export default function MemberOthersPage() {
       group: "akun",
     },
   ];
+
+  // Menu kembali ke admin — hanya untuk non-MEMBER yang punya member_id
+  if (user?.role && user.role !== "MEMBER") {
+    MENU.push({
+      key: "back-admin",
+      label: "Kembali ke Admin",
+      description: "Keluar dari mode jamaah",
+      Icon: Home,
+      to: "/",
+      group: "akun",
+    });
+  }
 
   function handleMenuClick(item: MenuItem) {
     if (item.to) {
