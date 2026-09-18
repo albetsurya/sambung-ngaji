@@ -34,6 +34,9 @@ const MemberMoodPage = lazy(() => import("./pages/MemberMoodPage"));
 const MemberSholatJournalPage = lazy(
   () => import("./pages/MemberSholatJournalPage"),
 );
+const MemberPuasaPage = lazy(
+  () => import("./pages/MemberPuasaPage"),
+);
 const MemberTahfidzPage = lazy(
   () => import("./pages/MemberTahfidzPage"),
 );
@@ -146,6 +149,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberTahfidzSurahPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/puasa"
+          element={
+            <PersonalRoute>
+              <MemberPuasaPage />
             </PersonalRoute>
           }
         />
