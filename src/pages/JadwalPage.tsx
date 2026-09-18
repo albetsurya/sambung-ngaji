@@ -1,14 +1,32 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Calendar,
   Plus,
   ScrollText,
+  Loader2,
 } from "../components/common/FontAwesomeIcons";
-import { CalendarTab } from "../components/jadwal/CalendarTab";
-import { BulkCreateTab } from "../components/jadwal/BulkCreateTab";
-import { ImportPdfTab } from "../components/jadwal/ImportPdfTab";
+
+/* -------------------------------------------------------------------------- */
+/*                              Lazy Tabs                                     */
+/* -------------------------------------------------------------------------- */
+
+const CalendarTab = lazy(() =>
+  import("../components/jadwal/CalendarTab").then((m) => ({
+    default: m.CalendarTab,
+  })),
+);
+const BulkCreateTab = lazy(() =>
+  import("../components/jadwal/BulkCreateTab").then((m) => ({
+    default: m.BulkCreateTab,
+  })),
+);
+const ImportPdfTab = lazy(() =>
+  import("../components/jadwal/ImportPdfTab").then((m) => ({
+    default: m.ImportPdfTab,
+  })),
+);
 
 const TABS = [
   { key: "kalender", label: "Kalender", Icon: Calendar },
@@ -17,6 +35,15 @@ const TABS = [
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
+
+function TabFallback() {
+  return (
+    <div className="py-12 flex flex-col items-center gap-3">
+      <Loader2 size={20} className="animate-spin text-surface-muted" />
+      <p className="text-ios-footnote text-surface-muted">Memuat...</p>
+    </div>
+  );
+}
 
 export default function JadwalPage() {
   const navigate = useNavigate();
@@ -57,12 +84,14 @@ export default function JadwalPage() {
         </div>
       </div>
 
-      {/* Tab content */}
-      <div key={tab}>
-        {tab === "kalender" && <CalendarTab />}
-        {tab === "bulk" && <BulkCreateTab />}
-        {tab === "import" && <ImportPdfTab />}
-      </div>
+      {/* Tab content — lazy */}
+      <Suspense fallback={<TabFallback />}>
+        <div key={tab}>
+          {tab === "kalender" && <CalendarTab />}
+          {tab === "bulk" && <BulkCreateTab />}
+          {tab === "import" && <ImportPdfTab />}
+        </div>
+      </Suspense>
     </AppLayout>
   );
 }

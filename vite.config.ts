@@ -14,7 +14,6 @@ export default defineConfig({
         "favicon-dev.svg",
         "favicon-staging.svg",
         "apple-touch-icon-180x180.png",
-        "apple-touch-icon-180x180.png",
         "favicon-dev-180x180.png",
         "favicon-staging-180x180.png",
         "pwa-192x192.png",
@@ -34,6 +33,8 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        // Increase max file size to cache (pdf chunk 483KB)
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {
         enabled: true,
@@ -44,5 +45,54 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (!id.includes("node_modules")) return;
+
+          // React core
+          if (
+            id.includes("/react/") ||
+            id.includes("/react-dom/") ||
+            id.includes("/react-router") ||
+            id.includes("/scheduler/")
+          ) {
+            return "vendor-react";
+          }
+
+          // TanStack Query + persister
+          if (
+            id.includes("/@tanstack/react-query") ||
+            id.includes("/@tanstack/query-") ||
+            id.includes("/idb-keyval/")
+          ) {
+            return "vendor-query";
+          }
+
+          // FullCalendar (biggest vendor)
+          if (id.includes("/@fullcalendar/")) {
+            return "vendor-calendar";
+          }
+
+          // FontAwesome icons
+          if (
+            id.includes("/@fortawesome/") ||
+            id.includes("/fontawesome-")
+          ) {
+            return "vendor-icons";
+          }
+
+          // PDF.js
+          if (id.includes("/pdfjs-dist/")) {
+            return "vendor-pdf";
+          }
+
+          // Others
+          return "vendor";
+        },
+      },
+    },
   },
 });

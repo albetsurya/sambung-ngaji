@@ -23,7 +23,6 @@ import type { Member } from "../types";
 import { normalizePhoneNumber, formatDateShort } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
-import imageCompression from "browser-image-compression";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function MemberEditProfilePage() {
@@ -75,6 +74,9 @@ export default function MemberEditProfilePage() {
     setCompressing(true);
 
     try {
+      const { default: imageCompression } = await import(
+        "browser-image-compression"
+      );
       const compressed = await imageCompression(file, {
         maxSizeMB: 0.3,
         maxWidthOrHeight: 1000,

@@ -22,7 +22,6 @@ import {
 } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
-import imageCompression from "browser-image-compression";
 import { DateInput } from "../components/common/DateInput";
 
 /* -------------------------------------------------------------------------- */
@@ -106,6 +105,9 @@ export default function MemberFormPage() {
     setCompressing(true);
 
     try {
+      const { default: imageCompression } = await import(
+        "browser-image-compression"
+      );
       const compressed = await imageCompression(file, {
         maxSizeMB: 0.3,
         maxWidthOrHeight: 1000,
