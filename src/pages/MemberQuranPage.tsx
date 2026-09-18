@@ -63,7 +63,7 @@ export default function MemberQuranPage() {
   const hasSearch = search.trim().length > 0;
 
   return (
-    <AppLayout hideNav showAiChat={false}>
+    <AppLayout showAiChat={false}>
       <Header
         title="Al-Quran"
         subtitle="114 surah"

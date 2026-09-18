@@ -70,7 +70,7 @@ export default function MemberPrayerPage() {
   }
 
   return (
-    <AppLayout hideNav showAiChat={false}>
+    <AppLayout showAiChat={false}>
       <Header
         title="Waktu Sholat"
         subtitle={LATUKAN_LABEL}

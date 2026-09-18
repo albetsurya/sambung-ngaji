@@ -198,7 +198,7 @@ export default function MemberHomePage() {
 
   return (
     <AppLayout
-      hideNav
+      showAiChat={false}
       fab={
         <FloatingActionGroup>
           <FloatingActionButton

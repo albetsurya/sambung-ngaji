@@ -119,7 +119,7 @@ export default function MemberSelfPage() {
 
   return (
     <AppLayout
-      hideNav
+      showAiChat={false}
       fab={
         <FloatingActionGroup>
           {isMember && (

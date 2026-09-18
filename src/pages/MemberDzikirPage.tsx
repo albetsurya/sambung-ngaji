@@ -12,7 +12,7 @@ export default function MemberDzikirPage() {
   const adaProgress = totalDzikir > 0;
 
   return (
-    <AppLayout hideNav showAiChat={false}>
+    <AppLayout showAiChat={false}>
       <Header
         title="Dzikir"
         subtitle="Tasbih digital"
