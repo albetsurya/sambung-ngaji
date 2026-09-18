@@ -37,6 +37,9 @@ const MemberSholatJournalPage = lazy(
 const MemberTahfidzPage = lazy(
   () => import("./pages/MemberTahfidzPage"),
 );
+const MemberTahfidzSurahPage = lazy(
+  () => import("./pages/MemberTahfidzSurahPage"),
+);
 const MemberQuranSurahPage = lazy(
   () => import("./pages/MemberQuranSurahPage"),
 );
@@ -129,6 +132,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberTahfidzPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/tahfidz/surah/:nomor"
+          element={
+            <PersonalRoute>
+              <MemberTahfidzSurahPage />
             </PersonalRoute>
           }
         />
