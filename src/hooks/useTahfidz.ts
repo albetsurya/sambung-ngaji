@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { scopedKey, migrateKey } from "../lib/scopedStorage";
 import {
   TAHFIDZ_TARGETS,
   ayatKey,
@@ -6,7 +8,7 @@ import {
   type TahfidzTarget,
 } from "../data/tahfidz";
 
-const STORAGE_KEY = "tahfidz-v1";
+const BASE_KEY = "tahfidz-v1";
 
 /* -------------------------------------------------------------------------- */
 /*                              Types                                         */
@@ -14,20 +16,19 @@ const STORAGE_KEY = "tahfidz-v1";
 
 export interface AyatState {
   hafal: boolean;
-  hafalSince?: number;   // timestamp ketika ditandai hafal
-  lastReview?: number;   // timestamp terakhir di-review
+  hafalSince?: number;
+  lastReview?: number;
 }
 
-/** Key: "surah:ayat" → state */
 export type TahfidzData = Record<string, AyatState>;
 
 /* -------------------------------------------------------------------------- */
 /*                              Persist                                       */
 /* -------------------------------------------------------------------------- */
 
-function load(): TahfidzData {
+function load(key: string): TahfidzData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return {};
@@ -37,9 +38,9 @@ function load(): TahfidzData {
   }
 }
 
-function persist(data: TahfidzData) {
+function persist(key: string, data: TahfidzData) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(key, JSON.stringify(data));
   } catch {
     // ignore
   }
@@ -51,9 +52,9 @@ function persist(data: TahfidzData) {
 
 export interface SurahProgress {
   target: TahfidzTarget;
-  total: number;      // jumlah ayat target
-  hafal: number;      // jumlah ayat yang sudah hafal
-  percentage: number; // 0-100
+  total: number;
+  hafal: number;
+  percentage: number;
   complete: boolean;
 }
 
@@ -104,7 +105,6 @@ export function getOverallStats(data: TahfidzData) {
   };
 }
 
-/** Ambil N ayat yang hafal tapi paling lama tidak di-review */
 export function getReviewQueue(
   data: TahfidzData,
   limit: number = 5,
@@ -122,7 +122,6 @@ export function getReviewQueue(
     const [s, a] = key.split(":").map(Number);
     if (!Number.isInteger(s) || !Number.isInteger(a)) continue;
 
-    // Score: makin lama tidak di-review makin tinggi
     const last = state.lastReview ?? state.hafalSince ?? 0;
     const ageDays = (Date.now() - last) / (1000 * 60 * 60 * 24);
 
@@ -143,15 +142,28 @@ export function getReviewQueue(
 /* -------------------------------------------------------------------------- */
 
 export function useTahfidz() {
-  const [data, setData] = useState<TahfidzData>(() => load());
+  const { user } = useAuth();
+  const userId = user?.user_id ?? null;
+  const storageKey = scopedKey(BASE_KEY, userId);
 
+  const [data, setData] = useState<TahfidzData>(() => load(storageKey));
+
+  // Reload saat user berubah + migrasi key lama
+  useEffect(() => {
+    if (userId) {
+      migrateKey(BASE_KEY, storageKey);
+    }
+    setData(load(storageKey));
+  }, [storageKey, userId]);
+
+  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
-      if (e.key === STORAGE_KEY) setData(load());
+      if (e.key === storageKey) setData(load(storageKey));
     }
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
-  }, []);
+  }, [storageKey]);
 
   const isHafal = useCallback(
     (surah: number, ayat: number) => {
@@ -160,47 +172,52 @@ export function useTahfidz() {
     [data],
   );
 
-  const toggleHafal = useCallback((surah: number, ayat: number) => {
-    setData((prev) => {
-      const key = ayatKey(surah, ayat);
-      const existing = prev[key];
-      const next = { ...prev };
+  const toggleHafal = useCallback(
+    (surah: number, ayat: number) => {
+      setData((prev) => {
+        const key = ayatKey(surah, ayat);
+        const existing = prev[key];
+        const next = { ...prev };
 
-      if (existing?.hafal) {
-        delete next[key];
-      } else {
-        const now = Date.now();
-        next[key] = {
-          hafal: true,
-          hafalSince: existing?.hafalSince ?? now,
-          lastReview: now,
+        if (existing?.hafal) {
+          delete next[key];
+        } else {
+          const now = Date.now();
+          next[key] = {
+            hafal: true,
+            hafalSince: existing?.hafalSince ?? now,
+            lastReview: now,
+          };
+        }
+
+        persist(storageKey, next);
+        return next;
+      });
+    },
+    [storageKey],
+  );
+
+  const markReviewed = useCallback(
+    (surah: number, ayat: number) => {
+      setData((prev) => {
+        const key = ayatKey(surah, ayat);
+        const existing = prev[key];
+        if (!existing?.hafal) return prev;
+        const next = {
+          ...prev,
+          [key]: { ...existing, lastReview: Date.now() },
         };
-      }
-
-      persist(next);
-      return next;
-    });
-  }, []);
-
-  /** Tandai sudah di-review (update lastReview tanpa ubah hafal) */
-  const markReviewed = useCallback((surah: number, ayat: number) => {
-    setData((prev) => {
-      const key = ayatKey(surah, ayat);
-      const existing = prev[key];
-      if (!existing?.hafal) return prev;
-      const next = {
-        ...prev,
-        [key]: { ...existing, lastReview: Date.now() },
-      };
-      persist(next);
-      return next;
-    });
-  }, []);
+        persist(storageKey, next);
+        return next;
+      });
+    },
+    [storageKey],
+  );
 
   const reset = useCallback(() => {
     setData({});
-    persist({});
-  }, []);
+    persist(storageKey, {});
+  }, [storageKey]);
 
   const getState = useCallback(
     (surah: number, ayat: number): AyatState | undefined =>
