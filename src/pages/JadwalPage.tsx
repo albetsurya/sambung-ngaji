@@ -22,16 +22,16 @@ const BulkCreateTab = lazy(() =>
     default: m.BulkCreateTab,
   })),
 );
-const ImportPdfTab = lazy(() =>
-  import("../components/jadwal/ImportPdfTab").then((m) => ({
-    default: m.ImportPdfTab,
+const ImportTextTab = lazy(() =>
+  import("../components/jadwal/ImportTextTab").then((m) => ({
+    default: m.ImportTextTab,
   })),
 );
 
 const TABS = [
   { key: "kalender", label: "Kalender", Icon: Calendar },
   { key: "bulk", label: "Tambah Massal", Icon: Plus },
-  { key: "import", label: "Import PDF", Icon: ScrollText },
+  { key: "import", label: "Tempel Teks", Icon: ScrollText },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -93,7 +93,7 @@ export default function JadwalPage() {
         <div key={tab}>
           {tab === "kalender" && <CalendarTab />}
           {tab === "bulk" && <BulkCreateTab />}
-          {tab === "import" && <ImportPdfTab />}
+          {tab === "import" && <ImportTextTab />}
         </div>
       </Suspense>
     </AppLayout>

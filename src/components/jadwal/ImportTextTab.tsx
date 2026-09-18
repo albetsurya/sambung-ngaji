@@ -5,58 +5,54 @@ import { MEMBER_CATEGORIES } from "../../constants";
 import { CATEGORY_LABEL } from "../../utils/format";
 import { queryKeys } from "../../lib/queryClient";
 import { useToast } from "../../contexts/ToastContext";
-import { Button, BottomSheet, Input, Card } from "../common";
+import { Button, BottomSheet, Input, Card, Textarea } from "../common";
 import { DateInput } from "../common/DateInput";
 import { ApiError } from "../../services/api";
 import {
-  parseMeetingsFromPdf,
+  parseMeetingsFromText,
+  autoNumberText,
   type ParsedMeetingDraft,
 } from "../../lib/parseDaftarHadir";
 import {
-  FileWarning,
   Pencil,
   Trash2,
   Check,
   RefreshCw,
   Calendar,
   AlertTriangle,
+  ScrollText,
+  List,
 } from "../common/FontAwesomeIcons";
 import { formatDateShort } from "../../utils/format";
 import { GenderTargetPicker } from "./GenderTargetPicker";
 import type { GenderTarget } from "./GenderTargetPicker";
 
 /* -------------------------------------------------------------------------- */
-/*                              PDF Extract                                    */
-/* -------------------------------------------------------------------------- */
-
-async function extractPdfItems(file: File): Promise<any[]> {
-  const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
-
-  const buffer = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: buffer }).promise;
-
-  const allItems: any[] = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    allItems.push(...content.items);
-  }
-  return allItems;
-}
-
-/* -------------------------------------------------------------------------- */
 /*                              Main Component                                 */
 /* -------------------------------------------------------------------------- */
 
-type Phase = "upload" | "parsing" | "preview";
+const MAX_CHARS = 100_000;
 
-export function ImportPdfTab() {
+const EXAMPLE_TEXT = `1. Pengajian Rutin Bapak-bapak
+Hari/Tanggal: Senin, 14 September 2026
+Jam: 08:30 WIB - Selesai
+Tempat: Masjid Al-Ikhlas
+Peserta: Bapak-bapak
+
+2. Pengajian Muslimah
+Hari/Tanggal: Rabu, 16 September 2026
+Jam: 13:00 WIB - Selesai
+Tempat: Aula Pondok
+Peserta: Ibu-ibu`;
+
+type Phase = "input" | "preview";
+
+export function ImportTextTab() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
-  const [phase, setPhase] = useState<Phase>("upload");
-  const [fileName, setFileName] = useState("");
+  const [phase, setPhase] = useState<Phase>("input");
+  const [rawText, setRawText] = useState("");
   const [drafts, setDrafts] = useState<ParsedMeetingDraft[]>([]);
   const [editing, setEditing] = useState<ParsedMeetingDraft | null>(null);
 
@@ -114,48 +110,32 @@ export function ImportPdfTab() {
   });
 
   function resetAll() {
-    setPhase("upload");
-    setFileName("");
+    setPhase("input");
+    setRawText("");
     setDrafts([]);
     setEditing(null);
   }
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== "application/pdf") {
-      showToast("File harus PDF", "error");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      showToast("Ukuran PDF maksimum 10 MB", "error");
+  function handleAnalyze() {
+    const text = rawText.trim();
+    if (!text) {
+      showToast("Teks masih kosong", "error");
       return;
     }
 
-    setFileName(file.name);
-    setPhase("parsing");
+    const parsed = parseMeetingsFromText(text);
 
-    try {
-      const items = await extractPdfItems(file);
-      const parsed = parseMeetingsFromPdf(items);
-
-      if (parsed.length === 0) {
-        showToast(
-          "Tidak ada jadwal terdeteksi. Cek apakah PDF punya text layer.",
-          "error",
-        );
-        setPhase("upload");
-        return;
-      }
-
-      setDrafts(parsed);
-      setPhase("preview");
-      showToast(`${parsed.length} jadwal terdeteksi`);
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Gagal baca PDF", "error");
-      setPhase("upload");
+    if (parsed.length === 0) {
+      showToast(
+        'Tidak ada jadwal terdeteksi. Awali tiap jadwal dengan nomor, mis. "1. Judul Acara".',
+        "error",
+      );
+      return;
     }
+
+    setDrafts(parsed);
+    setPhase("preview");
+    showToast(`${parsed.length} jadwal terdeteksi`);
   }
 
   function removeDraft(id: string) {
@@ -168,65 +148,82 @@ export function ImportPdfTab() {
   }
 
   const validDrafts = drafts.filter((d) => d.tanggal && d.acara.trim());
+  const lineCount = rawText.split(/\r?\n/).filter((l) => l.trim()).length;
 
   return (
     <div className="px-4 py-4 space-y-4">
-      {phase === "upload" && (
+      {phase === "input" && (
         <>
           <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5">
             <p className="text-ios-footnote text-accent/90 leading-relaxed">
-              Upload PDF agenda rapat. Setiap point akan jadi 1 jadwal. Tempat &
-              peserta otomatis masuk ke catatan.
+              Tempel teks agenda pengajian (dari PDF, Word, atau WhatsApp).
+              Setiap point bernomor akan jadi 1 jadwal. Tempat & peserta
+              otomatis masuk ke catatan.
             </p>
           </div>
 
-          <label className="block cursor-pointer">
-            <input
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <div className="rounded-2xl border-2 border-dashed border-surface-border bg-surface-card hover:bg-surface-card2 transition-colors p-8 text-center active:scale-[0.99]">
-              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-accent-soft flex items-center justify-center">
-                <FileWarning size={26} className="text-accent" />
-              </div>
-              <p className="text-ios-body font-medium text-surface-text mb-1">
-                Pilih file PDF
-              </p>
-              <p className="text-ios-caption text-surface-muted">
-                Maks. 10 MB · PDF dengan text layer
-              </p>
-            </div>
-          </label>
+          <Textarea
+            label="Teks Jadwal"
+            value={rawText}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+              const v = e.target.value;
+              if (v.length > MAX_CHARS) {
+                showToast(`Teks maksimum ${MAX_CHARS.toLocaleString()} karakter`, "error");
+                return;
+              }
+              setRawText(v);
+            }}
+            rows={12}
+            className="min-h-[260px] font-mono text-[14px]"
+            placeholder={EXAMPLE_TEXT}
+          />
+
+          <div className="flex items-center justify-between px-1">
+            <span className="text-ios-caption text-surface-muted">
+              {lineCount} baris
+            </span>
+            <span className="text-ios-caption text-surface-muted tabular-nums">
+              {rawText.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+            </span>
+          </div>
 
           <div className="flex items-start gap-2 p-3 rounded-xl bg-surface-card2 border border-surface-border">
+            <ScrollText size={14} className="text-surface-muted flex-shrink-0 mt-0.5" />
             <p className="text-ios-caption text-surface-muted leading-relaxed">
-              <strong className="text-surface-text">Catatan:</strong> PDF hasil
-              scan gambar tidak bisa dibaca. Gunakan PDF digital hasil export
-              Word/Docs.
+              <strong className="text-surface-text">Format:</strong> tiap jadwal
+              diawali nomor, mis. <em>1. Judul Acara</em>. Baris berikutnya bisa
+              berisi <em>Hari/Tanggal</em>, <em>Jam</em>, <em>Tempat</em>, dan{" "}
+              <em>Peserta</em>.
             </p>
           </div>
-        </>
-      )}
 
-      {phase === "parsing" && (
-        <div className="rounded-2xl bg-surface-card border border-surface-border p-8 text-center">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full border-2 border-accent border-t-transparent animate-spin" />
-          <p className="text-ios-body font-medium text-surface-text mb-1">
-            Menganalisis PDF…
-          </p>
-          <p className="text-ios-caption text-surface-muted truncate">
-            {fileName}
-          </p>
-        </div>
+          <div className="flex gap-2">
+            <Button
+              fullWidth
+              variant="ghost"
+              onClick={() => {
+                const numbered = autoNumberText(rawText);
+                setRawText(numbered);
+                const count = (numbered.match(/^\d{1,2}[\.\)]\s/gm) || []).length;
+                showToast(`${count} jadwal diberi nomor otomatis`);
+              }}
+              disabled={!rawText.trim()}
+            >
+              <List size={14} />
+              Tambah Nomor Otomatis
+            </Button>
+            <Button fullWidth onClick={handleAnalyze} disabled={!rawText.trim()}>
+              Analisis Teks
+            </Button>
+          </div>
+        </>
       )}
 
       {phase === "preview" && (
         <>
           <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-card2 border border-surface-border">
             <p className="text-ios-caption text-surface-muted truncate flex-1">
-              📄 {fileName}
+              📝 Teks tempel · {lineCount} baris
             </p>
             <button
               onClick={resetAll}
@@ -269,7 +266,7 @@ export function ImportPdfTab() {
                 onClick={resetAll}
                 className="mt-2 text-ios-footnote font-medium text-accent hover:opacity-80"
               >
-                Upload ulang
+                Tempel teks lagi
               </button>
             </div>
           )}
