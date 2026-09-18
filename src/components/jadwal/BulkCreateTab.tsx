@@ -9,7 +9,15 @@ import {
 } from "../../services/domainApi";
 import { queryKeys } from "../../lib/queryClient";
 import { ApiError } from "../../services/api";
-import { Badge, Button, Card, ConfirmDialog, Input, Select } from "../common";
+import {
+  Badge,
+  BottomSheet,
+  Button,
+  Card,
+  ConfirmDialog,
+  Input,
+  Select,
+} from "../common";
 import { MEMBER_CATEGORIES } from "../../constants";
 import { CATEGORY_LABEL } from "../../utils/format";
 import { AlertTriangle, Check } from "../common/FontAwesomeIcons";
@@ -58,6 +66,7 @@ export function BulkCreateTab() {
   const [preview, setPreview] = useState<BulkMeetingPreviewResponse | null>(
     null,
   );
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const { data: groups = [] } = useQuery({
@@ -79,7 +88,10 @@ export function BulkCreateTab() {
         catatan,
         kategori_target: kategoriTarget,
       }),
-    onSuccess: (data) => setPreview(data),
+    onSuccess: (data) => {
+      setPreview(data);
+      setPreviewOpen(true);
+    },
     onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal preview",
@@ -103,6 +115,8 @@ export function BulkCreateTab() {
       }),
     onSuccess: (data) => {
       setShowConfirm(false);
+      setPreviewOpen(false);
+      setPreview(null);
       showToast(`${data.created} jadwal berhasil dibuat`);
       queryClient.invalidateQueries({ queryKey: queryKeys.meetings() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
@@ -128,12 +142,18 @@ export function BulkCreateTab() {
     );
   }
 
+  function handlePreviewClose() {
+    // Reset preview — user close berarti mau edit form
+    setPreviewOpen(false);
+    setPreview(null);
+  }
+
   const canPreview =
     hari.length > 0 && !!groupId && !!acara.trim() && !!jam.trim();
   const canSubmit = preview !== null && preview.total_new > 0;
 
   return (
-    <div className="px-4 py-4 space-y-4">
+    <div className="px-4 py-4 space-y-4 pb-8">
       {/* Info banner */}
       <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
@@ -267,72 +287,96 @@ export function BulkCreateTab() {
         {previewMutation.isPending ? "Memuat preview..." : "Preview Jadwal"}
       </Button>
 
-      {/* Preview result */}
-      {preview && (
-        <Card>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-ios-body font-semibold text-surface-text">
-              Hasil Preview
-            </p>
-            <Badge>{preview.total_new} baru</Badge>
-          </div>
-
-          <div className="space-y-2 mb-3">
-            <Row label="Total tanggal" value={preview.total_dates} />
-            <Row label="Akan dibuat" value={preview.total_new} highlight />
-            <Row
-              label="Sudah ada (skip)"
-              value={preview.total_existing}
-              danger={preview.total_existing > 0}
-            />
-          </div>
-
-          {preview.total_existing > 0 && (
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-warning-soft border border-warning/20 mb-3">
-              <AlertTriangle
-                size={16}
-                className="text-warning flex-shrink-0 mt-0.5"
-              />
-              <p className="text-ios-caption text-warning leading-relaxed">
-                {preview.total_existing} tanggal sudah ada dan akan di-skip
-                otomatis.
+      {/* Preview BottomSheet */}
+      <BottomSheet
+        open={previewOpen}
+        onClose={handlePreviewClose}
+        title="Hasil Preview"
+      >
+        {preview && (
+          <>
+            {/* Summary */}
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-ios-caption text-surface-muted">
+                Ringkasan
               </p>
+              <Badge>{preview.total_new} baru</Badge>
             </div>
-          )}
 
-          <p className="text-ios-caption text-surface-muted mb-2">
-            Daftar tanggal:
-          </p>
-          <div className="max-h-64 overflow-y-auto space-y-1 mb-4">
-            {preview.meetings.map((m, i) => (
-              <div
-                key={i}
-                className={`flex items-center justify-between p-2 rounded-lg text-ios-footnote ${
-                  m.sudah_ada
-                    ? "bg-surface-card2 text-surface-muted line-through"
-                    : "bg-accent-soft text-accent"
-                }`}
-              >
-                <span>
-                  {m.hari}, {m.tanggal_display}
-                </span>
-                {m.sudah_ada && (
-                  <span className="text-ios-caption">sudah ada</span>
-                )}
+            <div className="rounded-2xl border border-surface-border bg-surface-card p-4 mb-4 space-y-2">
+              <Row label="Total tanggal" value={preview.total_dates} />
+              <Row
+                label="Akan dibuat"
+                value={preview.total_new}
+                highlight
+              />
+              <Row
+                label="Sudah ada (skip)"
+                value={preview.total_existing}
+                danger={preview.total_existing > 0}
+              />
+            </div>
+
+            {preview.total_existing > 0 && (
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-warning-soft border border-warning/20 mb-4">
+                <AlertTriangle
+                  size={16}
+                  className="text-warning flex-shrink-0 mt-0.5"
+                />
+                <p className="text-ios-caption text-warning leading-relaxed">
+                  {preview.total_existing} tanggal sudah ada dan akan di-skip
+                  otomatis.
+                </p>
               </div>
-            ))}
-          </div>
+            )}
 
-          <Button
-            fullWidth
-            onClick={() => setShowConfirm(true)}
-            disabled={!canSubmit || createMutation.isPending}
-          >
-            <Check size={16} className="mr-1.5" />
-            Buat {preview.total_new} Jadwal
-          </Button>
-        </Card>
-      )}
+            {/* List tanggal — scroll internal */}
+            <p className="text-ios-caption text-surface-muted mb-2">
+              Daftar tanggal:
+            </p>
+            <div className="rounded-xl border border-surface-border bg-surface-card overflow-hidden mb-4">
+              <div className="max-h-[280px] overflow-y-auto divide-y divide-surface-border">
+                {preview.meetings.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between px-3 py-2.5 text-ios-footnote ${
+                      m.sudah_ada
+                        ? "bg-surface-card2/40 text-surface-muted line-through"
+                        : "text-surface-text"
+                    }`}
+                  >
+                    <span className="truncate">
+                      {m.hari}, {m.tanggal_display}
+                    </span>
+                    {m.sudah_ada && (
+                      <span className="text-ios-caption text-surface-muted flex-shrink-0 ml-2">
+                        sudah ada
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <Button variant="secondary" fullWidth onClick={handlePreviewClose}>
+                Revisi Form
+              </Button>
+              <Button
+                fullWidth
+                onClick={() => setShowConfirm(true)}
+                disabled={!canSubmit || createMutation.isPending}
+              >
+                <Check size={16} className="mr-1.5" />
+                Buat {preview.total_new} Jadwal
+              </Button>
+            </div>
+          </>
+        )}
+      </BottomSheet>
+
+      {/* Confirm Dialog — muncul di atas sheet */}
       <ConfirmDialog
         open={showConfirm}
         title="Konfirmasi Tambah Massal"
@@ -349,6 +393,10 @@ export function BulkCreateTab() {
     </div>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              Row                                            */
+/* -------------------------------------------------------------------------- */
 
 function Row({
   label,
