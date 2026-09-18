@@ -116,6 +116,7 @@ interface AttendancePageData {
 type SheetState =
   | { view: "closed" }
   | { view: "picker" }
+  | { view: "create-picker" }
   | { view: "action"; meeting: Meeting }
   | { view: "form"; mode: "create"; from: "picker" | "fab" }
   | { view: "form"; mode: "edit"; meeting: Meeting };
@@ -513,7 +514,9 @@ export default function AttendancePage() {
   }
 
   function handleSheetClose() {
-    if (sheet.view === "picker") {
+    if (sheet.view === "create-picker") {
+      closeSheet();
+    } else if (sheet.view === "picker") {
       closeSheet();
     } else if (sheet.view === "action") {
       setSheet({ view: "picker" });
@@ -587,6 +590,7 @@ export default function AttendancePage() {
   }
 
   const sheetTitle = (() => {
+    if (sheet.view === "create-picker") return "Buat Jadwal";
     if (sheet.view === "picker") return "Pilih Jadwal Pengajian";
     if (sheet.view === "action") return "Aksi Jadwal";
     if (sheet.view === "form") {
@@ -603,7 +607,7 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => openCreateForm("fab")} />
+          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} />
         ) : undefined
       }
     >
@@ -676,16 +680,22 @@ export default function AttendancePage() {
                 </div>
               </div>
             ) : (
-              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
-                <p className="text-ios-subhead text-surface-muted">
+              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-5 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-3">
+                  <Calendar size={22} className="text-accent" />
+                </div>
+                <p className="text-ios-body font-medium text-surface-text mb-1">
                   Belum ada jadwal pengajian
+                </p>
+                <p className="text-ios-caption text-surface-muted mb-4 max-w-xs mx-auto leading-relaxed">
+                  Buat jadwal pertama untuk mulai mencatat absensi
                 </p>
                 {canCreate && (
                   <button
-                    onClick={() => openCreateForm("picker")}
-                    className="mt-2 inline-flex items-center gap-1 text-ios-subhead font-medium text-accent transition-colors hover:text-accent-dark"
+                    onClick={() => setSheet({ view: "create-picker" })}
+                    className="min-h-[44px] px-6 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all hover:bg-accent-dark active:scale-[0.97] inline-flex items-center justify-center gap-1.5"
                   >
-                    <Plus size={14} /> Buat jadwal pengajian
+                    <Plus size={14} /> Buat Jadwal Pertama
                   </button>
                 )}
               </div>
@@ -827,6 +837,15 @@ export default function AttendancePage() {
         onClose={handleSheetClose}
         title={sheetTitle}
       >
+        {sheet.view === "create-picker" && (
+          <CreatePickerContent
+            onSingle={() => openCreateForm("fab")}
+            onBulk={() => {
+              closeSheet();
+              navigate("/lainnya/jadwal?tab=bulk");
+            }}
+          />
+        )}
         {sheet.view === "picker" && (
           <MeetingPickerContent
             meetings={meetings}
@@ -1244,6 +1263,66 @@ function MeetingPickerContent({
         </>
       )}
     </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                  Sheet Content: CREATE PICKER                              */
+/* -------------------------------------------------------------------------- */
+
+function CreatePickerContent({
+  onSingle,
+  onBulk,
+}: {
+  onSingle: () => void;
+  onBulk: () => void;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5 mb-3">
+        <p className="text-ios-footnote text-accent/90 leading-relaxed">
+          Pilih cara membuat jadwal pengajian.
+        </p>
+      </div>
+
+      {/* Buat 1 jadwal */}
+      <button
+        onClick={onSingle}
+        className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Plus size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-surface-text">
+            Buat 1 Jadwal
+          </p>
+          <p className="text-ios-caption text-surface-muted">
+            Untuk pengajian tunggal — isi tanggal & acara
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
+      </button>
+
+      {/* Buat massal */}
+      <button
+        onClick={onBulk}
+        className="w-full text-left rounded-2xl border border-accent/25 bg-accent-soft p-4 flex items-center gap-3 transition-all hover:bg-accent-soft/80 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Calendar size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-accent">
+            Buat Massal
+          </p>
+          <p className="text-ios-caption text-accent/80">
+            1 bulan sekaligus — pilih bulan & hari rutin
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
+      </button>
+    </div>
   );
 }
 
