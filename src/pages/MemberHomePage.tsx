@@ -15,6 +15,7 @@ import {
   Home,
   Compass,
   Star,
+  BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -95,6 +96,12 @@ const IBADAH_MENU: MenuItem[] = [
     Icon: Star,
     disabled: true,
     badge: "Soon",
+  },
+  {
+    key: "tahfidz",
+    label: "Tahfidz",
+    Icon: BookOpen,
+    to: "/member/tahfidz",
   },
 ];
 
