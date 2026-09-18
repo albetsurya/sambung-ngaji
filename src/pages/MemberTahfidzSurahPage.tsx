@@ -381,7 +381,10 @@ export default function MemberTahfidzSurahPage() {
                 <button
                   onClick={() =>
                     navigate(
-                      "/member/tahfidz/surah/" + data.suratSebelumnya!.nomor,
+                      "/member/tahfidz/surah/" +
+                        (data.suratSebelumnya === false
+                          ? ""
+                          : data.suratSebelumnya.nomor),
                     )
                   }
                   className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-left"
@@ -407,7 +410,10 @@ export default function MemberTahfidzSurahPage() {
                 <button
                   onClick={() =>
                     navigate(
-                      "/member/tahfidz/surah/" + data.suratSelanjutnya!.nomor,
+                      "/member/tahfidz/surah/" +
+                        (data.suratSelanjutnya === false
+                          ? ""
+                          : data.suratSelanjutnya.nomor),
                     )
                   }
                   className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center justify-end gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-right"

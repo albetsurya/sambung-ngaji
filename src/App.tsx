@@ -50,6 +50,9 @@ const MemberDzikirCounterPage = lazy(
   () => import("./pages/MemberDzikirCounterPage"),
 );
 const MemberGuidePage = lazy(() => import("./pages/MemberGuidePage"));
+const MemberSettingsPage = lazy(
+  () => import("./pages/MemberSettingsPage"),
+);
 const MemberPrivacyPage = lazy(() => import("./pages/MemberPrivacyPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
@@ -212,6 +215,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberGuidePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/settings"
+          element={
+            <PersonalRoute>
+              <MemberSettingsPage />
             </PersonalRoute>
           }
         />

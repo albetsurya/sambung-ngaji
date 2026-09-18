@@ -16,6 +16,7 @@ import {
   Compass,
   Star,
   BookOpen,
+  Settings,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -154,6 +155,13 @@ const LAINNYA_MENU: MenuItem[] = [
     description: "Bagaimana data Anda dikelola",
     Icon: Shield,
     to: "/member/privasi",
+  },
+  {
+    key: "settings",
+    label: "Pengaturan",
+    description: "Akun, tampilan, & lainnya",
+    Icon: Settings,
+    to: "/member/settings",
   },
 ];
 
