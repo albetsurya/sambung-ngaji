@@ -21,6 +21,7 @@ import {
   ListRow,
   ChevronRow,
   ChangePasswordSheet,
+  ChangeUsernameSheet,
 } from "../components/common";
 import {
   ThemePickerRow,
@@ -38,6 +39,7 @@ export default function MemberSettingsPage() {
   const { isMember } = usePermission();
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
@@ -104,19 +106,20 @@ export default function MemberSettingsPage() {
               </ChevronRow>
             </ListRow>
 
-            <ListRow insetDivider={false} leading={
-              <span className="w-9 h-9 rounded-xl bg-surface-card2 flex items-center justify-center text-surface-muted shrink-0">
-                <Lock size={16} />
-              </span>
-            }>
-              <div className="flex items-center justify-between gap-2 w-full">
-                <p className="text-ios-body font-medium text-surface-muted truncate">
+            <ListRow
+              onClick={() => setChangeUsernameOpen(true)}
+              insetDivider={false}
+              leading={
+                <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                  <Lock size={16} />
+                </span>
+              }
+            >
+              <ChevronRow>
+                <p className="text-ios-body font-medium text-surface-text truncate">
                   Ganti Username
                 </p>
-                <span className="px-2 py-0.5 rounded-full bg-warning-soft text-warning text-[9px] font-bold uppercase tracking-wide shrink-0">
-                  Soon
-                </span>
-              </div>
+              </ChevronRow>
             </ListRow>
           </GroupedList>
         </section>
@@ -265,6 +268,10 @@ export default function MemberSettingsPage() {
       <ChangePasswordSheet
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}
+      />
+      <ChangeUsernameSheet
+        open={changeUsernameOpen}
+        onClose={() => setChangeUsernameOpen(false)}
       />
       <ThemePickerSheet
         open={themePickerOpen}

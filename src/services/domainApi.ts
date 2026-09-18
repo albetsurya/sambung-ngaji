@@ -209,6 +209,9 @@ export const userApi = {
   changePassword: (payload: { old_password: string; new_password: string }) =>
     call<{ changed: boolean }>("changeMyPassword", payload),
 
+  changeUsername: (payload: { password: string; new_username: string }) =>
+    call<{ changed: boolean; username: string }>("changeMyUsername", payload),
+
   resetPassword: (payload: { user_id: string; new_password: string }) =>
     call<{ reset: boolean; user_id: string }>("resetUserPassword", payload),
 };
