@@ -62,6 +62,19 @@ import {
   faPalette,
   faTableCells,
   faList,
+  faStar,
+  faBookmark,
+  faPlay,
+  faPause,
+  faBackwardStep,
+  faForwardStep,
+  faVolumeHigh,
+  faAlignLeft,
+  faFont,
+  faBookOpen,
+  faCompass,
+  faLocationArrow,
+  faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -156,3 +169,29 @@ export const Download = createIcon(faDownload);
 export const Palette = createIcon(faPalette);
 export const LayoutGrid = createIcon(faTableCells);
 export const List = createIcon(faList);
+
+export const Star = createIcon(faStar);
+
+export const Bookmark = createIcon(faBookmark);
+
+export const Play = createIcon(faPlay);
+
+export const Pause = createIcon(faPause);
+
+export const SkipBack = createIcon(faBackwardStep);
+
+export const SkipForward = createIcon(faForwardStep);
+
+export const Volume2 = createIcon(faVolumeHigh);
+
+export const AlignLeft = createIcon(faAlignLeft);
+
+export const Type = createIcon(faFont);
+
+export const BookOpen = createIcon(faBookOpen);
+
+export const Compass = createIcon(faCompass);
+
+export const Navigation = createIcon(faLocationArrow);
+
+export const Upload = createIcon(faUpload);

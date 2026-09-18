@@ -1,14 +1,6 @@
-import {
-  memo,
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Search,
@@ -17,6 +9,7 @@ import {
   Download,
   LayoutGrid,
   List,
+  Loader2,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -32,7 +25,7 @@ import {
   BottomSheet,
   Button,
 } from "../components/common";
-import { memberApi } from "../services/memberApi";
+import { memberApi, type MemberFilters } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
 import {
   CATEGORY_LABEL,
@@ -57,6 +50,8 @@ export type GridCols = 2 | 3 | 4;
 const VIEW_KEY = "members_view_mode";
 const COLS_KEY = "members_grid_cols";
 const DEFAULT_VIEW: ViewMode = "row";
+const PAGE_SIZE = 20;
+const FETCH_THRESHOLD_PX = 300;
 
 const ROW_HEIGHTS: Record<ViewMode, number> = {
   row: 64,
@@ -72,7 +67,6 @@ export default function MembersListPage() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const deferredSearch = useDeferredValue(debouncedSearch);
   const [jenisKelamin, setJenisKelamin] = useState("");
   const [view, setView] = useState<ViewMode>(() => {
     if (typeof window === "undefined") return DEFAULT_VIEW;
@@ -88,15 +82,9 @@ export default function MembersListPage() {
     return 2;
   });
   const [actionsOpen, setActionsOpen] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  /* ---------------------------------------------------------------------- */
-  /*  KATEGORI — URL sebagai single source of truth                          */
-  /* ---------------------------------------------------------------------- */
-
-  /** Baca kategori dari URL, validasi terhadap MEMBER_CATEGORIES. */
   const kategori: MemberCategory | "" = useMemo(() => {
     const fromUrl = searchParams.get("kategori") || "";
     return (MEMBER_CATEGORIES as readonly string[]).includes(fromUrl)
@@ -104,7 +92,6 @@ export default function MembersListPage() {
       : "";
   }, [searchParams]);
 
-  /** Set kategori + update URL. */
   const setKategori = useCallback(
     (k: MemberCategory | "") => {
       const next = new URLSearchParams(searchParams);
@@ -114,8 +101,6 @@ export default function MembersListPage() {
     },
     [searchParams, setSearchParams],
   );
-
-  /* ---------------------------------------------------------------------- */
 
   useEffect(() => {
     localStorage.setItem(VIEW_KEY, view);
@@ -130,39 +115,36 @@ export default function MembersListPage() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const {
-    data: allMembers = [],
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: queryKeys.members(),
-    queryFn: () =>
-      role === "TIM_PNKB"
-        ? memberApi.listPNKB({ limit: 9999 })
-        : memberApi.list({ limit: 9999 }),
+  const filters: MemberFilters = useMemo(() => {
+    const f: MemberFilters = { limit: PAGE_SIZE };
+    if (debouncedSearch) f.search = debouncedSearch;
+    if (kategori) f.kategori = kategori;
+    if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
+    return f;
+  }, [debouncedSearch, kategori, jenisKelamin]);
+
+  const isPNKB = role === "TIM_PNKB";
+
+  const query = useInfiniteQuery({
+    queryKey: queryKeys.membersPaged(filters),
+    queryFn: ({ pageParam }) => {
+      const params: MemberFilters = { ...filters, offset: pageParam };
+      return isPNKB
+        ? memberApi.listPNKBPaged(params)
+        : memberApi.listPaged(params);
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.has_more ? lastPage.offset + lastPage.limit : undefined,
     staleTime: 5 * 60_000,
   });
 
-  const members = useMemo(() => {
-    return allMembers.filter((m) => {
-      if (kategori && m.kategori !== kategori) return false;
-      if (jenisKelamin && m.jenis_kelamin !== jenisKelamin) return false;
-      if (deferredSearch) {
-        const q = deferredSearch.toLowerCase();
-        const namaMatch = m.nama_lengkap.toLowerCase().includes(q);
-        const panggilanMatch = (m.nama_panggilan || "")
-          .toLowerCase()
-          .includes(q);
-        if (!namaMatch && !panggilanMatch) return false;
-      }
-      return true;
-    });
-  }, [allMembers, kategori, jenisKelamin, deferredSearch]);
+  const allMembers: Member[] = useMemo(
+    () => query.data?.pages.flatMap((p) => p.items) ?? [],
+    [query.data],
+  );
 
-  const deferredMembers = useDeferredValue(members);
-
-  const totalCount = allMembers.length;
+  const total = query.data?.pages[0]?.total ?? 0;
 
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
@@ -180,31 +162,58 @@ export default function MembersListPage() {
         ? "grid-cols-3"
         : "grid-cols-2";
 
-  useEffect(() => {
-    if (allMembers.length === 0) {
-      setShowSkeleton(true);
-      return;
-    }
-    const t = setTimeout(() => setShowSkeleton(false), 120);
-    return () => clearTimeout(t);
-  }, [allMembers.length]);
-
-  const showInitialSkeleton = showSkeleton;
-
   const getScrollElement = useCallback(() => scrollRef.current, []);
   const estimateSize = useCallback(() => ROW_HEIGHTS[view], [view]);
 
   const virtualizer = useVirtualizer({
     count:
       view === "grid"
-        ? Math.ceil(deferredMembers.length / gridCols)
-        : deferredMembers.length,
+        ? Math.ceil(allMembers.length / gridCols)
+        : allMembers.length,
     getScrollElement,
     estimateSize,
     overscan: 6,
   });
 
   const virtualItems = virtualizer.getVirtualItems();
+
+  const listVisible = !query.isLoading && !query.error && allMembers.length > 0;
+
+  const maybeFetchNext = useCallback(() => {
+    if (!query.hasNextPage) return;
+    if (query.isFetchingNextPage) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const viewportHeight =
+      window.innerHeight || document.documentElement.clientHeight;
+    const distanceToViewportBottom = rect.bottom - viewportHeight;
+
+    if (distanceToViewportBottom > FETCH_THRESHOLD_PX) return;
+    query.fetchNextPage();
+  }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
+
+  useEffect(() => {
+    if (!listVisible) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => maybeFetchNext();
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [listVisible, maybeFetchNext]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [debouncedSearch, kategori, jenisKelamin]);
 
   const handlePress = useCallback(
     (id: string) => {
@@ -216,17 +225,17 @@ export default function MembersListPage() {
   const renderItem = useCallback(
     (index: number) => {
       if (view === "row") {
-        const m = deferredMembers[index];
+        const m = allMembers[index];
         if (!m) return null;
         return <JamaahRow member={m} onPress={handlePress} />;
       }
       if (view === "list") {
-        const m = deferredMembers[index];
+        const m = allMembers[index];
         if (!m) return null;
         return <JamaahCard member={m} onPress={handlePress} />;
       }
       const start = index * gridCols;
-      const rowMembers = deferredMembers.slice(start, start + gridCols);
+      const rowMembers = allMembers.slice(start, start + gridCols);
       return (
         <div className={`grid ${gridColsClass} gap-2`}>
           {rowMembers.map((m) => (
@@ -240,8 +249,14 @@ export default function MembersListPage() {
         </div>
       );
     },
-    [deferredMembers, view, gridCols, gridColsClass, handlePress],
+    [allMembers, view, gridCols, gridColsClass, handlePress],
   );
+
+  const showSkeleton = query.isLoading;
+  const showError =
+    !query.isLoading && !!query.error && allMembers.length === 0;
+  const showEmpty = !query.isLoading && !query.error && allMembers.length === 0;
+  const showList = listVisible;
 
   return (
     <AppLayout
@@ -254,9 +269,9 @@ export default function MembersListPage() {
       <Header
         title="Jamaah"
         subtitle={
-          showInitialSkeleton
+          query.isLoading
             ? "Memuat..."
-            : `${members.length} dari ${totalCount} jamaah`
+            : `${allMembers.length} dari ${total} jamaah`
         }
         showSyncButton
       />
@@ -320,7 +335,7 @@ export default function MembersListPage() {
       </div>
 
       <div className="flex flex-col flex-1 min-h-0">
-        {showInitialSkeleton && (
+        {showSkeleton && (
           <div className={view === "grid" ? "px-4 py-2" : "py-2"}>
             {view === "grid" ? (
               <JamaahGridSkeleton rows={gridCols * 2} cols={gridCols} />
@@ -332,21 +347,21 @@ export default function MembersListPage() {
           </div>
         )}
 
-        {!isLoading && error && allMembers.length === 0 && (
+        {showError && (
           <ErrorState
             message={
-              error instanceof ApiError
-                ? error.message
+              query.error instanceof ApiError
+                ? query.error.message
                 : "Gagal memuat daftar jamaah"
             }
-            onRetry={refetch}
+            onRetry={query.refetch}
           />
         )}
 
-        {!showInitialSkeleton && !error && members.length === 0 && (
+        {showEmpty && (
           <EmptyState
             title={
-              hasActiveSearch || kategori
+              hasActiveSearch || kategori || jenisKelamin
                 ? "Tidak ditemukan"
                 : "Belum ada jamaah"
             }
@@ -355,10 +370,14 @@ export default function MembersListPage() {
                 ? `Tidak ada jamaah dengan nama "${search}". Coba kata kunci lain.`
                 : kategori
                   ? `Tidak ada jamaah dengan kategori ${CATEGORY_LABEL[kategori]}.`
-                  : "Tambahkan jamaah pertama untuk memulai pembinaan."
+                  : jenisKelamin
+                    ? `Tidak ada jamaah dengan jenis kelamin ${
+                        jenisKelamin === "L" ? "laki-laki" : "perempuan"
+                      }.`
+                    : "Tambahkan jamaah pertama untuk memulai pembinaan."
             }
             action={
-              canCreate && !hasActiveSearch && !kategori ? (
+              canCreate && !hasActiveSearch && !kategori && !jenisKelamin ? (
                 <Button onClick={() => navigate("/jamaah/baru")}>
                   Tambah Jamaah
                 </Button>
@@ -367,7 +386,7 @@ export default function MembersListPage() {
           />
         )}
 
-        {!showSkeleton && members.length > 0 && (
+        {showList && (
           <div
             ref={scrollRef}
             className={`flex-1 overflow-auto py-2 ${
@@ -385,12 +404,11 @@ export default function MembersListPage() {
               }}
             >
               {virtualItems.map((virtualRow) => {
-                const isLast =
-                  virtualRow.index ===
-                  (view === "grid"
-                    ? Math.ceil(deferredMembers.length / gridCols)
-                    : deferredMembers.length) -
-                    1;
+                const totalVirtualRows =
+                  view === "grid"
+                    ? Math.ceil(allMembers.length / gridCols)
+                    : allMembers.length;
+                const isLast = virtualRow.index === totalVirtualRows - 1;
                 return (
                   <div
                     key={virtualRow.key}
@@ -415,9 +433,30 @@ export default function MembersListPage() {
               })}
             </div>
 
-            <p className="text-center text-ios-footnote text-surface-muted py-4">
-              Semua jamaah sudah ditampilkan ({members.length})
-            </p>
+            {query.hasNextPage && (
+              <div className="flex justify-center py-4">
+                <button
+                  onClick={() => query.fetchNextPage()}
+                  disabled={query.isFetchingNextPage}
+                  className="min-h-[40px] px-5 rounded-xl bg-accent text-white text-ios-subhead font-medium transition-all hover:bg-accent-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                >
+                  {query.isFetchingNextPage ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Memuat...
+                    </>
+                  ) : (
+                    `Muat lebih banyak (${allMembers.length}/${total})`
+                  )}
+                </button>
+              </div>
+            )}
+
+            {!query.hasNextPage && allMembers.length > 0 && (
+              <p className="text-center text-ios-footnote text-surface-muted py-4">
+                Semua jamaah sudah ditampilkan ({allMembers.length})
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -528,22 +567,17 @@ export default function MembersListPage() {
               onClick={async () => {
                 setActionsOpen(false);
 
-                if (members.length === 0) {
-                  showToast("Tidak ada data untuk di-export", "error");
-                  return;
-                }
-
                 try {
                   showToast("Menyiapkan data export...");
 
-                  const filters: Record<string, unknown> = {};
-                  if (kategori) filters.kategori = kategori;
-                  if (jenisKelamin) filters.jenis_kelamin = jenisKelamin;
+                  const exportFilters: MemberFilters = {};
+                  if (kategori) exportFilters.kategori = kategori;
+                  if (jenisKelamin) exportFilters.jenis_kelamin = jenisKelamin;
 
                   const exportData = await memberApi.listForExport(
-                    role === "TIM_PNKB"
-                      ? { ...filters, kategori: "PRA_NIKAH" }
-                      : filters,
+                    isPNKB
+                      ? { ...exportFilters, kategori: "PRA_NIKAH" }
+                      : exportFilters,
                   );
 
                   if (!exportData || exportData.length === 0) {
@@ -570,7 +604,7 @@ export default function MembersListPage() {
                   Export CSV
                 </p>
                 <p className="text-ios-footnote text-surface-muted">
-                  Unduh {members.length} jamaah yang sudah dimuat
+                  Unduh {total} jamaah
                 </p>
               </div>
             </button>
@@ -593,10 +627,6 @@ export default function MembersListPage() {
     </AppLayout>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                              Icons & Buttons                               */
-/* -------------------------------------------------------------------------- */
 
 function ViewButton({
   active,
@@ -669,10 +699,6 @@ function GridIcon({ cols }: { cols: GridCols }) {
     </svg>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/*                                List Items                                  */
-/* -------------------------------------------------------------------------- */
 
 const JamaahRow = memo(function JamaahRow({
   member,

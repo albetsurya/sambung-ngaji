@@ -15,6 +15,7 @@ import {
   QrCode,
   User,
   Calendar,
+  Home,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -56,6 +57,14 @@ export default function OthersPage() {
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
   const menu = [
+    {
+      key: "tampilan-jamaah",
+      label: "Tampilan Jamaah",
+      description: "Mode personal — waktu sholat, doa, data pribadi",
+      Icon: Home,
+      to: "/member",
+      show: !!user?.member_id,
+    },
     {
       key: "profil-saya",
       label: "Biodata Saya",
@@ -107,11 +116,11 @@ export default function OthersPage() {
       show: isSuperAdmin,
     },
     {
-      key: "bulk-meeting",
-      label: "Buat Jadwal Massal",
-      description: "Buat jadwal sekaligus untuk sebulan",
+      key: "jadwal",
+      label: "Kelola Jadwal",
+      description: "Kalender, tambah massal, import PDF",
       Icon: Calendar,
-      to: "/lainnya/bulk-meeting",
+      to: "/lainnya/jadwal",
       show: isAdminLike || role === "TIM_ABSENSI",
     },
     {

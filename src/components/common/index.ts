@@ -5,3 +5,5 @@ export * from "./States";
 export * from "./Overlays";
 export * from "./Skeleton";
 export * from "./ChangePasswordSheet";
+export * from "./BackupDataSheet";
+export * from "./ChangeUsernameSheet";

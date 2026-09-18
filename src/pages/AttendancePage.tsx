@@ -10,9 +10,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   Search,
+  X,
   Plus,
   Check,
-  X,
   Thermometer,
   CircleAlert,
   ChevronDown,
@@ -58,6 +58,11 @@ import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
+import {
+  GenderTargetPicker,
+  getGenderTarget,
+} from "../components/jadwal/GenderTargetPicker";
+import type { GenderTarget } from "../components/jadwal/GenderTargetPicker";
 
 /* -------------------------------------------------------------------------- */
 /*                              Types & State                                 */
@@ -111,6 +116,7 @@ interface AttendancePageData {
 type SheetState =
   | { view: "closed" }
   | { view: "picker" }
+  | { view: "create-picker" }
   | { view: "action"; meeting: Meeting }
   | { view: "form"; mode: "create"; from: "picker" | "fab" }
   | { view: "form"; mode: "edit"; meeting: Meeting };
@@ -195,10 +201,24 @@ export default function AttendancePage() {
   const attendanceReady = !selectedMeetingId || pageData !== undefined;
 
   const eligibleMembers = useMemo(() => {
+    let list = members;
+
     const targets = normalizeTargets(selectedMeeting?.kategori_target);
-    if (targets.length === 0) return members;
-    return members.filter((m) => m.kategori && targets.includes(m.kategori));
-  }, [members, selectedMeeting?.kategori_target]);
+    if (targets.length > 0) {
+      list = list.filter((m) => m.kategori && targets.includes(m.kategori));
+    }
+
+    const gt = getGenderTarget(selectedMeeting);
+    if (gt) {
+      list = list.filter((m) => m.jenis_kelamin === gt);
+    }
+
+    return list;
+  }, [
+    members,
+    selectedMeeting?.kategori_target,
+    selectedMeeting?.gender_target,
+  ]);
 
   const records = useMemo(() => {
     const base: Record<string, AttendanceStatus> = {};
@@ -348,6 +368,32 @@ export default function AttendancePage() {
   });
   /* ============================================================= */
 
+  // Bulk delete mutation — dipanggil dari MeetingPickerContent
+  const deleteBulkMutation = useMutation({
+    mutationFn: (ids: string[]) => meetingApi.removeBulk(ids),
+    onSuccess: (res) => {
+      showToast(res.deleted + " jadwal dihapus");
+      // Kalau meeting yang sedang dipilih ikut terhapus → reset
+      if (pinnedMeetingId && !meetings.find((m) => m.meeting_id === pinnedMeetingId)) {
+        setPinnedMeetingId(null);
+      }
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.meetings({ range: "recent" }),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal hapus jadwal",
+        "error",
+      );
+    },
+  });
+
+  async function handleDeleteBulk(ids: string[]): Promise<void> {
+    await deleteBulkMutation.mutateAsync(ids);
+  }
+
   /* -------------------------- Attendance Handlers ------------------------- */
 
   async function tapStatus(memberId: string, status: AttendanceStatus) {
@@ -494,7 +540,9 @@ export default function AttendancePage() {
   }
 
   function handleSheetClose() {
-    if (sheet.view === "picker") {
+    if (sheet.view === "create-picker") {
+      closeSheet();
+    } else if (sheet.view === "picker") {
       closeSheet();
     } else if (sheet.view === "action") {
       setSheet({ view: "picker" });
@@ -568,6 +616,7 @@ export default function AttendancePage() {
   }
 
   const sheetTitle = (() => {
+    if (sheet.view === "create-picker") return "Buat Jadwal";
     if (sheet.view === "picker") return "Pilih Jadwal Pengajian";
     if (sheet.view === "action") return "Aksi Jadwal";
     if (sheet.view === "form") {
@@ -584,7 +633,7 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => openCreateForm("fab")} />
+          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} />
         ) : undefined
       }
     >
@@ -657,16 +706,22 @@ export default function AttendancePage() {
                 </div>
               </div>
             ) : (
-              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-4 text-center">
-                <p className="text-ios-subhead text-surface-muted">
+              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-5 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-3">
+                  <Calendar size={22} className="text-accent" />
+                </div>
+                <p className="text-ios-body font-medium text-surface-text mb-1">
                   Belum ada jadwal pengajian
+                </p>
+                <p className="text-ios-caption text-surface-muted mb-4 max-w-xs mx-auto leading-relaxed">
+                  Buat jadwal pertama untuk mulai mencatat absensi
                 </p>
                 {canCreate && (
                   <button
-                    onClick={() => openCreateForm("picker")}
-                    className="mt-2 inline-flex items-center gap-1 text-ios-subhead font-medium text-accent transition-colors hover:text-accent-dark"
+                    onClick={() => setSheet({ view: "create-picker" })}
+                    className="min-h-[44px] px-6 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all hover:bg-accent-dark active:scale-[0.97] inline-flex items-center justify-center gap-1.5"
                   >
-                    <Plus size={14} /> Buat jadwal pengajian
+                    <Plus size={14} /> Buat Jadwal Pertama
                   </button>
                 )}
               </div>
@@ -808,6 +863,15 @@ export default function AttendancePage() {
         onClose={handleSheetClose}
         title={sheetTitle}
       >
+        {sheet.view === "create-picker" && (
+          <CreatePickerContent
+            onSingle={() => openCreateForm("fab")}
+            onBulk={() => {
+              closeSheet();
+              navigate("/lainnya/jadwal?tab=bulk");
+            }}
+          />
+        )}
         {sheet.view === "picker" && (
           <MeetingPickerContent
             meetings={meetings}
@@ -821,8 +885,9 @@ export default function AttendancePage() {
             onCreateNew={() => openCreateForm("picker")}
             onCreateBulk={() => {
               closeSheet();
-              navigate("/lainnya/bulk-meeting");
+              navigate("/lainnya/jadwal");
             }}
+            onDeleteBulk={handleDeleteBulk}
           />
         )}
         {sheet.view === "action" && (
@@ -1117,6 +1182,60 @@ function CategoryChip({
 /*                      Sheet Content: PICKER VIEW                            */
 /* -------------------------------------------------------------------------- */
 
+function CreatePickerContent({
+  onSingle,
+  onBulk,
+}: {
+  onSingle: () => void;
+  onBulk: () => void;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5 mb-3">
+        <p className="text-ios-footnote text-accent/90 leading-relaxed">
+          Pilih cara membuat jadwal pengajian.
+        </p>
+      </div>
+
+      <button
+        onClick={onSingle}
+        className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Plus size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-surface-text">
+            Buat 1 Jadwal
+          </p>
+          <p className="text-ios-caption text-surface-muted">
+            Untuk pengajian tunggal — isi tanggal & acara
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
+      </button>
+
+      <button
+        onClick={onBulk}
+        className="w-full text-left rounded-2xl border border-accent/25 bg-accent-soft p-4 flex items-center gap-3 transition-all hover:bg-accent-soft/80 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Calendar size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-accent">
+            Buat Massal
+          </p>
+          <p className="text-ios-caption text-accent/80">
+            1 bulan sekaligus — pilih bulan & hari rutin
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
+      </button>
+    </div>
+  );
+}
+
 function MeetingPickerContent({
   meetings,
   selectedId,
@@ -1125,6 +1244,7 @@ function MeetingPickerContent({
   onRequestAction,
   onCreateNew,
   onCreateBulk,
+  onDeleteBulk,
 }: {
   meetings: Meeting[];
   selectedId?: string;
@@ -1133,104 +1253,424 @@ function MeetingPickerContent({
   onRequestAction: (m: Meeting) => void;
   onCreateNew: () => void;
   onCreateBulk: () => void;
+  onDeleteBulk: (ids: string[]) => Promise<void>;
 }) {
+  const { showToast } = useToast();
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const today = getTodayIso();
+
+  /* --------------------------- Filter & Group --------------------------- */
+
+  const filtered = useMemo(() => {
+    if (!deferredSearch.trim()) return meetings;
+    const q = deferredSearch.toLowerCase().trim();
+    return meetings.filter((m) => {
+      const hay =
+        (m.acara || "").toLowerCase() +
+        " " +
+        (m.hari || "").toLowerCase() +
+        " " +
+        (m.tanggal || "") +
+        " " +
+        (m.jam || "").toLowerCase();
+      return hay.includes(q);
+    });
+  }, [meetings, deferredSearch]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, Meeting[]>();
+    for (const m of filtered) {
+      const monthKey = m.tanggal.slice(0, 7);
+      const list = map.get(monthKey) ?? [];
+      list.push(m);
+      map.set(monthKey, list);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([monthKey, items]) => ({
+        monthKey,
+        label: formatMonthLabel(monthKey),
+        items: [...items].sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
+      }));
+  }, [filtered]);
+
+  const hasSearch = search.trim().length > 0;
+  const totalVisible = filtered.length;
+  const allVisibleSelected =
+    totalVisible > 0 && filtered.every((m) => selectedIds.has(m.meeting_id));
+  const selectedCount = selectedIds.size;
+
+  /* --------------------------- Selection Actions --------------------------- */
+
+  function enterSelectionMode(initialId?: string) {
+    setSelectionMode(true);
+    if (initialId) {
+      setSelectedIds(new Set([initialId]));
+    } else {
+      setSelectedIds(new Set());
+    }
+  }
+
+  function exitSelectionMode() {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (allVisibleSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((m) => m.meeting_id)));
+    }
+  }
+
+  async function handleConfirmDelete() {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    setDeleting(true);
+    try {
+      await onDeleteBulk(ids);
+      setConfirmOpen(false);
+      exitSelectionMode();
+    } catch {
+      // toast sudah ditangani parent
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  const selectedMeetings = filtered.filter((m) =>
+    selectedIds.has(m.meeting_id),
+  );
+
   return (
     <>
-      <div className="space-y-2">
-        {meetings.map((m) => {
-          const active = m.meeting_id === selectedId;
-          const targets = normalizeTargets(m.kategori_target);
-          return (
-            <div
-              key={m.meeting_id}
-              className={`w-full rounded-2xl border p-3.5 flex items-center gap-3 transition-all ${
-                active
-                  ? "border-accent bg-accent-soft"
-                  : "border-surface-border bg-surface-card hover:bg-surface-card2"
-              }`}
+      {/* Toolbar selection mode */}
+      {selectionMode ? (
+        <div className="-mx-4 px-4 py-2 mb-3 bg-accent text-white rounded-2xl flex items-center gap-2">
+          <button
+            onClick={exitSelectionMode}
+            aria-label="Keluar pilihan"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white transition-colors hover:bg-white/15"
+          >
+            <X size={16} strokeWidth={2.4} />
+          </button>
+          <span className="flex-1 text-ios-footnote font-semibold tabular-nums">
+            {selectedCount} dipilih
+          </span>
+          <button
+            onClick={toggleSelectAll}
+            disabled={totalVisible === 0}
+            className="text-ios-caption font-semibold px-2.5 py-1.5 rounded-lg transition-colors hover:bg-white/15 disabled:opacity-50"
+          >
+            {allVisibleSelected ? "Batal Semua" : "Pilih Semua"}
+          </button>
+        </div>
+      ) : (
+        meetings.length > 0 &&
+        canCreate && (
+          <div className="flex justify-end mb-3">
+            <button
+              onClick={() => enterSelectionMode()}
+              className="text-ios-caption font-medium text-accent px-3 py-1.5 rounded-lg transition-colors hover:bg-accent-soft active:scale-[0.97]"
             >
-              <button
-                onClick={() => onSelect(m)}
-                className="flex items-center gap-3 flex-1 min-w-0 text-left active:scale-[0.99] transition-transform"
-              >
+              Pilih
+            </button>
+          </div>
+        )
+      )}
+
+      {/* Search */}
+      {meetings.length > 0 && !selectionMode && (
+        <div className="relative mb-3">
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari acara, tanggal, atau jam..."
+            className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+          />
+          {hasSearch && (
+            <button
+              onClick={() => setSearch("")}
+              aria-label="Hapus pencarian"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {meetings.length > 0 && filtered.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-6 text-center mb-3">
+          <p className="text-ios-body font-medium text-surface-text mb-1">
+            Tidak ditemukan
+          </p>
+          <p className="text-ios-footnote text-surface-muted">
+            Coba kata kunci lain
+          </p>
+        </div>
+      )}
+
+      {/* Grouped list */}
+      {grouped.map(({ monthKey, label, items }) => (
+        <section key={monthKey} className="mb-4">
+          <div className="sticky top-0 z-10 -mx-4 px-4 py-2 bg-surface-bg/95 backdrop-blur-sm border-b border-surface-border/60">
+            <div className="flex items-center justify-between">
+              <p className="text-ios-footnote font-semibold text-surface-text">
+                {label}
+              </p>
+              <span className="text-ios-caption text-surface-muted tabular-nums">
+                {items.length} jadwal
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-2 rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+            {items.map((m, i) => {
+              const active = m.meeting_id === selectedId;
+              const isToday = m.tanggal === today;
+              const targets = normalizeTargets(m.kategori_target);
+              const isSelected = selectedIds.has(m.meeting_id);
+
+              return (
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    active
-                      ? "bg-accent text-white"
-                      : "bg-surface-card2 text-surface-muted"
+                  key={m.meeting_id}
+                  className={`flex items-center gap-2 px-3 ${
+                    i !== items.length - 1
+                      ? "border-b border-surface-border"
+                      : ""
+                  } ${
+                    isSelected
+                      ? "bg-accent-soft/60"
+                      : active
+                        ? "bg-accent-soft/40"
+                        : isToday
+                          ? "bg-success-soft/20"
+                          : ""
                   }`}
                 >
-                  <Calendar size={18} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-ios-body font-medium text-surface-text truncate">
-                    {m.hari} — {m.acara || "Pengajian"}
-                  </p>
-                  <p className="text-ios-footnote text-surface-muted truncate">
-                    {formatDateLongText(m.tanggal)} · {m.jam || "—"}
-                  </p>
-                  {targets.length > 0 && (
-                    <div className="flex items-center gap-1 mt-1 flex-wrap">
-                      {targets.map((k) => (
-                        <span
-                          key={k}
-                          className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"
-                        >
-                          {CATEGORY_LABEL[k]}
-                        </span>
-                      ))}
+                  {selectionMode && (
+                    <button
+                      onClick={() => toggleSelect(m.meeting_id)}
+                      aria-label={isSelected ? "Batal pilih" : "Pilih"}
+                      className={
+                        "w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all " +
+                        (isSelected
+                          ? "bg-accent text-white"
+                          : "border-2 border-surface-border bg-transparent")
+                      }
+                    >
+                      {isSelected && <Check size={14} strokeWidth={3} />}
+                    </button>
+                  )}
+
+                  <button
+                    onContextMenu={(e) => {
+                      if (!canCreate || selectionMode) return;
+                      e.preventDefault();
+                      enterSelectionMode(m.meeting_id);
+                    }}
+                    onTouchStart={(e) => {
+                      if (!canCreate || selectionMode) return;
+                      const target = e.currentTarget;
+                      const timer = window.setTimeout(() => {
+                        enterSelectionMode(m.meeting_id);
+                      }, 600);
+                      (target as any)._lpTimer = timer;
+                    }}
+                    onTouchEnd={(e) => {
+                      const target = e.currentTarget as any;
+                      if (target._lpTimer) {
+                        clearTimeout(target._lpTimer);
+                        target._lpTimer = null;
+                      }
+                    }}
+                    onTouchMove={(e) => {
+                      const target = e.currentTarget as any;
+                      if (target._lpTimer) {
+                        clearTimeout(target._lpTimer);
+                        target._lpTimer = null;
+                      }
+                    }}
+                    onClick={() => {
+                      if (selectionMode) {
+                        toggleSelect(m.meeting_id);
+                      } else {
+                        onSelect(m);
+                      }
+                    }}
+                    className="flex items-center gap-3 flex-1 min-w-0 text-left py-2.5 active:scale-[0.995] transition-transform"
+                  >
+                    <div
+                      className={
+                        "w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 " +
+                        (isSelected
+                          ? "bg-accent text-white"
+                          : active
+                            ? "bg-accent text-white"
+                            : isToday
+                              ? "bg-success text-white"
+                              : "bg-surface-card2 text-surface-muted")
+                      }
+                    >
+                      <span className="text-[8px] font-semibold uppercase tracking-wide leading-none">
+                        {m.hari.slice(0, 3)}
+                      </span>
+                      <span className="text-[13px] font-bold leading-none mt-0.5 tabular-nums">
+                        {parseInt(m.tanggal.slice(8, 10), 10)}
+                      </span>
                     </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <p
+                          className={
+                            "text-ios-footnote font-medium truncate " +
+                            (active && !selectionMode
+                              ? "text-accent"
+                              : "text-surface-text")
+                          }
+                        >
+                          {m.acara || "Pengajian"}
+                        </p>
+                        {isToday && !active && !selectionMode && (
+                          <span className="text-[8px] font-bold tracking-wide text-success bg-success-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
+                            Hari ini
+                          </span>
+                        )}
+                        {active && !selectionMode && (
+                          <Check
+                            size={12}
+                            className="text-accent flex-shrink-0"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </div>
+                      <p className="text-ios-caption text-surface-muted truncate">
+                        {m.jam || "—"}
+                        {targets.length > 0 &&
+                          " · " +
+                            targets
+                              .slice(0, 2)
+                              .map((k) => CATEGORY_LABEL[k])
+                              .join(", ")}
+                        {targets.length > 2 && " +" + (targets.length - 2)}
+                      </p>
+                    </div>
+                  </button>
+
+                  {canCreate && !selectionMode && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRequestAction(m);
+                      }}
+                      aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
+                      title="Aksi jadwal"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
+                    >
+                      <MoreVertical size={16} strokeWidth={2.2} />
+                    </button>
                   )}
                 </div>
-                {active && (
-                  <Check size={18} className="text-accent flex-shrink-0" />
-                )}
-              </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
 
-              {canCreate && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRequestAction(m);
-                  }}
-                  aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
-                  title="Aksi jadwal"
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
-                >
-                  <MoreVertical size={16} strokeWidth={2.2} />
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {canCreate && (
-        <>
-          {/* Tambah 1 jadwal (existing) */}
+      {canCreate && !selectionMode && (
+        <div className="pt-2 space-y-2">
           <button
             onClick={onCreateNew}
-            className="mt-3 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-surface-border text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
+            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-surface-border text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
           >
-            <Plus size={16} /> Buat jadwal baru
+            <Plus size={14} /> Buat 1 jadwal
           </button>
 
-          {/* Tambah massal (BARU) */}
           <button
             onClick={onCreateBulk}
-            className="mt-2 w-full min-h-[48px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-subhead font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
+            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
           >
-            <Calendar size={16} /> Buat jadwal massal
+            <Calendar size={14} /> Buat jadwal massal
           </button>
-        </>
+        </div>
       )}
+
+      {/* Bottom bar — hapus */}
+      {selectionMode && (
+        <div className="sticky bottom-0 -mx-4 px-4 pt-3 pb-2 bg-surface-bg/95 backdrop-blur border-t border-surface-border">
+          <button
+            onClick={() => setConfirmOpen(true)}
+            disabled={selectedCount === 0 || deleting}
+            className="w-full min-h-[48px] rounded-2xl bg-danger text-white text-ios-footnote font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 size={16} strokeWidth={2.4} />
+            Hapus {selectedCount > 0 ? selectedCount + " " : ""}Jadwal
+          </button>
+        </div>
+      )}
+
+      {/* Confirm delete */}
+      <ConfirmDialog
+        open={confirmOpen}
+        title={"Hapus " + selectedCount + " Jadwal?"}
+        description={
+          selectedMeetings.length > 0
+            ? "Jadwal berikut akan dihapus permanen:\n" +
+              selectedMeetings
+                .slice(0, 5)
+                .map((m) => "• " + m.tanggal + " · " + (m.acara || "Pengajian"))
+                .join("\n") +
+              (selectedMeetings.length > 5
+                ? "\n• +" + (selectedMeetings.length - 5) + " lainnya"
+                : "") +
+              "\n\nSemua catatan absensi terkait ikut terhapus."
+            : ""
+        }
+        confirmLabel={deleting ? "Menghapus..." : "Ya, Hapus"}
+        danger
+        loading={deleting}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                      Sheet Content: ACTION VIEW                            */
+/*                              Helpers                                       */
 /* -------------------------------------------------------------------------- */
+
+function formatMonthLabel(monthKey: string): string {
+  const [y, m] = monthKey.split("-").map(Number);
+  const BULAN = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+  ];
+  if (!y || !m || m < 1 || m > 12) return monthKey;
+  return BULAN[m - 1] + " " + y;
+}
 
 function MeetingActionContent({
   meeting,
@@ -1331,6 +1771,7 @@ function MeetingFormContent({
   const [groupId, setGroupId] = useState("");
   const [acara, setAcara] = useState("Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>([]);
+  const [genderTarget, setGenderTarget] = useState<GenderTarget>("");
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -1349,12 +1790,14 @@ function MeetingFormContent({
           ? (meeting.kategori_target as MemberCategory[])
           : [],
       );
+      setGenderTarget(getGenderTarget(meeting));
     } else {
       setTanggal(getTodayIso());
       setJam("Isya di tempat");
       setGroupId("");
       setAcara("Sambung Kelompok");
       setKategoriTarget([]);
+      setGenderTarget("");
     }
   }, [isEdit, meeting]);
 
@@ -1366,6 +1809,7 @@ function MeetingFormContent({
         group_id: groupId,
         acara,
         kategori_target: kategoriTarget,
+        gender_target: genderTarget,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -1451,6 +1895,11 @@ function MeetingFormContent({
           })}
         </div>
       </div>
+
+      <GenderTargetPicker
+        value={genderTarget}
+        onChange={setGenderTarget}
+      />
 
       <Button
         fullWidth

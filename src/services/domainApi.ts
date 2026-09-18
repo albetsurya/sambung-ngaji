@@ -47,7 +47,9 @@ export const meetingApi = {
     group_id: string;
     acara: string;
     materi?: string;
+    catatan?: string;
     kategori_target?: string[];
+    gender_target?: "" | "L" | "P";
   }) => call<Meeting>("createMeeting", payload),
 
   update: (payload: {
@@ -60,12 +62,17 @@ export const meetingApi = {
     status?: string;
     catatan?: string;
     kategori_target?: string[];
+    gender_target?: "" | "L" | "P";
   }) => call<Meeting>("updateMeeting", payload),
 
-  // ✅ FIX: ini yang hilang sebelumnya — menyebabkan delete tidak terkirim ke backend.
   remove: (meeting_id: string) =>
     call<{ meeting_id: string; deleted_attendance: number }>("deleteMeeting", {
       meeting_id,
+    }),
+
+  removeBulk: (meeting_ids: string[]) =>
+    call<{ requested: number; deleted: number }>("deleteMeetingsBulk", {
+      meeting_ids,
     }),
 };
 
@@ -206,6 +213,9 @@ export const userApi = {
 
   changePassword: (payload: { old_password: string; new_password: string }) =>
     call<{ changed: boolean }>("changeMyPassword", payload),
+
+  changeUsername: (payload: { password: string; new_username: string }) =>
+    call<{ changed: boolean; username: string }>("changeMyUsername", payload),
 
   resetPassword: (payload: { user_id: string; new_password: string }) =>
     call<{ reset: boolean; user_id: string }>("resetUserPassword", payload),

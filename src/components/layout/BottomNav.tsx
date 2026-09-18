@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { usePermission } from "../../hooks/usePermission";
 import { useEnvironment } from "../../hooks/useEnvironment";
 import {
@@ -7,9 +7,17 @@ import {
   CalendarCheck,
   Megaphone,
   MoreHorizontal,
+  BookOpen,
+  RefreshCw,
+  User,
+  Calendar,
 } from "../common/FontAwesomeIcons";
 
-const ITEMS = [
+/* -------------------------------------------------------------------------- */
+/*                              Menu Definitions                              */
+/* -------------------------------------------------------------------------- */
+
+const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
   { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
@@ -22,10 +30,33 @@ const ITEMS = [
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 
+const MEMBER_ITEMS = [
+  { key: "beranda", label: "Beranda", to: "/member", icon: Home },
+  { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
+  { key: "sholat", label: "Sholat", to: "/member/prayer", icon: Calendar },
+  { key: "dzikir", label: "Dzikir", to: "/member/dzikir", icon: RefreshCw },
+  { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
+];
+
+/* -------------------------------------------------------------------------- */
+/*                              Component                                     */
+/* -------------------------------------------------------------------------- */
+
 export function BottomNav() {
+  const location = useLocation();
   const { isDevelopment } = useEnvironment();
   const { canSeeNav } = usePermission();
-  const visible = ITEMS.filter((i) => canSeeNav(i.key));
+
+  // Konteks member: path mulai "/member". Admin yang masuk mode jamaah
+  // (akses /member/*) juga lihat nav versi member.
+  const isMemberContext = location.pathname.startsWith("/member");
+
+  const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
+
+  // Admin: filter berdasarkan permission. Member: semua item tampil.
+  const visible = isMemberContext
+    ? items
+    : items.filter((i) => canSeeNav(i.key));
 
   return (
     <div className="relative w-full">
@@ -49,7 +80,7 @@ export function BottomNav() {
             <NavLink
               key={item.key}
               to={item.to}
-              end={item.to === "/"}
+              end={item.to === "/" || item.to === "/member"}
               className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200"
             >
               {({ isActive }) => (

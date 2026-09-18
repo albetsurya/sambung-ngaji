@@ -187,4 +187,4 @@ private/
 .env.production
 .env.test
 .env.staging
-.env.*.local
+.env.*.localpackage-lock.json
