@@ -1184,6 +1184,60 @@ function CategoryChip({
 /*                      Sheet Content: PICKER VIEW                            */
 /* -------------------------------------------------------------------------- */
 
+function CreatePickerContent({
+  onSingle,
+  onBulk,
+}: {
+  onSingle: () => void;
+  onBulk: () => void;
+}) {
+  return (
+    <div className="space-y-2.5">
+      <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5 mb-3">
+        <p className="text-ios-footnote text-accent/90 leading-relaxed">
+          Pilih cara membuat jadwal pengajian.
+        </p>
+      </div>
+
+      <button
+        onClick={onSingle}
+        className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Plus size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-surface-text">
+            Buat 1 Jadwal
+          </p>
+          <p className="text-ios-caption text-surface-muted">
+            Untuk pengajian tunggal — isi tanggal & acara
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
+      </button>
+
+      <button
+        onClick={onBulk}
+        className="w-full text-left rounded-2xl border border-accent/25 bg-accent-soft p-4 flex items-center gap-3 transition-all hover:bg-accent-soft/80 active:scale-[0.99]"
+      >
+        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+          <Calendar size={20} strokeWidth={2.4} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-ios-body font-medium text-accent">
+            Buat Massal
+          </p>
+          <p className="text-ios-caption text-accent/80">
+            1 bulan sekaligus — pilih bulan & hari rutin
+          </p>
+        </div>
+        <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
+      </button>
+    </div>
+  );
+}
+
 function MeetingPickerContent({
   meetings,
   selectedId,
@@ -1611,7 +1665,6 @@ function MeetingPickerContent({
 /* -------------------------------------------------------------------------- */
 
 function formatMonthLabel(monthKey: string): string {
-  // monthKey: "2026-09"
   const [y, m] = monthKey.split("-").map(Number);
   const BULAN = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -1619,64 +1672,6 @@ function formatMonthLabel(monthKey: string): string {
   ];
   if (!y || !m || m < 1 || m > 12) return monthKey;
   return BULAN[m - 1] + " " + y;
-}
-
-/* -------------------------------------------------------------------------- */
-/*                      Sheet Content: ACTION VIEW                            */
-/* -------------------------------------------------------------------------- */
-
-function CreatePickerContent({
-  onSingle,
-  onBulk,
-}: {
-  onSingle: () => void;
-  onBulk: () => void;
-}) {
-  return (
-    <div className="space-y-2.5">
-      <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5 mb-3">
-        <p className="text-ios-footnote text-accent/90 leading-relaxed">
-          Pilih cara membuat jadwal pengajian.
-        </p>
-      </div>
-
-      <button
-        onClick={onSingle}
-        className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
-      >
-        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
-          <Plus size={20} strokeWidth={2.4} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-ios-body font-medium text-surface-text">
-            Buat 1 Jadwal
-          </p>
-          <p className="text-ios-caption text-surface-muted">
-            Untuk pengajian tunggal — isi tanggal & acara
-          </p>
-        </div>
-        <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
-      </button>
-
-      <button
-        onClick={onBulk}
-        className="w-full text-left rounded-2xl border border-accent/25 bg-accent-soft p-4 flex items-center gap-3 transition-all hover:bg-accent-soft/80 active:scale-[0.99]"
-      >
-        <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
-          <Calendar size={20} strokeWidth={2.4} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-ios-body font-medium text-accent">
-            Buat Massal
-          </p>
-          <p className="text-ios-caption text-accent/80">
-            1 bulan sekaligus — pilih bulan & hari rutin
-          </p>
-        </div>
-        <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
-      </button>
-    </div>
-  );
 }
 
 function MeetingActionContent({

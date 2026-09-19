@@ -396,14 +396,80 @@ function cryptoId(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/* ============================== Auto-number ============================== */
+
+/**
+ * Deteksi baris yang mengandung tanggal (Hari, DD Bulan YYYY / DD-MM-YYYY / dll)
+ * dan sisipkan nomor urut di baris sebelumnya (header acara).
+ * Gunakan sebelum parse kalau teks mentah tidak bernomor.
+ */
+export function autoNumberText(text: string): string {
+  const lines = text.split(/\r?\n/);
+  const out: string[] = [];
+  let sectionNum = 0;
+
+  const dateLineRegex = new RegExp(
+    `(?:${HARI_LIST.join("|")})?\\s*,?\\s*\\d{1,2}\\s+(?:${BULAN_ALT})\\s+\\d{4}|\\d{1,2}[-/]\\d{1,2}[-/]\\d{2,4}`,
+    "i",
+  );
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    const isDateLine = dateLineRegex.test(trimmed);
+    const alreadyNumbered = /^\d{1,2}[\.\)]\s/.test(trimmed);
+
+    if (isDateLine && !alreadyNumbered) {
+      // Cari baris header sebelumnya (non-kosong, bukan tanggal, belum bernomor)
+      let headerIdx = -1;
+      for (let j = out.length - 1; j >= 0; j--) {
+        const prev = out[j].trim();
+        if (!prev) continue;
+        if (dateLineRegex.test(prev)) continue;
+        if (/^\d{1,2}[\.\)]\s/.test(prev)) continue;
+        headerIdx = j;
+        break;
+      }
+
+      if (headerIdx >= 0) {
+        sectionNum++;
+        out[headerIdx] = `${sectionNum}. ${out[headerIdx].trim()}`;
+      } else {
+        // Tidak ada header sebelumnya → nomor di baris tanggal ini
+        sectionNum++;
+        out.push(`${sectionNum}. ${trimmed}`);
+        continue;
+      }
+    }
+
+    out.push(line);
+  }
+
+  return out.join("\n");
+}
+
 /* ============================== Main Parser ============================== */
+
+function parseLines(lines: string[]): ParsedMeetingDraft[] {
+  const cleaned = lines.map((l) => l.trim()).filter((l) => l.length > 0);
+
+  const sections = splitSections(cleaned);
+  const parsed = sections.map(parseSection);
+
+  return parsed.filter((p) => p.acara && p.acara.length >= 3);
+}
 
 export function parseMeetingsFromPdf(rawItems: any[]): ParsedMeetingDraft[] {
   const items = normalizeTextItems(rawItems);
   const lines = groupIntoLines(items).filter((l) => l.length > 0);
+  return parseLines(lines);
+}
 
-  const sections = splitSections(lines);
-  const parsed = sections.map(parseSection);
-
-  return parsed.filter((p) => p.acara && p.acara.length >= 3);
+/**
+ * Parse teks mentah (paste dari PDF/Docs/WA) jadi daftar draft jadwal.
+ * Tiap section bernomor (`1. Judul`) jadi 1 jadwal.
+ */
+export function parseMeetingsFromText(text: string): ParsedMeetingDraft[] {
+  return parseLines(text.split(/\r?\n/));
 }
