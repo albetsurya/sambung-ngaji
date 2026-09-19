@@ -38,13 +38,13 @@ export const THEME_PRESETS: {
     key: "whatsapp",
     label: "WhatsApp",
     description: "Hijau familiar",
-    swatch: ["#25D366", "#128C42", "#DCF8E4"],
+    swatch: ["#25D366", "#128C7E", "#DCF8C6"],
   },
   {
     key: "instagram",
     label: "Instagram",
     description: "Pink gradient trendy",
-    swatch: ["#E1306C", "#C13584", "#FCE7F3"],
+    swatch: ["#E1306C", "#F77737", "#FCE7F3"],
   },
   {
     key: "tiktok",

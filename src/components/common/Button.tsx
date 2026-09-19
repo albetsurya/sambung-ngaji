@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger";
@@ -66,13 +67,16 @@ export function Button({
   ...rest
 }: Props) {
   const s = SIZES[size];
+  const { preset } = useTheme();
+  const tiktokSpecial =
+    variant === "primary" && preset === "tiktok" ? "btn-preset-special" : "";
 
   if (iconOnly) {
     return (
       <button
         className={`inline-flex items-center justify-center ${s.height} ${
           size === "sm" ? "w-10" : size === "lg" ? "w-[52px]" : "w-12"
-        } rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${className}`}
+        } rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${className}`}
         {...rest}
       >
         <span className={`flex items-center justify-center ${s.iconSize}`}>
@@ -84,7 +88,7 @@ export function Button({
 
   return (
     <button
-      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
       {...rest}
     >
       {leftIcon && (
