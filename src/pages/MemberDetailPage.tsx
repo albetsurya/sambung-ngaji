@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,6 +9,7 @@ import {
   UserPlus,
   ArrowUpRight,
   Pencil,
+  RefreshCw,
 } from "../components/common/FontAwesomeIcons";
 import {
   Button,
@@ -43,6 +44,34 @@ import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
+
+/* -------------------------------------------------------------------------- */
+/*                       AUTO-GENERATE USER CREDENTIALS                       */
+/* -------------------------------------------------------------------------- */
+
+function generateUsernameFromMember(member: Member): string {
+  const panggilan = member.nama_panggilan?.trim();
+  const fallback = member.nama_lengkap?.trim().split(/\s+/)[0] || "";
+  const source = panggilan || fallback;
+  const clean = source.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return clean.slice(0, 20) || "user";
+}
+
+function generatePasswordFromMember(member: Member): string {
+  const tgl = member.tanggal_lahir;
+  if (tgl) {
+    const iso = tgl.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (iso) return `${iso[3]}${iso[2]}${iso[1]}`;
+
+    const dmy = tgl.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+    if (dmy) {
+      const dd = dmy[1].padStart(2, "0");
+      const mm = dmy[2].padStart(2, "0");
+      return `${dd}${mm}${dmy[3]}`;
+    }
+  }
+  return "latukan354";
+}
 
 const TABS = [
   { key: "Biodata", label: "Biodata", Icon: User },
@@ -364,18 +393,22 @@ function CreateUserFromMemberSheet({
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("MEMBER");
 
-  // Sinkronisasi saat sheet dibuka
-  useState(() => {
+  useEffect(() => {
     if (!open) return;
-    setUsername(member.no_wa || "");
-    setPassword("");
+    setUsername(generateUsernameFromMember(member));
+    setPassword(generatePasswordFromMember(member));
     setRole("MEMBER");
-  });
+  }, [open, member.member_id]);
+
+  const handleRegenerate = () => {
+    setUsername(generateUsernameFromMember(member));
+    setPassword(generatePasswordFromMember(member));
+  };
 
   const mutation = useMutation({
     mutationFn: () =>
       userApi.create({
-        username,
+        username: username.trim(),
         nama: member.nama_lengkap,
         password,
         role,
@@ -404,6 +437,15 @@ function CreateUserFromMemberSheet({
           </p>
         </div>
 
+        <button
+          type="button"
+          onClick={handleRegenerate}
+          className="w-full mb-3 min-h-[40px] rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 flex items-center justify-center gap-2 text-ios-footnote font-medium text-accent transition-colors active:scale-[0.98]"
+        >
+          <RefreshCw size={14} />
+          Generate Ulang Username & Password
+        </button>
+
         <Select
           label="Role"
           value={role}
@@ -428,11 +470,11 @@ function CreateUserFromMemberSheet({
         />
         <Input
           label="Password"
-          type="password"
+          type="text"
           placeholder="Minimal 6 karakter"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
+          autoComplete="off"
           hint="Catat password ini dan berikan ke jamaah"
         />
 
