@@ -368,14 +368,16 @@ export default function AttendancePage() {
   });
   /* ============================================================= */
 
-  // Bulk delete mutation — dipanggil dari MeetingPickerContent
+  /* -------------------------- Bulk Delete Mutation ------------------------ */
+
   const deleteBulkMutation = useMutation({
     mutationFn: (ids: string[]) => meetingApi.removeBulk(ids),
     onSuccess: (res) => {
       showToast(res.deleted + " jadwal dihapus");
-      // Kalau meeting yang sedang dipilih ikut terhapus → reset
-      if (pinnedMeetingId && !meetings.find((m) => m.meeting_id === pinnedMeetingId)) {
-        setPinnedMeetingId(null);
+      if (pinnedMeetingId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.meetings({ range: "recent" }),
+        });
       }
       queryClient.invalidateQueries({
         queryKey: queryKeys.meetings({ range: "recent" }),
@@ -1348,7 +1350,7 @@ function MeetingPickerContent({
       setConfirmOpen(false);
       exitSelectionMode();
     } catch {
-      // toast sudah ditangani parent
+      // toast handled di parent
     } finally {
       setDeleting(false);
     }
@@ -1357,6 +1359,8 @@ function MeetingPickerContent({
   const selectedMeetings = filtered.filter((m) =>
     selectedIds.has(m.meeting_id),
   );
+
+  /* ------------------------------- Render -------------------------------- */
 
   return (
     <>
@@ -1617,7 +1621,6 @@ function MeetingPickerContent({
         </div>
       )}
 
-      {/* Bottom bar — hapus */}
       {selectionMode && (
         <div className="sticky bottom-0 -mx-4 px-4 pt-3 pb-2 bg-surface-bg/95 backdrop-blur border-t border-surface-border">
           <button
@@ -1631,7 +1634,6 @@ function MeetingPickerContent({
         </div>
       )}
 
-      {/* Confirm delete */}
       <ConfirmDialog
         open={confirmOpen}
         title={"Hapus " + selectedCount + " Jadwal?"}
