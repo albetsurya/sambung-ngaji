@@ -368,6 +368,34 @@ export default function AttendancePage() {
   });
   /* ============================================================= */
 
+  /* -------------------------- Bulk Delete Mutation ------------------------ */
+
+  const deleteBulkMutation = useMutation({
+    mutationFn: (ids: string[]) => meetingApi.removeBulk(ids),
+    onSuccess: (res) => {
+      showToast(res.deleted + " jadwal dihapus");
+      if (pinnedMeetingId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.meetings({ range: "recent" }),
+        });
+      }
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.meetings({ range: "recent" }),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal hapus jadwal",
+        "error",
+      );
+    },
+  });
+
+  async function handleDeleteBulk(ids: string[]): Promise<void> {
+    await deleteBulkMutation.mutateAsync(ids);
+  }
+
   /* -------------------------- Attendance Handlers ------------------------- */
 
   async function tapStatus(memberId: string, status: AttendanceStatus) {
@@ -861,6 +889,7 @@ export default function AttendancePage() {
               closeSheet();
               navigate("/lainnya/jadwal");
             }}
+            onDeleteBulk={handleDeleteBulk}
           />
         )}
         {sheet.view === "action" && (
@@ -1163,6 +1192,7 @@ function MeetingPickerContent({
   onRequestAction,
   onCreateNew,
   onCreateBulk,
+  onDeleteBulk,
 }: {
   meetings: Meeting[];
   selectedId?: string;
@@ -1171,9 +1201,16 @@ function MeetingPickerContent({
   onRequestAction: (m: Meeting) => void;
   onCreateNew: () => void;
   onCreateBulk: () => void;
+  onDeleteBulk: (ids: string[]) => Promise<void>;
 }) {
+  const { showToast } = useToast();
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const today = getTodayIso();
 
   /* --------------------------- Filter & Group --------------------------- */
@@ -1197,28 +1234,119 @@ function MeetingPickerContent({
   const grouped = useMemo(() => {
     const map = new Map<string, Meeting[]>();
     for (const m of filtered) {
-      const monthKey = m.tanggal.slice(0, 7); // YYYY-MM
+      const monthKey = m.tanggal.slice(0, 7);
       const list = map.get(monthKey) ?? [];
       list.push(m);
       map.set(monthKey, list);
     }
     return Array.from(map.entries())
-      .sort((a, b) => b[0].localeCompare(a[0])) // descending (terbaru dulu)
+      .sort((a, b) => b[0].localeCompare(a[0]))
       .map(([monthKey, items]) => ({
         monthKey,
         label: formatMonthLabel(monthKey),
-        items: [...items].sort((a, b) =>
-          b.tanggal.localeCompare(a.tanggal),
-        ),
+        items: [...items].sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
       }));
   }, [filtered]);
 
   const hasSearch = search.trim().length > 0;
+  const totalVisible = filtered.length;
+  const allVisibleSelected =
+    totalVisible > 0 && filtered.every((m) => selectedIds.has(m.meeting_id));
+  const selectedCount = selectedIds.size;
+
+  /* --------------------------- Selection Actions --------------------------- */
+
+  function enterSelectionMode(initialId?: string) {
+    setSelectionMode(true);
+    if (initialId) {
+      setSelectedIds(new Set([initialId]));
+    } else {
+      setSelectedIds(new Set());
+    }
+  }
+
+  function exitSelectionMode() {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (allVisibleSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((m) => m.meeting_id)));
+    }
+  }
+
+  async function handleConfirmDelete() {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    setDeleting(true);
+    try {
+      await onDeleteBulk(ids);
+      setConfirmOpen(false);
+      exitSelectionMode();
+    } catch {
+      // toast handled di parent
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  const selectedMeetings = filtered.filter((m) =>
+    selectedIds.has(m.meeting_id),
+  );
+
+  /* ------------------------------- Render -------------------------------- */
 
   return (
     <>
-      {/* Search bar */}
-      {meetings.length > 0 && (
+      {/* Toolbar selection mode */}
+      {selectionMode ? (
+        <div className="-mx-4 px-4 py-2 mb-3 bg-accent text-white rounded-2xl flex items-center gap-2">
+          <button
+            onClick={exitSelectionMode}
+            aria-label="Keluar pilihan"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white transition-colors hover:bg-white/15"
+          >
+            <X size={16} strokeWidth={2.4} />
+          </button>
+          <span className="flex-1 text-ios-footnote font-semibold tabular-nums">
+            {selectedCount} dipilih
+          </span>
+          <button
+            onClick={toggleSelectAll}
+            disabled={totalVisible === 0}
+            className="text-ios-caption font-semibold px-2.5 py-1.5 rounded-lg transition-colors hover:bg-white/15 disabled:opacity-50"
+          >
+            {allVisibleSelected ? "Batal Semua" : "Pilih Semua"}
+          </button>
+        </div>
+      ) : (
+        meetings.length > 0 &&
+        canCreate && (
+          <div className="flex justify-end mb-3">
+            <button
+              onClick={() => enterSelectionMode()}
+              className="text-ios-caption font-medium text-accent px-3 py-1.5 rounded-lg transition-colors hover:bg-accent-soft active:scale-[0.97]"
+            >
+              Pilih
+            </button>
+          </div>
+        )
+      )}
+
+      {/* Search */}
+      {meetings.length > 0 && !selectionMode && (
         <div className="relative mb-3">
           <Search
             size={14}
@@ -1242,7 +1370,6 @@ function MeetingPickerContent({
         </div>
       )}
 
-      {/* Empty search */}
       {meetings.length > 0 && filtered.length === 0 && (
         <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-6 text-center mb-3">
           <p className="text-ios-body font-medium text-surface-text mb-1">
@@ -1254,10 +1381,9 @@ function MeetingPickerContent({
         </div>
       )}
 
-      {/* Grouped compact list */}
+      {/* Grouped list */}
       {grouped.map(({ monthKey, label, items }) => (
         <section key={monthKey} className="mb-4">
-          {/* Sticky month header */}
           <div className="sticky top-0 z-10 -mx-4 px-4 py-2 bg-surface-bg/95 backdrop-blur-sm border-b border-surface-border/60">
             <div className="flex items-center justify-between">
               <p className="text-ios-footnote font-semibold text-surface-text">
@@ -1269,12 +1395,12 @@ function MeetingPickerContent({
             </div>
           </div>
 
-          {/* Rows */}
           <div className="mt-2 rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
             {items.map((m, i) => {
               const active = m.meeting_id === selectedId;
               const isToday = m.tanggal === today;
               const targets = normalizeTargets(m.kategori_target);
+              const isSelected = selectedIds.has(m.meeting_id);
 
               return (
                 <div
@@ -1283,23 +1409,79 @@ function MeetingPickerContent({
                     i !== items.length - 1
                       ? "border-b border-surface-border"
                       : ""
-                  } ${active ? "bg-accent-soft/60" : ""} ${
-                    isToday && !active ? "bg-success-soft/20" : ""
+                  } ${
+                    isSelected
+                      ? "bg-accent-soft/60"
+                      : active
+                        ? "bg-accent-soft/40"
+                        : isToday
+                          ? "bg-success-soft/20"
+                          : ""
                   }`}
                 >
+                  {selectionMode && (
+                    <button
+                      onClick={() => toggleSelect(m.meeting_id)}
+                      aria-label={isSelected ? "Batal pilih" : "Pilih"}
+                      className={
+                        "w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-all " +
+                        (isSelected
+                          ? "bg-accent text-white"
+                          : "border-2 border-surface-border bg-transparent")
+                      }
+                    >
+                      {isSelected && <Check size={14} strokeWidth={3} />}
+                    </button>
+                  )}
+
                   <button
-                    onClick={() => onSelect(m)}
+                    onContextMenu={(e) => {
+                      if (!canCreate || selectionMode) return;
+                      e.preventDefault();
+                      enterSelectionMode(m.meeting_id);
+                    }}
+                    onTouchStart={(e) => {
+                      if (!canCreate || selectionMode) return;
+                      const target = e.currentTarget;
+                      const timer = window.setTimeout(() => {
+                        enterSelectionMode(m.meeting_id);
+                      }, 600);
+                      (target as any)._lpTimer = timer;
+                    }}
+                    onTouchEnd={(e) => {
+                      const target = e.currentTarget as any;
+                      if (target._lpTimer) {
+                        clearTimeout(target._lpTimer);
+                        target._lpTimer = null;
+                      }
+                    }}
+                    onTouchMove={(e) => {
+                      const target = e.currentTarget as any;
+                      if (target._lpTimer) {
+                        clearTimeout(target._lpTimer);
+                        target._lpTimer = null;
+                      }
+                    }}
+                    onClick={() => {
+                      if (selectionMode) {
+                        toggleSelect(m.meeting_id);
+                      } else {
+                        onSelect(m);
+                      }
+                    }}
                     className="flex items-center gap-3 flex-1 min-w-0 text-left py-2.5 active:scale-[0.995] transition-transform"
                   >
-                    {/* Date badge — compact */}
                     <div
-                      className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${
-                        active
+                      className={
+                        "w-10 h-10 rounded-xl flex flex-col items-center justify-center flex-shrink-0 " +
+                        (isSelected
                           ? "bg-accent text-white"
-                          : isToday
-                            ? "bg-success text-white"
-                            : "bg-surface-card2 text-surface-muted"
-                      }`}
+                          : active
+                            ? "bg-accent text-white"
+                            : isToday
+                              ? "bg-success text-white"
+                              : "bg-surface-card2 text-surface-muted")
+                      }
                     >
                       <span className="text-[8px] font-semibold uppercase tracking-wide leading-none">
                         {m.hari.slice(0, 3)}
@@ -1312,18 +1494,21 @@ function MeetingPickerContent({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <p
-                          className={`text-ios-footnote font-medium truncate ${
-                            active ? "text-accent" : "text-surface-text"
-                          }`}
+                          className={
+                            "text-ios-footnote font-medium truncate " +
+                            (active && !selectionMode
+                              ? "text-accent"
+                              : "text-surface-text")
+                          }
                         >
                           {m.acara || "Pengajian"}
                         </p>
-                        {isToday && !active && (
+                        {isToday && !active && !selectionMode && (
                           <span className="text-[8px] font-bold tracking-wide text-success bg-success-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
                             Hari ini
                           </span>
                         )}
-                        {active && (
+                        {active && !selectionMode && (
                           <Check
                             size={12}
                             className="text-accent flex-shrink-0"
@@ -1344,7 +1529,7 @@ function MeetingPickerContent({
                     </div>
                   </button>
 
-                  {canCreate && (
+                  {canCreate && !selectionMode && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -1364,8 +1549,7 @@ function MeetingPickerContent({
         </section>
       ))}
 
-      {/* Create buttons — sticky di bawah */}
-      {canCreate && (
+      {canCreate && !selectionMode && (
         <div className="pt-2 space-y-2">
           <button
             onClick={onCreateNew}
@@ -1382,6 +1566,42 @@ function MeetingPickerContent({
           </button>
         </div>
       )}
+
+      {selectionMode && (
+        <div className="sticky bottom-0 -mx-4 px-4 pt-3 pb-2 bg-surface-bg/95 backdrop-blur border-t border-surface-border">
+          <button
+            onClick={() => setConfirmOpen(true)}
+            disabled={selectedCount === 0 || deleting}
+            className="w-full min-h-[48px] rounded-2xl bg-danger text-white text-ios-footnote font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 size={16} strokeWidth={2.4} />
+            Hapus {selectedCount > 0 ? selectedCount + " " : ""}Jadwal
+          </button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={"Hapus " + selectedCount + " Jadwal?"}
+        description={
+          selectedMeetings.length > 0
+            ? "Jadwal berikut akan dihapus permanen:\n" +
+              selectedMeetings
+                .slice(0, 5)
+                .map((m) => "• " + m.tanggal + " · " + (m.acara || "Pengajian"))
+                .join("\n") +
+              (selectedMeetings.length > 5
+                ? "\n• +" + (selectedMeetings.length - 5) + " lainnya"
+                : "") +
+              "\n\nSemua catatan absensi terkait ikut terhapus."
+            : ""
+        }
+        confirmLabel={deleting ? "Menghapus..." : "Ya, Hapus"}
+        danger
+        loading={deleting}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 }

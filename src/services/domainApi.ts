@@ -69,6 +69,11 @@ export const meetingApi = {
     call<{ meeting_id: string; deleted_attendance: number }>("deleteMeeting", {
       meeting_id,
     }),
+
+  removeBulk: (meeting_ids: string[]) =>
+    call<{ requested: number; deleted: number }>("deleteMeetingsBulk", {
+      meeting_ids,
+    }),
 };
 
 export const attendanceApi = {
