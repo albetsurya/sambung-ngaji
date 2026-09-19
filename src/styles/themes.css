@@ -168,112 +168,51 @@
 }
 
 /* ========================================================================
-   TikTok preset — tombol aksen dichotomy (glitch tri-color).
-   Khusus preset tiktok saja: kiri = cyan (#25F4EE), kanan = merah (#FE2C55),
-   body putih, teks hitam. Dipakai oleh <Button variant="primary">
-   (class btn-preset-special di-inject dari komponen).
+   TikTok preset — tombol aksen dichotomy (border samping cyan/merah).
+   Khusus preset tiktok saja: border kiri = cyan (#25F4EE), border kanan =
+   merah (#FE2C55), atas & bawah tanpa border. Body hitam, teks/icon putih.
+   Dipakai oleh <Button variant="primary"> (class btn-preset-special
+   di-inject dari komponen).
    ======================================================================== */
 
 [data-preset="tiktok"] .btn-preset-special {
   position: relative;
-  isolation: isolate;
   color: #ffffff;
   background-color: #010101;
-  border: 1px solid rgb(254 44 85 / 0.28);
-  box-shadow:
-    0 4px 14px rgb(37 244 238 / 0.18),
-    0 4px 14px rgb(254 44 85 / 0.18);
-}
-
-[data-preset="tiktok"] .btn-preset-special::before,
-[data-preset="tiktok"] .btn-preset-special::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 30%;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: -1;
-  transition: background 200ms ease-out;
-}
-
-[data-preset="tiktok"] .btn-preset-special::before {
-  left: 0;
-  background: linear-gradient(
-    90deg,
-    rgb(37 244 238 / 0.95),
-    rgb(37 244 238 / 0)
-  );
-}
-
-[data-preset="tiktok"] .btn-preset-special::after {
-  right: 0;
-  background: linear-gradient(
-    90deg,
-    rgb(254 44 85 / 0),
-    rgb(254 44 85 / 0.95)
-  );
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
 }
 
 [data-preset="tiktok"] .btn-preset-special:hover {
   color: #ffffff;
   background-color: #010101;
-  box-shadow:
-    0 8px 20px rgb(37 244 238 / 0.24),
-    0 8px 20px rgb(254 44 85 / 0.24);
-}
-
-[data-preset="tiktok"] .btn-preset-special:hover::before {
-  background: linear-gradient(
-    90deg,
-    rgb(37 244 238),
-    rgb(37 244 238 / 0)
-  );
-}
-
-[data-preset="tiktok"] .btn-preset-special:hover::after {
-  background: linear-gradient(
-    90deg,
-    rgb(254 44 85 / 0),
-    rgb(254 44 85)
-  );
-}
-
-[data-preset="tiktok"] .btn-preset-special:active {
-  color: #ffffff;
-  background-color: #010101;
 }
 
 [data-preset="tiktok"] .btn-preset-special:disabled {
-  box-shadow: none;
-  border-color: rgb(255 255 255 / 0.12);
+  border-left-color: rgb(37 244 238 / 0.25);
+  border-right-color: rgb(254 44 85 / 0.25);
 }
 
-/* Glitch flicker halus — sesekali tepi kiri/kanan bergeser */
-@keyframes tiktokGlitchEdge {
-  0%,
-  84%,
-  88%,
-  96%,
-  100% {
-    transform: none;
-  }
-  85% {
-    transform: translateX(-3px) skewX(-6deg);
-  }
-  86% {
-    transform: translateX(3px) skewX(3deg);
-  }
-  94% {
-    transform: translateX(2px);
-  }
-}
+/* ========================================================================
+   TikTok preset — chip & segmented (aksen penuh bg-accent text-white).
+   Sama seperti tombol: body hitam + teks putih + border kiri cyan & kanan
+   merah, atas/bawah tanpa border. Berlaku di light & dark.
+   Pengecualian: tombol yang sudah .btn-preset-special & badge mungil (w/h 4–5).
+   ======================================================================== */
 
-[data-preset="tiktok"] .btn-preset-special::before {
-  animation: tiktokGlitchEdge 5s steps(1) infinite;
-}
-
-[data-preset="tiktok"] .btn-preset-special::after {
-  animation: tiktokGlitchEdge 7s steps(1) infinite reverse;
+[data-preset="tiktok"]
+  [class~="bg-accent"][class~="text-white"]:not(
+    [class~="btn-preset-special"]
+  ):not([class~="w-4"]):not([class~="w-5"]):not([class~="h-4"]):not(
+    [class~="h-5"]
+  ):not([class~="min-w-[16px]"]):not([class~="rounded-2xl"]) {
+  position: relative;
+  color: #ffffff;
+  background-color: #010101;
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
 }
