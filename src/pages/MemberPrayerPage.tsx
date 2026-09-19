@@ -15,9 +15,11 @@ import {
   getNextPrayer,
   getCurrentPrayer,
   getMonthlySchedule,
+  getSunnahTimes,
   LATUKAN_LABEL,
   type PrayerDay,
   type PrayerKey,
+  type SunnahTimeInfo,
 } from "../utils/prayerTimes";
 
 /* -------------------------------------------------------------------------- */
@@ -40,6 +42,7 @@ export default function MemberPrayerPage() {
   const today = useMemo(() => getPrayerTimesForDate(now), []);
   const next = getNextPrayer(now);
   const current = getCurrentPrayer(now);
+  const sunnah = useMemo(() => getSunnahTimes(now), []);
   const hijri = formatHijri(now);
 
   async function handleShare() {
@@ -193,9 +196,62 @@ export default function MemberPrayerPage() {
               })}
           </div>
 
-          <p className="text-ios-caption text-surface-muted mt-2 px-1 leading-relaxed">
-            *Syuruq (matahari terbit) tidak ditampilkan — bukan waktu sholat wajib.
+        </section>
+
+        {/* ---------------------- Waktu Sunnah & Info ---------------------- */}
+        <section>
+          <p className="text-ios-footnote font-semibold text-surface-text mb-2.5 px-1">
+            Waktu Sunnah & Info
           </p>
+
+          <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+            <SunnahRow info={sunnah.syuruq} />
+            <SunnahRow info={sunnah.dhuha} />
+            <SunnahRow info={sunnah.nisfulLail} last />
+          </div>
+
+          <p className="text-ios-caption text-surface-muted mt-2 px-1 leading-relaxed">
+            Syuruq & Dhuha untuk panduan sholat sunnah pagi. Nisful Lail
+            (pertengahan malam) jadi batas akhir sholat Isya.
+          </p>
+        </section>
+
+        {/* ---------------------- Qiyamul Lail (1/3 akhir) ---------------------- */}
+        <section>
+          <p className="text-ios-footnote font-semibold text-surface-text mb-2.5 px-1">
+            Qiyamul Lail
+          </p>
+
+          <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-4">
+              <div className="w-11 h-11 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
+                <span className="text-[16px] font-bold tabular-nums">
+                  {sunnah.sepertigaAkhir.timeFormatted.slice(0, 2)}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-ios-body font-medium text-accent">
+                  {sunnah.sepertigaAkhir.label}
+                </p>
+                <p
+                  className="text-accent/70 truncate"
+                  style={{
+                    fontFamily:
+                      '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
+                    fontSize: "16px",
+                  }}
+                >
+                  {sunnah.sepertigaAkhir.arabic}
+                </p>
+                <p className="text-ios-caption text-accent/70 mt-0.5">
+                  {sunnah.sepertigaAkhir.description}
+                </p>
+              </div>
+              <p className="text-ios-body font-semibold text-accent tabular-nums flex-shrink-0">
+                {sunnah.sepertigaAkhir.timeFormatted}
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* ---------------------- Jadwal Sebulan (collapsible) ---------------------- */}
@@ -238,6 +294,52 @@ export default function MemberPrayerPage() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Sunnah Row                                     */
+/* -------------------------------------------------------------------------- */
+
+function SunnahRow({
+  info,
+  last = false,
+}: {
+  info: SunnahTimeInfo;
+  last?: boolean;
+}) {
+  const icons: Record<string, string> = {
+    syuruq: "☀️",
+    dhuha: "🌤️",
+    nisfulLail: "🌙",
+  };
+
+  return (
+    <div
+      className={
+        "flex items-center gap-3 px-4 py-3.5 " +
+        (last ? "" : "border-b border-surface-border")
+      }
+    >
+      <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center flex-shrink-0">
+        <span className="text-[18px] leading-none">
+          {icons[info.key] || "•"}
+        </span>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-ios-body font-medium text-surface-text">
+          {info.label}
+        </p>
+        <p className="text-ios-caption text-surface-muted truncate">
+          {info.description}
+        </p>
+      </div>
+
+      <p className="text-ios-body font-semibold text-surface-text tabular-nums flex-shrink-0">
+        {info.timeFormatted}
+      </p>
+    </div>
   );
 }
 

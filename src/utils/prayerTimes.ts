@@ -203,6 +203,102 @@ export function getMonthlySchedule(
 }
 
 /* -------------------------------------------------------------------------- */
+/*                          Waktu Sunnah & Info                               */
+/* -------------------------------------------------------------------------- */
+
+export type SunnahKey = "syuruq" | "dhuha" | "nisfulLail" | "sepertigaAkhir";
+
+export interface SunnahTimeInfo {
+  key: SunnahKey;
+  label: string;
+  arabic: string;
+  time: Date;
+  timeFormatted: string;
+  description: string;
+}
+
+export interface SunnahTimes {
+  syuruq: SunnahTimeInfo;
+  dhuha: SunnahTimeInfo;
+  nisfulLail: SunnahTimeInfo;
+  sepertigaAkhir: SunnahTimeInfo;
+}
+
+/**
+ * Hitung waktu-waktu sunnah & info tambahan:
+ * - Syuruq: matahari terbit
+ * - Dhuha: ±15 menit setelah syuruq (waktu sholat dhuha awal)
+ * - Nisful Lail: pertengahan antara Maghrib & Subuh besok
+ * - Sepertiga Akhir: 2/3 rentang malam dari Maghrib — waktu utama tahajud
+ */
+export function getSunnahTimes(
+  date: Date = new Date(),
+  lat: number = LATUKAN_COORDS.lat,
+  lng: number = LATUKAN_COORDS.lng,
+): SunnahTimes {
+  const today = getPrayerTimesForDate(date, lat, lng);
+  const syuruq = today.prayers.find((p) => p.key === "sunrise")!;
+  const maghrib = today.prayers.find((p) => p.key === "maghrib")!;
+
+  // Subuh besok (untuk hitung malam)
+  const tomorrow = new Date(date);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDay = getPrayerTimesForDate(tomorrow, lat, lng);
+  const fajrTomorrow = tomorrowDay.prayers.find((p) => p.key === "fajr")!;
+
+  // Dhuha = syuruq + 15 menit
+  const dhuhaTime = new Date(syuruq.time.getTime() + 15 * 60 * 1000);
+
+  // Rentang malam: Maghrib hari ini → Fajr besok
+  const maghribMs = maghrib.time.getTime();
+  const fajrMs = fajrTomorrow.time.getTime();
+  const nightSpan = fajrMs - maghribMs;
+
+  // Nisful Lail: 50% malam
+  const nisfulLailTime = new Date(maghribMs + Math.floor(nightSpan / 2));
+
+  // Sepertiga Akhir: 66.6% malam
+  const sepertigaAkhirTime = new Date(
+    maghribMs + Math.floor((nightSpan * 2) / 3),
+  );
+
+  return {
+    syuruq: {
+      key: "syuruq",
+      label: "Syuruq",
+      arabic: "الشروق",
+      time: syuruq.time,
+      timeFormatted: formatTime(syuruq.time),
+      description: "Matahari terbit — batas akhir sholat Subuh",
+    },
+    dhuha: {
+      key: "dhuha",
+      label: "Dhuha",
+      arabic: "الضحى",
+      time: dhuhaTime,
+      timeFormatted: formatTime(dhuhaTime),
+      description: "±15 menit setelah terbit — awal sholat Dhuha",
+    },
+    nisfulLail: {
+      key: "nisfulLail",
+      label: "Nisful Lail",
+      arabic: "نصف الليل",
+      time: nisfulLailTime,
+      timeFormatted: formatTime(nisfulLailTime),
+      description: "Pertengahan malam — batas akhir sholat Isya",
+    },
+    sepertigaAkhir: {
+      key: "sepertigaAkhir",
+      label: "1/3 Malam Akhir",
+      arabic: "الثلث الأخير",
+      time: sepertigaAkhirTime,
+      timeFormatted: formatTime(sepertigaAkhirTime),
+      description: "Waktu utama tahajud & qiyamul lail",
+    },
+  };
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Format Helpers                                */
 /* -------------------------------------------------------------------------- */
 

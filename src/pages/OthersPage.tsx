@@ -16,6 +16,7 @@ import {
   User,
   Calendar,
   Home,
+  FileText,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -89,6 +90,14 @@ export default function OthersPage() {
       description: "Kelola kelompok pengajian",
       Icon: Building2,
       to: "/lainnya/kelompok",
+      show: isAdminLike,
+    },
+    {
+      key: "import-jamaah",
+      label: "Import Jamaah",
+      description: "Paste text biodata dari WhatsApp",
+      Icon: FileText,
+      to: "/lainnya/import-jamaah",
       show: isAdminLike,
     },
     {

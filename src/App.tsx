@@ -62,6 +62,9 @@ const MemberSettingsPage = lazy(
 const MemberOthersPage = lazy(
   () => import("./pages/MemberOthersPage"),
 );
+const MemberImportPage = lazy(
+  () => import("./pages/MemberImportPage"),
+);
 const MemberPrivacyPage = lazy(() => import("./pages/MemberPrivacyPage"));
 const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
@@ -309,6 +312,7 @@ function AppRoutes() {
             <Route path="pengaturan" element={<SettingsPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
             <Route path="jadwal" element={<JadwalPage />} />
+            <Route path="import-jamaah" element={<MemberImportPage />} />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />
