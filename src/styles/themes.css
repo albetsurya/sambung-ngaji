@@ -1,32 +1,32 @@
 [data-preset="whatsapp"] {
   --c-accent: 37 211 102;
-  --c-accent-dark: 18 140 66;
-  --c-accent-light: 220 248 228;
-  --c-accent-2: 18 140 66;
-  --c-accent-2-dark: 12 110 50;
-  --c-accent-2-light: 200 240 210;
+  --c-accent-dark: 18 140 126;
+  --c-accent-light: 220 248 198;
+  --c-accent-2: 18 140 126;
+  --c-accent-2-dark: 16 122 110;
+  --c-accent-2-light: 200 245 225;
 }
 [data-preset="whatsapp"].dark {
-  --c-bg: 0 0 0;
-  --c-card: 15 20 16;
-  --c-card2: 8 12 9;
-  --c-border: 35 45 38;
+  --c-bg: 11 20 26;
+  --c-card: 17 27 33;
+  --c-card2: 14 23 29;
+  --c-border: 42 57 66;
   --c-accent: 37 211 102;
-  --c-accent-dark: 74 222 128;
-  --c-accent-light: 18 60 35;
-  --c-accent-2: 74 222 128;
-  --c-accent-2-dark: 110 231 153;
-  --c-accent-2-light: 25 80 45;
-  --c-text: 240 250 245;
+  --c-accent-dark: 0 168 132;
+  --c-accent-light: 0 92 75;
+  --c-accent-2: 0 168 132;
+  --c-accent-2-dark: 37 211 102;
+  --c-accent-2-light: 17 51 44;
+  --c-text: 233 237 239;
 }
 
 [data-preset="instagram"] {
   --c-accent: 225 48 108;
-  --c-accent-dark: 193 33 87;
+  --c-accent-dark: 193 53 132;
   --c-accent-light: 252 231 243;
-  --c-accent-2: 245 158 11;
-  --c-accent-2-dark: 217 119 6;
-  --c-accent-2-light: 254 243 199;
+  --c-accent-2: 247 119 55;
+  --c-accent-2-dark: 253 29 29;
+  --c-accent-2-light: 255 228 214;
 }
 [data-preset="instagram"].dark {
   --c-bg: 10 10 10;
@@ -36,9 +36,9 @@
   --c-accent: 244 114 182;
   --c-accent-dark: 249 168 212;
   --c-accent-light: 80 25 60;
-  --c-accent-2: 251 191 36;
-  --c-accent-2-dark: 252 211 77;
-  --c-accent-2-light: 80 50 10;
+  --c-accent-2: 247 119 55;
+  --c-accent-2-dark: 225 48 108;
+  --c-accent-2-light: 70 30 20;
   --c-text: 255 255 255;
 }
 
@@ -165,4 +165,115 @@
   --c-accent-dark: 196 181 253;
   --c-accent-light: 30 15 50;
   --c-text: 250 250 255;
+}
+
+/* ========================================================================
+   TikTok preset — tombol aksen dichotomy (glitch tri-color).
+   Khusus preset tiktok saja: kiri = cyan (#25F4EE), kanan = merah (#FE2C55),
+   body putih, teks hitam. Dipakai oleh <Button variant="primary">
+   (class btn-preset-special di-inject dari komponen).
+   ======================================================================== */
+
+[data-preset="tiktok"] .btn-preset-special {
+  position: relative;
+  isolation: isolate;
+  color: #ffffff;
+  background-color: #010101;
+  border: 1px solid rgb(254 44 85 / 0.28);
+  box-shadow:
+    0 4px 14px rgb(37 244 238 / 0.18),
+    0 4px 14px rgb(254 44 85 / 0.18);
+}
+
+[data-preset="tiktok"] .btn-preset-special::before,
+[data-preset="tiktok"] .btn-preset-special::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30%;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  transition: background 200ms ease-out;
+}
+
+[data-preset="tiktok"] .btn-preset-special::before {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(37 244 238 / 0.95),
+    rgb(37 244 238 / 0)
+  );
+}
+
+[data-preset="tiktok"] .btn-preset-special::after {
+  right: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(254 44 85 / 0),
+    rgb(254 44 85 / 0.95)
+  );
+}
+
+[data-preset="tiktok"] .btn-preset-special:hover {
+  color: #ffffff;
+  background-color: #010101;
+  box-shadow:
+    0 8px 20px rgb(37 244 238 / 0.24),
+    0 8px 20px rgb(254 44 85 / 0.24);
+}
+
+[data-preset="tiktok"] .btn-preset-special:hover::before {
+  background: linear-gradient(
+    90deg,
+    rgb(37 244 238),
+    rgb(37 244 238 / 0)
+  );
+}
+
+[data-preset="tiktok"] .btn-preset-special:hover::after {
+  background: linear-gradient(
+    90deg,
+    rgb(254 44 85 / 0),
+    rgb(254 44 85)
+  );
+}
+
+[data-preset="tiktok"] .btn-preset-special:active {
+  color: #ffffff;
+  background-color: #010101;
+}
+
+[data-preset="tiktok"] .btn-preset-special:disabled {
+  box-shadow: none;
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+/* Glitch flicker halus — sesekali tepi kiri/kanan bergeser */
+@keyframes tiktokGlitchEdge {
+  0%,
+  84%,
+  88%,
+  96%,
+  100% {
+    transform: none;
+  }
+  85% {
+    transform: translateX(-3px) skewX(-6deg);
+  }
+  86% {
+    transform: translateX(3px) skewX(3deg);
+  }
+  94% {
+    transform: translateX(2px);
+  }
+}
+
+[data-preset="tiktok"] .btn-preset-special::before {
+  animation: tiktokGlitchEdge 5s steps(1) infinite;
+}
+
+[data-preset="tiktok"] .btn-preset-special::after {
+  animation: tiktokGlitchEdge 7s steps(1) infinite reverse;
 }
