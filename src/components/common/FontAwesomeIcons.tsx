@@ -75,6 +75,7 @@ import {
   faCompass,
   faLocationArrow,
   faUpload,
+  faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -195,3 +196,5 @@ export const Compass = createIcon(faCompass);
 export const Navigation = createIcon(faLocationArrow);
 
 export const Upload = createIcon(faUpload);
+
+export const FileText = createIcon(faFileAlt);
