@@ -369,17 +369,12 @@ function ApproveSheet({
           ))}
         </Select>
 
-        {data.no_wa && (
-          <div className="mb-4 p-3 rounded-xl bg-surface-card2 border border-surface-border">
-            <p className="text-ios-caption text-surface-muted leading-relaxed">
-              Notifikasi akun aktif akan dikirim ke WhatsApp{" "}
-              <span className="font-medium text-surface-text">
-                +{data.no_wa}
-              </span>
-              .
-            </p>
-          </div>
-        )}
+        <div className="mb-4 p-3 rounded-xl bg-warning-soft/60 border border-warning/20">
+          <p className="text-ios-caption text-warning leading-relaxed">
+            Akun tidak dikirim otomatis. Sampaikan username &amp; password ke
+            jamaah secara manual via WhatsApp atau tatap muka.
+          </p>
+        </div>
 
         <Button
           fullWidth
@@ -442,13 +437,7 @@ function RejectSheet({
         <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/20">
           <p className="text-ios-footnote text-danger leading-relaxed">
             Pendaftar akan ditolak dan tidak akan ditambahkan sebagai jamaah.
-            {noWa && (
-              <>
-                {" "}
-                Alasan penolakan akan dikirim ke WhatsApp{" "}
-                <span className="font-medium">+{noWa}</span>.
-              </>
-            )}
+            Alasan tidak dikirim otomatis — sampaikan manual kalau perlu.
           </p>
         </div>
 
