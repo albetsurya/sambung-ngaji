@@ -40,6 +40,9 @@ const MemberPuasaPage = lazy(
 const MemberTahfidzPage = lazy(
   () => import("./pages/MemberTahfidzPage"),
 );
+const MemberSchedulePage = lazy(
+  () => import("./pages/MemberSchedulePage"),
+);
 const MemberTahfidzSurahPage = lazy(
   () => import("./pages/MemberTahfidzSurahPage"),
 );
@@ -75,6 +78,7 @@ const PendingMembersPage = lazy(() => import("./pages/PendingMembersPage"));
 const PendingMemberDetailPage = lazy(
   () => import("./pages/PendingMemberDetailPage"),
 );
+const MemberRequestsPage = lazy(() => import("./pages/MemberRequestsPage"));
 
 const PublicRegistrationPage = lazy(
   () => import("./pages/PublicRegistrationPage"),
@@ -147,6 +151,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberTahfidzPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/jadwal"
+          element={
+            <PersonalRoute>
+              <MemberSchedulePage />
             </PersonalRoute>
           }
         />
@@ -305,6 +317,10 @@ function AppRoutes() {
             <Route
               path="pendaftar/:submission_id"
               element={<PendingMemberDetailPage />}
+            />
+            <Route
+              path="permintaan-member"
+              element={<MemberRequestsPage />}
             />
             <Route path="qr-code" element={<QrCodePage />} />
             <Route path="ai-usage" element={<AiUsagePage />} />
