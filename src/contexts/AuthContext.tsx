@@ -45,6 +45,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -126,8 +127,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  async function refreshUser() {
+    try {
+      const u = await authApi.validateSession();
+      setUser(u);
+    } catch (err) {
+      console.warn("refreshUser failed:", err);
+      setUser(null);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

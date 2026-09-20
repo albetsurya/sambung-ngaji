@@ -54,7 +54,7 @@ type TabKey = (typeof TABS)[number]["key"];
 export default function MemberSelfPage() {
   const navigate = useNavigate();
   const { isMember, role } = usePermission();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const qc = useQueryClient();
   const [searchParams] = useSearchParams();
   const [requestMsg, setRequestMsg] = useState<string | null>(null);
@@ -84,9 +84,12 @@ export default function MemberSelfPage() {
 
   const becomeMember = useMutation({
     mutationFn: () => memberRequestApi.becomeMember(),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       setRequestMsg(res.message);
       if (res.auto_created) {
+        // Refresh AuthContext supaya user.member_id ter-update
+        // (menu "Tampilan Jamaah" di /lainnya cek field ini)
+        await refreshUser();
         qc.invalidateQueries({
           queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
         });
