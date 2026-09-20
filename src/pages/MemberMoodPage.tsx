@@ -10,6 +10,7 @@ import {
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { MOOD_LIST, getMood, type Mood, type MoodKey } from "../data/mood";
 import { useMoodPick } from "../hooks/useMoodPick";
+import { moodApi } from "../services/domainApi";
 
 export default function MemberMoodPage() {
   const navigate = useNavigate();
@@ -93,7 +94,13 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       </div>
 
       <button
-        onClick={() => selected && onSelect(selected)}
+        onClick={() => {
+          if (selected) {
+            // Best-effort sync mood harian ke backend (upsert per hari). Gagal tidak memblok UX.
+            moodApi.save(selected).catch(() => {});
+            onSelect(selected);
+          }
+        }}
         disabled={!selected}
         className="w-full min-h-[52px] rounded-2xl bg-accent text-white text-ios-body font-semibold transition-all duration-200 hover:bg-accent-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >

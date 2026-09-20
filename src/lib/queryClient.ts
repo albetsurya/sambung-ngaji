@@ -43,6 +43,7 @@ export const queryKeys = {
     filters
       ? ["monitoring-paged", memberId, filters]
       : ["monitoring-paged", memberId],
+  memberMoods: (memberId: string) => ["member-moods", memberId],
   announcements: () => ["announcements"],
   announcementsPaged: (filters?: object) =>
     filters ? ["announcements-paged", filters] : ["announcements-paged"],

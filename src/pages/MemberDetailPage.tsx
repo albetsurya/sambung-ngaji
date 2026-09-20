@@ -10,6 +10,7 @@ import {
   ArrowUpRight,
   Pencil,
   RefreshCw,
+  Sparkles,
 } from "../components/common/FontAwesomeIcons";
 import {
   Button,
@@ -19,7 +20,7 @@ import {
   LoadingOverlay,
   MemberSelfSkeleton,
 } from "../components/common";
-import { userApi, meetingApi } from "../services/domainApi";
+import { userApi, meetingApi, moodApi } from "../services/domainApi";
 import type { Role } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { ROLE_LABEL } from "../hooks/usePermission";
@@ -37,6 +38,7 @@ import {
   BiodataTab,
   EducationTab,
   AttendanceTab,
+  MoodTab,
   CategoryHeaderBadge,
   type AttendanceItem,
 } from "../components/member/MemberTabs";
@@ -78,6 +80,7 @@ const TABS = [
   { key: "Pendidikan", label: "Pendidikan", Icon: GraduationCap },
   { key: "Kehadiran", label: "Kehadiran", Icon: Calendar },
   { key: "Monitoring", label: "Monitoring", Icon: Heart },
+  { key: "Mood", label: "Mood", Icon: Sparkles },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -131,6 +134,13 @@ export default function MemberDetailPage() {
     queryFn: () => memberApi.getUserStatus(id!),
     enabled: !!id && canManageUsers,
     staleTime: 30_000,
+  });
+
+  const { data: moods = [] } = useQuery({
+    queryKey: queryKeys.memberMoods(id || ""),
+    queryFn: () => moodApi.listMember(id!).catch(() => []),
+    enabled: !!id,
+    staleTime: 60_000,
   });
 
   /* ---------------------------- Loading/Error ---------------------------- */
@@ -258,6 +268,7 @@ export default function MemberDetailPage() {
           <EducationTab education={member.pendidikan || []} />
         )}
         {tab === "Kehadiran" && <AttendanceTab items={attendanceItems} />}
+        {tab === "Mood" && <MoodTab entries={moods} />}
         {tab === "Monitoring" && (
           <MonitoringTab
             memberId={member.member_id}

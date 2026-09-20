@@ -190,6 +190,22 @@ export const uploadApi = {
     call<{ deleted: boolean }>("deletePhoto", member_id ? { member_id } : {}),
 };
 
+export interface MoodEntry {
+  mood_id: string;
+  member_id: string;
+  mood_key: string;
+  tanggal: string;
+  created_at: string;
+}
+
+export const moodApi = {
+  save: (mood_key: string, tanggal?: string) =>
+    call<MoodEntry>("saveMood", { mood_key, ...(tanggal ? { tanggal } : {}) }),
+  listMy: (limit = 100) => call<MoodEntry[]>("getMyMoods", { limit }),
+  listMember: (member_id: string, limit = 100) =>
+    call<MoodEntry[]>("getMemberMoods", { member_id, limit }),
+};
+
 export const dashboardApi = {
   general: () => call<DashboardGeneral>("getDashboard"),
   pnkb: () => call<DashboardPNKB>("getDashboard"),
