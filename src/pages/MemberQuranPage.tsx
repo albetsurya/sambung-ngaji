@@ -241,7 +241,10 @@ function SurahRow({
         </p>
       </div>
 
-      <div className="text-right flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <p className="text-[10px] text-surface-muted tabular-nums">
+          {toArabicNumber(surah.nomor)}
+        </p>
         <p
           className="text-accent/90"
           style={{
@@ -253,9 +256,6 @@ function SurahRow({
           }}
         >
           {surah.nama}
-        </p>
-        <p className="text-[10px] text-surface-muted mt-0.5">
-          {toArabicNumber(surah.nomor)}
         </p>
       </div>
     </button>
