@@ -30,14 +30,14 @@ export const DOA_HARIAN: DoaHarianKategori[] = [
         id: "harian-makan-sesudah",
         judul: "Setelah Makan",
         arab:
-          "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
+          "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
         latin:
-          "Alhamdulillaahil ladzii ath'amani haadzaa wa razaqaniihi min ghairi haulin minnii wa laa quwwah.",
+          "Alhamdulillaahilladzii ath'amanaa wa saqaanaa wa ja'alanaa muslimiin.",
         arti:
-          "Segala puji bagi Allah yang telah memberiku makan ini dan memberiku rezeki tanpa daya dan kekuatan dariku.",
-        sumber: "HR. Tirmidzi 3458, Abu Dawud 4023",
+          "Segala puji bagi Allah yang telah memberi kami makan dan minum, serta menjadikan kami kaum muslimin.",
+        sumber: "HR. Abu Dawud 3850",
         keutamaan:
-          "Barangsiapa membacanya, diampuni dosa-dosanya yang telah lalu.",
+          "Dibaca setelah menyelesaikan makan sebagai rasa syukur atas nikmat yang telah Allah berikan.",
       },
     ],
   },
@@ -53,9 +53,9 @@ export const DOA_HARIAN: DoaHarianKategori[] = [
       {
         id: "harian-tidur-sebelum",
         judul: "Sebelum Tidur",
-        arab: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-        latin: "Bismika Allahumma amuutu wa ahyaa.",
-        arti: "Dengan nama-Mu ya Allah, aku mati dan aku hidup.",
+        arab: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
+        latin: "Allahumma bismika amuutu wa ahyaa.",
+        arti: "Ya Allah, dengan nama-Mu aku mati dan aku hidup.",
         sumber: "HR. Bukhari 6324",
       },
       {
