@@ -139,6 +139,7 @@ export interface MyAttendanceEntry {
   attendance_id: string;
   meeting_id: string;
   status: AttendanceStatus;
+  status_meeting?: string;
   catatan?: string;
   tanggal: string;
   hari: string;

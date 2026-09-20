@@ -181,6 +181,7 @@ export default function MemberSelfPage() {
           .filter(Boolean)
           .join(" · "),
         status: a.status,
+        libur: a.status_meeting === "LIBUR",
       }),
     )
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));

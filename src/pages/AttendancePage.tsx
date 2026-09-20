@@ -17,6 +17,7 @@ import {
   CircleAlert,
   ChevronDown,
   Calendar,
+  CalendarCheck,
   Trash2,
   MoreVertical,
   Pencil,
@@ -375,6 +376,35 @@ export default function AttendancePage() {
   });
   /* ============================================================= */
 
+  /* -------------------------- Libur Mutation ------------------------ */
+
+  const liburMutation = useMutation({
+    mutationFn: ({ meetingId, status }: { meetingId: string; status: string }) =>
+      meetingApi.update({ meeting_id: meetingId, status }),
+    onSuccess: (_data, vars) => {
+      showToast(
+        vars.status === "LIBUR"
+          ? "Jadwal ditandai libur"
+          : "Jadwal diaktifkan kembali",
+      );
+      setSheet({ view: "closed" });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.meetings({ range: "recent" }),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendancePage(vars.meetingId),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal mengubah status jadwal",
+        "error",
+      );
+    },
+  });
+  /* ============================================================= */
+
   /* -------------------------- Bulk Delete Mutation ------------------------ */
 
   const deleteBulkMutation = useMutation({
@@ -698,6 +728,12 @@ export default function AttendancePage() {
                         </p>
                       )}
                       {selectedMeeting &&
+                        selectedMeeting.status === "LIBUR" && (
+                          <span className="inline-flex items-center mt-0.5 text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5">
+                            Libur
+                          </span>
+                        )}
+                      {selectedMeeting &&
                         normalizeTargets(selectedMeeting.kategori_target)
                           .length > 0 && (
                           <p className="text-ios-caption text-accent truncate mt-0.5">
@@ -902,6 +938,13 @@ export default function AttendancePage() {
         {sheet.view === "action" && (
           <MeetingActionContent
             meeting={sheet.meeting}
+            liburLoading={liburMutation.isPending}
+            onToggleLibur={() =>
+              liburMutation.mutate({
+                meetingId: sheet.meeting.meeting_id,
+                status: sheet.meeting.status === "LIBUR" ? "SCHEDULED" : "LIBUR",
+              })
+            }
             onEdit={openEditForm}
             onDelete={() => handleDeleteFromAction(sheet.meeting)}
           />
@@ -1683,13 +1726,18 @@ function formatMonthLabel(monthKey: string): string {
 
 function MeetingActionContent({
   meeting,
+  onToggleLibur,
+  liburLoading,
   onEdit,
   onDelete,
 }: {
   meeting: Meeting;
+  onToggleLibur: () => void;
+  liburLoading?: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const isLibur = meeting.status === "LIBUR";
   return (
     <>
       <div className="mb-4 flex items-center gap-3 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
@@ -1699,6 +1747,11 @@ function MeetingActionContent({
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-medium text-surface-text truncate">
             {meeting.hari} — {meeting.acara || "Pengajian"}
+            {isLibur && (
+              <span className="ml-2 inline-block text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5 align-middle">
+                Libur
+              </span>
+            )}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
             {formatDateLongText(meeting.tanggal)} · {meeting.jam || "—"}
@@ -1707,6 +1760,26 @@ function MeetingActionContent({
       </div>
 
       <div className="space-y-2">
+        <button
+          onClick={onToggleLibur}
+          disabled={liburLoading}
+          className="w-full text-left rounded-2xl border border-warning/25 bg-warning-soft p-3.5 flex items-center gap-3 transition-all hover:bg-warning-soft/80 active:scale-[0.99] disabled:opacity-50"
+        >
+          <div className="w-10 h-10 rounded-xl bg-warning text-white flex items-center justify-center flex-shrink-0">
+            <CalendarCheck size={18} strokeWidth={2.2} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-ios-body font-medium text-warning">
+              {isLibur ? "Aktifkan Kembali" : "Tandai Libur"}
+            </p>
+            <p className="text-ios-footnote text-warning/80">
+              {isLibur
+                ? "Jadwal akan dihitung kembali dalam absensi"
+                : "Jadwal libur tidak dihitung dalam persentase absensi"}
+            </p>
+          </div>
+        </button>
+
         <button
           onClick={onEdit}
           className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"

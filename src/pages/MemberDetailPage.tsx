@@ -189,6 +189,7 @@ export default function MemberDetailPage() {
         label: acara,
         sublabel: [hari, tanggal, jam].filter(Boolean).join(" · "),
         status: a.status,
+        libur: m?.status === "LIBUR",
       };
     })
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));

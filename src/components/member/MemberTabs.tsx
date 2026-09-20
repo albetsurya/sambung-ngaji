@@ -196,6 +196,8 @@ export interface AttendanceItem {
   label: string;
   sublabel?: string;
   status: AttendanceStatus;
+  /** true jika meeting berstatus LIBUR — tidak dihitung dalam rate/rekap */
+  libur?: boolean;
 }
 
 const ATT_STATUS_CONFIG: Record<
@@ -296,6 +298,9 @@ export function AttendanceTab({
 }) {
   const [showAll, setShowAll] = useState(false);
 
+  /* -------- Item yang dihitung statistik: kecualikan meeting LIBUR -------- */
+  const statsItems = items.filter((it) => !it.libur);
+
   /* ---------------------------- Compute stats ---------------------------- */
   const counts = {
     HADIR: 0,
@@ -304,15 +309,15 @@ export function AttendanceTab({
     ALPA: 0,
     DISPENSASI: 0,
   };
-  items.forEach((it) => {
+  statsItems.forEach((it) => {
     if (counts.hasOwnProperty(it.status)) counts[it.status]++;
   });
 
-  const persentase = items.length
-    ? Math.round((counts.HADIR / items.length) * 100)
+  const persentase = statsItems.length
+    ? Math.round((counts.HADIR / statsItems.length) * 100)
     : 0;
 
-  const monthlyRecap = buildMonthlyRecap(items);
+  const monthlyRecap = buildMonthlyRecap(statsItems);
   const hasMore = items.length > initialCount;
   const displayedItems = showAll ? items : items.slice(0, initialCount);
 
@@ -409,7 +414,11 @@ export function AttendanceTab({
                         </p>
                       )}
                     </div>
-                    <Badge color={config.color}>{config.label}</Badge>
+                    {it.libur ? (
+                      <Badge color="ink">Libur</Badge>
+                    ) : (
+                      <Badge color={config.color}>{config.label}</Badge>
+                    )}
                   </Card>
                 );
               })}
