@@ -23,6 +23,7 @@ import {
   Home,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { InstallAppCard } from "../components/member/InstallAppCard";
 import {
   Avatar,
   ConfirmDialog,
@@ -381,6 +382,10 @@ export default function MemberOthersPage() {
               </div>
             </ListRow>
           </GroupedList>
+        </div>
+
+        <div className="px-4 pb-2">
+          <InstallAppCard />
         </div>
 
         <div className="text-center pt-5 pb-3">
