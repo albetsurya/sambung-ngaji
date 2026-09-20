@@ -260,7 +260,7 @@ export default function MemberOthersPage() {
     if (items.length === 0) return null;
     return (
       <section>
-        <p className="px-1 mb-2.5 mt-4 text-ios-footnote font-semibold text-surface-text">
+        <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
           {title}
         </p>
         <GroupedList>
@@ -334,9 +334,7 @@ export default function MemberOthersPage() {
                 {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-ios-body text-surface-text">
-                  Mode Tampilan
-                </p>
+                <p className="text-ios-body text-surface-text">Mode Tampilan</p>
                 <p className="text-ios-caption text-surface-muted">
                   {theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif"}
                 </p>
@@ -393,10 +391,7 @@ export default function MemberOthersPage() {
         open={changeUsernameOpen}
         onClose={() => setChangeUsernameOpen(false)}
       />
-      <BackupDataSheet
-        open={backupOpen}
-        onClose={() => setBackupOpen(false)}
-      />
+      <BackupDataSheet open={backupOpen} onClose={() => setBackupOpen(false)} />
       <ThemePickerSheet
         open={themeSheetOpen}
         onClose={() => setThemeSheetOpen(false)}
