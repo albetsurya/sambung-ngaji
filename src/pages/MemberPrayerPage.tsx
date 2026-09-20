@@ -50,7 +50,7 @@ export default function MemberPrayerPage() {
       .filter((p) => p.key !== "sunrise")
       .map((p) => `${p.label.padEnd(8, " ")}: ${p.timeFormatted}`);
     const text = [
-      `🕌 Waktu Sholat — ${LATUKAN_LABEL}`,
+      `🕌 Waktu Sholat · ${LATUKAN_LABEL}`,
       `${formatDateId(now)}`,
       ``,
       ...lines,
@@ -287,8 +287,8 @@ export default function MemberPrayerPage() {
         {/* ---------------------- Info Kemenag ---------------------- */}
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5">
           <p className="text-ios-caption text-surface-muted leading-relaxed">
-            Perhitungan mengikuti metode <strong>Kemenag RI</strong> — Fajr 20°,
-            Isha 18°, madzhab Syafi'i, dengan ihtiyati +2 menit. Selisih
+            Perhitungan mengikuti metode <strong>Kemenag RI</strong> (Fajr 20°,
+            Isha 18°, madzhab Syafi'i, ihtiyati +2 menit). Selisih
             ±2 menit dari jadwal resmi adalah wajar.
           </p>
         </div>

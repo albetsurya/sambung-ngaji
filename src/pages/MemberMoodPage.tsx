@@ -57,7 +57,7 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
     <>
       <div className="rounded-2xl border border-accent/15 bg-accent-soft/60 px-4 py-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
-          Tidak ada perasaan yang salah. Pilih yang paling dekat — kami akan
+          Tidak ada perasaan yang salah. Pilih yang paling dekat, kami akan
           temani dengan ayat & doa yang menenangkan.
         </p>
       </div>

@@ -149,7 +149,7 @@ export default function MemberKiblatPage() {
               {canShowCompass && (
                 <p className="text-ios-caption text-success mt-2 flex items-center justify-center gap-1">
                   <Check size={12} strokeWidth={2.8} />
-                  Kompas aktif — putar HP sampai panah hijau di atas
+                  Kompas aktif. Putar HP sampai panah hijau di atas
                 </p>
               )}
               {!canShowCompass && permission === "idle" && (

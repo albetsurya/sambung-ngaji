@@ -62,7 +62,7 @@ export default function OthersPage() {
     {
       key: "tampilan-jamaah",
       label: "Tampilan Jamaah",
-      description: "Mode personal — waktu sholat, doa, data pribadi",
+      description: "Mode personal: waktu sholat, doa, data pribadi",
       Icon: Home,
       to: "/member",
       show: !!user?.member_id,
