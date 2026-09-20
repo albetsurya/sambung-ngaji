@@ -152,6 +152,14 @@ export default function MemberOthersPage() {
       group: "data",
     },
     {
+      key: "jadwal",
+      label: "Jadwal Pengajian",
+      description: "Kalender & daftar bulanan",
+      Icon: Calendar,
+      to: "/member/jadwal",
+      group: "data",
+    },
+    {
       key: "dzikir",
       label: "Dzikir Counter",
       description: "Tasbih digital",
