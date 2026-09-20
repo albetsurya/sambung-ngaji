@@ -708,8 +708,8 @@ function AbsensiDashboard({
 
       <div className="flex gap-3">
         <StatTile
-          label="Ijin"
-          value={data.ijin}
+          label="Izin"
+          value={data.izin}
           tone="default"
           Icon={ClipboardList}
         />
@@ -720,8 +720,8 @@ function AbsensiDashboard({
           Icon={Thermometer}
         />
         <StatTile
-          label="Tanpa Ket."
-          value={data.tanpa_keterangan}
+          label="Alpa"
+          value={data.alpa}
           tone="danger"
           Icon={CircleAlert}
         />
@@ -777,10 +777,10 @@ function AbsensiDashboard({
                   </div>
                   <div className="rounded-lg bg-warning-soft px-2 py-1.5 text-center">
                     <p className="text-[15px] font-bold text-warning tabular-nums leading-none">
-                      {cat.ijin}
+                      {cat.izin}
                     </p>
                     <p className="text-[9px] text-warning/70 mt-0.5 font-medium">
-                      IJIN
+                      IZIN
                     </p>
                   </div>
                   <div className="rounded-lg bg-info-soft px-2 py-1.5 text-center">
@@ -793,7 +793,7 @@ function AbsensiDashboard({
                   </div>
                   <div className="rounded-lg bg-danger-soft px-2 py-1.5 text-center">
                     <p className="text-[15px] font-bold text-danger tabular-nums leading-none">
-                      {cat.tanpa_keterangan}
+                      {cat.alpa}
                     </p>
                     <p className="text-[9px] text-danger/70 mt-0.5 font-medium">
                       ALPA

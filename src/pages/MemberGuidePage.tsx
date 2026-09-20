@@ -58,7 +58,7 @@ export default function MemberGuidePage() {
           description="Tab Absensi menampilkan statistik kehadiran dan riwayat lengkap Anda."
           steps={[
             "Buka tab Absensi",
-            "Lihat 4 stat box: Hadir, Ijin, Sakit, Alpa",
+            "Lihat 4 stat box: Hadir, Izin, Sakit, Alpa",
             "Persentase kehadiran dihitung otomatis",
             "Scroll untuk riwayat per pengajian",
           ]}

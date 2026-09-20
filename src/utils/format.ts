@@ -270,9 +270,10 @@ export function getCategoryLabel(
 
 export const ATTENDANCE_LABEL: Record<string, string> = {
   HADIR: "Hadir",
-  IJIN: "Ijin",
+  IZIN: "Izin",
   SAKIT: "Sakit",
-  TANPA_KETERANGAN: "Alpa",
+  ALPA: "Alpa",
+  DISPENSASI: "Dispensasi",
 };
 
 export const MONITORING_LABEL: Record<string, string> = {

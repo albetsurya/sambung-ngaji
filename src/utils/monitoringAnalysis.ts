@@ -24,7 +24,7 @@ export interface AttendanceAnalysis {
 const MIN_ATTENDANCE_FOR_RATE = 3; // minimal 3 absensi untuk hitung rate
 const RATE_THRESHOLD = 50; // < 50% dianggap kurang
 const SAKIT_STREAK_THRESHOLD = 3;
-const ALPA_STREAK_THRESHOLD = 3;
+const ALPA_STREAK_THRESHOLD = 5;
 const IJIN_STREAK_THRESHOLD = 5;
 
 /* -------------------------------------------------------------------------- */
@@ -35,9 +35,9 @@ const IJIN_STREAK_THRESHOLD = 5;
  * Analisis kehadiran jamaah dan generate saran catatan monitoring.
  *
  * Aturan:
- * - Alpa ≥ 3× berturut → pengingat
+ * - Alpa ≥ 5× berturut → pengingat
  * - Sakit ≥ 3× berturut → doa kesembuhan
- * - Ijin ≥ 5× berturut → doa kelapangan
+ * - Izin ≥ 5× berturut → doa kelapangan
  * - Kehadiran 30 hari < 50% → perhatian khusus
  *
  * @param attendance - Daftar absensi (date + status)
@@ -73,8 +73,8 @@ export function analyzeAttendance(
   }
 
   const sakitStreak = currentStreak("SAKIT");
-  const alpaStreak = currentStreak("TANPA_KETERANGAN");
-  const ijinStreak = currentStreak("IJIN");
+  const alpaStreak = currentStreak("ALPA");
+  const ijinStreak = currentStreak("IZIN");
 
   /* -------- Build suggestions -------- */
   const suggestions: string[] = [];
@@ -93,7 +93,7 @@ export function analyzeAttendance(
 
   if (ijinStreak >= IJIN_STREAK_THRESHOLD) {
     suggestions.push(
-      `🤲 Ijin ${ijinStreak}× berturut-turut. Mari doakan agar diberikan kelapangan waktu untuk hadir kembali.`,
+      `🤲 Izin ${ijinStreak}× berturut-turut. Mari doakan agar diberikan kelapangan waktu untuk hadir kembali.`,
     );
   }
 

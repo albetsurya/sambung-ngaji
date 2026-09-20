@@ -84,8 +84,8 @@ const STATUS_CONFIG: Record<
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-accent-soft hover:text-accent",
   },
-  IJIN: {
-    label: "Ijin",
+  IZIN: {
+    label: "Izin",
     Icon: X,
     activeClass: "bg-warning text-white shadow-sm shadow-warning/30",
     inactiveClass:
@@ -98,12 +98,19 @@ const STATUS_CONFIG: Record<
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-info-soft hover:text-info",
   },
-  TANPA_KETERANGAN: {
+  ALPA: {
     label: "Alpa",
     Icon: CircleAlert,
     activeClass: "bg-danger text-white shadow-sm shadow-danger/30",
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-danger-soft hover:text-danger",
+  },
+  DISPENSASI: {
+    label: "Dispensasi",
+    Icon: Calendar,
+    activeClass: "bg-surface-muted text-white shadow-sm shadow-surface-muted/30",
+    inactiveClass:
+      "bg-surface-card2 text-surface-muted hover:bg-surface-soft hover:text-surface-foreground",
   },
 };
 
