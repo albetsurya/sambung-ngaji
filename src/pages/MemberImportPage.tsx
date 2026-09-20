@@ -248,7 +248,7 @@ function InputPhase({
       <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
           Copy text biodata dari WhatsApp, paste di bawah, lalu klik Parse.
-          Format bebas — parser deteksi field secara otomatis. Bisa multi-jamaah
+          Format bebas, parser mendeteksi field secara otomatis. Bisa multi-jamaah
           sekaligus.
         </p>
       </div>

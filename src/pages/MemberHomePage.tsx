@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ScrollText,
@@ -20,7 +20,13 @@ import {
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
 import { Avatar } from "../components/common";
 import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
+import { meetingApi } from "../services/domainApi";
+import { memberSelfApi } from "../services/memberSelfApi";
+import { queryKeys } from "../lib/queryClient";
+import { CATEGORY_LABEL } from "../utils/format";
+import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";
 
 /* -------------------------------------------------------------------------- */
@@ -61,6 +67,44 @@ const TONE_BG: Record<Tone, string> = {
 };
 
 /* -------------------------------------------------------------------------- */
+/*                        SCHEDULE PREVIEW HELPERS                            */
+/* -------------------------------------------------------------------------- */
+
+function isoDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function normalizeTargets(raw: unknown): MemberCategory[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as MemberCategory[];
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as MemberCategory[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function formatScheduleDate(iso: string): string {
+  try {
+    const d = new Date(iso + "T00:00:00");
+    return new Intl.DateTimeFormat("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    }).format(d);
+  } catch {
+    return iso;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Component                                     */
 /* -------------------------------------------------------------------------- */
 
@@ -72,6 +116,18 @@ export default function MemberHomePage() {
   const greeting = getGreeting();
   const displayName = user?.nama || "Jamaah";
   const isNonMember = !!user?.role && user.role !== "MEMBER";
+
+  // Fetch kategori user (untuk default filter jadwal)
+  const { data: selfDashboard } = useQuery({
+    queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
+    queryFn: () => memberSelfApi.getDashboard(),
+    enabled: !!user?.user_id,
+    staleTime: 5 * 60_000,
+  });
+
+  const userKategori = selfDashboard?.profile?.kategori as
+    | MemberCategory
+    | undefined;
 
   return (
     <AppLayout
@@ -113,6 +169,12 @@ export default function MemberHomePage() {
       <div className="px-4 py-4 space-y-5 pb-8">
         {/* Prayer card */}
         <PrayerTimesCard />
+
+        {/* Jadwal Pengajian card */}
+        <SchedulePreviewCard
+          userKategori={userKategori}
+          onSeeAll={() => navigate("/member/jadwal")}
+        />
 
         {/* Sering Dipakai */}
         <section>
@@ -184,6 +246,86 @@ export default function MemberHomePage() {
         profilePath="/member/profil"
       />
     </AppLayout>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        Schedule Preview Card                               */
+/* -------------------------------------------------------------------------- */
+
+function SchedulePreviewCard({
+  userKategori,
+  onSeeAll,
+}: {
+  userKategori?: MemberCategory;
+  onSeeAll: () => void;
+}) {
+  const range = useMemo(() => {
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const to = new Date(now.getFullYear(), now.getMonth() + 3, 0);
+    return { from: isoDate(from), to: isoDate(to) };
+  }, []);
+
+  const { data: meetings = [] } = useQuery({
+    queryKey: ["member-schedule", range],
+    queryFn: () => meetingApi.list({ from: range.from, to: range.to }),
+    staleTime: 2 * 60_000,
+  });
+
+  // Filter sesuai kategori user + ambil yang paling dekat
+  const nextMeeting = useMemo(() => {
+    const today = isoDate(new Date());
+    const filtered = meetings.filter((m: Meeting) => {
+      if (!userKategori) return true;
+      const targets = normalizeTargets(m.kategori_target);
+      if (targets.length > 0 && !targets.includes(userKategori)) return false;
+      return true;
+    });
+    return (
+      filtered
+        .filter((m) => m.tanggal >= today)
+        .sort((a, b) => a.tanggal.localeCompare(b.tanggal))[0] || null
+    );
+  }, [meetings, userKategori]);
+
+  return (
+    <button
+      onClick={onSeeAll}
+      className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2 hover:border-accent/30"
+    >
+      <span className="w-11 h-11 rounded-2xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
+        <Calendar size={19} strokeWidth={2.2} />
+      </span>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-0.5">
+          {nextMeeting ? "Jadwal Terdekat" : "Jadwal Pengajian"}
+        </p>
+        {nextMeeting ? (
+          <>
+            <p className="text-ios-body font-medium text-surface-text truncate">
+              {nextMeeting.acara || "Pengajian"}
+            </p>
+            <p className="text-ios-caption text-surface-muted truncate">
+              {formatScheduleDate(nextMeeting.tanggal)}
+              {nextMeeting.jam ? ` · ${nextMeeting.jam}` : ""}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-ios-body font-medium text-surface-text truncate">
+              Lihat Jadwal Pengajian
+            </p>
+            <p className="text-ios-caption text-surface-muted truncate">
+              Kalender & daftar bulanan
+            </p>
+          </>
+        )}
+      </div>
+
+      <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
+    </button>
   );
 }
 

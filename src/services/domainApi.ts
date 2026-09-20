@@ -190,6 +190,53 @@ export const uploadApi = {
     call<{ deleted: boolean }>("deletePhoto", member_id ? { member_id } : {}),
 };
 
+export interface MoodEntry {
+  mood_id: string;
+  member_id: string;
+  mood_key: string;
+  tanggal: string;
+  created_at: string;
+}
+
+export const moodApi = {
+  save: (mood_key: string, tanggal?: string) =>
+    call<MoodEntry>("saveMood", { mood_key, ...(tanggal ? { tanggal } : {}) }),
+  listMy: (limit = 100) => call<MoodEntry[]>("getMyMoods", { limit }),
+  listMember: (member_id: string, limit = 100) =>
+    call<MoodEntry[]>("getMemberMoods", { member_id, limit }),
+};
+
+export interface MemberRequestEntry {
+  request_id: string;
+  user_id: string;
+  nama: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  member_id?: string;
+  reason?: string;
+  created_at: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+}
+
+export interface RequestBecomeMemberResult {
+  auto_created?: string;
+  request_sent?: string;
+  message: string;
+}
+
+export const memberRequestApi = {
+  becomeMember: () => call<RequestBecomeMemberResult>("requestBecomeMember", {}),
+  list: (status?: string) =>
+    call<MemberRequestEntry[]>("getMemberRequests", status ? { status } : {}),
+  approve: (request_id: string) =>
+    call<MemberRequestEntry>("approveMemberRequest", { request_id }),
+  reject: (request_id: string, reason?: string) =>
+    call<{ rejected: boolean }>("rejectMemberRequest", {
+      request_id,
+      ...(reason ? { reason } : {}),
+    }),
+};
+
 export const dashboardApi = {
   general: () => call<DashboardGeneral>("getDashboard"),
   pnkb: () => call<DashboardPNKB>("getDashboard"),

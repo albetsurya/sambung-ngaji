@@ -17,7 +17,12 @@ export type MemberCategory =
   | "DEWASA"
   | "ISTIMEWA";
 
-export type AttendanceStatus = "HADIR" | "IJIN" | "SAKIT" | "TANPA_KETERANGAN";
+export type AttendanceStatus =
+  | "HADIR"
+  | "IZIN"
+  | "SAKIT"
+  | "ALPA"
+  | "DISPENSASI";
 
 export type MonitoringStatus =
   | "AKTIF"
@@ -134,6 +139,7 @@ export interface MyAttendanceEntry {
   attendance_id: string;
   meeting_id: string;
   status: AttendanceStatus;
+  status_meeting?: string;
   catatan?: string;
   tanggal: string;
   hari: string;
@@ -212,9 +218,9 @@ export interface DashboardAbsensiCategory {
   kategori: MemberCategory[];
   is_semua: boolean;
   hadir: number;
-  ijin: number;
+  izin: number;
   sakit: number;
-  tanpa_keterangan: number;
+  alpa: number;
   total_absen: number;
   total_target: number;
   meeting_count: number;
@@ -233,9 +239,9 @@ export interface DashboardAbsensi {
   jumlah_jamaah: number;
   total_target: number;
   hadir: number;
-  ijin: number;
+  izin: number;
   sakit: number;
-  tanpa_keterangan: number;
+  alpa: number;
   by_category: DashboardAbsensiCategory[];
 }
 

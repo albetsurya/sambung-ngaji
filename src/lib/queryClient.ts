@@ -26,6 +26,8 @@ export const queryKeys = {
   pendingMembers: (status?: string) =>
     status ? ["pending-members", { status }] : ["pending-members"],
   pendingDetail: (id: string) => ["pending-member", id],
+  memberRequests: (status?: string) =>
+    status ? ["member-requests", { status }] : ["member-requests"],
   dashboard: () => ["dashboard"],
   meetings: (filters?: Record<string, unknown>) =>
     filters ? ["meetings", filters] : ["meetings"],
@@ -43,6 +45,7 @@ export const queryKeys = {
     filters
       ? ["monitoring-paged", memberId, filters]
       : ["monitoring-paged", memberId],
+  memberMoods: (memberId: string) => ["member-moods", memberId],
   announcements: () => ["announcements"],
   announcementsPaged: (filters?: object) =>
     filters ? ["announcements-paged", filters] : ["announcements-paged"],

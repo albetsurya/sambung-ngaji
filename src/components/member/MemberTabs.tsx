@@ -13,6 +13,8 @@ import {
   ATTENDANCE_LABEL,
   formatDateLongText,
 } from "../../utils/format";
+import { getMood } from "../../data/mood";
+import type { MoodEntry } from "../../services/domainApi";
 
 /* -------------------------------------------------------------------------- */
 /*                              BIODATA TAB                                   */
@@ -194,6 +196,8 @@ export interface AttendanceItem {
   label: string;
   sublabel?: string;
   status: AttendanceStatus;
+  /** true jika meeting berstatus LIBUR — tidak dihitung dalam rate/rekap */
+  libur?: boolean;
 }
 
 const ATT_STATUS_CONFIG: Record<
@@ -201,9 +205,10 @@ const ATT_STATUS_CONFIG: Record<
   { label: string; color: "emerald" | "amber" | "red" | "ink" }
 > = {
   HADIR: { label: "Hadir", color: "emerald" },
-  IJIN: { label: "Ijin", color: "amber" },
+  IZIN: { label: "Izin", color: "amber" },
   SAKIT: { label: "Sakit", color: "amber" },
-  TANPA_KETERANGAN: { label: "Alpa", color: "red" },
+  ALPA: { label: "Alpa", color: "red" },
+  DISPENSASI: { label: "Dispensasi", color: "ink" },
 };
 
 /* ----------------------------- Month helpers ----------------------------- */
@@ -241,6 +246,7 @@ interface MonthlyRecap {
   ijin: number;
   sakit: number;
   alpa: number;
+  dispensasi: number;
   rate: number;
 }
 
@@ -258,14 +264,16 @@ function buildMonthlyRecap(items: AttendanceItem[]): MonthlyRecap[] {
         ijin: 0,
         sakit: 0,
         alpa: 0,
+        dispensasi: 0,
         rate: 0,
       };
     }
     map[key].total++;
     if (it.status === "HADIR") map[key].hadir++;
-    else if (it.status === "IJIN") map[key].ijin++;
+    else if (it.status === "IZIN") map[key].ijin++;
     else if (it.status === "SAKIT") map[key].sakit++;
-    else if (it.status === "TANPA_KETERANGAN") map[key].alpa++;
+    else if (it.status === "ALPA") map[key].alpa++;
+    else if (it.status === "DISPENSASI") map[key].dispensasi++;
   });
 
   const list = Object.values(map);
@@ -290,22 +298,26 @@ export function AttendanceTab({
 }) {
   const [showAll, setShowAll] = useState(false);
 
+  /* -------- Item yang dihitung statistik: kecualikan meeting LIBUR -------- */
+  const statsItems = items.filter((it) => !it.libur);
+
   /* ---------------------------- Compute stats ---------------------------- */
   const counts = {
     HADIR: 0,
-    IJIN: 0,
+    IZIN: 0,
     SAKIT: 0,
-    TANPA_KETERANGAN: 0,
+    ALPA: 0,
+    DISPENSASI: 0,
   };
-  items.forEach((it) => {
+  statsItems.forEach((it) => {
     if (counts.hasOwnProperty(it.status)) counts[it.status]++;
   });
 
-  const persentase = items.length
-    ? Math.round((counts.HADIR / items.length) * 100)
+  const persentase = statsItems.length
+    ? Math.round((counts.HADIR / statsItems.length) * 100)
     : 0;
 
-  const monthlyRecap = buildMonthlyRecap(items);
+  const monthlyRecap = buildMonthlyRecap(statsItems);
   const hasMore = items.length > initialCount;
   const displayedItems = showAll ? items : items.slice(0, initialCount);
 
@@ -314,9 +326,9 @@ export function AttendanceTab({
       {/* ------------------------------ Stats Grid ------------------------------ */}
       <div className="grid grid-cols-4 gap-2">
         <StatBox label="Hadir" value={counts.HADIR} color="emerald" />
-        <StatBox label="Ijin" value={counts.IJIN} color="amber" />
+        <StatBox label="Izin" value={counts.IZIN} color="amber" />
         <StatBox label="Sakit" value={counts.SAKIT} color="amber" />
-        <StatBox label="Alpa" value={counts.TANPA_KETERANGAN} color="red" />
+        <StatBox label="Alpa" value={counts.ALPA} color="red" />
       </div>
 
       {/* ---------------------------- Percentage Bar ---------------------------- */}
@@ -402,7 +414,11 @@ export function AttendanceTab({
                         </p>
                       )}
                     </div>
-                    <Badge color={config.color}>{config.label}</Badge>
+                    {it.libur ? (
+                      <Badge color="ink">Libur</Badge>
+                    ) : (
+                      <Badge color={config.color}>{config.label}</Badge>
+                    )}
                   </Card>
                 );
               })}
@@ -438,7 +454,7 @@ export function AttendanceTab({
 /* -------------------------------------------------------------------------- */
 
 function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
-  const { monthKey, total, hadir, ijin, sakit, alpa, rate } = recap;
+  const { monthKey, total, hadir, ijin, sakit, alpa, dispensasi, rate } = recap;
 
   // Warna bar berdasarkan rate
   const barColor =
@@ -449,11 +465,17 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
   if (hadir > 0)
     chips.push({ label: "hadir", value: hadir, color: "text-accent" });
   if (ijin > 0)
-    chips.push({ label: "ijin", value: ijin, color: "text-warning" });
+    chips.push({ label: "izin", value: ijin, color: "text-warning" });
   if (sakit > 0)
     chips.push({ label: "sakit", value: sakit, color: "text-warning" });
   if (alpa > 0)
     chips.push({ label: "alpa", value: alpa, color: "text-danger" });
+  if (dispensasi > 0)
+    chips.push({
+      label: "dispensasi",
+      value: dispensasi,
+      color: "text-surface-muted",
+    });
 
   return (
     <Card>
@@ -537,4 +559,53 @@ function StatBox({
 export function CategoryHeaderBadge({ member }: { member: Member }) {
   if (!member.kategori) return null;
   return <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          MOOD TAB                                          */
+/* -------------------------------------------------------------------------- */
+
+function moodMeta(key: string): { emoji: string; label: string } {
+  const m = getMood(key as Parameters<typeof getMood>[0]);
+  return m ? { emoji: m.emoji, label: m.label } : { emoji: "😶", label: key };
+}
+
+export function MoodTab({ entries }: { entries: MoodEntry[] }) {
+  if (entries.length === 0) {
+    return (
+      <Card>
+        <p className="text-ios-subhead text-surface-muted text-center py-4">
+          Belum ada catatan mood.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-ios-footnote font-medium text-surface-muted px-0.5">
+        Riwayat mood harian
+      </p>
+      <Card>
+        <GroupedList>
+          {entries.map((e) => {
+            const meta = moodMeta(e.mood_key);
+            return (
+              <ListRow
+                key={e.mood_id}
+                leading={<span className="text-[22px] leading-none">{meta.emoji}</span>}
+              >
+                <p className="text-ios-subhead text-surface-text font-medium">
+                  {meta.label}
+                </p>
+                <p className="text-ios-caption text-surface-muted">
+                  {formatDateLongText(e.tanggal)}
+                </p>
+              </ListRow>
+            );
+          })}
+        </GroupedList>
+      </Card>
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
-# 🕌 Manajemen Pengajian
+# 🕌 Sambung Ngaji — Frontend
 
-Aplikasi web modern untuk manajemen pengajian, jamaah, absensi, monitoring pembinaan, dan pengumuman berbasis **Google Apps Script + React + Vite**.
+Aplikasi web manajemen pengajian untuk **admin** & **jamaah**. Dibangun dengan **React 18 + TypeScript + Vite**, mengonsumsi API backend Go (lihat [`../backend/go/README.md`](../backend/go/README.md)).
 
 ![Status](https://img.shields.io/badge/status-active-success)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
@@ -10,106 +10,224 @@ Aplikasi web modern untuk manajemen pengajian, jamaah, absensi, monitoring pembi
 
 ## ✨ Fitur
 
-### 📊 Dashboard
+Aplikasi punya **2 mode** yang dibedakan berdasarkan role user.
 
-- Ringkasan jamaah aktif, rata-rata kehadiran, dan jamaah yang perlu perhatian
-- Distribusi jamaah per kategori (Caberawit, Pra Remaja, Remaja, Pra Nikah, Dewasa, Manula)
-- Dashboard khusus per role (Super Admin, Admin, Tim PNKB, Tim Absensi)
-- Pengajian terdekat dan daftar perlu perhatian
+### 🛠️ Mode Admin
 
-### 👥 Manajemen Jamaah
+Role: `SUPER_ADMIN`, `ADMIN`, `TIM_PNKB`, `TIM_ABSENSI`, `PENGAWAS`
 
-- Biodata lengkap jamaah (identitas, kontak, alamat, pendidikan)
-- Kategori otomatis berdasarkan usia & status pernikahan
-- Upload foto jamaah (maks. 5MB)
-- Filter & pencarian jamaah
-- Data jamaah lengkap dengan fallback avatar (icon hijab / pria)
+- **Dashboard** — statistik jamaah, kehadiran, perlu perhatian; layout beda per role
+- **Jamaah** — CRUD biodata, import dari text WhatsApp, upload foto, export CSV, virtual list
+- **Absensi** — per meeting, bulk "Hadir semua", filter kategori & gender
+- **Jadwal** — kalender bulanan, bulk create 1 bulan, import dari text/PDF
+- **Pengumuman** — template WhatsApp, generate otomatis, share ke WA
+- **Monitoring** — catatan pembinaan per jamaah + timeline
+- **Kelompok** — kelola kelompok pengajian
+- **User & Akses** — manajemen user, reset password, role assignment
+- **Permintaan Member** — approve/reject request jadi member
+- **Audit Log** — riwayat aktivitas sistem
+- **QR Pendaftaran** — share link/form pendaftaran jamaah baru
 
-### 📅 Absensi
+### 🕌 Mode Member
 
-- Buat jadwal pengajian
-- Absensi cepat dengan segmented control (Hadir, Ijin, Sakit, Alpa)
-- Bulk action "Tandai semua hadir"
-- Progress indikator kehadiran
-- Riwayat absensi per jamaah
+- **Beranda** — greeting, jadwal sholat, quick actions, preview jadwal pengajian terdekat
+- **Al-Quran** — 114 surah (per ayat / mushaf), audio multi-qari, bookmark
+- **Doa & Dzikir** — pagi, sore, harian; dzikir counter dengan progress
+- **Waktu Sholat** — jadwal 5 waktu, countdown, hijriah (adhan)
+- **Puasa Sunnah** — jadwal 60 hari ke depan
+- **Arah Kiblat** — kompas real-time berbasis sensor
+- **Tenangkan Hati** — ayat & doa sesuai mood
+- **Jurnal Sholat** — tracker 5 waktu + streak
+- **Tahfidz** — progress hafalan per surah/ayat + mode uji
+- **Jadwal Pengajian** — kalender + daftar, filter per kategori user
+- **Biodata Saya** — lihat & edit profil sendiri
+- **Asisten AI** — chat pribadi untuk tanya data sendiri
 
-### 💬 Monitoring & Pembinaan
+### 🔗 Cross-cutting
 
-- Catatan monitoring per jamaah
-- Status pembinaan (Aktif, Perlu Perhatian, Kurang Aktif, Tidak Aktif)
-- Timeline aktivitas jamaah
-- Dashboard khusus Tim PNKB
-
-### 📢 Pengumuman
-
-- Template WhatsApp untuk undangan pengajian
-- Generate otomatis berdasarkan template
-- Preview sebelum share
-- Bagikan langsung ke WhatsApp
-
-### 🤖 AI Chat Assistant
-
-- Asisten AI dengan tool calling untuk ambil data real
-- Multi-provider: OmniRoute, Gemini, Groq (dengan fallback otomatis)
-- Chat history tersimpan di localStorage
-- Markdown renderer (bold, code, table, heading)
-- Copy, share, regenerate response
-
-### 🔐 Keamanan & Akses
-
-- Login dengan session token (TTL 12 jam)
-- Role-based access control:
-  - **Super Admin** — akses penuh
-  - **Admin** — kelola jamaah, kelompok, absensi, pengumuman
-  - **Tim PNKB** — khusus pembinaan pra nikah
-  - **Tim Absensi** — khusus absensi pengajian
-- Audit log untuk aktivitas penting
-- Field-level visibility berdasarkan role
-
-### 🎨 UI/UX
-
-- Design system konsisten dengan warna biru navy (Stockbit-inspired)
-- Dark mode otomatis mengikuti sistem
-- Animasi halus (FAB glow, shimmer skeleton, spring entrance)
-- Skeleton loading mirror layout (tidak ada layout shift)
-- Loading overlay blocking untuk aksi penting
-- Responsive mobile-first (max-width 480px)
-- Safe-area aware untuk iOS notch
-- PWA-ready (installable di home screen)
+- **Auth** — login, register publik, ganti password/username
+- **Tema** — light/dark + preset warna custom
+- **PWA** — installable, offline cache via Workbox
+- **Backup** — export/import data lokal
 
 ---
 
 ## 🚀 Tech Stack
 
-### Frontend
+### Core
 
 | Teknologi          | Fungsi                  |
 | ------------------ | ----------------------- |
 | **React 18**       | UI framework            |
-| **TypeScript**     | Type safety             |
-| **Vite**           | Build tool & dev server |
+| **TypeScript 5**   | Type safety             |
+| **Vite 5**         | Build tool & dev server |
 | **React Router 6** | Routing                 |
-| **Tailwind CSS**   | Styling                 |
-| **Lucide React**   | Icon library            |
-| **Inter Font**     | Typography              |
 
-### Backend
+### Data & State
 
-| Teknologi              | Fungsi                         |
-| ---------------------- | ------------------------------ |
-| **Google Apps Script** | Serverless backend             |
-| **Google Sheets**      | Database                       |
-| **Google Drive**       | Storage foto jamaah            |
-| **UrlFetchApp**        | HTTP client untuk AI providers |
+| Teknologi                    | Fungsi                                     |
+| ---------------------------- | ------------------------------------------ |
+| **TanStack Query v5**        | Server state, caching, retry               |
+| **TanStack Query Persister** | Cache persisten (IndexedDB via idb-keyval) |
+| **Context API**              | Auth, Theme, Toast                         |
 
-### AI Providers
+### UI
 
-| Provider      | Model                | Fungsi                |
-| ------------- | -------------------- | --------------------- |
-| **OmniRoute** | auto/best-vision     | Provider utama (fast) |
-| **Gemini**    | gemini-2.0-flash-exp | Fallback 1            |
-| **Groq**      | llama-3.3-70b        | Fallback 2 (gratis)   |
+| Teknologi          | Fungsi          |
+| ------------------ | --------------- |
+| **Tailwind CSS 3** | Styling utility |
+| **FontAwesome**    | Icon library    |
+| **Inter**          | Typography      |
+
+### Fitur Khusus
+
+| Teknologi                     | Fungsi                             |
+| ----------------------------- | ---------------------------------- |
+| **FullCalendar**              | Kalender jadwal (admin + member)   |
+| **adhan**                     | Perhitungan waktu sholat           |
+| **browser-image-compression** | Kompres foto sebelum upload        |
+| **qrcode.react**              | QR pendaftaran                     |
+| **TanStack Virtual**          | Virtual list (daftar jamaah besar) |
+
+### PWA & Build
+
+| Teknologi                      | Fungsi                    |
+| ------------------------------ | ------------------------- |
+| **vite-plugin-pwa**            | Service worker + manifest |
+| **Workbox**                    | Runtime caching strategy  |
+| **@vite-pwa/assets-generator** | Generate icon PWA         |
 
 ---
 
 ## 📁 Struktur Project
+
+```
+src/
+├── components/
+│   ├── common/         # Button, Input, Sheet, Modal, dsb
+│   ├── layout/         # AppLayout, Header, BottomNav, ProfileMenuSheet
+│   ├── member/         # Komponen khusus mode jamaah
+│   ├── jadwal/         # Kalender & tab jadwal admin
+│   └── monitoring/     # Komponen monitoring
+├── contexts/           # AuthContext, ThemeContext, ToastContext
+├── data/               # Data statis (quran, doa, dzikir, tahfidz, mood)
+├── hooks/              # Custom hooks (usePermission, useTahfidz, dsb)
+├── lib/                # QueryClient, helper
+├── pages/              # Halaman per route
+├── services/           # API clients (authApi, memberApi, domainApi, dsb)
+├── types/              # TypeScript types
+└── utils/              # Formatter, helper umum
+```
+
+---
+
+## 🔧 Setup Development
+
+### Prerequisites
+
+- **Node.js** ≥ 20
+- **Yarn**
+- Backend Go jalan di `127.0.0.1:8080` (lihat README backend)
+
+### Install
+
+```bash
+yarn install
+```
+
+### Konfigurasi Env
+
+Copy `.env.example` → `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Isi `VITE_API_BASE_URL` dengan endpoint backend. **Gunakan `127.0.0.1`, bukan `localhost`** (macOS IPv6 issue):
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8080/api
+```
+
+### Run
+
+```bash
+yarn dev
+```
+
+Buka `http://127.0.0.1:5173`.
+
+---
+
+## 📜 Scripts
+
+| Perintah         | Fungsi                                   |
+| ---------------- | ---------------------------------------- |
+| `yarn dev`       | Dev server (Vite HMR)                    |
+| `yarn build`     | Type-check (`tsc -b`) + production build |
+| `yarn build:dev` | Build dengan mode development            |
+| `yarn preview`   | Preview hasil build lokal                |
+| `yarn fetch-doa` | Regenerate data doa dari sumber          |
+
+---
+
+## 🧪 Verifikasi Sebelum Commit
+
+```bash
+npx tsc --noEmit
+yarn build
+```
+
+Expected: `tsc` tanpa output, build `✓ built in ...` dengan PWA generated.
+
+---
+
+## 🚢 Deploy
+
+Repo punya `vercel.json` — deploy otomatis via Vercel.
+
+### Setup di Vercel
+
+1. Import repo GitHub → framework preset **Vite**
+2. Set env variable: `VITE_API_BASE_URL` → URL backend production
+3. Build command & output default dari `vercel.json`
+
+---
+
+## 🔌 Kontrak API
+
+Semua request pakai pola **single-endpoint dispatcher**:
+
+```
+POST {VITE_API_BASE_URL}
+Content-Type: application/json
+
+Body:
+{
+  "action": "login",
+  "token": "...",
+  ...params
+}
+
+Response:
+{
+  "success": true,
+  "data": { ... },
+  "message": ""
+}
+```
+
+Implementasi: `src/services/api.ts` (`call<T>()` dengan retry otomatis).
+Daftar action lengkap: `src/services/domainApi.ts`.
+
+---
+
+## 📚 Terkait
+
+- **Backend Go** — [`../backend/go/README.md`](../backend/go/README.md)
+
+---
+
+## 📄 Lisensi
+
+MIT

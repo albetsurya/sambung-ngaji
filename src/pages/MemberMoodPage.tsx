@@ -10,6 +10,7 @@ import {
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { MOOD_LIST, getMood, type Mood, type MoodKey } from "../data/mood";
 import { useMoodPick } from "../hooks/useMoodPick";
+import { moodApi } from "../services/domainApi";
 
 export default function MemberMoodPage() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
     <>
       <div className="rounded-2xl border border-accent/15 bg-accent-soft/60 px-4 py-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
-          Tidak ada perasaan yang salah. Pilih yang paling dekat — kami akan
+          Tidak ada perasaan yang salah. Pilih yang paling dekat, kami akan
           temani dengan ayat & doa yang menenangkan.
         </p>
       </div>
@@ -93,7 +94,13 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       </div>
 
       <button
-        onClick={() => selected && onSelect(selected)}
+        onClick={() => {
+          if (selected) {
+            // Best-effort sync mood harian ke backend (upsert per hari). Gagal tidak memblok UX.
+            moodApi.save(selected).catch(() => {});
+            onSelect(selected);
+          }
+        }}
         disabled={!selected}
         className="w-full min-h-[52px] rounded-2xl bg-accent text-white text-ios-body font-semibold transition-all duration-200 hover:bg-accent-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >

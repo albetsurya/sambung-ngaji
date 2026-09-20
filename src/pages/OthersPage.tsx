@@ -17,6 +17,7 @@ import {
   Calendar,
   Home,
   FileText,
+  UserPlus,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -61,7 +62,7 @@ export default function OthersPage() {
     {
       key: "tampilan-jamaah",
       label: "Tampilan Jamaah",
-      description: "Mode personal — waktu sholat, doa, data pribadi",
+      description: "Mode personal: waktu sholat, doa, data pribadi",
       Icon: Home,
       to: "/member",
       show: !!user?.member_id,
@@ -83,6 +84,14 @@ export default function OthersPage() {
       show: isAdminLike,
       badge: pendingCount > 0 ? pendingCount : undefined,
       badgeLoading: pendingLoading,
+    },
+    {
+      key: "permintaan-member",
+      label: "Permintaan Member",
+      description: "User minta menjadi member",
+      Icon: UserPlus,
+      to: "/lainnya/permintaan-member",
+      show: isAdminLike,
     },
     {
       key: "kelompok",

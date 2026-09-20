@@ -12,9 +12,10 @@ export const MEMBER_CATEGORIES = [
 
 export const ATTENDANCE_STATUSES = [
   "HADIR",
-  "IJIN",
+  "IZIN",
   "SAKIT",
-  "TANPA_KETERANGAN",
+  "ALPA",
+  "DISPENSASI",
 ] as const;
 
 export const MONITORING_STATUSES = [

@@ -323,7 +323,7 @@ export default function MemberDoaPage() {
             </>
           ) : (
             <p className="text-ios-caption text-surface-muted leading-relaxed">
-              Doa harian untuk aktivitas sehari-hari — makan, tidur, keluar
+              Doa harian untuk aktivitas sehari-hari, seperti makan, tidur, dan keluar rumah
               rumah, perjalanan, dan lainnya. Sumber dari Al-Quran &
               Kutubusittah.
             </p>

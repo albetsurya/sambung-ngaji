@@ -437,7 +437,7 @@ function RejectSheet({
         <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/20">
           <p className="text-ios-footnote text-danger leading-relaxed">
             Pendaftar akan ditolak dan tidak akan ditambahkan sebagai jamaah.
-            Alasan tidak dikirim otomatis — sampaikan manual kalau perlu.
+            Alasan tidak terkirim otomatis. Sampaikan manual kalau perlu.
           </p>
         </div>
 

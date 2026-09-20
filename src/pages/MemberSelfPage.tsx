@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User,
   GraduationCap,
@@ -19,9 +19,11 @@ import {
   Avatar,
   Card,
   ErrorState,
+  Button,
 } from "../components/common";
 import { MemberSelfSkeleton } from "../components/common/Skeleton";
 import { memberSelfApi } from "../services/memberSelfApi";
+import { memberRequestApi } from "../services/domainApi";
 import type { Member, MonitoringEntry, Meeting, Education } from "../types";
 import {
   CATEGORY_LABEL,
@@ -51,9 +53,12 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export default function MemberSelfPage() {
   const navigate = useNavigate();
-  const { isMember } = usePermission();
+  const { isMember, role } = usePermission();
   const { user } = useAuth();
+  const qc = useQueryClient();
   const [searchParams] = useSearchParams();
+  const [requestMsg, setRequestMsg] = useState<string | null>(null);
+  const isAdminSelf = role === "SUPER_ADMIN" || role === "ADMIN";
   const tabFromUrl = searchParams.get("tab") as TabKey | null;
   const isValidTab = (t: string | null): t is TabKey =>
     t !== null && TABS.some((x) => x.key === t);
@@ -77,11 +82,74 @@ export default function MemberSelfPage() {
     enabled: !!user?.user_id,
   });
 
+  const becomeMember = useMutation({
+    mutationFn: () => memberRequestApi.becomeMember(),
+    onSuccess: (res) => {
+      setRequestMsg(res.message);
+      if (res.auto_created) {
+        qc.invalidateQueries({
+          queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
+        });
+        setTimeout(() => refetch(), 600);
+      }
+    },
+    onError: (e) =>
+      setRequestMsg(
+        e instanceof Error ? e.message : "Terjadi kesalahan. Coba lagi.",
+      ),
+  });
+
+  const noMemberError =
+    !!error &&
+    error instanceof ApiError &&
+    /belum terhubung ke data jamaah|belum memiliki/i.test(error.message);
+
   if (isLoading) {
     return (
       <AppLayout hideNav>
         <Header title="Biodata Saya" />
         <MemberSelfSkeleton />
+      </AppLayout>
+    );
+  }
+
+  if (noMemberError) {
+    return (
+      <AppLayout hideNav showAiChat={false}>
+        <Header
+          title="Biodata Saya"
+          onBack={backPath ? () => navigate(backPath) : undefined}
+          backLabel="Kembali"
+        />
+        <div className="px-5 py-10 flex flex-col items-center text-center">
+          <span className="w-16 h-16 rounded-3xl bg-accent-soft flex items-center justify-center text-accent mb-4">
+            <User size={28} />
+          </span>
+          <p className="text-ios-title font-semibold text-surface-text mb-2">
+            Akun Anda belum memiliki data member
+          </p>
+          <p className="text-ios-footnote text-surface-muted max-w-xs leading-relaxed mb-6">
+            {isAdminSelf
+              ? "Sebagai admin, Anda bisa langsung membuat data member untuk akun Anda."
+              : "Kirim permintaan agar admin menyetujui Anda menjadi member."}
+          </p>
+
+          <Button
+            variant="primary"
+            fullWidth
+            className="max-w-xs"
+            disabled={becomeMember.isPending}
+            onClick={() => becomeMember.mutate()}
+          >
+            {isAdminSelf ? "Buat Data Member Saya" : "Kirim Permintaan"}
+          </Button>
+
+          {requestMsg && (
+            <p className="text-ios-footnote text-surface-muted mt-4 leading-relaxed">
+              {requestMsg}
+            </p>
+          )}
+        </div>
       </AppLayout>
     );
   }
@@ -113,6 +181,7 @@ export default function MemberSelfPage() {
           .filter(Boolean)
           .join(" · "),
         status: a.status,
+        libur: a.status_meeting === "LIBUR",
       }),
     )
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));

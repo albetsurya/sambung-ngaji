@@ -536,7 +536,7 @@ function TahfidzAyatCard({
           <button
             onClick={onToggleHafal}
             aria-label={hafal ? "Tandai belum hafal" : "Tandai hafal"}
-            title={hafal ? "Sudah hafal — tap untuk batalkan" : "Tandai hafal"}
+            title={hafal ? "Sudah hafal, tap untuk batalkan" : "Tandai hafal"}
             className={
               "w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 active:scale-95 " +
               (hafal

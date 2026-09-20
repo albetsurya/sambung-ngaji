@@ -63,7 +63,7 @@ export function DoaCard({
           }}
           disabled={!onToggleRead}
           aria-label={isRead ? "Tandai belum dibaca" : "Tandai sudah dibaca"}
-          title={isRead ? "Sudah dibaca — klik untuk batalkan" : "Tandai sudah dibaca"}
+          title={isRead ? "Sudah dibaca, klik untuk batalkan" : "Tandai sudah dibaca"}
           className={
             "w-9 h-9 rounded-xl flex items-center justify-center text-[12px] font-bold flex-shrink-0 tabular-nums transition-all duration-200 active:scale-[0.92] " +
             (isRead
