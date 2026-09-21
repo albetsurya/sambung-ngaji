@@ -33,11 +33,24 @@ import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
 import { pendingApi } from "../services/pendingApi";
 import { useDelayedLoading } from "../hooks/useDelayedLoading";
-import {
-  ThemePickerRow,
-  ThemePickerSheet,
-} from "../components/common/ThemePickerSheet";
+import { ThemePickerSheet } from "../components/common/ThemePickerSheet";
 import { queryKeys } from "../lib/queryClient";
+
+type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "sistem" | "akun";
+
+interface MenuEntry {
+  key: string;
+  label: string;
+  description?: string;
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  to?: string;
+  onClick?: () => void;
+  show: boolean;
+  group: MenuGroup;
+  badge?: number;
+  badgeLoading?: boolean;
+  renderToggle?: boolean;
+}
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
@@ -58,23 +71,29 @@ export default function OthersPage() {
   const pendingCount = pendingList.length;
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
-  const menu = [
+  const menu = ([
+    // Tampilan
     {
-      key: "tampilan-jamaah",
-      label: "Tampilan Jamaah",
-      description: "Mode personal: waktu sholat, doa, data pribadi",
-      Icon: Home,
-      to: "/member",
-      show: !!user?.member_id,
-    },
-    {
-      key: "profil-saya",
-      label: "Biodata Saya",
-      description: "Lihat & edit biodata pribadi Anda",
-      Icon: User,
-      to: "/profil-saya",
+      key: "mode-tampilan",
+      label: "Mode Tampilan",
+      description: theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif",
+      Icon: theme === "dark" ? Sun : Moon,
+      onClick: toggleTheme,
       show: true,
+      group: "tampilan",
+      renderToggle: true,
     },
+    {
+      key: "theme-preset",
+      label: "Preset Tema",
+      description: "Pilih warna tampilan",
+      Icon: Settings,
+      onClick: () => setThemePickerOpen(true),
+      show: true,
+      group: "tampilan",
+    },
+
+    // Jamaah & Pendaftaran
     {
       key: "pendaftar",
       label: "Pendaftar",
@@ -82,6 +101,7 @@ export default function OthersPage() {
       Icon: ClipboardList,
       to: "/lainnya/pendaftar",
       show: isAdminLike,
+      group: "jamaah",
       badge: pendingCount > 0 ? pendingCount : undefined,
       badgeLoading: pendingLoading,
     },
@@ -92,6 +112,7 @@ export default function OthersPage() {
       Icon: UserPlus,
       to: "/lainnya/permintaan-member",
       show: isAdminLike,
+      group: "jamaah",
     },
     {
       key: "kelompok",
@@ -100,6 +121,7 @@ export default function OthersPage() {
       Icon: Building2,
       to: "/lainnya/kelompok",
       show: isAdminLike,
+      group: "jamaah",
     },
     {
       key: "import-jamaah",
@@ -108,6 +130,7 @@ export default function OthersPage() {
       Icon: FileText,
       to: "/lainnya/import-jamaah",
       show: isAdminLike,
+      group: "jamaah",
     },
     {
       key: "qr-code",
@@ -116,23 +139,10 @@ export default function OthersPage() {
       Icon: QrCode,
       to: "/lainnya/qr-code",
       show: isAdminLike,
+      group: "jamaah",
     },
-    {
-      key: "change-password",
-      label: "Ganti Password",
-      description: "Ubah password akun Anda",
-      Icon: Lock,
-      to: "",
-      show: true,
-    },
-    {
-      key: "users",
-      label: "Manajemen User",
-      description: "Atur akun & hak akses",
-      Icon: KeyRound,
-      to: "/lainnya/users",
-      show: isSuperAdmin,
-    },
+
+    // Jadwal & Absensi
     {
       key: "jadwal",
       label: "Kelola Jadwal",
@@ -140,14 +150,18 @@ export default function OthersPage() {
       Icon: Calendar,
       to: "/lainnya/jadwal",
       show: isAdminLike || role === "TIM_ABSENSI",
+      group: "jadwal",
     },
+
+    // Sistem
     {
-      key: "ai-usage",
-      label: "Monitoring AI",
-      description: "Statistik pemakaian AI",
-      Icon: Sparkles,
-      to: "/lainnya/ai-usage",
-      show: isAdminLike,
+      key: "users",
+      label: "Manajemen User",
+      description: "Atur akun & hak akses",
+      Icon: KeyRound,
+      to: "/lainnya/users",
+      show: isSuperAdmin,
+      group: "sistem",
     },
     {
       key: "settings",
@@ -156,6 +170,16 @@ export default function OthersPage() {
       Icon: Settings,
       to: "/lainnya/pengaturan",
       show: isAdminLike,
+      group: "sistem",
+    },
+    {
+      key: "ai-usage",
+      label: "Monitoring AI",
+      description: "Statistik pemakaian AI",
+      Icon: Sparkles,
+      to: "/lainnya/ai-usage",
+      show: isAdminLike,
+      group: "sistem",
     },
     {
       key: "audit",
@@ -164,8 +188,136 @@ export default function OthersPage() {
       Icon: ScrollText,
       to: "/lainnya/audit-log",
       show: isSuperAdmin,
+      group: "sistem",
     },
-  ].filter((m) => m.show);
+
+    // Akun
+    {
+      key: "tampilan-jamaah",
+      label: "Tampilan Jamaah",
+      description: "Mode personal: waktu sholat, doa, data pribadi",
+      Icon: Home,
+      to: "/member",
+      show: !!user?.member_id,
+      group: "akun",
+    },
+    {
+      key: "profil-saya",
+      label: "Biodata Saya",
+      description: "Lihat & edit biodata pribadi Anda",
+      Icon: User,
+      to: "/profil-saya",
+      show: true,
+      group: "akun",
+    },
+    {
+      key: "change-password",
+      label: "Ganti Password",
+      description: "Ubah password akun Anda",
+      Icon: Lock,
+      onClick: () => setChangePasswordOpen(true),
+      show: true,
+      group: "akun",
+    },
+  ] satisfies MenuEntry[]).filter((m) => m.show);
+
+  const GROUP_LABEL: Record<MenuGroup, string> = {
+    tampilan: "Tampilan",
+    jamaah: "Jamaah & Pendaftaran",
+    jadwal: "Jadwal & Absensi",
+    sistem: "Sistem",
+    akun: "Akun",
+  };
+
+  const GROUP_ORDER: MenuGroup[] = [
+    "tampilan",
+    "jamaah",
+    "jadwal",
+    "sistem",
+    "akun",
+  ];
+
+  function renderMenuGroup(groupKey: MenuGroup) {
+    const items = menu.filter((m) => m.group === groupKey);
+    if (items.length === 0) return null;
+    return (
+      <section key={groupKey}>
+        <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+          {GROUP_LABEL[groupKey]}
+        </p>
+        <GroupedList>
+        {items.map((m, i) => {
+          const Icon = m.Icon;
+          const handleClick = () => {
+            if (m.onClick) m.onClick();
+            else if (m.to) navigate(m.to);
+          };
+          return (
+            <ListRow
+              key={m.key}
+              onClick={handleClick}
+              insetDivider={i !== items.length - 1}
+              leading={
+                <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                  <Icon size={16} />
+                </span>
+              }
+            >
+              {m.renderToggle ? (
+                <div className="flex items-center gap-3 w-full">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-ios-body text-surface-text">{m.label}</p>
+                    {m.description && (
+                      <p className="text-ios-caption text-surface-muted truncate">
+                        {m.description}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+                      theme === "dark" ? "bg-accent" : "bg-surface-card2"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                        theme === "dark" ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </span>
+                </div>
+              ) : (
+                <ChevronRow>
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-ios-body font-medium text-surface-text truncate">
+                        {m.label}
+                      </p>
+                      {m.description && (
+                        <p className="text-ios-caption text-surface-muted truncate">
+                          {m.description}
+                        </p>
+                      )}
+                    </div>
+                    {m.badgeLoading && showBadgeSkeleton ? (
+                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-surface-card2 animate-pulse shrink-0">
+                        <span className="w-2 h-2 rounded-full bg-surface-muted/40" />
+                      </span>
+                    ) : m.badge !== undefined ? (
+                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
+                        {m.badge > 99 ? "99+" : m.badge}
+                      </span>
+                    ) : null}
+                  </div>
+                </ChevronRow>
+              )}
+            </ListRow>
+          );
+        })}
+        </GroupedList>
+      </section>
+    );
+  }
 
   return (
     <AppLayout>
@@ -191,87 +343,7 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
-        <GroupedList>
-          <ListRow onClick={toggleTheme} insetDivider={false}>
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent shrink-0">
-                {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-ios-body text-surface-text">Mode Tampilan</p>
-                <p className="text-ios-caption text-surface-muted">
-                  {theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif"}
-                </p>
-              </div>
-              <span
-                className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
-                  theme === "dark" ? "bg-accent" : "bg-surface-card2"
-                }`}
-                aria-hidden="true"
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                    theme === "dark" ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </span>
-            </div>
-          </ListRow>
-        </GroupedList>
-
-        <GroupedList>
-          <ThemePickerRow onClick={() => setThemePickerOpen(true)} />
-        </GroupedList>
-
-        {menu.length > 0 && (
-          <GroupedList>
-            {menu.map((m, i) => {
-              const Icon = m.Icon;
-              return (
-                <ListRow
-                  key={m.key}
-                  onClick={() => {
-                    if (m.key === "change-password") {
-                      setChangePasswordOpen(true);
-                    } else {
-                      navigate(m.to);
-                    }
-                  }}
-                  insetDivider={i !== menu.length - 1}
-                  leading={
-                    <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
-                      <Icon size={16} />
-                    </span>
-                  }
-                >
-                  <ChevronRow>
-                    <div className="flex items-center justify-between gap-2 w-full">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-ios-body font-medium text-surface-text truncate">
-                          {m.label}
-                        </p>
-                        {m.description && (
-                          <p className="text-ios-caption text-surface-muted truncate">
-                            {m.description}
-                          </p>
-                        )}
-                      </div>
-                      {m.badgeLoading && showBadgeSkeleton ? (
-                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-surface-card2 animate-pulse shrink-0">
-                          <span className="w-2 h-2 rounded-full bg-surface-muted/40" />
-                        </span>
-                      ) : m.badge !== undefined ? (
-                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
-                          {m.badge > 99 ? "99+" : m.badge}
-                        </span>
-                      ) : null}
-                    </div>
-                  </ChevronRow>
-                </ListRow>
-              );
-            })}
-          </GroupedList>
-        )}
+        {GROUP_ORDER.map((g) => renderMenuGroup(g))}
 
         <GroupedList>
           <ListRow
