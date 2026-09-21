@@ -78,6 +78,7 @@ export default function DashboardPage() {
             className="rounded-full overflow-hidden transition-all hover:opacity-80 active:scale-95"
           >
             <Avatar
+              src={user?.foto_url}
               name={user?.nama || "?"}
               size={32}
               gender={normalizeGender(user?.jenis_kelamin)}

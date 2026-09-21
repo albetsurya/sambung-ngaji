@@ -42,6 +42,7 @@ import { AboutAppModal } from "../components/member/AboutAppModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
+import { normalizeGender } from "../utils/format";
 
 /* -------------------------------------------------------------------------- */
 /*                              Types                                         */
@@ -359,7 +360,12 @@ export default function MemberOthersPage() {
             onClick={() => navigate(profilePath)}
           >
             <div className="flex items-center gap-3">
-              <Avatar name={user?.nama || "?"} size={52} gender="L" />
+              <Avatar
+                src={user?.foto_url}
+                name={user?.nama || "?"}
+                size={52}
+                gender={normalizeGender(user?.jenis_kelamin)}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-ios-body font-semibold text-surface-text truncate">
                   {user?.nama}
