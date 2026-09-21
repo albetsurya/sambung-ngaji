@@ -273,7 +273,6 @@ export const ATTENDANCE_LABEL: Record<string, string> = {
   IZIN: "Izin",
   SAKIT: "Sakit",
   ALPA: "Alpa",
-  DISPENSASI: "Dispensasi",
 };
 
 export const MONITORING_LABEL: Record<string, string> = {

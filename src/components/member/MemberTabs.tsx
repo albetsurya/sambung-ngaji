@@ -208,7 +208,6 @@ const ATT_STATUS_CONFIG: Record<
   IZIN: { label: "Izin", color: "amber" },
   SAKIT: { label: "Sakit", color: "amber" },
   ALPA: { label: "Alpa", color: "red" },
-  DISPENSASI: { label: "Dispensasi", color: "ink" },
 };
 
 /* ----------------------------- Month helpers ----------------------------- */
@@ -246,7 +245,6 @@ interface MonthlyRecap {
   ijin: number;
   sakit: number;
   alpa: number;
-  dispensasi: number;
   rate: number;
 }
 
@@ -264,7 +262,6 @@ function buildMonthlyRecap(items: AttendanceItem[]): MonthlyRecap[] {
         ijin: 0,
         sakit: 0,
         alpa: 0,
-        dispensasi: 0,
         rate: 0,
       };
     }
@@ -273,7 +270,6 @@ function buildMonthlyRecap(items: AttendanceItem[]): MonthlyRecap[] {
     else if (it.status === "IZIN") map[key].ijin++;
     else if (it.status === "SAKIT") map[key].sakit++;
     else if (it.status === "ALPA") map[key].alpa++;
-    else if (it.status === "DISPENSASI") map[key].dispensasi++;
   });
 
   const list = Object.values(map);
@@ -307,7 +303,6 @@ export function AttendanceTab({
     IZIN: 0,
     SAKIT: 0,
     ALPA: 0,
-    DISPENSASI: 0,
   };
   statsItems.forEach((it) => {
     if (counts.hasOwnProperty(it.status)) counts[it.status]++;
@@ -454,7 +449,7 @@ export function AttendanceTab({
 /* -------------------------------------------------------------------------- */
 
 function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
-  const { monthKey, total, hadir, ijin, sakit, alpa, dispensasi, rate } = recap;
+  const { monthKey, total, hadir, ijin, sakit, alpa, rate } = recap;
 
   // Warna bar berdasarkan rate
   const barColor =
@@ -470,12 +465,6 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
     chips.push({ label: "sakit", value: sakit, color: "text-warning" });
   if (alpa > 0)
     chips.push({ label: "alpa", value: alpa, color: "text-danger" });
-  if (dispensasi > 0)
-    chips.push({
-      label: "dispensasi",
-      value: dispensasi,
-      color: "text-surface-muted",
-    });
 
   return (
     <Card>

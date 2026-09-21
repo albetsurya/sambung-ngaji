@@ -15,7 +15,6 @@ export const ATTENDANCE_STATUSES = [
   "IZIN",
   "SAKIT",
   "ALPA",
-  "DISPENSASI",
 ] as const;
 
 export const MONITORING_STATUSES = [

@@ -106,13 +106,6 @@ const STATUS_CONFIG: Record<
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-danger-soft hover:text-danger",
   },
-  DISPENSASI: {
-    label: "Dispensasi",
-    Icon: Calendar,
-    activeClass: "bg-surface-muted text-white shadow-sm shadow-surface-muted/30",
-    inactiveClass:
-      "bg-surface-card2 text-surface-muted hover:bg-surface-soft hover:text-surface-foreground",
-  },
 };
 
 interface AttendancePageData {
@@ -535,13 +528,9 @@ export default function AttendancePage() {
 
   /* ------------------------------- Callbacks ------------------------------ */
 
-  const handleStatusChange = useCallback(
-    (memberId: string, status: AttendanceStatus) => {
-      tapStatus(memberId, status);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedMeetingId],
-  );
+  function handleStatusChange(memberId: string, status: AttendanceStatus) {
+    tapStatus(memberId, status);
+  }
 
   const handleRequestDelete = useCallback(
     (memberId: string, memberName: string) => {
