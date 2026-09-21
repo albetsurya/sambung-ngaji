@@ -92,15 +92,17 @@ export function EmptyState({
   title,
   description,
   action,
+  icon,
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <div className={STATE_WRAPPER}>
       <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-4">
-        <ClipboardList size={26} className="text-accent" />
+        {icon ?? <ClipboardList size={26} className="text-accent" />}
       </div>
       <h3 className="text-ios-nav font-semibold text-surface-text mb-1.5">
         {title}

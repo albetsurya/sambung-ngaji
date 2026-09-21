@@ -152,6 +152,7 @@ export default function AttendancePage() {
     memberName: string;
   } | null>(null);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
+  const [confirmLibur, setConfirmLibur] = useState<Meeting | null>(null);
 
   /* -------------------------------- Data --------------------------------- */
 
@@ -430,6 +431,10 @@ export default function AttendancePage() {
 
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
+    if (selectedMeeting.status === "LIBUR") {
+      showToast("Jadwal libur — absensi tidak dapat diubah", "warning");
+      return;
+    }
     const prev = records[memberId];
     const nextStatus = prev === status ? undefined : status;
 
@@ -524,6 +529,22 @@ export default function AttendancePage() {
     if (!selectedMeeting) return;
     setOptimistic({});
     resetMutation.mutate(selectedMeeting.meeting_id);
+  }
+
+  function executeToggleLibur(meeting: Meeting) {
+    liburMutation.mutate({
+      meetingId: meeting.meeting_id,
+      status: meeting.status === "LIBUR" ? "SCHEDULED" : "LIBUR",
+    });
+  }
+
+  function handleToggleLibur(meeting: Meeting) {
+    const willBeLibur = meeting.status !== "LIBUR";
+    if (willBeLibur) {
+      setConfirmLibur(meeting);
+      return;
+    }
+    executeToggleLibur(meeting);
   }
 
   /* ------------------------------- Callbacks ------------------------------ */
@@ -702,12 +723,19 @@ export default function AttendancePage() {
                       <Calendar size={18} className="text-accent" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
-                        Jadwal dipilih
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-[11px] font-medium text-surface-muted uppercase tracking-wide">
+                          Jadwal dipilih
+                        </p>
+                        {selectedMeeting?.status === "LIBUR" && (
+                          <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wide bg-danger text-white rounded-full px-2 py-0.5 shrink-0">
+                            Libur
+                          </span>
+                        )}
+                      </div>
                       <p className="text-ios-body font-medium text-surface-text truncate">
                         {selectedMeeting
-                          ? `${selectedMeeting.hari} — ${selectedMeeting.acara || "Pengajian"}`
+                          ? `${selectedMeeting.hari} - ${selectedMeeting.acara || "Pengajian"}`
                           : "Pilih jadwal"}
                       </p>
                       {selectedMeeting && (
@@ -716,12 +744,6 @@ export default function AttendancePage() {
                           {selectedMeeting.jam || "—"}
                         </p>
                       )}
-                      {selectedMeeting &&
-                        selectedMeeting.status === "LIBUR" && (
-                          <span className="inline-flex items-center mt-0.5 text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5">
-                            Libur
-                          </span>
-                        )}
                       {selectedMeeting &&
                         normalizeTargets(selectedMeeting.kategori_target)
                           .length > 0 && (
@@ -740,25 +762,21 @@ export default function AttendancePage() {
                 </div>
               </div>
             ) : (
-              <div className="px-4 rounded-2xl border border-dashed border-surface-border bg-surface-card p-5 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-3">
-                  <Calendar size={22} className="text-accent" />
-                </div>
-                <p className="text-ios-body font-medium text-surface-text mb-1">
-                  Belum ada jadwal pengajian
-                </p>
-                <p className="text-ios-caption text-surface-muted mb-4 max-w-xs mx-auto leading-relaxed">
-                  Buat jadwal pertama untuk mulai mencatat absensi
-                </p>
-                {canCreate && (
-                  <button
-                    onClick={() => setSheet({ view: "create-picker" })}
-                    className="min-h-[44px] px-6 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all hover:bg-accent-dark active:scale-[0.97] inline-flex items-center justify-center gap-1.5"
-                  >
-                    <Plus size={14} /> Buat Jadwal Pertama
-                  </button>
-                )}
-              </div>
+              <EmptyState
+                icon={<Calendar size={26} className="text-accent" />}
+                title="Belum ada jadwal pengajian"
+                description="Buat jadwal pertama untuk mulai mencatat absensi."
+                action={
+                  canCreate ? (
+                    <button
+                      onClick={() => setSheet({ view: "create-picker" })}
+                      className="min-h-[44px] px-6 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all hover:bg-accent-dark active:scale-[0.97] inline-flex items-center justify-center gap-1.5"
+                    >
+                      <Plus size={14} /> Buat Jadwal Pertama
+                    </button>
+                  ) : undefined
+                }
+              />
             )}
           </div>
 
@@ -856,6 +874,24 @@ export default function AttendancePage() {
               </div>
 
               <div className="bg-surface-card">
+                {selectedMeeting.status === "LIBUR" && (
+                  <div className="mx-4 my-3 p-3 rounded-xl bg-warning-soft border border-warning/20 flex items-start gap-2.5">
+                    <AlertTriangle
+                      size={14}
+                      className="text-warning flex-shrink-0 mt-0.5"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-ios-caption font-semibold text-warning">
+                        Jadwal Libur
+                      </p>
+                      <p className="text-ios-caption text-warning/80 leading-relaxed mt-0.5">
+                        Absensi tidak dihitung dalam persentase kehadiran dan
+                        tidak dapat diubah.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {filteredMembers.length === 0 && (
                   <EmptyState
                     title="Tidak ada jamaah"
@@ -882,7 +918,7 @@ export default function AttendancePage() {
                     onStatus={handleStatusChange}
                     onRequestDelete={handleRequestDelete}
                     divider={i !== filteredMembers.length - 1}
-                    readonly={isReadonly}
+                    readonly={isReadonly || selectedMeeting.status === "LIBUR"}
                   />
                 ))}
               </div>
@@ -928,12 +964,7 @@ export default function AttendancePage() {
           <MeetingActionContent
             meeting={sheet.meeting}
             liburLoading={liburMutation.isPending}
-            onToggleLibur={() =>
-              liburMutation.mutate({
-                meetingId: sheet.meeting.meeting_id,
-                status: sheet.meeting.status === "LIBUR" ? "SCHEDULED" : "LIBUR",
-              })
-            }
+            onToggleLibur={() => handleToggleLibur(sheet.meeting)}
             onEdit={openEditForm}
             onDelete={() => handleDeleteFromAction(sheet.meeting)}
           />
@@ -999,6 +1030,25 @@ export default function AttendancePage() {
         loading={resetMutation.isPending}
         onCancel={() => setConfirmResetAll(false)}
         onConfirm={resetAllAttendance}
+      />
+
+      <ConfirmDialog
+        open={!!confirmLibur}
+        title="Tandai jadwal libur?"
+        description={
+          confirmLibur
+            ? `Jadwal "${confirmLibur.acara || "Pengajian"}" akan ditandai libur. Absensi yang sudah ada tidak akan dihitung dalam persentase kehadiran dan tidak dapat diubah.`
+            : ""
+        }
+        confirmLabel="Ya, Tandai Libur"
+        loading={liburMutation.isPending}
+        onCancel={() => setConfirmLibur(null)}
+        onConfirm={() => {
+          if (confirmLibur) {
+            executeToggleLibur(confirmLibur);
+            setConfirmLibur(null);
+          }
+        }}
       />
     </AppLayout>
   );
