@@ -4,6 +4,7 @@ import { Download, Share2, Check, Copy } from "../common/FontAwesomeIcons";
 import { Card, Button } from "../common";
 import { useInstallPrompt } from "../../hooks/useInstallPrompt";
 import { useToast } from "../../contexts/ToastContext";
+import { InstallConfirmModal } from "./InstallConfirmModal";
 
 /**
  * Kartu "Install Aplikasi".
@@ -15,6 +16,8 @@ export function InstallAppCard() {
   const { showToast } = useToast();
   const { canInstall, installed, promptInstall } = useInstallPrompt();
   const [copied, setCopied] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [installing, setInstalling] = useState(false);
 
   const appUrl =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -85,7 +88,7 @@ export function InstallAppCard() {
                 variant="primary"
                 fullWidth
                 className="mb-3"
-                onClick={() => promptInstall()}
+                onClick={() => setConfirmOpen(true)}
               >
                 <Download size={16} /> Install
               </Button>
@@ -121,6 +124,25 @@ export function InstallAppCard() {
           </>
         )}
       </Card>
+
+      <InstallConfirmModal
+        open={confirmOpen}
+        loading={installing}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={async () => {
+          setInstalling(true);
+          try {
+            const ok = await promptInstall();
+            if (ok) showToast("Aplikasi berhasil diinstall");
+            else showToast("Install dibatalkan", "warning");
+          } catch {
+            showToast("Gagal install", "error");
+          } finally {
+            setInstalling(false);
+            setConfirmOpen(false);
+          }
+        }}
+      />
     </div>
   );
 }

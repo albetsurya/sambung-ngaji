@@ -151,6 +151,19 @@ function MaleIcon({ size, className }: { size: number; className?: string }) {
 /*                                   Avatar                                   */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Optimasi URL foto avatar.
+ * Google Drive thumbnail default `sz=w1000` (1000px) — untuk avatar 44-64px
+ * cukup `w200` (retina 3x). Turunkan bandwidth ~5x tanpa kelihatan blur.
+ */
+function optimizeAvatarUrl(url: string): string {
+  if (!url) return url;
+  if (url.includes("drive.google.com") && /sz=w\d+/.test(url)) {
+    return url.replace(/sz=w\d+/, "sz=w200");
+  }
+  return url;
+}
+
 interface AvatarProps {
   src?: string;
   name: string;
@@ -177,13 +190,14 @@ export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
   if (showPhoto) {
     return (
       <img
-        src={src}
+        src={optimizeAvatarUrl(src!)}
         alt={name}
-        onError={() => setImgError(true)} // ← ini penting
+        onError={() => setImgError(true)}
         style={{ width: size, height: size }}
         className="rounded-full object-cover bg-accent-soft flex-shrink-0 ring-1 ring-surface-border"
-        loading="lazy" // ← optimasi
-        referrerPolicy="no-referrer" // ← hilangkan referrer
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
       />
     );
   }
