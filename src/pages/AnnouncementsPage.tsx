@@ -7,6 +7,7 @@ import {
   Share2,
   ScrollText,
   Check,
+  Plus,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -112,10 +113,13 @@ export default function AnnouncementsPage() {
         {!isLoading && !error && list.length === 0 && (
           <EmptyState
             title="Belum ada pengumuman"
-            description="Buat pengumuman pertama untuk jadwal pengajian rutin."
+            description="Buat pengumuman pertama untuk jadwal pengajian."
             action={
               isAdminLike ? (
-                <Button onClick={() => setCreateOpen(true)}>
+                <Button
+                  onClick={() => setCreateOpen(true)}
+                  leftIcon={<Plus size={14} />}
+                >
                   Buat Pengumuman
                 </Button>
               ) : undefined

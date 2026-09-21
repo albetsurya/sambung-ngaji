@@ -53,8 +53,9 @@ interface MenuItem {
   description?: string;
   Icon: (props: { size?: number; className?: string }) => React.ReactNode;
   to?: string;
-  action?: "changePassword" | "changeUsername" | "backup" | "about" | "theme";
-  group: "ibadah" | "data" | "akun";
+  action?: "changePassword" | "changeUsername" | "backup" | "about" | "theme" | "toggleTheme";
+  group: "tampilan" | "ibadah" | "data" | "akun" | "tentang";
+  render?: "toggle";
 }
 
 /* -------------------------------------------------------------------------- */
@@ -77,6 +78,25 @@ export default function MemberOthersPage() {
   const profilePath = isMember ? "/member/profil" : "/profil-saya";
 
   const MENU: MenuItem[] = [
+    // Grup Tampilan
+    {
+      key: "mode-tampilan",
+      label: "Mode Tampilan",
+      description: theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif",
+      Icon: theme === "dark" ? Sun : Moon,
+      action: "toggleTheme",
+      group: "tampilan",
+      render: "toggle",
+    },
+    {
+      key: "theme",
+      label: "Preset Tema",
+      description: "Pilih warna tampilan",
+      Icon: Palette,
+      action: "theme",
+      group: "tampilan",
+    },
+
     // Grup Ibadah
     {
       key: "quran",
@@ -187,14 +207,6 @@ export default function MemberOthersPage() {
       group: "akun",
     },
     {
-      key: "theme",
-      label: "Preset Tema",
-      description: "Pilih warna tampilan",
-      Icon: Palette,
-      action: "theme",
-      group: "akun",
-    },
-    {
       key: "backup",
       label: "Backup Data",
       description: "Export / import data",
@@ -208,7 +220,7 @@ export default function MemberOthersPage() {
       description: "Info versi & fitur",
       Icon: Info,
       action: "about",
-      group: "akun",
+      group: "tentang",
     },
     {
       key: "panduan",
@@ -216,7 +228,7 @@ export default function MemberOthersPage() {
       description: "Cara pakai aplikasi",
       Icon: HelpCircle,
       to: "/member/panduan",
-      group: "akun",
+      group: "tentang",
     },
     {
       key: "privasi",
@@ -224,7 +236,7 @@ export default function MemberOthersPage() {
       description: "Bagaimana data Anda dikelola",
       Icon: Shield,
       to: "/member/privasi",
-      group: "akun",
+      group: "tentang",
     },
   ];
 
@@ -261,6 +273,9 @@ export default function MemberOthersPage() {
       case "about":
         setAboutOpen(true);
         break;
+      case "toggleTheme":
+        toggleTheme();
+        break;
     }
   }
 
@@ -286,18 +301,43 @@ export default function MemberOthersPage() {
                   </span>
                 }
               >
-                <ChevronRow>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-ios-body font-medium text-surface-text truncate">
-                      {m.label}
-                    </p>
-                    {m.description && (
-                      <p className="text-ios-caption text-surface-muted truncate">
-                        {m.description}
-                      </p>
-                    )}
+                {m.render === "toggle" ? (
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-ios-body text-surface-text">{m.label}</p>
+                      {m.description && (
+                        <p className="text-ios-caption text-surface-muted truncate">
+                          {m.description}
+                        </p>
+                      )}
+                    </div>
+                    <span
+                      className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+                        theme === "dark" ? "bg-accent" : "bg-surface-card2"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                          theme === "dark" ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </span>
                   </div>
-                </ChevronRow>
+                ) : (
+                  <ChevronRow>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-ios-body font-medium text-surface-text truncate">
+                        {m.label}
+                      </p>
+                      {m.description && (
+                        <p className="text-ios-caption text-surface-muted truncate">
+                          {m.description}
+                        </p>
+                      )}
+                    </div>
+                  </ChevronRow>
+                )}
               </ListRow>
             );
           })}
@@ -335,38 +375,11 @@ export default function MemberOthersPage() {
           </ListRow>
         </GroupedList>
 
-        {/* Mode Tampilan toggle */}
-        <GroupedList>
-          <ListRow onClick={toggleTheme} insetDivider={false}>
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent shrink-0">
-                {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-ios-body text-surface-text">Mode Tampilan</p>
-                <p className="text-ios-caption text-surface-muted">
-                  {theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif"}
-                </p>
-              </div>
-              <span
-                className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
-                  theme === "dark" ? "bg-accent" : "bg-surface-card2"
-                }`}
-                aria-hidden="true"
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                    theme === "dark" ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </span>
-            </div>
-          </ListRow>
-        </GroupedList>
-
+        {renderGroup("Tampilan", "tampilan")}
         {renderGroup("Ibadah", "ibadah")}
         {renderGroup("Data Saya", "data")}
-        {renderGroup("Akun & Lainnya", "akun")}
+        {renderGroup("Akun", "akun")}
+        {renderGroup("Tentang", "tentang")}
 
         {/* Logout */}
         <div className="mt-4">

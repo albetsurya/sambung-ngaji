@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -32,7 +32,7 @@ import type { Meeting, MemberCategory } from "../types";
 /* -------------------------------------------------------------------------- */
 
 type ViewMode = "calendar" | "list";
-type KategoriFilter = "default" | "all" | MemberCategory;
+type KategoriFilter = "all" | MemberCategory;
 type GenderFilter = "" | "L" | "P";
 
 const VIEW_KEY = "member-schedule-view";
@@ -87,7 +87,8 @@ export default function MemberSchedulePage() {
 
   const [view, setView] = useState<ViewMode>(() => loadView());
   const [kategoriFilter, setKategoriFilter] =
-    useState<KategoriFilter>("default");
+    useState<KategoriFilter>("all");
+  const kategoriInitialized = useRef(false);
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("");
   const [selected, setSelected] = useState<Meeting | null>(null);
 
@@ -105,6 +106,16 @@ export default function MemberSchedulePage() {
   const userKategori = selfDashboard?.profile?.kategori as
     | MemberCategory
     | undefined;
+
+  // Auto-aktifkan kategori user sekali saat data tersedia.
+  // Setelah itu, jangan override pilihan manual user.
+  useEffect(() => {
+    if (kategoriInitialized.current) return;
+    if (userKategori) {
+      setKategoriFilter(userKategori);
+      kategoriInitialized.current = true;
+    }
+  }, [userKategori]);
 
   /* ------------------------- Fetch meetings ------------------------- */
 
@@ -128,13 +139,7 @@ export default function MemberSchedulePage() {
 
   /* ---------------------------- Filtering ---------------------------- */
 
-  const effectiveKategori: MemberCategory | "all" = useMemo(() => {
-    if (kategoriFilter === "default") {
-      return userKategori ?? "all";
-    }
-    if (kategoriFilter === "all") return "all";
-    return kategoriFilter;
-  }, [kategoriFilter, userKategori]);
+  const effectiveKategori: MemberCategory | "all" = kategoriFilter;
 
   const filtered = useMemo(() => {
     return meetings.filter((m) => {
@@ -153,10 +158,6 @@ export default function MemberSchedulePage() {
       return true;
     });
   }, [meetings, effectiveKategori, genderFilter]);
-
-  const defaultLabel = userKategori
-    ? CATEGORY_LABEL[userKategori] ?? userKategori
-    : "Semua";
 
   /* ---------------------------- Handlers ---------------------------- */
 
@@ -215,13 +216,6 @@ export default function MemberSchedulePage() {
             Kategori
           </p>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
-            <FilterChip
-              active={kategoriFilter === "default"}
-              label={
-                userKategori ? `Default · ${defaultLabel}` : "Default"
-              }
-              onClick={() => setKategoriFilter("default")}
-            />
             <FilterChip
               active={kategoriFilter === "all"}
               label="Semua"

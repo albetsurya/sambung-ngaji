@@ -166,10 +166,10 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-[26px] font-bold text-surface-text tracking-[-0.02em] leading-tight">
-            Hai, Jamaah Latukan 👋
+            Sambung Ngaji
           </h1>
           <p className="text-ios-body text-surface-muted mt-2 max-w-[280px] mx-auto leading-relaxed">
-            Absen, cek data, dan ikut pengajian — semua di satu aplikasi.
+            Assalamu&apos;alaikum, silakan masuk.
           </p>
         </div>
 
@@ -272,7 +272,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-ios-caption text-surface-muted/70 mt-6">
-          dibuat dengan 🤍 untuk jamaah Latukan
+          Sambung Ngaji · v1.0.0
         </p>
       </div>
     </div>

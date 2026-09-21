@@ -21,8 +21,7 @@ export type AttendanceStatus =
   | "HADIR"
   | "IZIN"
   | "SAKIT"
-  | "ALPA"
-  | "DISPENSASI";
+  | "ALPA";
 
 export type MonitoringStatus =
   | "AKTIF"
