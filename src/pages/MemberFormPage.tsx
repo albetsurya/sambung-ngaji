@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Camera,
   Pencil,
@@ -23,6 +24,7 @@ import {
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
+import { queryKeys } from "../lib/queryClient";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -57,6 +59,7 @@ export default function MemberFormPage() {
   const isEdit = !!id;
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState<Partial<Member>>(emptyForm);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(isEdit);
@@ -153,6 +156,19 @@ export default function MemberFormPage() {
         const base64 = await fileToBase64(photoFile);
         await uploadApi.photo(memberId, base64, photoFile.type);
       }
+      // Invalidate cache supaya detail & list refresh
+      if (memberId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.memberDetail(memberId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.attendanceByMember(memberId),
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+
       showToast(isEdit ? "Data jamaah diperbarui" : "Jamaah baru ditambahkan");
       navigate(memberId ? `/jamaah/${memberId}` : "/jamaah");
     } catch (err) {
