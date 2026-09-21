@@ -31,6 +31,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
+import { normalizeGender } from "../utils/format";
 import { pendingApi } from "../services/pendingApi";
 import { useDelayedLoading } from "../hooks/useDelayedLoading";
 import { ThemePickerSheet } from "../components/common/ThemePickerSheet";
@@ -327,7 +328,12 @@ export default function OthersPage() {
         <GroupedList>
           <ListRow insetDivider={false} className="py-3.5">
             <div className="flex items-center gap-3">
-              <Avatar name={user?.nama || "?"} size={52} gender="L" />
+              <Avatar
+                src={user?.foto_url}
+                name={user?.nama || "?"}
+                size={52}
+                gender={normalizeGender(user?.jenis_kelamin)}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-ios-body font-semibold text-surface-text truncate">
                   {user?.nama}

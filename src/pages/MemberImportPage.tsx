@@ -205,7 +205,7 @@ export default function MemberImportPage() {
           <DonePhase
             results={results}
             onReset={handleReset}
-            onViewMembers={() => navigate("/jamaah")}
+            onViewMembers={() => navigate("/jamaah", { replace: true })}
           />
         )}
       </div>

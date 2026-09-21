@@ -46,6 +46,7 @@ export interface User {
   role: Role;
   member_id?: string;
   jenis_kelamin?: string;
+  foto_url?: string;
   status_aktif?: boolean;
   created_at?: string;
   updated_at?: string;

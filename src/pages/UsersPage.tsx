@@ -7,6 +7,7 @@ import {
   KeyRound,
   Shield,
   ArrowUpRight,
+  Trash2,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -53,6 +54,7 @@ export default function UsersPage() {
     userId: string;
     userName: string;
   } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const queryClient = useQueryClient();
 
   const {
@@ -189,6 +191,20 @@ export default function UsersPage() {
         onViewMember={(memberId) => {
           setEditTarget(null);
           navigate(`/jamaah/${memberId}`);
+        }}
+        onRequestDelete={(u) => {
+          setEditTarget(null);
+          setDeleteTarget(u);
+        }}
+      />
+
+      <DeleteUserConfirmModal
+        user={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onDeleted={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+          queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+          setDeleteTarget(null);
         }}
       />
 
@@ -343,12 +359,14 @@ function EditUserSheet({
   onClose,
   onUpdated,
   onViewMember,
+  onRequestDelete,
 }: {
   user: User | null;
   members: Member[];
   onClose: () => void;
   onUpdated: () => void;
   onViewMember: (memberId: string) => void;
+  onRequestDelete: (u: User) => void;
 }) {
   const { showToast } = useToast();
   const [nama, setNama] = useState("");
@@ -498,6 +516,30 @@ function EditUserSheet({
             </Button>
           </div>
         )}
+
+        {user.role !== "SUPER_ADMIN" && (
+          <div className="mt-6 pt-4 border-t border-surface-border">
+            <p className="text-ios-caption text-danger font-medium mb-2 px-0.5">
+              Zona Berbahaya
+            </p>
+            <button
+              onClick={() => onRequestDelete(user)}
+              className="w-full text-left rounded-xl border border-danger/30 bg-danger-soft hover:bg-danger-soft/80 p-3.5 flex items-center gap-3 transition-all active:scale-[0.99]"
+            >
+              <span className="w-10 h-10 rounded-xl bg-danger text-white flex items-center justify-center flex-shrink-0">
+                <Trash2 size={16} strokeWidth={2.2} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-ios-body font-medium text-danger">
+                  Hapus Permanen
+                </p>
+                <p className="text-ios-caption text-danger/80">
+                  User + data member dihapus. Tidak bisa dibatalkan.
+                </p>
+              </div>
+            </button>
+          </div>
+        )}
       </BottomSheet>
 
       <ConfirmDialog
@@ -514,5 +556,106 @@ function EditUserSheet({
         }}
       />
     </>
+  );
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*                    DELETE USER CONFIRM MODAL                               */
+/* -------------------------------------------------------------------------- */
+
+function DeleteUserConfirmModal({
+  user,
+  onClose,
+  onDeleted,
+}: {
+  user: User | null;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const { showToast } = useToast();
+  const [confirmText, setConfirmText] = useState("");
+
+  useEffect(() => {
+    setConfirmText("");
+  }, [user?.user_id]);
+
+  const mutation = useMutation({
+    mutationFn: () => userApi.deletePermanent(user!.user_id),
+    onSuccess: () => {
+      showToast("User berhasil dihapus permanen");
+      onDeleted();
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus user",
+        "error",
+      );
+    },
+  });
+
+  if (!user) return null;
+
+  const targetName = user.nama || user.username;
+  const canDelete = confirmText.trim() === targetName;
+
+  return (
+    <BottomSheet
+      open={!!user}
+      onClose={onClose}
+      title="Hapus Permanen User?"
+    >
+      <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/30">
+        <p className="text-ios-footnote text-danger leading-relaxed">
+          Tindakan ini <strong>tidak bisa dibatalkan</strong>. User{" "}
+          <strong>{targetName}</strong> akan dihapus permanen bersama:
+        </p>
+        <ul className="mt-2 ml-4 list-disc text-ios-caption text-danger/90 space-y-0.5">
+          <li>Data akun login</li>
+          <li>Data member (biodata, foto)</li>
+          <li>Riwayat absensi & pembinaan terkait</li>
+        </ul>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-ios-footnote font-medium text-surface-text mb-2 px-1">
+          Ketik nama user untuk konfirmasi:
+        </label>
+        <div className="rounded-xl bg-surface-card2 px-3 py-2 mb-2">
+          <code className="text-ios-body font-mono text-surface-text">
+            {targetName}
+          </code>
+        </div>
+        <Input
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder="Ketik nama persis di atas"
+          autoComplete="off"
+          autoCapitalize="none"
+        />
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          variant="secondary"
+          fullWidth
+          onClick={onClose}
+          disabled={mutation.isPending}
+        >
+          Batal
+        </Button>
+        <Button
+          variant="danger"
+          fullWidth
+          onClick={() => mutation.mutate()}
+          disabled={!canDelete || mutation.isPending}
+          leftIcon={!mutation.isPending ? <Trash2 size={16} /> : undefined}
+        >
+          {mutation.isPending ? "Menghapus..." : "Hapus Permanen"}
+        </Button>
+      </div>
+
+      <LoadingOverlay open={mutation.isPending} label="Menghapus user..." />
+    </BottomSheet>
   );
 }

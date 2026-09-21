@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Camera,
   Pencil,
@@ -24,11 +25,13 @@ import { normalizePhoneNumber, formatDateShort } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import { queryKeys } from "../lib/queryClient";
 
 export default function MemberEditProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const [form, setForm] = useState<Partial<Member>>({});
   const [original, setOriginal] = useState<Member | null>(null);
   const [loading, setLoading] = useState(true);
@@ -155,6 +158,18 @@ export default function MemberEditProfilePage() {
           original?.foto_url,
         );
       }
+
+      // Invalidate cache supaya dashboard & detail refresh
+      if (user?.user_id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.memberSelfDashboard(user.user_id),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.memberSelfProfile(user.user_id),
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
 
       showToast("Biodata diperbarui");
       const returnPath = user?.role === "MEMBER" ? "/member" : "/profil-saya";
