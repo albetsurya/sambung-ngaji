@@ -334,7 +334,7 @@ export default function MembersListPage() {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1">
         {showSkeleton && (
           <div className={view === "grid" ? "px-4 py-2" : "py-2"}>
             {view === "grid" ? (
