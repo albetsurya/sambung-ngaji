@@ -170,7 +170,9 @@ export default function MemberFormPage() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
 
       showToast(isEdit ? "Data jamaah diperbarui" : "Jamaah baru ditambahkan");
-      navigate(memberId ? `/jamaah/${memberId}` : "/jamaah");
+      navigate(memberId ? `/jamaah/${memberId}` : "/jamaah", {
+        replace: true,
+      });
     } catch (err) {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menyimpan data",
