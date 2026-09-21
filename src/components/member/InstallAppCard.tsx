@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { Download, Share2, Check } from "../common/FontAwesomeIcons";
+import { Download, Share2, Check, Copy } from "../common/FontAwesomeIcons";
 import { Card, Button } from "../common";
 import { useInstallPrompt } from "../../hooks/useInstallPrompt";
 import { useToast } from "../../contexts/ToastContext";
@@ -60,7 +60,7 @@ export function InstallAppCard() {
                 Aplikasi sudah terinstal
               </p>
               <p className="text-ios-caption text-surface-muted">
-                Sambung Ngaji berjalan dalam mode aplikasi.
+                Berjalan dalam mode aplikasi.
               </p>
             </div>
           </div>
@@ -72,10 +72,10 @@ export function InstallAppCard() {
               </span>
               <div className="flex-1 min-w-0">
                 <p className="text-ios-subhead font-semibold text-surface-text">
-                  Instal Sambung Ngaji
+                  Install Sambung Ngaji
                 </p>
                 <p className="text-ios-caption text-surface-muted">
-                  Dapat diakses dari layar utama, seperti aplikasi biasa.
+                  Akses dari layar utama, seperti aplikasi biasa.
                 </p>
               </div>
             </div>
@@ -87,7 +87,7 @@ export function InstallAppCard() {
                 className="mb-3"
                 onClick={() => promptInstall()}
               >
-                <Download size={16} /> Install Aplikasi
+                <Download size={16} /> Install
               </Button>
             )}
 
@@ -103,18 +103,18 @@ export function InstallAppCard() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-ios-footnote text-surface-muted leading-relaxed">
-                  Scan QR di HP lain untuk membuka aplikasi, lalu tekan{" "}
+                  Scan QR dari HP lain, lalu ketuk{" "}
                   <span className="font-semibold text-surface-text">Install</span>{" "}
-                  di menu browser.
+                  di browser.
                 </p>
                 <div className="flex gap-2 mt-2">
                   <Button variant="secondary" size="sm" onClick={handleCopy}>
-                    {copied ? <Check size={13} /> : <Share2 size={13} />}
-                    {copied ? "Tersalin" : "Salin Link"}
+                    {copied ? <Check size={13} /> : <Copy size={13} />}
+                    {copied ? "Tersalin" : "Salin"}
                   </Button>
                   <Button variant="secondary" size="sm" onClick={handleShare}>
-                      <Share2 size={13} /> Bagikan
-                    </Button>
+                    <Share2 size={13} /> Bagikan
+                  </Button>
                 </div>
               </div>
             </div>
