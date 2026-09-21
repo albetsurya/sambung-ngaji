@@ -50,6 +50,7 @@ export const meetingApi = {
     catatan?: string;
     kategori_target?: string[];
     gender_target?: "" | "L" | "P";
+    send_reminder?: boolean;
   }) => call<Meeting>("createMeeting", payload),
 
   update: (payload: {
@@ -63,6 +64,7 @@ export const meetingApi = {
     catatan?: string;
     kategori_target?: string[];
     gender_target?: "" | "L" | "P";
+    send_reminder?: boolean;
   }) => call<Meeting>("updateMeeting", payload),
 
   remove: (meeting_id: string) =>

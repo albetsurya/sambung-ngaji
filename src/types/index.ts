@@ -122,6 +122,7 @@ export interface Meeting {
   catatan?: string;
   kategori_target?: MemberCategory[];
   gender_target?: "" | "L" | "P";
+  send_reminder?: boolean;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
