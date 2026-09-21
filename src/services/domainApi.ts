@@ -266,6 +266,11 @@ export const userApi = {
 
   resetPassword: (payload: { user_id: string; new_password: string }) =>
     call<{ reset: boolean; user_id: string }>("resetUserPassword", payload),
+
+  deletePermanent: (user_id: string) =>
+    call<{ deleted: boolean; user_id: string }>("deleteUserPermanent", {
+      user_id,
+    }),
 };
 
 export const settingsApi = {
