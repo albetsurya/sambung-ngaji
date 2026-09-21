@@ -711,7 +711,7 @@ export default function AttendancePage() {
         <AttendancePageSkeleton rows={8} />
       ) : (
         <>
-          <div className="pt-3 pb-2">
+          <div className="pt-3 pb-2 flex-1 flex flex-col">
             {meetings.length > 0 ? (
               <div className="px-4">
                 <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 transition-all hover:border-accent/40">
@@ -768,12 +768,12 @@ export default function AttendancePage() {
                 description="Buat jadwal pertama untuk mulai mencatat absensi."
                 action={
                   canCreate ? (
-                    <button
+                    <Button
                       onClick={() => setSheet({ view: "create-picker" })}
-                      className="min-h-[44px] px-6 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all hover:bg-accent-dark active:scale-[0.97] inline-flex items-center justify-center gap-1.5"
+                      leftIcon={<Plus size={14} />}
                     >
-                      <Plus size={14} /> Buat Jadwal Pertama
-                    </button>
+                      Buat Jadwal Pertama
+                    </Button>
                   ) : undefined
                 }
               />
