@@ -711,7 +711,13 @@ export default function AttendancePage() {
         <AttendancePageSkeleton rows={8} />
       ) : (
         <>
-          <div className="pt-3 pb-2 flex-1 flex flex-col">
+          <div
+            className={
+              meetings.length === 0
+                ? "pt-3 pb-2 flex-1 flex flex-col"
+                : "pt-3 pb-2"
+            }
+          >
             {meetings.length > 0 ? (
               <div className="px-4">
                 <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 transition-all hover:border-accent/40">
