@@ -53,15 +53,16 @@ function releaseSlot(): void {
 /* -------------------------------------------------------------------------- */
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  const match = document.cookie.match(/(?:^|;\s*)pengajian_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 export function setToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token);
+  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict`;
 }
 
 export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
+  document.cookie = "pengajian_token=; path=/; SameSite=Strict; Max-Age=-1";
 }
 
 /* -------------------------------------------------------------------------- */

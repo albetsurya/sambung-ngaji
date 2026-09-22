@@ -59,17 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     (async () => {
-      const token = getToken();
-      console.log(
-        "🔐 AuthProvider: checking token:",
-        token ? "present" : "none",
-      );
-
-      if (!token) {
-        if (!cancelled) setLoading(false);
-        return;
-      }
-
       try {
         // ✅ Pakai cached promise — kalau dipanggil 2x (Strict Mode),
         //    request kedua pakai promise yang sama, tidak kirim request baru.
@@ -77,7 +66,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (cancelled) return;
 
-        console.log("✅ AuthProvider: session valid, user:", u);
         setUser(u);
       } catch (error) {
         if (cancelled) return;
@@ -88,14 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error.message.toLowerCase().includes("sesi tidak valid") ||
             error.message.toLowerCase().includes("token"));
 
-        console.error("❌ AuthProvider: session error:", error);
-
         if (isAuthError) {
-          console.log("→ Auth error, clearing token");
           clearToken();
           setUser(null);
-        } else {
-          console.log("→ Non-auth error, token dipertahankan");
         }
       } finally {
         if (!cancelled) setLoading(false);
