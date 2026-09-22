@@ -171,9 +171,12 @@ async function callOnce<T>(
       action,
       ...params,
     };
-    if (token) payload.token = token;
-
     const body = JSON.stringify(payload);
+
+    const headers: Record<string, string> = {
+      "Content-Type": "text/plain;charset=utf-8",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     // Cache buster hanya di attempt 0. Retry tanpa buster (pakai cache GAS).
     const url =
@@ -190,9 +193,7 @@ async function callOnce<T>(
     try {
       response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
+        headers,
         body,
         redirect: "follow",
         cache: "no-store",
