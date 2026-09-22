@@ -41,7 +41,6 @@ import {
 import { AboutAppModal } from "../components/member/AboutAppModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { usePermission } from "../hooks/usePermission";
 import { normalizeGender } from "../utils/format";
 
 /* -------------------------------------------------------------------------- */
@@ -67,7 +66,6 @@ export default function MemberOthersPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { isMember } = usePermission();
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
@@ -76,7 +74,8 @@ export default function MemberOthersPage() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const profilePath = isMember ? "/member/profil" : "/profil-saya";
+  // Halaman ini selalu di /member/* — tetap di konteks jamaah
+  const profilePath = "/member/profil";
 
   const MENU: MenuItem[] = [
     // Grup Tampilan
