@@ -292,3 +292,10 @@ export interface MemberUserStatus {
   has_user: boolean;
   user: User | null;
 }
+
+export interface Streaks {
+  sholat: number;
+  dzikir: number;
+  tahfidz: number;
+  quran: number;
+}

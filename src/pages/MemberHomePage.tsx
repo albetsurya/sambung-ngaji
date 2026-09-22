@@ -26,6 +26,13 @@ import { meetingApi } from "../services/domainApi";
 import { memberSelfApi } from "../services/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
 import { CATEGORY_LABEL } from "../utils/format";
+import { useSholatJournal } from "../hooks/useSholatJournal";
+import { useDzikirStreak } from "../hooks/useDzikirStreak";
+import { useTahfidz } from "../hooks/useTahfidz";
+import { useQuranStreak } from "../hooks/useQuranStreak";
+import { useBadges } from "../hooks/useBadges";
+import { StreakCard } from "../components/member/StreakCard";
+import { BadgeCollection } from "../components/member/BadgeCollection";
 import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";
 
@@ -129,6 +136,20 @@ export default function MemberHomePage() {
     | MemberCategory
     | undefined;
 
+  const sholatJournal = useSholatJournal();
+  const dzikirStreak = useDzikirStreak();
+  const tahfidz = useTahfidz();
+  const quranStreak = useQuranStreak();
+
+  const streaks = {
+    sholat: sholatJournal.streak,
+    dzikir: dzikirStreak.streak,
+    tahfidz: tahfidz.streak,
+    quran: quranStreak.streak,
+  };
+
+  const { badges } = useBadges(streaks);
+
   return (
     <AppLayout
       showAiChat={false}
@@ -176,6 +197,10 @@ export default function MemberHomePage() {
           userKategori={userKategori}
           onSeeAll={() => navigate("/member/jadwal")}
         />
+
+        {/* Streak + Badge */}
+        <StreakCard streaks={streaks} />
+        <BadgeCollection badges={badges} />
 
         {/* Sering Dipakai */}
         <section>

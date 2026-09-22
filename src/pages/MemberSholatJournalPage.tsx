@@ -5,6 +5,11 @@ import {
   Calendar,
   TrendingUp,
 } from "../components/common/FontAwesomeIcons";
+import { BadgeCollection } from "../components/member/BadgeCollection";
+import { useBadges } from "../hooks/useBadges";
+import { useDzikirStreak } from "../hooks/useDzikirStreak";
+import { useQuranStreak } from "../hooks/useQuranStreak";
+import type { Streaks } from "../types";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   WAKTU_LIST,
@@ -149,6 +154,9 @@ export default function MemberSholatJournalPage() {
             </div>
           </div>
         </div>
+
+        {/* Badge */}
+        <BadgeSection streak={streak} />
 
         {/* Checklist 5 waktu */}
         <section className="space-y-2.5">
@@ -359,4 +367,17 @@ function WaktuRow({
       </div>
     </div>
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Badge Section                                 */
+/* -------------------------------------------------------------------------- */
+
+function BadgeSection({ streak }: { streak: number }) {
+  const dzikir = useDzikirStreak();
+  const quran = useQuranStreak();
+  const streaks: Streaks = { sholat: streak, dzikir: dzikir.streak, tahfidz: 0, quran: quran.streak };
+  const { badges } = useBadges(streaks);
+
+  return <BadgeCollection badges={badges} />;
 }

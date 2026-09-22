@@ -15,6 +15,8 @@ import {
 } from "../../utils/format";
 import { getMood } from "../../data/mood";
 import type { MoodEntry } from "../../services/domainApi";
+import { downloadPDF } from "../../lib/pdfExport";
+import { downloadExcel } from "../../lib/excelExport";
 
 /* -------------------------------------------------------------------------- */
 /*                              BIODATA TAB                                   */
@@ -324,6 +326,22 @@ export function AttendanceTab({
         <StatBox label="Izin" value={counts.IZIN} color="amber" />
         <StatBox label="Sakit" value={counts.SAKIT} color="amber" />
         <StatBox label="Alpa" value={counts.ALPA} color="red" />
+      </div>
+
+      {/* ---------------------------- Download ---------------------------- */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => downloadPDF(monthlyRecap, "member")}
+          className="rounded-xl border border-surface-border bg-surface-card px-3 py-2 text-[11px] font-semibold text-surface-text hover:bg-surface-card2 active:scale-[0.97] transition-all"
+        >
+          📥 PDF
+        </button>
+        <button
+          onClick={() => downloadExcel(monthlyRecap, "member")}
+          className="rounded-xl border border-surface-border bg-surface-card px-3 py-2 text-[11px] font-semibold text-surface-text hover:bg-surface-card2 active:scale-[0.97] transition-all"
+        >
+          📥 Excel
+        </button>
       </div>
 
       {/* ---------------------------- Percentage Bar ---------------------------- */}

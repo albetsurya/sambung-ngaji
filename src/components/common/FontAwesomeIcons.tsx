@@ -26,6 +26,8 @@ import {
   faPaperPlane,
   faUser,
   faBolt,
+  faFire,
+  faTrophy,
   faChevronDown,
   faUserPlus,
   faKey,
@@ -172,6 +174,8 @@ export const LayoutGrid = createIcon(faTableCells);
 export const List = createIcon(faList);
 
 export const Star = createIcon(faStar);
+export const Fire = createIcon(faFire);
+export const Trophy = createIcon(faTrophy);
 
 export const Bookmark = createIcon(faBookmark);
 
