@@ -25,6 +25,8 @@ import {
 import { getTargetBySurah } from "../data/tahfidz";
 import { useTahfidz } from "../hooks/useTahfidz";
 import { useDoaFontSize } from "../hooks/useDoaFontSize";
+import { useIsMuballigh } from "../hooks/useIsMuballigh";
+import { TranslationLockedNote } from "../components/member/TranslationLockedNote";
 
 type Mode = "baca" | "uji";
 
@@ -67,6 +69,7 @@ export default function MemberTahfidzSurahPage() {
 
   const { isHafal, toggleHafal, markReviewed, getState } = useTahfidz();
   const { size: fontSize } = useDoaFontSize();
+  const showTranslation = useIsMuballigh();
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -371,6 +374,7 @@ export default function MemberTahfidzSurahPage() {
                   onReveal={() => revealAyat(ayat.nomorAyat)}
                   onToggleHafal={() => toggleHafalAyat(ayat.nomorAyat)}
                   onPlay={() => setPlayingAyat(ayat.nomorAyat)}
+                  showTranslation={showTranslation}
                 />
               );
             })}
@@ -469,6 +473,7 @@ function TahfidzAyatCard({
   onReveal,
   onToggleHafal,
   onPlay,
+  showTranslation = false,
 }: {
   ayat: Ayat;
   surahNomor: number;
@@ -481,6 +486,7 @@ function TahfidzAyatCard({
   onReveal: () => void;
   onToggleHafal: () => void;
   onPlay: () => void;
+  showTranslation?: boolean;
 }) {
   const { spec } = useDoaFontSize();
   const hidden = mode === "uji" && !revealed;
@@ -588,7 +594,7 @@ function TahfidzAyatCard({
           )}
         </button>
 
-        {/* Latin + terjemah — selalu tampil */}
+        {/* Latin + terjemah — latin selalu tampil, terjemah khusus mubaligh */}
         {!hidden && (
           <>
             <p
@@ -601,15 +607,19 @@ function TahfidzAyatCard({
               {ayat.teksLatin}
             </p>
 
-            <p
-              className="text-ios-footnote text-surface-text leading-relaxed"
-              style={{
-                fontSize: spec.body + "px",
-                lineHeight: spec.bodyLineHeight,
-              }}
-            >
-              {ayat.teksIndonesia}
-            </p>
+            {showTranslation ? (
+              <p
+                className="text-ios-footnote text-surface-text leading-relaxed"
+                style={{
+                  fontSize: spec.body + "px",
+                  lineHeight: spec.bodyLineHeight,
+                }}
+              >
+                {ayat.teksIndonesia}
+              </p>
+            ) : (
+              <TranslationLockedNote />
+            )}
           </>
         )}
       </div>

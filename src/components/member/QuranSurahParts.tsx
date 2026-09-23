@@ -20,6 +20,7 @@ export function PerAyatView({
   onPrev,
   fontSize,
   onJump,
+  showTranslation = false,
 }: {
   data: SurahDetail;
   ayatIndex: number;
@@ -32,6 +33,7 @@ export function PerAyatView({
   onPrev: () => void;
   fontSize: DoaFontSize;
   onJump: (idx: number) => void;
+  showTranslation?: boolean;
 }) {
   const ayat = data.ayat[ayatIndex];
   if (!ayat) return null;
@@ -68,29 +70,30 @@ export function PerAyatView({
         onPlay={() => onPlay(ayat.nomorAyat)}
         onToggleBookmark={() => onToggleBookmark(ayat)}
         fontSize={fontSize}
+        showTranslation={showTranslation}
       />
 
       <div className="flex gap-2 pt-2">
-        <button
-          onClick={onPrev}
-          disabled={prevDisabled}
-          className="flex-1 min-h-[52px] rounded-2xl border border-surface-border bg-surface-card flex items-center justify-center gap-2 text-ios-footnote font-medium text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <ChevronRight size={18} className="text-surface-muted" />
-          {isFirst && hasPrevSurah
-            ? data.suratSebelumnya && data.suratSebelumnya.namaLatin
-            : "Sebelumnya"}
-        </button>
-
         <button
           onClick={onNext}
           disabled={nextDisabled}
           className="flex-1 min-h-[52px] rounded-2xl bg-accent text-white flex items-center justify-center gap-2 text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
         >
+          <ChevronLeft size={18} className="text-white/80" />
           {isLast && hasNextSurah
             ? data.suratSelanjutnya && data.suratSelanjutnya.namaLatin
             : "Berikutnya"}
-          <ChevronLeft size={18} className="text-white/80" />
+        </button>
+
+        <button
+          onClick={onPrev}
+          disabled={prevDisabled}
+          className="flex-1 min-h-[52px] rounded-2xl border border-surface-border bg-surface-card flex items-center justify-center gap-2 text-ios-footnote font-medium text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {isFirst && hasPrevSurah
+            ? data.suratSebelumnya && data.suratSebelumnya.namaLatin
+            : "Sebelumnya"}
+          <ChevronRight size={18} className="text-surface-muted" />
         </button>
       </div>
 
@@ -175,7 +178,11 @@ export function SurahHeaderCard({ data }: { data: SurahDetail }) {
 /*                              Bismillah                                     */
 /* -------------------------------------------------------------------------- */
 
-export function BismillahBlock() {
+export function BismillahBlock({
+  showTranslation = false,
+}: {
+  showTranslation?: boolean;
+}) {
   return (
     <div className="text-center py-3">
       <p
@@ -191,9 +198,11 @@ export function BismillahBlock() {
       >
         بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
       </p>
-      <p className="text-ios-caption text-surface-muted mt-1">
-        Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang
-      </p>
+      {showTranslation && (
+        <p className="text-ios-caption text-surface-muted mt-1">
+          Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang
+        </p>
+      )}
     </div>
   );
 }
@@ -213,30 +222,12 @@ export function SurahNavFooter({
 }) {
   return (
     <div className="flex gap-2 pt-3">
-      {data.suratSebelumnya ? (
-        <button
-          onClick={onPrev}
-          className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-left"
-        >
-          <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted">
-              Sebelumnya
-            </p>
-            <p className="text-ios-footnote font-medium text-surface-text truncate">
-              {data.suratSebelumnya.namaLatin}
-            </p>
-          </div>
-        </button>
-      ) : (
-        <div className="flex-1" />
-      )}
-
       {data.suratSelanjutnya ? (
         <button
           onClick={onNext}
-          className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center justify-end gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-right"
+          className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-left"
         >
+          <ChevronLeft size={18} className="text-surface-muted flex-shrink-0" />
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted">
               Selanjutnya
@@ -245,7 +236,25 @@ export function SurahNavFooter({
               {data.suratSelanjutnya.namaLatin}
             </p>
           </div>
-          <ChevronLeft size={18} className="text-surface-muted flex-shrink-0" />
+        </button>
+      ) : (
+        <div className="flex-1" />
+      )}
+
+      {data.suratSebelumnya ? (
+        <button
+          onClick={onPrev}
+          className="flex-1 rounded-2xl border border-surface-border bg-surface-card px-3 py-3.5 flex items-center justify-end gap-2 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99] text-right"
+        >
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted">
+              Sebelumnya
+            </p>
+            <p className="text-ios-footnote font-medium text-surface-text truncate">
+              {data.suratSebelumnya.namaLatin}
+            </p>
+          </div>
+          <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
         </button>
       ) : (
         <div className="flex-1" />

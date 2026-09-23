@@ -32,6 +32,7 @@ import {
 } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
 import { useDoaFontSize } from "../hooks/useDoaFontSize";
+import { useIsMuballigh } from "../hooks/useIsMuballigh";
 
 type BacaMode = "scroll" | "ayat";
 const MODE_KEY = "quran-baca-mode";
@@ -77,6 +78,7 @@ export default function MemberQuranSurahPage() {
 
   const { setLastRead, isBookmarked, toggleBookmark } = useQuranBookmark();
   const { size: fontSize } = useDoaFontSize();
+  const showTranslation = useIsMuballigh();
   const topRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, error, refetch } = useQuery<SurahDetail>({
@@ -323,7 +325,9 @@ export default function MemberQuranSurahPage() {
         {!isLoading && data && mode === "scroll" && (
           <>
             <SurahHeaderCard data={data} />
-            {data.nomor !== 1 && data.nomor !== 9 && <BismillahBlock />}
+            {data.nomor !== 1 && data.nomor !== 9 && (
+              <BismillahBlock showTranslation={showTranslation} />
+            )}
             {data.ayat.map((ayat) => (
               <QuranAyatCard
                 key={ayat.nomorAyat}
@@ -342,6 +346,7 @@ export default function MemberQuranSurahPage() {
                   })
                 }
                 fontSize={fontSize}
+                showTranslation={showTranslation}
               />
             ))}
             <SurahNavFooter
@@ -379,6 +384,7 @@ export default function MemberQuranSurahPage() {
             onPrev={goPrevAyat}
             fontSize={fontSize}
             onJump={(idx) => setAyatIndex(idx)}
+            showTranslation={showTranslation}
           />
         )}
       </div>

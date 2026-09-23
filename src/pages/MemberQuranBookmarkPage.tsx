@@ -12,11 +12,14 @@ import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ConfirmDialog } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
+import { useIsMuballigh } from "../hooks/useIsMuballigh";
+import { TranslationLockedNote } from "../components/member/TranslationLockedNote";
 import { useToast } from "../contexts/ToastContext";
 
 export default function MemberQuranBookmarkPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const showTranslation = useIsMuballigh();
   const { bookmarks, toggleBookmark, clearBookmarks } = useQuranBookmark();
 
   const [search, setSearch] = useState("");
@@ -226,9 +229,13 @@ export default function MemberQuranBookmarkPage() {
                           · {formatDate(b.timestamp)}
                         </span>
                       </div>
-                      <p className="text-ios-footnote text-surface-text truncate">
-                        {b.ayatPreview || "(tanpa preview)"}
-                      </p>
+                      {showTranslation ? (
+                        <p className="text-ios-footnote text-surface-text truncate">
+                          {b.ayatPreview || "(tanpa preview)"}
+                        </p>
+                      ) : (
+                        <TranslationLockedNote className="truncate" />
+                      )}
                     </button>
 
                     <button
