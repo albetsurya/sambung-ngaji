@@ -266,3 +266,8 @@
   border-bottom: 0 none;
   box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
 }
+
+/* Toggle switch tiktok (dark): knob hitam agar kontras di atas track putih. */
+[data-preset="tiktok"].dark .toggle-knob {
+  background-color: #000000;
+}

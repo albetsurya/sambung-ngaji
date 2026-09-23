@@ -1,4 +1,5 @@
 import { X } from "./FontAwesomeIcons";
+import { Button } from "./Button";
 import type { ReactNode } from "react";
 
 interface SheetProps {
@@ -110,22 +111,22 @@ export function ConfirmDialog({
           )}
         </div>
         <div className="flex gap-2.5 px-4 pb-4">
-          <button
+          <Button
+            variant="ghost"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 h-11 rounded-2xl text-[15px] font-medium text-surface-text border border-surface-border bg-surface-card transition-colors hover:bg-surface-card2 active:scale-[0.97]"
+            className="flex-1 border border-surface-border"
           >
             Batal
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={danger ? "danger" : "primary"}
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 h-11 rounded-2xl text-[15px] font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97] ${
-              danger ? "bg-danger" : "bg-accent"
-            }`}
+            className="flex-1"
           >
             {loading ? "Memproses..." : confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

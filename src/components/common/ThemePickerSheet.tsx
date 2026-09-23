@@ -40,13 +40,13 @@ export function ThemePickerSheet({
               </p>
             </div>
             <span
-              className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+              className={`relative inline-flex items-center w-11 h-6 rounded-full border border-surface-border transition-colors duration-300 shrink-0 ${
                 theme === "dark" ? "bg-accent" : "bg-surface-card2"
               }`}
               aria-hidden="true"
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                className={`toggle-knob absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
                   theme === "dark" ? "translate-x-5" : "translate-x-0"
                 }`}
               />
