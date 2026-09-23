@@ -216,7 +216,7 @@ export default function FridaySchedulesPage() {
       <Header
         title="Petugas Jumat"
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
 
       <div className="py-3 px-4 space-y-3">
@@ -295,7 +295,7 @@ export default function FridaySchedulesPage() {
             }
             action={
               canEdit && tab === "upcoming" ? (
-                <Button onClick={openCreate} rightIcon={<Plus size={15} />}>
+                <Button onClick={openCreate} rightIcon={<Plus size={16} />}>
                   Buat Jadwal
                 </Button>
               ) : undefined
@@ -370,29 +370,39 @@ export default function FridaySchedulesPage() {
 
                 <div className="flex items-center gap-2 mt-3">
                   {tab === "upcoming" && (
-                    <button
+                    <Button
+                      variant="soft"
+                      size="sm"
+                      className="flex-1"
                       onClick={() => setFollowUp(s)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-accent-soft text-accent text-ios-footnote font-semibold active:scale-[0.97]"
+                      rightIcon={<Send size={14} />}
                     >
-                      <Send size={13} /> Follow Up
-                    </button>
+                      Follow Up
+                    </Button>
                   )}
                   {canEdit && (
                     <>
-                      <button
-                        onClick={() => openEdit(s)}
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        iconOnly
                         aria-label="Edit jadwal"
-                        className="w-9 h-9 inline-flex items-center justify-center rounded-xl border border-surface-border text-surface-muted active:scale-95"
+                        title="Edit jadwal"
+                        className="border border-surface-border"
+                        onClick={() => openEdit(s)}
                       >
                         <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(s)}
+                      </Button>
+                      <Button
+                        variant="softDanger"
+                        size="xs"
+                        iconOnly
                         aria-label="Hapus jadwal"
-                        className="w-9 h-9 inline-flex items-center justify-center rounded-xl border border-danger/30 text-danger active:scale-95"
+                        title="Hapus jadwal"
+                        onClick={() => setDeleteTarget(s)}
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     </>
                   )}
                 </div>

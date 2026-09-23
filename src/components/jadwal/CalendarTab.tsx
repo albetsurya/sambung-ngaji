@@ -278,7 +278,7 @@ function AgendaList({
                   <span className="text-[9px] font-semibold uppercase tracking-wide leading-none">
                     {m.hari.slice(0, 3)}
                   </span>
-                  <span className="text-sm font-bold leading-none mt-0.5 tabular-nums">
+                  <span className="text-ios-subhead font-bold leading-none mt-0.5 tabular-nums">
                     {parseInt(m.tanggal.slice(8, 10), 10)}
                   </span>
                 </div>
@@ -346,7 +346,7 @@ function MeetingDetailContent({
         <p className="text-[11px] font-medium text-accent uppercase tracking-wide mb-1">
           {meeting.hari}
         </p>
-        <p className="text-lg font-semibold text-surface-text mb-1">
+        <p className="text-ios-nav font-semibold text-surface-text mb-1">
           {meeting.acara || "Pengajian"}
         </p>
         <div className="flex items-center gap-3 text-ios-footnote text-surface-muted flex-wrap">

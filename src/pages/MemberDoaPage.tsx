@@ -17,6 +17,7 @@ import {
   CloudRain,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { DoaCard } from "../components/member/DoaCard";
 import { DoaFontSizeSheet } from "../components/member/DoaFontSizeSheet";
 import { useDoaProgress } from "../hooks/useDoaProgress";
@@ -112,11 +113,12 @@ export default function MemberDoaPage() {
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          <button
+          <Button
             onClick={() => setFontSheetOpen(true)}
             aria-label="Ubah ukuran teks"
             title="Ubah ukuran teks"
-            className="flex items-center gap-1 h-9 px-3 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+            variant="secondary"
+            size="sm"
           >
             <span
               className="text-[11px] font-bold"
@@ -128,7 +130,7 @@ export default function MemberDoaPage() {
             >
               Aa
             </span>
-          </button>
+          </Button>
         }
       />
 
@@ -153,7 +155,7 @@ export default function MemberDoaPage() {
                       : "text-surface-muted hover:bg-surface-card")
                   }
                 >
-                  <t.Icon size={15} />
+                  <t.Icon size={16} />
                   {t.label}
                 </button>
               </div>
@@ -178,7 +180,7 @@ export default function MemberDoaPage() {
                       : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2")
                   }
                 >
-                  <Icon size={13} />
+                  <Icon size={14} />
                   {k.label}
                 </button>
               );
@@ -257,13 +259,14 @@ export default function MemberDoaPage() {
                     ? "Alhamdulillah, semua doa sudah dibaca"
                     : "Teruskan, tinggal " + (total - count) + " lagi"}
                 </p>
-                <button
+                <Button
                   onClick={reset}
-                  className="flex items-center gap-1 text-ios-caption font-medium text-surface-muted transition-colors duration-200 hover:text-danger"
+                  variant="ghost"
+                  size="xs"
+                  leftIcon={<RefreshCw size={12} />}
                 >
-                  <RefreshCw size={11} />
                   Reset
-                </button>
+                </Button>
               </div>
             )}
           </div>

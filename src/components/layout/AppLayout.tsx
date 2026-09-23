@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
+import { Button } from "../common/Button";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useEnvironment } from "../../hooks/useEnvironment";
@@ -94,24 +95,30 @@ export function Header({
 
         <div className="flex items-center justify-end gap-1.5 min-w-0">
           {showSyncButton && (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
               onClick={handleSync}
               disabled={syncing}
               aria-label="Sync data"
               title="Sync data"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all hover:bg-surface-card2 active:scale-95 shrink-0 disabled:opacity-50"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
             >
-              <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
-            </button>
+              <RefreshCw size={16} className={syncing ? "animate-spin" : ""} />
+            </Button>
           )}
           {showThemeToggle && (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
               onClick={toggleTheme}
               aria-label="Ganti mode tampilan"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all hover:bg-surface-card2 active:scale-95 shrink-0"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
             >
-              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-            </button>
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </Button>
           )}
           {right}
         </div>

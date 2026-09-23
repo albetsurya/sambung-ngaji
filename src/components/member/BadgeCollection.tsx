@@ -14,7 +14,7 @@ export function BadgeCollection({ badges }: { badges: BadgeState[] }) {
   return (
     <section className="rounded-2xl border border-surface-border bg-surface-card p-4">
       <p className="text-ios-footnote font-semibold text-surface-muted mb-3 flex items-center gap-1.5">
-        <Star size={13} className="text-accent" />
+        <Star size={14} className="text-accent" />
         {unlocked.length}/{badges.length} Badge
       </p>
       <div className="grid grid-cols-5 gap-2">

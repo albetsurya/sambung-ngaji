@@ -9,6 +9,7 @@ import {
   RefreshCw,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { aiApi } from "../services/aiApi";
 import { useToast } from "../contexts/ToastContext";
 import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
@@ -165,12 +166,13 @@ export default function MemberAiChatPage() {
         onBack={() => history.back()}
         right={
           messages.length > 0 ? (
-            <button
+            <Button
               onClick={clearHistory}
-              className="text-ios-body font-medium text-accent px-2 h-9 rounded-xl transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
+              variant="soft"
+              size="sm"
             >
               Reset
-            </button>
+            </Button>
           ) : undefined
         }
       />
@@ -222,18 +224,21 @@ export default function MemberAiChatPage() {
                 disabled={loading || !hydrated}
                 className="flex-1 min-h-[44px] max-h-[120px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all resize-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 disabled:opacity-50"
               />
-              <button
+              <Button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || loading || !hydrated}
                 aria-label="Kirim"
-                className="w-11 h-11 rounded-2xl bg-accent text-white flex items-center justify-center flex-shrink-0 transition-all hover:bg-accent-dark active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                variant="primary"
+                size="sm"
+                iconOnly
+                className="flex-shrink-0"
               >
                 {loading ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <Send size={18} />
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -304,7 +309,7 @@ function ChatBubble({
     <div className={`flex gap-2.5 ${isUser ? "flex-row-reverse" : ""}`}>
       {isUser ? (
         <div className="w-8 h-8 rounded-full bg-surface-card2 text-surface-muted flex items-center justify-center flex-shrink-0">
-          <UserIcon size={15} />
+          <UserIcon size={16} />
         </div>
       ) : (
         <AiAvatar size={32} />
@@ -361,13 +366,14 @@ function ActionButton({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       onClick={onClick}
-      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-[0.95]"
+      variant="ghost"
+      size="xs"
+      leftIcon={icon}
     >
-      {icon}
-      <span>{label}</span>
-    </button>
+      {label}
+    </Button>
   );
 }
 
@@ -589,12 +595,9 @@ function CodeBlock({
         <span className="text-[10px] font-mono text-surface-muted uppercase tracking-wide">
           {language || "code"}
         </span>
-        <button
-          onClick={handleCopy}
-          className="text-[10px] font-medium text-surface-muted hover:text-accent transition-colors px-2 py-0.5 rounded-md hover:bg-accent-soft"
-        >
+        <Button onClick={handleCopy} variant="ghost" size="xs">
           {copied ? "Tersalin" : "Salin"}
-        </button>
+        </Button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
         <code className="font-mono text-surface-text whitespace-pre">

@@ -14,6 +14,7 @@ import {
   Star,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import {
   TAHFIDZ_KATEGORI,
   TAHFIDZ_TARGETS,
@@ -81,14 +82,16 @@ export default function MemberTahfidzPage() {
         showSyncButton={false}
         right={
           stats.totalHafal > 0 ? (
-            <button
+            <Button
               onClick={handleReset}
               aria-label="Reset semua"
               title="Reset progress"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all duration-200 hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+              variant="softDanger"
+              size="xs"
+              iconOnly
             >
-              <RefreshCw size={15} />
-            </button>
+              <RefreshCw size={16} />
+            </Button>
           ) : undefined
         }
       />
@@ -103,7 +106,7 @@ export default function MemberTahfidzPage() {
 
           <div className="relative">
             <div className="flex items-center gap-1.5 mb-2">
-              <BookOpen size={13} className="text-accent/80" />
+              <BookOpen size={14} className="text-accent/80" />
               <p className="text-[11px] font-semibold uppercase tracking-wide text-accent/80">
                 Progress Hafalan
               </p>
@@ -143,7 +146,7 @@ export default function MemberTahfidzPage() {
         {reviewQueue.length > 0 && (
           <section className="space-y-2.5">
             <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
-              <RefreshCw size={13} className="text-warning" />
+              <RefreshCw size={14} className="text-warning" />
               Muraja'ah — Perlu Diulang
             </p>
 

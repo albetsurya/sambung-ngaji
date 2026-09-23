@@ -167,7 +167,7 @@ export default function MemberProgressPage() {
                 className="flex flex-col items-center gap-1 rounded-2xl border border-surface-border bg-surface-card p-3"
               >
                 <Icon size={18} className="text-accent" />
-                <span className="text-lg font-bold text-surface-text tabular-nums">
+                <span className="text-ios-nav font-bold text-surface-text tabular-nums">
                   {value}
                 </span>
                 <span className="text-[10px] font-medium text-surface-muted">
@@ -211,7 +211,7 @@ export default function MemberProgressPage() {
                   <span
                     className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${TIER_CHIP[badge.tier]}`}
                   >
-                    <Star size={17} />
+                    <Star size={16} />
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-ios-body font-medium text-surface-text truncate">
@@ -250,7 +250,7 @@ function BadgeRow({ badge, streaks }: { badge: BadgeState; streaks: { sholat: nu
           }`}
         >
           {badge.unlocked ? (
-            <Star size={17} />
+            <Star size={16} />
           ) : (
             <Lock size={16} className="text-surface-muted" />
           )}
@@ -263,7 +263,7 @@ function BadgeRow({ badge, streaks }: { badge: BadgeState; streaks: { sholat: nu
             </p>
             {badge.unlocked && (
               <Check
-                size={13}
+                size={14}
                 strokeWidth={2.8}
                 className="text-success flex-shrink-0"
               />

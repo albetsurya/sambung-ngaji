@@ -171,7 +171,7 @@ export default function MemberImportPage() {
         title="Import Jamaah"
         subtitle="Paste text biodata dari WhatsApp"
         onBack={() => navigate("/lainnya")}
-        backLabel="Lainnya"
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
@@ -298,13 +298,14 @@ function InputPhase({
             <p className="text-ios-caption font-medium text-surface-muted">
               Contoh Template
             </p>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={onCopySample}
-              className="flex items-center gap-1 text-ios-caption font-medium text-accent transition-colors hover:text-accent-dark"
+              leftIcon={<Copy size={12} />}
             >
-              <Copy size={12} />
               Salin
-            </button>
+            </Button>
           </div>
           <pre className="px-4 py-3 text-[12px] leading-relaxed text-surface-text font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
             {SAMPLE}

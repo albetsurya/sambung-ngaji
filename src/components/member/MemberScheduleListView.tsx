@@ -104,7 +104,7 @@ export function MemberScheduleListView({
                     <span className="text-[9px] font-semibold uppercase tracking-wide leading-none">
                       {m.hari.slice(0, 3)}
                     </span>
-                    <span className="text-sm font-bold leading-none mt-0.5 tabular-nums">
+                    <span className="text-ios-subhead font-bold leading-none mt-0.5 tabular-nums">
                       {parseInt(m.tanggal.slice(8, 10), 10)}
                     </span>
                   </div>

@@ -129,7 +129,7 @@ export function DateInput({
           aria-label="Buka kalender"
           className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-[0.95] disabled:opacity-40"
         >
-          <Calendar size={15} />
+          <Calendar size={16} />
         </button>
         <input
           ref={nativeRef}

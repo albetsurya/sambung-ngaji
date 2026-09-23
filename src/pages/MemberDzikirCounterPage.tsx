@@ -6,6 +6,7 @@ import {
   ChevronLeft,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { getDzikirPreset } from "../data/dzikir";
 import { useDzikirCounters, vibrate } from "../hooks/useDzikirCounters";
 import { useToast } from "../contexts/ToastContext";
@@ -61,13 +62,15 @@ export default function MemberDzikirCounterPage() {
       {/* Header custom */}
       <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80">
         <div className="grid grid-cols-[auto_1fr_auto] items-center h-[52px] px-3 gap-2">
-          <button
+          <Button
             onClick={() => navigate("/member/dzikir")}
             aria-label="Kembali"
-            className="flex items-center justify-center w-9 h-9 rounded-xl text-accent transition-colors duration-200 hover:bg-accent-soft/60 active:scale-95"
+            variant="ghost"
+            size="sm"
+            iconOnly
           >
             <ChevronLeft size={24} strokeWidth={2.2} />
-          </button>
+          </Button>
 
           <div className="flex flex-col items-center min-w-0">
             <h1 className="text-ios-nav font-semibold text-surface-text truncate">
@@ -78,14 +81,16 @@ export default function MemberDzikirCounterPage() {
             </p>
           </div>
 
-          <button
+          <Button
             onClick={handleReset}
             aria-label="Reset"
             title="Reset hitungan"
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all duration-200 hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+            variant="softDanger"
+            size="xs"
+            iconOnly
           >
-            <RefreshCw size={15} />
-          </button>
+            <RefreshCw size={16} />
+          </Button>
         </div>
       </header>
 
@@ -170,7 +175,7 @@ export default function MemberDzikirCounterPage() {
 
             {done && (
               <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-success">
-                <Check size={11} strokeWidth={3} />
+                <Check size={12} strokeWidth={3} />
                 Selesai
               </span>
             )}
@@ -190,12 +195,14 @@ export default function MemberDzikirCounterPage() {
         )}
 
         {done && (
-          <button
+          <Button
             onClick={() => navigate("/member/dzikir")}
-            className="mt-6 min-h-[44px] px-6 rounded-2xl bg-accent text-white text-ios-subhead font-medium transition-all duration-200 hover:bg-accent-dark active:scale-[0.97]"
+            variant="primary"
+            size="sm"
+            className="mt-6"
           >
             Pilih Dzikir Lain
-          </button>
+          </Button>
         )}
       </div>
     </AppLayout>

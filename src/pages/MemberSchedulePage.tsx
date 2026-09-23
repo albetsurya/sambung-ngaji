@@ -9,7 +9,7 @@ import {
   Users,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { BottomSheet, Card, ErrorState, Badge } from "../components/common";
+import { BottomSheet, Button, Card, ErrorState, Badge } from "../components/common";
 import { MemberCalendarView } from "../components/member/MemberCalendarView";
 import { MemberScheduleListView } from "../components/member/MemberScheduleListView";
 import { meetingApi } from "../services/domainApi";
@@ -355,7 +355,7 @@ function MeetingDetailSheet({
         <p className="text-[11px] font-medium text-accent uppercase tracking-wide mb-1">
           {meeting.hari}
         </p>
-        <p className="text-lg font-semibold text-surface-text mb-2">
+        <p className="text-ios-nav font-semibold text-surface-text mb-2">
           {meeting.acara || "Pengajian"}
         </p>
         <div className="flex items-center gap-3 text-ios-footnote text-surface-muted flex-wrap">
@@ -411,12 +411,15 @@ function MeetingDetailSheet({
         </Card>
       )}
 
-      <button
+      <Button
         onClick={onClose}
-        className="w-full mt-4 min-h-[44px] rounded-xl border border-surface-border bg-surface-card text-ios-subhead font-medium text-surface-text transition-colors hover:bg-surface-card2 active:scale-[0.98]"
+        variant="secondary"
+        size="sm"
+        fullWidth
+        className="mt-4"
       >
         Tutup
-      </button>
+      </Button>
     </BottomSheet>
   );
 }

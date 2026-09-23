@@ -357,13 +357,15 @@ function UserAccountSection({
                 {ROLE_LABEL[userStatus.user.role]}
               </span>
             </div>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
+              fullWidth
               onClick={() => navigate("/lainnya/users")}
-              className="w-full min-h-[44px] rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 flex items-center justify-center gap-2 text-ios-subhead font-medium text-accent transition-colors active:scale-[0.98]"
+              leftIcon={<ArrowUpRight size={16} />}
             >
-              <ArrowUpRight size={15} />
               Kelola Akun
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="space-y-3">
@@ -449,14 +451,17 @@ function CreateUserFromMemberSheet({
           </p>
         </div>
 
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
+          fullWidth
           type="button"
           onClick={handleRegenerate}
-          className="w-full mb-3 min-h-[40px] rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 flex items-center justify-center gap-2 text-ios-footnote font-medium text-accent transition-colors active:scale-[0.98]"
+          leftIcon={<RefreshCw size={14} />}
+          className="mb-3"
         >
-          <RefreshCw size={14} />
           Generate Ulang Username & Password
-        </button>
+        </Button>
 
         <Select
           label="Role"

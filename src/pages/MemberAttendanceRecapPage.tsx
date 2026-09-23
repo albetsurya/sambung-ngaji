@@ -319,32 +319,36 @@ export default function MemberAttendanceRecapPage() {
               </p>
               {hasData && !isReadonly && (
                 <div className="flex items-center gap-1 flex-shrink-0">
-                  <button
+                  <Button
                     onClick={() => exportFull("pdf")}
                     disabled={exporting !== null}
                     aria-label="Export PDF"
                     title="Export PDF"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted transition-all hover:bg-surface-card2 hover:text-surface-text active:scale-95 disabled:opacity-40"
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
                   >
                     {exporting === "pdf" ? (
                       <Loader2 size={14} className="animate-spin" />
                     ) : (
                       <FileText size={14} />
                     )}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => exportFull("excel")}
                     disabled={exporting !== null}
                     aria-label="Export Excel"
                     title="Export Excel"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted transition-all hover:bg-surface-card2 hover:text-surface-text active:scale-95 disabled:opacity-40"
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
                   >
                     {exporting === "excel" ? (
                       <Loader2 size={14} className="animate-spin" />
                     ) : (
                       <Download size={14} />
                     )}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -463,20 +467,19 @@ export default function MemberAttendanceRecapPage() {
         {/* Paginasi — pola MembersListPage: auto saat scroll + tombol */}
         {tableVisible && membersQuery.hasNextPage && (
           <div className="flex justify-center pt-1">
-            <button
+            <Button
               onClick={() => membersQuery.fetchNextPage()}
               disabled={membersQuery.isFetchingNextPage}
-              className="min-h-[40px] px-5 rounded-xl bg-accent text-white text-ios-subhead font-medium transition-all hover:bg-accent-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              variant="primary"
+              size="sm"
+              leftIcon={membersQuery.isFetchingNextPage ? <Loader2 size={14} className="animate-spin" /> : undefined}
             >
               {membersQuery.isFetchingNextPage ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  Memuat...
-                </>
+                "Memuat..."
               ) : (
                 `Muat lebih banyak (${allMembers.length}/${totalMembers})`
               )}
-            </button>
+            </Button>
           </div>
         )}
 

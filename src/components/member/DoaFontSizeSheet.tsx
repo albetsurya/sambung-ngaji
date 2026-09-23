@@ -80,7 +80,7 @@ export function DoaFontSizeSheet({ open, onClose }: DoaFontSizeSheetProps) {
 
               {active && (
                 <span className="w-6 h-6 rounded-full bg-accent text-white flex items-center justify-center flex-shrink-0">
-                  <Check size={13} strokeWidth={3} />
+                  <Check size={14} strokeWidth={3} />
                 </span>
               )}
             </button>

@@ -10,6 +10,7 @@ import {
   Check,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { useQiblaDirection } from "../hooks/useQiblaDirection";
 
 const LATUKAN = { lat: -6.9879, lng: 112.3729 };
@@ -66,17 +67,20 @@ export default function MemberKiblatPage() {
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          <button
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
             onClick={() => {
               setUsingDefault(false);
               requestLocation();
             }}
             aria-label="Refresh lokasi"
             title="Refresh lokasi"
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+            className="border border-surface-border"
           >
-            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-          </button>
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </Button>
         }
       />
 
@@ -154,13 +158,15 @@ export default function MemberKiblatPage() {
                 </p>
               )}
               {!canShowCompass && permission === "idle" && (
-                <button
+                <Button
+                  variant="primary"
+                  size="xs"
                   onClick={requestOrientation}
-                  className="mt-3 inline-flex items-center gap-1.5 min-h-[36px] px-4 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-dark active:scale-95"
+                  leftIcon={<Compass size={14} />}
+                  className="mt-3"
                 >
-                  <Compass size={14} />
                   Aktifkan Kompas
-                </button>
+                </Button>
               )}
               {!canShowCompass && permission === "unsupported" && (
                 <p className="text-ios-caption text-warning mt-2 max-w-xs mx-auto leading-relaxed">
@@ -189,7 +195,7 @@ export default function MemberKiblatPage() {
         {/* Hint / panduan */}
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5">
           <p className="text-ios-footnote font-medium text-surface-text mb-2 flex items-center gap-1.5">
-            <Navigation size={13} className="text-accent" />
+            <Navigation size={14} className="text-accent" />
             Cara pakai
           </p>
           <ul className="space-y-1.5">

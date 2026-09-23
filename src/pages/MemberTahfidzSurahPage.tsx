@@ -12,7 +12,7 @@ import {
   BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ErrorState } from "../components/common";
+import { Button, ErrorState } from "../components/common";
 import { AudioPlayerMini, type AudioTrack } from "../components/member/AudioPlayerMini";
 import {
   fetchSurahDetail,
@@ -227,17 +227,17 @@ export default function MemberTahfidzSurahPage() {
         backLabel="Tahfidz"
         showSyncButton={false}
         right={
-          <button
+          <Button
             onClick={() =>
               setQariKey(QARI_LIST[(QARI_LIST.findIndex((q) => q.key === qariKey) + 1) % QARI_LIST.length].key)
             }
             aria-label="Ganti qari"
             title="Ganti qari"
-            className="flex items-center gap-1 h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
-          >
-            <Play size={13} />
-            <ChevronDown size={12} className="text-surface-muted" />
-          </button>
+            variant="secondary"
+            size="sm"
+            leftIcon={<Play size={14} />}
+            rightIcon={<ChevronDown size={12} className="text-surface-muted" />}
+          />
         }
       />
 
@@ -247,7 +247,7 @@ export default function MemberTahfidzSurahPage() {
       {target && stats.total > 0 && (
         <div className="px-4 pt-3">
           <div className="rounded-xl border border-surface-border bg-surface-card px-3 py-2 flex items-center gap-2">
-            <BookOpen size={13} className="text-accent flex-shrink-0" />
+            <BookOpen size={14} className="text-accent flex-shrink-0" />
             <span className="text-ios-caption text-surface-muted tabular-nums flex-shrink-0">
               {stats.hafal}/{stats.total}
             </span>
@@ -280,7 +280,7 @@ export default function MemberTahfidzSurahPage() {
                   : "text-surface-muted hover:bg-surface-card")
               }
             >
-              <Eye size={13} />
+              <Eye size={14} />
               Baca
             </button>
           </div>
@@ -295,7 +295,7 @@ export default function MemberTahfidzSurahPage() {
                   : "text-surface-muted hover:bg-surface-card")
               }
             >
-              <EyeOff size={13} />
+              <EyeOff size={14} />
               Uji Hafalan
             </button>
           </div>
@@ -512,7 +512,7 @@ function TahfidzAyatCard({
                 : "bg-accent-soft text-accent")
             }
           >
-            {hafal ? <Check size={13} strokeWidth={3} /> : ayat.nomorAyat}
+            {hafal ? <Check size={14} strokeWidth={3} /> : ayat.nomorAyat}
           </span>
           <span className="text-ios-caption text-surface-muted truncate">
             Ayat {ayat.nomorAyat}
@@ -550,7 +550,7 @@ function TahfidzAyatCard({
                 : "text-surface-muted hover:bg-success-soft hover:text-success")
             }
           >
-            <Check size={15} strokeWidth={2.6} />
+            <Check size={16} strokeWidth={2.6} />
           </button>
         </div>
       </div>

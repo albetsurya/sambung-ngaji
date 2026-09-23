@@ -13,6 +13,7 @@ import {
   Moon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { useToast } from "../contexts/ToastContext";
 import {
   getPrayerTimesForDate,
@@ -131,13 +132,14 @@ export default function MemberPrayerPage() {
             <p className="text-ios-footnote font-semibold text-surface-text">
               Hari Ini
             </p>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={handleShare}
-              className="flex items-center gap-1 text-ios-caption font-medium text-accent hover:text-accent-dark transition-colors"
+              leftIcon={copied ? <Check size={12} /> : <Copy size={12} />}
             >
-              {copied ? <Check size={12} /> : <Copy size={12} />}
               {copied ? "Tersalin" : "Bagikan"}
-            </button>
+            </Button>
           </div>
 
           <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">

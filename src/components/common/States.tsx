@@ -5,6 +5,7 @@ import {
   RefreshCw,
   Loader2,
 } from "./FontAwesomeIcons";
+import { Button } from "./Button";
 
 const STATE_WRAPPER =
   "flex flex-col items-center justify-center text-center flex-1 min-h-[60vh] px-6";
@@ -136,12 +137,15 @@ export function ErrorState({
         {message}
       </p>
       {onRetry && (
-        <button
+        <Button
+          variant="soft"
+          size="sm"
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-1.5 px-4 h-10 rounded-xl text-ios-subhead font-medium text-accent bg-accent-soft transition-colors hover:bg-accent-soft/70 active:scale-[0.97]"
+          leftIcon={<RefreshCw size={14} />}
+          className="mt-5"
         >
-          <RefreshCw size={14} /> Coba lagi
-        </button>
+          Coba lagi
+        </Button>
       )}
     </div>
   );

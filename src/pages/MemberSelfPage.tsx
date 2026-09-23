@@ -326,7 +326,7 @@ function ProfileTab({
               <Card key={m.meeting_id} className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
                   <Calendar size={12} className="text-accent" />
-                  <span className="text-sm font-bold text-accent leading-none mt-0.5 tabular-nums">
+                  <span className="text-ios-subhead font-bold text-accent leading-none mt-0.5 tabular-nums">
                     {new Date(m.tanggal).getDate()}
                   </span>
                 </div>
@@ -334,11 +334,11 @@ function ProfileTab({
                   <span className="inline-block text-[10px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 mb-1 uppercase">
                     {m.hari}
                   </span>
-                  <p className="font-medium text-sm text-surface-text truncate">
+                  <p className="font-medium text-ios-subhead text-surface-text truncate">
                     {m.acara || "Pengajian"}
                   </p>
                   {m.jam && (
-                    <p className="text-xs text-surface-muted truncate">
+                    <p className="text-ios-caption text-surface-muted truncate">
                       {m.jam}
                     </p>
                   )}

@@ -352,7 +352,7 @@ export default function MemberOthersPage() {
               className="justify-center"
             >
               <div className="flex items-center gap-2 text-danger">
-                <LogOut size={17} />
+                <LogOut size={16} />
                 <span className="text-ios-body font-medium">Keluar</span>
               </div>
             </ListRow>

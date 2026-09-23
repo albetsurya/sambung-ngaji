@@ -65,7 +65,7 @@ export default function QrCodePage() {
       <Header
         title="QR Code Pendaftaran"
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
 
       <div className="px-4 py-4 space-y-4">

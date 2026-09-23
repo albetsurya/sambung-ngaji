@@ -340,7 +340,7 @@ function SchedulePreviewCard({
       className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2 hover:border-accent/30"
     >
       <span className="w-11 h-11 rounded-2xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-        <Calendar size={19} strokeWidth={2.2} />
+        <Calendar size={18} strokeWidth={2.2} />
       </span>
 
       <div className="flex-1 min-w-0">

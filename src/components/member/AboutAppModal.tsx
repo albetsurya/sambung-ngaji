@@ -46,7 +46,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
-              <Users size={15} />
+              <Users size={16} />
             </div>
             <div>
               <p className="text-ios-body font-medium text-surface-text">
@@ -60,7 +60,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
 
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
-              <CalendarCheck size={15} />
+              <CalendarCheck size={16} />
             </div>
             <div>
               <p className="text-ios-body font-medium text-surface-text">
@@ -74,7 +74,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
 
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
-              <Heart size={15} />
+              <Heart size={16} />
             </div>
             <div>
               <p className="text-ios-body font-medium text-surface-text">
@@ -88,7 +88,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
 
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
-              <Sparkles size={15} />
+              <Sparkles size={16} />
             </div>
             <div>
               <p className="text-ios-body font-medium text-surface-text">

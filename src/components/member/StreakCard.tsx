@@ -27,7 +27,7 @@ export function StreakCard({ streaks }: { streaks: Streaks }) {
             className="flex flex-col items-center gap-1 rounded-xl bg-surface-card2 p-3"
           >
             <Icon size={18} className="text-accent" />
-            <span className="text-lg font-bold text-surface-text tabular-nums">
+            <span className="text-ios-nav font-bold text-surface-text tabular-nums">
               {streaks[key]}
             </span>
             <span className="text-[10px] font-medium text-surface-muted">

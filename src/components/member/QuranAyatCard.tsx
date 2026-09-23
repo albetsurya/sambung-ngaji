@@ -69,9 +69,9 @@ export function QuranAyatCard({
             }
           >
             {isBookmarked ? (
-              <Check size={15} strokeWidth={2.6} />
+              <Check size={16} strokeWidth={2.6} />
             ) : (
-              <Bookmark size={15} />
+              <Bookmark size={16} />
             )}
           </button>
         </div>

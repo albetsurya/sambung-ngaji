@@ -223,7 +223,7 @@ export function ImportTextTab() {
         <>
           <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-card2 border border-surface-border">
             <p className="text-ios-caption text-surface-muted truncate flex-1 flex items-center gap-1.5">
-              <ScrollText size={13} className="flex-shrink-0" />
+              <ScrollText size={14} className="flex-shrink-0" />
               Teks tempel · {lineCount} baris
             </p>
             <button
@@ -345,7 +345,7 @@ function DraftCard({
             {draft.tanggal ? (
               <>
                 <span className="inline-flex items-center gap-1">
-                  <Calendar size={11} />
+                  <Calendar size={12} />
                   {draft.hari && `${draft.hari}, `}
                   {formatDateShort(draft.tanggal)}
                   {draft.tanggalSelesai && (

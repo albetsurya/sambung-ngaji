@@ -71,7 +71,7 @@ export default function GroupsPage() {
       <Header
         title="Kelompok"
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
       <div className="py-3">
         {isLoading && <GroupedListSkeleton rows={5} />}

@@ -256,7 +256,7 @@ export function ChevronRow({
     <div onClick={onClick} className="flex items-center gap-3">
       <div className="flex-1 min-w-0">{children}</div>
       <ChevronRight
-        size={17}
+        size={16}
         strokeWidth={2.3}
         className="text-surface-muted/60 flex-shrink-0"
       />

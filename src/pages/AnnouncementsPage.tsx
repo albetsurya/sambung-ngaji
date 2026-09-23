@@ -81,17 +81,16 @@ export default function AnnouncementsPage() {
         subtitle="Template WhatsApp pengajian"
         right={
           isAdminLike ? (
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => navigate("/pengumuman/templates")}
               aria-label="Kelola template"
               title="Kelola template"
-              className="flex items-center gap-1 h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-accent transition-all hover:bg-surface-card2 active:scale-[0.97]"
+              leftIcon={<ScrollText size={14} strokeWidth={2.4} />}
             >
-              <ScrollText size={14} strokeWidth={2.4} />
-              <span className="text-ios-footnote font-medium hidden xs:inline">
-                Template
-              </span>
-            </button>
+              <span className="hidden xs:inline">Template</span>
+            </Button>
           ) : undefined
         }
       />

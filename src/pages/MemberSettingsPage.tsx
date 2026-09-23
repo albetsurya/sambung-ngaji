@@ -17,6 +17,7 @@ import {
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Avatar,
+  Button,
   ConfirmDialog,
   GroupedList,
   ListRow,
@@ -76,14 +77,16 @@ export default function MemberSettingsPage() {
                 @{user?.username || "-"}
               </p>
             </div>
-            <button
+            <Button
+              variant="soft"
+              size="xs"
+              iconOnly
               onClick={() => navigate(editPath)}
               aria-label="Edit biodata"
               title="Edit biodata"
-              className="flex items-center justify-center w-9 h-9 rounded-xl bg-accent-soft text-accent transition-all duration-200 hover:bg-accent-soft/80 active:scale-95"
             >
-              <Pencil size={15} strokeWidth={2.2} />
-            </button>
+              <Pencil size={16} strokeWidth={2.2} />
+            </Button>
           </div>
         </div>
 
@@ -278,7 +281,7 @@ export default function MemberSettingsPage() {
             className="justify-center"
           >
             <div className="flex items-center gap-2 text-danger">
-              <LogOut size={17} />
+              <LogOut size={16} />
               <span className="text-ios-body font-medium">Keluar</span>
             </div>
           </ListRow>

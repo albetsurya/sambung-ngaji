@@ -13,7 +13,7 @@ import {
   Type as TypeIcon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ErrorState } from "../components/common";
+import { Button, ErrorState } from "../components/common";
 import { MushafPageSkeleton } from "../components/common/Skeleton";
 import { MushafPageView } from "../components/member/MushafPageView";
 import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
@@ -198,22 +198,26 @@ export default function MemberQuranMushafPage() {
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={cycleScale}
               aria-label="Ubah ukuran"
               title="Ukuran teks"
-              className="flex items-center justify-center h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+              variant="secondary"
+              size="xs"
+              iconOnly
             >
               <TypeIcon size={14} />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setNavSheetOpen(true)}
               aria-label="Lompat ke surah / halaman"
               title="Lompat ke..."
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+              variant="secondary"
+              size="xs"
+              iconOnly
             >
-              <List size={15} />
-            </button>
+              <List size={16} />
+            </Button>
           </div>
         }
       />
@@ -267,15 +271,17 @@ export default function MemberQuranMushafPage() {
       {/* Bottom controls */}
       <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe bg-surface-bg/95 backdrop-blur border-t border-surface-border">
         <div className="app-shell px-3 py-2.5 flex items-center gap-2">
-          <button
+          <Button
             onClick={nextPage}
             disabled={currentPage >= TOTAL_PAGES}
             aria-label="Halaman berikutnya"
             title="Halaman berikutnya"
-            className="w-11 h-11 rounded-xl border border-surface-border bg-surface-card flex items-center justify-center text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            variant="secondary"
+            size="sm"
+            iconOnly
           >
             <ChevronLeft size={20} />
-          </button>
+          </Button>
 
           <form
             onSubmit={handleJumpInput}
@@ -291,36 +297,41 @@ export default function MemberQuranMushafPage() {
               className="flex-1 min-h-[44px] rounded-xl border border-surface-border bg-surface-card px-3 text-center text-[16px] text-surface-text placeholder:text-surface-muted focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 tabular-nums"
             />
             {jumpInput && (
-              <button
+              <Button
                 type="submit"
-                className="min-h-[44px] px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-dark active:scale-95"
+                variant="primary"
+                size="sm"
               >
                 Go
-              </button>
+              </Button>
             )}
           </form>
 
-          <button
+          <Button
             onClick={prevPage}
             disabled={currentPage <= 1}
             aria-label="Halaman sebelumnya"
             title="Halaman sebelumnya"
-            className="w-11 h-11 rounded-xl border border-surface-border bg-surface-card flex items-center justify-center text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            variant="secondary"
+            size="sm"
+            iconOnly
           >
             <ChevronRight size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* Resume last page hint */}
         {lastPage && lastPage !== currentPage && (
           <div className="app-shell px-3 pb-2">
-            <button
+            <Button
               onClick={() => goToPage(lastPage)}
-              className="w-full min-h-[34px] rounded-xl bg-accent-soft text-accent text-ios-caption font-medium transition-all duration-200 hover:bg-accent-soft/80 active:scale-[0.99] flex items-center justify-center gap-1.5"
+              variant="soft"
+              size="sm"
+              fullWidth
+              leftIcon={<Bookmark size={12} />}
             >
-              <Bookmark size={11} />
               Lanjutkan dari hal. {lastPage}
-            </button>
+            </Button>
           </div>
         )}
       </div>

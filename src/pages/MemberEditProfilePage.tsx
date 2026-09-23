@@ -238,15 +238,17 @@ export default function MemberEditProfilePage() {
           )}
 
           {photoPreview && !compressing && (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               type="button"
               onClick={() => setConfirmDeleteOpen(true)}
               disabled={deletingPhoto || submitting}
-              className="mt-3 inline-flex items-center gap-1.5 text-ios-footnote font-medium text-danger hover:text-danger/80 transition-colors active:scale-[0.97] disabled:opacity-50"
+              leftIcon={<Trash2 size={14} />}
+              className="mt-3 !text-danger hover:!text-danger/80"
             >
-              <Trash2 size={14} />
               {deletingPhoto ? "Menghapus..." : "Hapus Foto"}
-            </button>
+            </Button>
           )}
         </div>
 
@@ -499,7 +501,7 @@ function LockedField({ label, value }: { label: string; value?: string }) {
         {label}
       </span>
       <span className="text-ios-body text-surface-text text-right truncate flex items-center gap-1.5">
-        <Lock size={11} className="text-surface-muted/50 flex-shrink-0" />
+        <Lock size={12} className="text-surface-muted/50 flex-shrink-0" />
         {value || "-"}
       </span>
     </div>

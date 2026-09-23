@@ -12,6 +12,7 @@ import { useDzikirStreak } from "../hooks/useDzikirStreak";
 import { useQuranStreak } from "../hooks/useQuranStreak";
 import type { Streaks } from "../types";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import {
   WAKTU_LIST,
   STATUS_LIST,
@@ -81,14 +82,17 @@ export default function MemberSholatJournalPage() {
         showSyncButton={false}
         right={
           recorded > 0 ? (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
               onClick={handleResetToday}
               aria-label="Reset hari ini"
               title="Reset hari ini"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all duration-200 hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+              className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
             >
-              <RefreshCw size={15} />
-            </button>
+              <RefreshCw size={16} />
+            </Button>
           ) : undefined
         }
       />
@@ -99,7 +103,7 @@ export default function MemberSholatJournalPage() {
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-1">
-                <TrendingUp size={13} className="text-accent/80" />
+                <TrendingUp size={14} className="text-accent/80" />
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-accent/80">
                   Streak
                 </p>
@@ -218,7 +222,7 @@ export default function MemberSholatJournalPage() {
         {/* History 7 hari */}
         <section className="space-y-2.5">
           <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
-            <Calendar size={13} className="text-accent" />
+            <Calendar size={14} className="text-accent" />
             7 Hari Terakhir
           </p>
 

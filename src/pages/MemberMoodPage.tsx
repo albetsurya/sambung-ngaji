@@ -8,6 +8,7 @@ import {
   Heart,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import {
   MOOD_LIST,
   getMood,
@@ -131,7 +132,7 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
         })}
       </div>
 
-      <button
+      <Button
         onClick={() => {
           if (selected) {
             moodApi.save(selected).catch(() => {});
@@ -139,11 +140,13 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
           }
         }}
         disabled={!selected}
-        className="w-full min-h-[52px] rounded-2xl bg-accent text-white text-ios-body font-semibold transition-all duration-200 hover:bg-accent-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        variant="primary"
+        size="lg"
+        fullWidth
+        leftIcon={<Sparkles size={16} />}
       >
-        <Sparkles size={16} />
         {selected ? "Tampilkan untuk saya" : "Pilih mood dulu"}
-      </button>
+      </Button>
     </>
   );
 }
@@ -182,9 +185,9 @@ function MoodResult({ mood }: { mood: Mood }) {
           title={dalil.kind === "ayat" ? "Ayat untukmu" : "Hadits untukmu"}
           icon={
             dalil.kind === "ayat" ? (
-              <ScrollText size={13} className="text-accent" />
+              <ScrollText size={14} className="text-accent" />
             ) : (
-              <Heart size={13} className="text-success" />
+              <Heart size={14} className="text-success" />
             )
           }
         >
@@ -203,7 +206,7 @@ function MoodResult({ mood }: { mood: Mood }) {
       {doa && (
         <Section
           title="Doa untukmu"
-          icon={<Sparkles size={13} className="text-accent" />}
+          icon={<Sparkles size={14} className="text-accent" />}
         >
           <DoaCard doa={doa} />
         </Section>
@@ -212,7 +215,7 @@ function MoodResult({ mood }: { mood: Mood }) {
       {/* Nasehat & Hikmah */}
       <Section
         title="Nasehat & Hikmah"
-        icon={<Heart size={13} className="text-success" />}
+        icon={<Heart size={14} className="text-success" />}
       >
         <div className="rounded-2xl border border-success/20 bg-success-soft/60 px-4 py-4">
           <p className="text-ios-footnote text-surface-text leading-relaxed">
@@ -223,20 +226,24 @@ function MoodResult({ mood }: { mood: Mood }) {
 
       {/* Aksi */}
       <div className="flex flex-col gap-2 pt-2">
-        <button
+        <Button
           onClick={() => navigate("/member/dzikir")}
-          className="min-h-[48px] rounded-2xl border border-accent/25 bg-accent-soft text-accent text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-soft/80 active:scale-[0.98] flex items-center justify-center gap-2"
+          variant="soft"
+          size="md"
+          fullWidth
+          leftIcon={<RefreshCw size={14} />}
         >
-          <RefreshCw size={14} />
           Lanjutkan dengan dzikir
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => navigate("/member/quran")}
-          className="min-h-[48px] rounded-2xl border border-surface-border bg-surface-card text-surface-text text-ios-footnote font-medium transition-all duration-200 hover:bg-surface-card2 active:scale-[0.98] flex items-center justify-center gap-2"
+          variant="secondary"
+          size="md"
+          fullWidth
+          leftIcon={<ScrollText size={14} />}
         >
-          <ScrollText size={14} />
           Baca Al-Quran
-        </button>
+        </Button>
       </div>
 
       <p className="text-ios-caption text-surface-muted text-center pt-1">
