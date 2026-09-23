@@ -93,7 +93,7 @@ export const THEME_PRESETS: {
     key: "glass",
     label: "Glass",
     description: "Kaca frosted modern",
-    swatch: ["#6366F1", "#22D3EE", "#FFFFFF"],
+    swatch: ["#E2E8F0", "#FFFFFF", "#0F172A"],
   },
 ];
 

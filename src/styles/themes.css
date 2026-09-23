@@ -291,32 +291,20 @@
    ======================================================================== */
 
 [data-preset="glass"] {
-  --c-bg: 238 242 255;
+  --c-bg: 240 243 248;
   --c-card: 255 255 255;
-  --c-card2: 242 245 253;
-  --c-border: 214 222 240;
-  --c-text: 20 28 58;
-  --c-muted: 100 112 150;
-  --c-accent: 99 102 241;
-  --c-accent-dark: 79 70 229;
-  --c-accent-light: 228 231 255;
-  --c-accent-2: 34 211 238;
-  --c-accent-2-dark: 8 145 178;
-  --c-accent-2-light: 207 250 254;
+  --c-card2: 244 247 252;
+  --c-border: 218 226 238;
+  --c-text: 20 28 45;
+  --c-muted: 100 112 140;
 }
 [data-preset="glass"].dark {
-  --c-bg: 9 13 28;
-  --c-card: 17 23 42;
-  --c-card2: 12 17 34;
-  --c-border: 42 54 88;
-  --c-text: 238 242 255;
-  --c-muted: 148 160 200;
-  --c-accent: 129 140 248;
-  --c-accent-dark: 165 180 252;
-  --c-accent-light: 28 32 72;
-  --c-accent-2: 34 211 238;
-  --c-accent-2-dark: 103 232 249;
-  --c-accent-2-light: 10 40 55;
+  --c-bg: 8 10 18;
+  --c-card: 16 20 34;
+  --c-card2: 11 14 26;
+  --c-border: 38 46 72;
+  --c-text: 238 242 250;
+  --c-muted: 150 160 190;
 }
 
 html[data-preset="glass"] body::before {
@@ -326,13 +314,13 @@ html[data-preset="glass"] body::before {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(480px 320px at 85% -2%, rgb(99 102 241 / 0.16), transparent 65%),
-    radial-gradient(420px 300px at -5% 25%, rgb(34 211 238 / 0.12), transparent 65%),
-    radial-gradient(520px 360px at 50% 108%, rgb(168 85 247 / 0.12), transparent 65%);
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.9), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(203 213 225 / 0.5), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(226 232 240 / 0.7), transparent 65%);
 }
 html[data-preset="glass"].dark body::before {
   background:
-    radial-gradient(480px 320px at 85% -2%, rgb(99 102 241 / 0.28), transparent 65%),
-    radial-gradient(420px 300px at -5% 25%, rgb(34 211 238 / 0.2), transparent 65%),
-    radial-gradient(520px 360px at 50% 108%, rgb(168 85 247 / 0.22), transparent 65%);
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.07), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(148 163 184 / 0.1), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(255 255 255 / 0.05), transparent 65%);
 }
