@@ -16,7 +16,7 @@ export function BottomSheet({ open, onClose, title, children }: SheetProps) {
         className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
         onClick={onClose}
       />
-      <div className="app-shell relative w-full bg-surface-card rounded-t-[28px] border-t border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
+      <div className="app-shell sheet relative w-full bg-surface-card rounded-t-[28px] border-t border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
         <div className="flex items-center justify-center pt-2.5 pb-2">
           <div className="w-9 h-[5px] rounded-full bg-surface-muted/25" />
         </div>

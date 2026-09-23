@@ -231,18 +231,19 @@
   color: #ffffff;
 }
 
-/* Input/teks area/select: border merah (lebih tegas saat focus).
-   Berlaku untuk semua input teks termasuk kolom search/filter. */
-[data-preset="tiktok"] input:not([type="checkbox"]):not([type="radio"]),
-[data-preset="tiktok"] textarea,
-[data-preset="tiktok"] select {
-  border-color: rgb(254 44 85 / 0.65);
-}
+/* Input/teks area/select: border abu saat rest, merah hanya saat focus. */
 [data-preset="tiktok"] input:focus,
 [data-preset="tiktok"] textarea:focus,
 [data-preset="tiktok"] select:focus {
   border-color: rgb(254 44 85);
   --tw-ring-color: rgb(254 44 85 / 0.18);
+}
+
+/* Tombol di dalam sheet (dark): teks putih + border abu muda. */
+[data-preset="tiktok"].dark .sheet .btn-primary,
+[data-preset="tiktok"].dark .sheet .btn-secondary {
+  color: #ffffff;
+  border-color: rgb(200 200 200);
 }
 
 /* FAB add — glitch berupa border kiri cyan & border kanan merah
