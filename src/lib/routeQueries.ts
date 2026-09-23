@@ -57,6 +57,13 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
 
   // Member self (mode member)
   if (pathname.startsWith("/member")) {
+    if (pathname.startsWith("/member/petugas-jumat")) {
+      return [
+        ["member-self-dashboard"],
+        ["member-self-profile"],
+        queryKeys.fridaySchedules(),
+      ];
+    }
     return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
@@ -73,11 +80,11 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
   if (pathname.startsWith("/lainnya/audit-log")) {
     return [queryKeys.auditLogs(200)];
   }
-  if (pathname.startsWith("/lainnya/pengaturan")) {
-    return [queryKeys.settings()];
-  }
   if (pathname.startsWith("/lainnya/ai-usage")) {
     return [queryKeys.aiUsage()];
+  }
+  if (pathname.startsWith("/lainnya/petugas-jumat")) {
+    return [queryKeys.fridaySchedules()];
   }
 
   // Fallback — halaman "Lainnya" index

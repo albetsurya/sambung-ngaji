@@ -299,3 +299,18 @@ export interface Streaks {
   tahfidz: number;
   quran: number;
 }
+
+export interface FridaySchedule {
+  friday_id: string;
+  tanggal: string;
+  hari: string;
+  khatib_imam: string;
+  muadzin: string;
+  penasihat: string;
+  petugas_parkir: string;
+  penata_sandal: string;
+  catatan: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}

@@ -22,6 +22,7 @@ import {
   User,
   Home,
   Trophy,
+  Mosque,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { InstallAppCard } from "../components/member/InstallAppCard";
@@ -195,6 +196,14 @@ export default function MemberOthersPage() {
       description: "Kalender & daftar bulanan",
       Icon: Calendar,
       to: "/member/jadwal",
+      group: "data",
+    },
+    {
+      key: "petugas-jumat",
+      label: "Petugas Jumat",
+      description: "Info petugas sholat Jumat",
+      Icon: Mosque,
+      to: "/member/petugas-jumat",
       group: "data",
     },
     {

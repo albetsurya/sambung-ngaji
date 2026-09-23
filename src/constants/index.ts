@@ -23,5 +23,3 @@ export const MONITORING_STATUSES = [
   "KURANG_AKTIF",
   "TIDAK_AKTIF",
 ] as const;
-
-export const JADWAL_RUTIN = ["Minggu", "Selasa", "Kamis"];

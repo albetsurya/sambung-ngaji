@@ -15,6 +15,7 @@ import {
   QrCode,
   User,
   Calendar,
+  Mosque,
   Home,
   FileText,
   UserPlus,
@@ -153,6 +154,15 @@ export default function OthersPage() {
       show: isAdminLike || role === "TIM_ABSENSI",
       group: "jadwal",
     },
+    {
+      key: "petugas-jumat",
+      label: "Petugas Jumat",
+      description: "Kelola petugas sholat Jumat",
+      Icon: Mosque,
+      to: "/lainnya/petugas-jumat",
+      show: isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS",
+      group: "jadwal",
+    },
 
     // Sistem
     {
@@ -162,15 +172,6 @@ export default function OthersPage() {
       Icon: KeyRound,
       to: "/lainnya/users",
       show: isSuperAdmin,
-      group: "sistem",
-    },
-    {
-      key: "settings",
-      label: "Pengaturan",
-      description: "Konfigurasi aplikasi",
-      Icon: Settings,
-      to: "/lainnya/pengaturan",
-      show: isAdminLike,
       group: "sistem",
     },
     {

@@ -18,7 +18,6 @@ const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const OthersPage = lazy(() => import("./pages/OthersPage"));
 const GroupsPage = lazy(() => import("./pages/GroupsPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
-const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const AiChatPage = lazy(() => import("./pages/AiChatPage"));
 const AnnouncementTemplatesPage = lazy(
@@ -43,6 +42,10 @@ const MemberTahfidzPage = lazy(
 );
 const MemberSchedulePage = lazy(
   () => import("./pages/MemberSchedulePage"),
+);
+const MemberFridayPage = lazy(() => import("./pages/MemberFridayPage"));
+const FridaySchedulesPage = lazy(
+  () => import("./pages/FridaySchedulesPage"),
 );
 const MemberTahfidzSurahPage = lazy(
   () => import("./pages/MemberTahfidzSurahPage"),
@@ -163,6 +166,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberSchedulePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/petugas-jumat"
+          element={
+            <PersonalRoute>
+              <MemberFridayPage />
             </PersonalRoute>
           }
         />
@@ -349,9 +360,9 @@ function AppRoutes() {
             <Route path="qr-code" element={<QrCodePage />} />
             <Route path="ai-usage" element={<AiUsagePage />} />
             <Route path="users" element={<UsersPage />} />
-            <Route path="pengaturan" element={<SettingsPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
             <Route path="jadwal" element={<JadwalPage />} />
+            <Route path="petugas-jumat" element={<FridaySchedulesPage />} />
             <Route path="import-jamaah" element={<MemberImportPage />} />
             <Route path="rekap-absensi" element={<MemberAttendanceRecapPage />} />
           </Route>
