@@ -17,7 +17,8 @@ export type ThemePreset =
   | "masjid"
   | "ocean"
   | "sunset"
-  | "midnight";
+  | "midnight"
+  | "glass";
 
 const STORAGE_KEY = "pengajian_theme";
 const PRESET_KEY = "pengajian_preset";
@@ -88,6 +89,12 @@ export const THEME_PRESETS: {
     description: "Hitam neon sleek",
     swatch: ["#8B5CF6", "#000000", "#A78BFA"],
   },
+  {
+    key: "glass",
+    label: "Glass",
+    description: "Kaca frosted modern",
+    swatch: ["#6366F1", "#22D3EE", "#FFFFFF"],
+  },
 ];
 
 interface ThemeContextValue {
@@ -121,6 +128,7 @@ function getInitialPreset(): ThemePreset {
     "ocean",
     "sunset",
     "midnight",
+    "glass",
   ];
   if (stored && valid.includes(stored)) return stored;
   return "default";
