@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User,
   GraduationCap,
   Calendar,
+  CalendarCheck,
+  ChevronRight,
   Heart,
   Sparkles,
   Pencil,
@@ -28,24 +30,21 @@ import type { Member, MonitoringEntry, Meeting, Education } from "../types";
 import {
   CATEGORY_LABEL,
   normalizeGender,
-  formatDateShort,
 } from "../utils/format";
 import { useAuth } from "../contexts/AuthContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
+import { goBack } from "../utils/navigation";
 import {
   BiodataTab,
   EducationTab,
-  AttendanceTab,
-  type AttendanceItem,
 } from "../components/member/MemberTabs";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
 const TABS = [
   { key: "profil", label: "Profil", Icon: User },
   { key: "pendidikan", label: "Pendidikan", Icon: GraduationCap },
-  { key: "absensi", label: "Absensi", Icon: Calendar },
   { key: "pembinaan", label: "Pembinaan", Icon: Heart },
 ] as const;
 
@@ -53,6 +52,7 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export default function MemberSelfPage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { isMember, role } = usePermission();
   const { user, refreshUser } = useAuth();
   const qc = useQueryClient();
@@ -73,7 +73,12 @@ export default function MemberSelfPage() {
   }, [tabFromUrl]);
 
   const basePath = isMember ? "/member" : "/profil-saya";
-  const backPath = isMember ? "/member" : "/lainnya";
+  // Fallback berbasis route aktif, bukan role — supaya admin yang sedang
+  // di mode jamaah (/member/profil) tidak terlempar ke /lainnya admin.
+  const backFallback = pathname.startsWith("/member")
+    ? "/member/lainnya"
+    : "/lainnya";
+  const handleBack = () => goBack(navigate, backFallback);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
@@ -121,7 +126,7 @@ export default function MemberSelfPage() {
       <AppLayout hideNav showAiChat={false}>
         <Header
           title="Biodata Saya"
-          onBack={backPath ? () => navigate(backPath) : undefined}
+          onBack={handleBack}
           backLabel="Kembali"
         />
         <div className="px-5 py-10 flex flex-col items-center text-center">
@@ -173,20 +178,11 @@ export default function MemberSelfPage() {
 
   const { profile, attendance, monitoring, upcoming } = data;
 
-  /* Normalize attendance untuk AttendanceTab */
-  const attendanceItems: AttendanceItem[] = attendance
-    .map(
-      (a): AttendanceItem => ({
-        id: a.attendance_id,
-        date: a.tanggal,
-        label: a.acara || "Pengajian",
-        sublabel: [a.hari, a.tanggal ? formatDateShort(a.tanggal) : "", a.jam]
-          .filter(Boolean)
-          .join(" · "),
-        status: a.status,
-        libur: a.status_meeting === "LIBUR",
-      }),
-    )
+  /* Snapshot kehadiran — hanya untuk analisis grafik pembinaan.
+     Tampilan riwayat penuh pindah ke halaman /member/absensi. */
+  const attendanceHistory = attendance
+    .filter((a) => a.tanggal && a.status_meeting !== "LIBUR")
+    .map((a) => ({ date: a.tanggal, status: a.status }))
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   return (
@@ -214,8 +210,8 @@ export default function MemberSelfPage() {
       <Header
         title={isMember ? "Profil Saya" : "Biodata Saya"}
         subtitle={profile.kelompok || "Jamaah"}
-        onBack={backPath ? () => navigate(backPath) : undefined}
-        backLabel="Lainnya"
+        onBack={handleBack}
+        backLabel="Kembali"
         showSyncButton
       />
 
@@ -281,14 +277,11 @@ export default function MemberSelfPage() {
         {tab === "pendidikan" && (
           <EducationTab education={profile.pendidikan || []} />
         )}
-        {tab === "absensi" && <AttendanceTab items={attendanceItems} />}
         {tab === "pembinaan" && (
           <MonitoringTab
             memberId={profile.member_id}
             entries={monitoring}
-            attendance={attendanceItems
-              .filter((a) => a.date)
-              .map((a) => ({ date: a.date!, status: a.status }))}
+            attendance={attendanceHistory}
             canWrite={false}
             onSaved={refetch}
           />
@@ -355,6 +348,36 @@ function ProfileTab({
           </div>
         )}
       </div>
+
+      {/* Link ke riwayat absensi penuh */}
+      <div className="px-4">
+        <AttendanceHistoryLink />
+      </div>
     </div>
+  );
+}
+
+function AttendanceHistoryLink() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  if (!user?.member_id) return null;
+  return (
+    <button
+      onClick={() => navigate("/member/absensi")}
+      className="w-full rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+    >
+      <span className="w-10 h-10 rounded-xl bg-success-soft text-success flex items-center justify-center flex-shrink-0">
+        <CalendarCheck size={18} />
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="block text-ios-body font-medium text-surface-text">
+          Riwayat Absensi
+        </span>
+        <span className="block text-ios-caption text-surface-muted truncate">
+          Statistik & rekap kehadiran bulanan
+        </span>
+      </span>
+      <ChevronRight size={16} className="text-surface-muted flex-shrink-0" />
+    </button>
   );
 }

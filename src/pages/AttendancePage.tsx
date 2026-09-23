@@ -65,7 +65,6 @@ import {
   getGenderTarget,
 } from "../components/jadwal/GenderTargetPicker";
 import type { GenderTarget } from "../components/jadwal/GenderTargetPicker";
-import { buildRecapMatrix, exportRecapPDF, exportRecapExcel, type RecapMatrix } from "../lib/monthlyAttendanceExport";
 
 /* -------------------------------------------------------------------------- */
 /*                              Types & State                                 */
@@ -144,12 +143,6 @@ export default function AttendancePage() {
   const deferredSearch = useDeferredValue(search);
   const [category, setCategory] = useState("");
   const [gender, setGender] = useState<"" | "L" | "P">("");
-
-  // Rekap Bulanan state
-  const [recapMonth, setRecapMonth] = useState(() => new Date().toISOString().slice(0, 7));
-  const [recapKategori, setRecapKategori] = useState("");
-  const [recapMatrix, setRecapMatrix] = useState<RecapMatrix | null>(null);
-  const [recapLoading, setRecapLoading] = useState(false);
 
   const [sheet, setSheet] = useState<SheetState>({ view: "closed" });
 
@@ -265,47 +258,6 @@ export default function AttendancePage() {
   const progress = filteredMembers.length
     ? (hadirCount / filteredMembers.length) * 100
     : 0;
-
-  /* --------------------------- Rekap Bulanan Fetch -------------------------- */
-
-  const fetchRecap = useCallback(async () => {
-    setRecapLoading(true);
-    try {
-      const from = `${recapMonth}-01`;
-      const to = new Date(Date.UTC(Number(recapMonth.slice(0, 4)), Number(recapMonth.slice(5, 7)), 0)).toISOString().slice(0, 10);
-
-      const [meetingsInMonth, membersForRecap] = await Promise.all([
-        meetingApi.list({ from, to }),
-        memberApi.list({ kategori: recapKategori || undefined }),
-      ]);
-
-      const nonLiburMeetings = meetingsInMonth.filter((m) => m.status !== "LIBUR");
-
-      if (nonLiburMeetings.length === 0) {
-        setRecapMatrix({ rows: [], meetings: [] });
-        showToast("Tidak ada jadwal pengajian pada bulan ini", "warning");
-        return;
-      }
-
-      const attendanceByMeeting = new Map<string, AttendanceRecord[]>();
-      await Promise.all(
-        nonLiburMeetings.map(async (meeting) => {
-          const records = await attendanceApi.byMeeting(meeting.meeting_id);
-          attendanceByMeeting.set(meeting.meeting_id, records);
-        })
-      );
-
-      const matrix = buildRecapMatrix(membersForRecap, nonLiburMeetings, attendanceByMeeting);
-      setRecapMatrix(matrix);
-    } catch (err) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal memuat rekap bulanan",
-        "error",
-      );
-    } finally {
-      setRecapLoading(false);
-    }
-  }, [recapMonth, recapKategori, showToast]);
 
   /* ------------------------------- Mutations ------------------------------- */
 
@@ -741,6 +693,16 @@ export default function AttendancePage() {
           selectedMeeting ? formatDateLong(selectedMeeting.tanggal) : undefined
         }
         showSyncButton={false}
+        right={
+          <button
+            onClick={() => navigate("/lainnya/rekap-absensi")}
+            aria-label="Rekap absensi bulanan"
+            className="flex items-center gap-1.5 min-h-[32px] px-3 rounded-xl bg-accent-soft text-accent text-ios-footnote font-medium transition-all hover:opacity-80 active:scale-95"
+          >
+            <CalendarCheck size={14} />
+            Rekap
+          </button>
+        }
       />
 
       {isReadonly && (
@@ -926,117 +888,6 @@ export default function AttendancePage() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {/* --------------------------- Rekap Bulanan -------------------------- */}
-              <div className="mx-4 my-4 p-4 rounded-2xl border border-surface-border bg-surface-card">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                  <h3 className="text-ios-headline font-semibold text-surface-text">Rekap Bulanan</h3>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-2">
-                      <label className="text-ios-caption text-surface-muted">Bulan:</label>
-                      <input
-                        type="month"
-                        value={recapMonth}
-                        onChange={(e) => setRecapMonth(e.target.value)}
-                        className="min-h-[40px] rounded-xl border border-surface-border bg-surface-card px-3 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-ios-caption text-surface-muted">Kategori:</label>
-                      <select
-                        value={recapKategori}
-                        onChange={(e) => setRecapKategori(e.target.value)}
-                        className="min-h-[40px] rounded-xl border border-surface-border bg-surface-card px-3 text-[16px] text-surface-text shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
-                      >
-                        <option value="">Semua</option>
-                        {MEMBER_CATEGORIES.map((c) => (
-                          <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <button
-                      onClick={fetchRecap}
-                      disabled={recapLoading}
-                      className="px-4 py-2 rounded-xl bg-accent text-white font-medium text-ios-body transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      {recapLoading ? "Memuat..." : "Tampilkan"}
-                    </button>
-                    {recapMatrix && recapMatrix.meetings.length > 0 && (
-                      <>
-                        <button
-                          onClick={() => exportRecapPDF(recapMatrix, recapMonth, recapKategori || "semua")}
-                          className="px-4 py-2 rounded-xl border border-surface-border bg-surface-card text-surface-text font-medium text-ios-body transition-colors hover:bg-surface-card2 active:scale-[0.97]"
-                        >
-                          PDF
-                        </button>
-                        <button
-                          onClick={() => exportRecapExcel(recapMatrix, recapMonth, recapKategori || "semua")}
-                          className="px-4 py-2 rounded-xl border border-surface-border bg-surface-card text-surface-text font-medium text-ios-body transition-colors hover:bg-surface-card2 active:scale-[0.97]"
-                        >
-                          Excel
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {recapMatrix === null ? (
-                  <p className="text-ios-caption text-surface-muted text-center py-8">
-                    Pilih bulan dan kategori, lalu klik Tampilkan untuk melihat rekap kehadiran seluruh jamaah.
-                  </p>
-                ) : recapMatrix.meetings.length === 0 ? (
-                  <p className="text-ios-caption text-surface-muted text-center py-8">
-                    Tidak ada jadwal pengajian pada bulan ini.
-                  </p>
-                ) : recapMatrix.rows.length === 0 ? (
-                  <p className="text-ios-caption text-surface-muted text-center py-8">
-                    Tidak ada jamaah pada kategori yang dipilih.
-                  </p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-ios-caption">
-                      <thead>
-                        <tr className="bg-surface-card2 border-b border-surface-border">
-                          <th className="px-2 py-2 font-semibold text-surface-text text-center w-8">No</th>
-                          <th className="px-2 py-2 font-semibold text-surface-text text-left">Nama</th>
-                          {recapMatrix.meetings.map((m) => (
-                            <th key={m.meeting_id} className="px-2 py-2 font-semibold text-surface-text text-center w-10" title={`${formatDateLongText(m.tanggal)} - ${m.acara || "Pengajian"}`}>
-                              <div className="whitespace-nowrap">{m.tanggal.slice(5)}</div>
-                              <div className="text-[9px] text-surface-muted truncate max-w-[50px] mx-auto">{m.acara || "Pengajian"}</div>
-                            </th>
-                          ))}
-                          <th className="px-2 py-2 font-semibold text-surface-text text-center w-12">Hadir</th>
-                          <th className="px-2 py-2 font-semibold text-surface-text text-center w-16">Tdk Hadir</th>
-                          <th className="px-2 py-2 font-semibold text-surface-text text-center w-12">%</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {recapMatrix.rows.map((row, idx) => {
-                          const rateColor = row.rate >= 80 ? "text-emerald-600" : row.rate >= 60 ? "text-amber-600" : row.rate >= 40 ? "text-orange-600" : "text-red-600";
-                          const rateBg = row.rate >= 80 ? "bg-emerald-50" : row.rate >= 60 ? "bg-amber-50" : row.rate >= 40 ? "bg-orange-50" : "bg-red-50";
-                          return (
-                            <tr key={row.member.member_id} className="border-b border-surface-border hover:bg-surface-card2/50">
-                              <td className="px-2 py-1.5 text-center text-surface-muted">{idx + 1}</td>
-                              <td className="px-2 py-1.5 font-medium text-surface-text truncate max-w-[120px]">{row.member.nama_lengkap}</td>
-                              {recapMatrix.meetings.map((m) => {
-                                const status = row.cells[m.meeting_id];
-                                const initial = status ? { HADIR: "H", IZIN: "I", SAKIT: "S", ALPA: "A" }[status] : "-";
-                                const statusColor = status === "HADIR" ? "text-emerald-600" : status === "IZIN" ? "text-amber-600" : status === "SAKIT" ? "text-blue-600" : status === "ALPA" ? "text-red-600" : "text-surface-muted";
-                                return (
-                                  <td key={m.meeting_id} className={`px-2 py-1.5 text-center font-medium ${statusColor}`}>{initial}</td>
-                                );
-                              })}
-                              <td className="px-2 py-1.5 text-center font-semibold text-emerald-600">{row.hadir}</td>
-                              <td className="px-2 py-1.5 text-center font-semibold text-red-600">{row.nonHadir}</td>
-                              <td className={`px-2 py-1.5 text-center font-bold ${rateColor} ${rateBg} rounded`}>{row.rate}%</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
               </div>
 
               <div className="bg-surface-card">

@@ -21,6 +21,7 @@ import {
   Moon,
   User,
   Home,
+  Trophy,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { InstallAppCard } from "../components/member/InstallAppCard";
@@ -148,6 +149,22 @@ export default function MemberOthersPage() {
     },
 
     // Grup Data Saya
+    {
+      key: "progres",
+      label: "Progres Saya",
+      description: "Streak ibadah & badge",
+      Icon: Trophy,
+      to: "/member/progres",
+      group: "data",
+    },
+    {
+      key: "absensi-saya",
+      label: "Absensi Saya",
+      description: "Rekap kehadiran pengajian",
+      Icon: CalendarCheck,
+      to: "/member/absensi",
+      group: "data",
+    },
     {
       key: "profil",
       label: "Biodata Saya",

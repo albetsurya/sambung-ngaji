@@ -4,6 +4,7 @@ import "jspdf-autotable";
 import type { Member } from "../types";
 import type { Meeting } from "../types";
 import type { AttendanceRecord } from "../types";
+import { formatDayMonth } from "../utils/format";
 
 export interface RecapMatrixRow {
   member: Member;
@@ -73,7 +74,7 @@ export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, ka
   doc.text(`Bulan: ${monthLabel}  |  Kategori: ${kategoriLabel}`, 14, 26);
   doc.text(`Dicetak: ${new Date().toLocaleString("id-ID")}`, 14, 32);
 
-  const meetingHeaders = matrix.meetings.map((m) => `${m.tanggal.slice(5)}\n${m.acara || "Pengajian"}`);
+  const meetingHeaders = matrix.meetings.map((m) => `${formatDayMonth(m.tanggal)}\n${m.acara || "Pengajian"}`);
   const headers = ["No", "Nama", ...meetingHeaders, "Hadir", "Tidak Hadir", "%"];
 
   const body = matrix.rows.map((row, idx) => [
@@ -114,7 +115,7 @@ export async function exportRecapExcel(matrix: RecapMatrix, monthLabel: string, 
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Rekap Absensi");
 
-  const meetingHeaders = matrix.meetings.map((m) => `${m.tanggal.slice(5)}\n${m.acara || "Pengajian"}`);
+  const meetingHeaders = matrix.meetings.map((m) => `${formatDayMonth(m.tanggal)}\n${m.acara || "Pengajian"}`);
   const headerRow = ["No", "Nama", ...meetingHeaders, "Hadir", "Tidak Hadir", "%"];
 
   ws.addRow(headerRow);

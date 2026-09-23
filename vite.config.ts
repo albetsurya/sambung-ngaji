@@ -33,7 +33,6 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
-        // Increase max file size to cache (pdf chunk 483KB)
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {
@@ -45,5 +44,15 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-excel": ["exceljs"],
+          "vendor-pdf": ["jspdf", "jspdf-autotable"],
+        },
+      },
+    },
   },
 });

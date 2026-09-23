@@ -23,8 +23,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
+import { goBack } from "../utils/navigation";
 import { MEMBER_CATEGORIES } from "../constants";
 import { CATEGORY_LABEL } from "../utils/format";
+import {
+  CalendarSkeleton,
+  MeetingCardSkeleton,
+} from "../components/common/Skeleton";
 import type { Meeting, MemberCategory } from "../types";
 
 /* -------------------------------------------------------------------------- */
@@ -92,7 +97,8 @@ export default function MemberSchedulePage() {
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("");
   const [selected, setSelected] = useState<Meeting | null>(null);
 
-  const backPath = isMember ? "/member" : "/profil-saya";
+  const backPath = "/member";
+  const handleBack = () => goBack(navigate, backPath);
 
   /* ---------------------- Fetch user's kategori ---------------------- */
 
@@ -175,8 +181,8 @@ export default function MemberSchedulePage() {
             ? "Memuat..."
             : `${filtered.length} dari ${meetings.length} jadwal`
         }
-        onBack={() => navigate(backPath)}
-        backLabel={isMember ? "Home" : "Biodata"}
+        onBack={handleBack}
+        backLabel={isMember ? "Home" : "Kembali"}
         showSyncButton={false}
       />
 
@@ -267,11 +273,16 @@ export default function MemberSchedulePage() {
         </div>
 
         {/* Content */}
-        {isLoading && (
-          <div className="py-12 flex justify-center">
-            <span className="w-6 h-6 rounded-full border-2 border-accent border-t-transparent animate-spin" />
-          </div>
-        )}
+        {isLoading &&
+          (view === "calendar" ? (
+            <CalendarSkeleton />
+          ) : (
+            <div className="space-y-2.5">
+              <MeetingCardSkeleton />
+              <MeetingCardSkeleton />
+              <MeetingCardSkeleton />
+            </div>
+          ))}
 
         {!isLoading && error && (
           <ErrorState

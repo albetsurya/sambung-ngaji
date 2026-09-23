@@ -88,6 +88,9 @@ const RegistrationSuccessPage = lazy(
   () => import("./pages/RegistrationSuccessPage"),
 );
 const MemberAiChatPage = lazy(() => import("./pages/MemberAiChatPage"));
+const MemberProgressPage = lazy(() => import("./pages/MemberProgressPage"));
+const MemberAttendancePage = lazy(() => import("./pages/MemberAttendancePage"));
+const MemberAttendanceRecapPage = lazy(() => import("./pages/MemberAttendanceRecapPage"));
 const AiUsagePage = lazy(() => import("./pages/AiUsagePage"));
 const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 
@@ -295,6 +298,26 @@ function AppRoutes() {
             </PersonalRoute>
           }
         />
+        <Route
+          path="/member/progres"
+          element={
+            <PersonalRoute>
+              <MemberProgressPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/rekap-absen"
+          element={<Navigate to="/member/absensi" replace />}
+        />
+        <Route
+          path="/member/absensi"
+          element={
+            <PersonalRoute>
+              <MemberAttendancePage />
+            </PersonalRoute>
+          }
+        />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
@@ -330,6 +353,7 @@ function AppRoutes() {
             <Route path="audit-log" element={<AuditLogPage />} />
             <Route path="jadwal" element={<JadwalPage />} />
             <Route path="import-jamaah" element={<MemberImportPage />} />
+            <Route path="rekap-absensi" element={<MemberAttendanceRecapPage />} />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />
