@@ -16,9 +16,9 @@ import {
   BottomSheet,
   LoadingOverlay,
   ErrorState,
-  LoadingState,
   Avatar,
 } from "../components/common";
+import { MemberSelfSkeleton } from "../components/common/Skeleton";
 import { pendingApi } from "../services/pendingApi";
 import { groupApi } from "../services/domainApi";
 import type { PendingMember } from "../types";
@@ -61,7 +61,7 @@ export default function PendingMemberDetailPage() {
     return (
       <AppLayout hideNav>
         <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
-        <LoadingState />
+        <MemberSelfSkeleton />
       </AppLayout>
     );
   }

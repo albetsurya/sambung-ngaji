@@ -24,6 +24,7 @@ import { Calendar, Check, ChevronRight, Pencil, Trash2 } from "../common/FontAwe
 import type { Meeting, MemberCategory } from "../../types";
 import { EventClickArg } from "@fullcalendar/core/index.js";
 import { BottomSheet, Button, ConfirmDialog, Input, Select } from "../common";
+import { CalendarSkeleton } from "../common/Skeleton";
 
 type ModalState =
   | { view: "closed" }
@@ -119,11 +120,7 @@ export function CalendarTab() {
 
   return (
     <div className="px-4 py-4 space-y-4">
-      {meetingsQuery.isLoading && (
-        <p className="text-center text-ios-caption text-surface-muted">
-          Memuat jadwal…
-        </p>
-      )}
+      {meetingsQuery.isLoading && <CalendarSkeleton />}
 
       <div className="bg-surface-card rounded-2xl border border-surface-border overflow-hidden">
         <FullCalendar

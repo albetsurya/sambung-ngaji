@@ -8,12 +8,15 @@ import {
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Card,
-  LoadingState,
   ErrorState,
   EmptyState,
   GroupedList,
   ListRow,
 } from "../components/common";
+import {
+  StatTileSkeleton,
+  GroupedListSkeleton,
+} from "../components/common/Skeleton";
 import { aiUsageApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
@@ -54,7 +57,15 @@ export default function AiUsagePage() {
       />
 
       <div className="py-4">
-        {isLoading && <LoadingState label="Memuat statistik AI..." />}
+        {isLoading && (
+          <div className="space-y-4">
+            <div className="px-4 flex gap-3">
+              <StatTileSkeleton />
+              <StatTileSkeleton />
+            </div>
+            <GroupedListSkeleton rows={5} />
+          </div>
+        )}
 
         {!isLoading && error && (
           <ErrorState

@@ -29,6 +29,7 @@ import {
   ListRow,
   Modal,
 } from "../components/common";
+import { AnnouncementListSkeleton } from "../components/common/Skeleton";
 import { announcementTemplateApi } from "../services/domainApi";
 import type { AnnouncementTemplate } from "../types";
 import { useToast } from "../contexts/ToastContext";
@@ -134,11 +135,7 @@ export default function AnnouncementTemplatesPage() {
       />
 
       <div className="flex flex-col flex-1">
-        {isLoading && (
-          <div className="py-8 text-center text-ios-footnote text-surface-muted">
-            Memuat...
-          </div>
-        )}
+        {isLoading && <AnnouncementListSkeleton rows={4} />}
 
         {!isLoading && error && (
           <ErrorState

@@ -14,6 +14,7 @@ import {
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ErrorState } from "../components/common";
+import { MushafPageSkeleton } from "../components/common/Skeleton";
 import { MushafPageView } from "../components/member/MushafPageView";
 import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
 import { fetchSurahList } from "../data/quran";
@@ -225,11 +226,7 @@ export default function MemberQuranMushafPage() {
         onPointerUp={(e) => onPointerUp(e.clientX, e.clientY)}
         onPointerCancel={() => (swipeRef.current.active = false)}
       >
-        {isLoading && (
-          <div className="h-full flex items-center justify-center">
-            <span className="w-6 h-6 rounded-full border-2 border-accent border-t-transparent animate-spin" />
-          </div>
-        )}
+        {isLoading && <MushafPageSkeleton />}
 
         {!isLoading && error && (
           <div className="h-full flex items-center justify-center p-4">
