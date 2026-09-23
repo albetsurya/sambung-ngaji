@@ -31,13 +31,16 @@ export function Card({
 export function GroupedList({
   children,
   className = "",
+  flush = false,
 }: {
   children: ReactNode;
   className?: string;
+  /** true = tanpa margin horizontal (untuk di dalam BottomSheet yang sudah px-5). */
+  flush?: boolean;
 }) {
   return (
     <div
-      className={`mx-4 my-2 bg-surface-card rounded-2xl border border-surface-border overflow-hidden shadow-sm ${className}`}
+      className={`${flush ? "" : "mx-4 "}my-2 bg-surface-card rounded-2xl border border-surface-border overflow-hidden shadow-sm ${className}`}
     >
       {children}
     </div>

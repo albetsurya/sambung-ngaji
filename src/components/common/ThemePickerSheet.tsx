@@ -25,7 +25,7 @@ export function ThemePickerSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Pilih Tema Aplikasi">
-      <GroupedList>
+      <GroupedList flush>
         <ListRow onClick={toggleTheme} insetDivider>
           <div className="flex items-center gap-3 w-full">
             <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
