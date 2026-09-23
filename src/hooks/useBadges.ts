@@ -1,11 +1,14 @@
 import { useMemo } from "react";
 import type { Streaks } from "../types";
 
+export type BadgeCategory = "sholat" | "dzikir" | "tahfidz" | "quran" | "total";
+export type BadgeTier = "bronze" | "silver" | "gold";
+
 export interface BadgeDef {
   id: string;
   name: string;
-  tier: "bronze" | "silver" | "gold";
-  category: "sholat" | "dzikir" | "tahfidz" | "quran" | "total";
+  tier: BadgeTier;
+  category: BadgeCategory;
   minStreak: number;
 }
 

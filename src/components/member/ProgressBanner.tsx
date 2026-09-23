@@ -16,13 +16,14 @@ export function ProgressBanner() {
 
   const juzHafal = useMemo(() => getJuzHafal(tahfidz.data), [tahfidz.data]);
 
-  const { unlockedCount, totalCount } = useBadges({
+  const streaks = {
     sholat: sholat.streak,
     dzikir: dzikir.streak,
     quran: quran.streak,
-    tahfidz: juzHafal,
-    tahfidzStreak: tahfidz.streak,
-  });
+    tahfidz: tahfidz.streak,
+  };
+
+  const { unlockedCount, totalCount } = useBadges(streaks);
 
   const totalStreak =
     sholat.streak + dzikir.streak + quran.streak + tahfidz.streak;

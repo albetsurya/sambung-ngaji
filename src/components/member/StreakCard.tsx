@@ -1,7 +1,8 @@
-import { Zap, Moon, BookOpen, ScrollText } from "../common/FontAwesomeIcons";
+import { useNavigate } from "react-router-dom";
+import { ScrollText, Zap, BookOpen, Moon } from "../common/FontAwesomeIcons";
 import type { Streaks } from "../../types";
 
-const ITEMS: { key: keyof Streaks; label: string; Icon: typeof Zap }[] = [
+const ITEMS: { key: keyof Streaks; label: string; Icon: typeof ScrollText }[] = [
   { key: "sholat", label: "Sholat", Icon: ScrollText },
   { key: "dzikir", label: "Dzikir", Icon: Zap },
   { key: "tahfidz", label: "Tahfidz", Icon: BookOpen },
@@ -9,10 +10,15 @@ const ITEMS: { key: keyof Streaks; label: string; Icon: typeof Zap }[] = [
 ];
 
 export function StreakCard({ streaks }: { streaks: Streaks }) {
+  const navigate = useNavigate();
+
   return (
-    <section className="rounded-2xl border border-surface-border bg-surface-card p-4">
+    <button
+      onClick={() => navigate("/member/progres")}
+      className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 transition-all active:scale-[0.99] hover:bg-surface-card2 hover:border-accent/30"
+    >
       <p className="text-ios-footnote font-semibold text-surface-muted mb-3">
-        🔥 Streak Aktif
+        Streak Aktif
       </p>
       <div className="grid grid-cols-4 gap-2.5">
         {ITEMS.map(({ key, label, Icon }) => (
@@ -30,6 +36,6 @@ export function StreakCard({ streaks }: { streaks: Streaks }) {
           </div>
         ))}
       </div>
-    </section>
+    </button>
   );
 }

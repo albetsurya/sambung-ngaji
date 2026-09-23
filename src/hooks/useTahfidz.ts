@@ -79,6 +79,33 @@ export function getSurahProgress(
   };
 }
 
+export function getJuzHafal(data: TahfidzData): number {
+  let juzCount = 0;
+  // Juz 30 is 37 surahs
+  let juz30Complete = true;
+  for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz30")) {
+    const p = getSurahProgress(data, t);
+    if (!p.complete) {
+      juz30Complete = false;
+      break;
+    }
+  }
+  if (juz30Complete) juzCount += 1;
+
+  // Juz 1 is 2 surahs
+  let juz1Complete = true;
+  for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz1")) {
+    const p = getSurahProgress(data, t);
+    if (!p.complete) {
+      juz1Complete = false;
+      break;
+    }
+  }
+  if (juz1Complete) juzCount += 1;
+
+  return juzCount;
+}
+
 export function getOverallStats(data: TahfidzData) {
   let totalHafal = 0;
   let totalAyat = 0;

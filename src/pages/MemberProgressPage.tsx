@@ -55,13 +55,46 @@ const TIER_BAR: Record<BadgeTier, string> = {
 /*                              Helpers                                       */
 /* -------------------------------------------------------------------------- */
 
-function formatCurrent(badge: BadgeState): string {
-  const current = Math.min(badge.current, badge.target);
-  const value =
-    badge.unit === "juz"
-      ? Math.round(current * 10) / 10
-      : Math.floor(current);
-  return `${value}/${badge.target}`;
+function formatProgress(badge: BadgeState): string {
+  const value = Math.min(badge.minStreak, badge.minStreak);
+  return `${value}/${badge.minStreak}`;
+}
+
+function formatCurrentValue(badge: BadgeState, streaks: { sholat: number; dzikir: number; quran: number; tahfidz: number }): string {
+  let current = 0;
+  switch (badge.category) {
+    case "sholat": current = streaks.sholat; break;
+    case "dzikir": current = streaks.dzikir; break;
+    case "quran": current = streaks.quran; break;
+    case "tahfidz": current = streaks.tahfidz; break;
+    case "total": current = streaks.sholat + streaks.dzikir + streaks.quran + streaks.tahfidz; break;
+  }
+  return `${current}/${badge.minStreak}`;
+}
+
+function formatProgressPercent(badge: BadgeState, streaks: { sholat: number; dzikir: number; quran: number; tahfidz: number }): number {
+  let current = 0;
+  switch (badge.category) {
+    case "sholat": current = streaks.sholat; break;
+    case "dzikir": current = streaks.dzikir; break;
+    case "quran": current = streaks.quran; break;
+    case "tahfidz": current = streaks.tahfidz; break;
+    case "total": current = streaks.sholat + streaks.dzikir + streaks.quran + streaks.tahfidz; break;
+  }
+  return Math.min(Math.round((current / badge.minStreak) * 100), 100);
+}
+
+function formatRemaining(badge: BadgeState, streaks: { sholat: number; dzikir: number; quran: number; tahfidz: number }): string {
+  let current = 0;
+  switch (badge.category) {
+    case "sholat": current = streaks.sholat; break;
+    case "dzikir": current = streaks.dzikir; break;
+    case "quran": current = streaks.quran; break;
+    case "tahfidz": current = streaks.tahfidz; break;
+    case "total": current = streaks.sholat + streaks.dzikir + streaks.quran + streaks.tahfidz; break;
+  }
+  const remaining = Math.max(badge.minStreak - current, 0);
+  return `${remaining} hari`;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -78,13 +111,14 @@ export default function MemberProgressPage() {
 
   const juzHafal = useMemo(() => getJuzHafal(tahfidz.data), [tahfidz.data]);
 
-  const { badges, unlockedCount, totalCount } = useBadges({
+  const streaks = {
     sholat: sholat.streak,
     dzikir: dzikir.streak,
     quran: quran.streak,
-    tahfidz: juzHafal,
-    tahfidzStreak: tahfidz.streak,
-  });
+    tahfidz: tahfidz.streak,
+  };
+
+  const { badges, unlockedCount, totalCount } = useBadges(streaks);
 
   const summary = [
     { key: "sholat", label: "Sholat", value: sholat.streak, Icon: Calendar },
@@ -98,14 +132,14 @@ export default function MemberProgressPage() {
     for (const badge of badges) {
       if (badge.unlocked) continue;
       const existing = byCategory.get(badge.category);
-      if (!existing || badge.progress > existing.progress) {
+      if (!existing || formatProgressPercent(badge, streaks) > formatProgressPercent(existing, streaks)) {
         byCategory.set(badge.category, badge);
       }
     }
     return Array.from(byCategory.values()).sort(
-      (a, b) => b.progress - a.progress,
+      (a, b) => formatProgressPercent(b, streaks) - formatProgressPercent(a, streaks),
     );
-  }, [badges]);
+  }, [badges, streaks]);
 
   return (
     <AppLayout showAiChat={false}>
@@ -157,7 +191,7 @@ export default function MemberProgressPage() {
 
           <div className="space-y-2">
             {badges.map((badge) => (
-              <BadgeRow key={badge.id} badge={badge} />
+              <BadgeRow key={badge.id} badge={badge} streaks={streaks} />
             ))}
           </div>
         </section>
@@ -184,15 +218,11 @@ export default function MemberProgressPage() {
                       {badge.name}
                     </p>
                     <p className="text-ios-caption text-surface-muted truncate">
-                      {CATEGORY_LABEL[badge.category]} · kurang{" "}
-                      {formatRemaining(badge)}
+                      {CATEGORY_LABEL[badge.category]} · kurang {formatRemaining(badge, streaks)}
                     </p>
                   </div>
                   <span className="text-ios-footnote font-semibold tabular-nums text-accent flex-shrink-0">
-                    {formatCurrent(badge)}{" "}
-                    <span className="font-normal text-surface-muted">
-                      {badge.unit}
-                    </span>
+                    {formatProgressPercent(badge, streaks)}%
                   </span>
                 </div>
               ))}
@@ -208,8 +238,8 @@ export default function MemberProgressPage() {
 /*                              Badge Row                                     */
 /* -------------------------------------------------------------------------- */
 
-function BadgeRow({ badge }: { badge: BadgeState }) {
-  const percent = Math.round(badge.progress * 100);
+function BadgeRow({ badge, streaks }: { badge: BadgeState; streaks: { sholat: number; dzikir: number; quran: number; tahfidz: number } }) {
+  const percent = formatProgressPercent(badge, streaks);
 
   return (
     <div className="rounded-2xl border border-surface-border bg-surface-card p-3.5">
@@ -252,8 +282,7 @@ function BadgeRow({ badge }: { badge: BadgeState }) {
         </div>
 
         <span className="text-ios-footnote font-semibold tabular-nums text-surface-text flex-shrink-0">
-          {formatCurrent(badge)}{" "}
-          <span className="font-normal text-surface-muted">{badge.unit}</span>
+          {formatCurrentValue(badge, streaks)}
         </span>
       </div>
 
@@ -267,17 +296,4 @@ function BadgeRow({ badge }: { badge: BadgeState }) {
       </div>
     </div>
   );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              Helper                                        */
-/* -------------------------------------------------------------------------- */
-
-function formatRemaining(badge: BadgeState): string {
-  const remaining = Math.max(badge.target - badge.current, 0);
-  const value =
-    badge.unit === "juz"
-      ? Math.round(remaining * 10) / 10
-      : Math.ceil(remaining);
-  return `${value} ${badge.unit}`;
 }
