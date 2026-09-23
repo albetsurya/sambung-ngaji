@@ -348,16 +348,16 @@ html[data-preset="glass"].dark body::before {
 .glass-clear-light {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(255, 255, 255, 0.12) 100%
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
   );
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 12px 32px 0 rgba(31, 38, 135, 0.08),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
   color: #0f172a;
 }
 
@@ -368,16 +368,16 @@ html[data-preset="glass"].dark body::before {
 [data-preset="glass"] .toast {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(255, 255, 255, 0.12) 100%
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
   );
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 12px 32px 0 rgba(31, 38, 135, 0.08),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
 }
 
 /* Varian dark-nya. */
