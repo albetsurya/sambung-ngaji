@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
+import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -384,6 +385,7 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <AppRoutes />
+            <PwaUpdatePrompt />
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
