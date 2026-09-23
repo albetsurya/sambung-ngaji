@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -75,8 +76,8 @@ export default function MemberTahfidzPage() {
       <Header
         title="Tahfidz"
         subtitle="Hafalan Al-Quran pribadi"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           stats.totalHafal > 0 ? (

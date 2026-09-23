@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Compass,
   Navigation,
@@ -61,8 +62,8 @@ export default function MemberKiblatPage() {
               ? "Lokasi Anda saat ini"
               : "Mencari lokasi..."
         }
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           <button

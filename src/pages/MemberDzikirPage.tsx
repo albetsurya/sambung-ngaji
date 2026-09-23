@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { RefreshCw } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { DZIKIR_PRESETS } from "../data/dzikir";
@@ -16,8 +17,8 @@ export default function MemberDzikirPage() {
       <Header
         title="Dzikir"
         subtitle="Tasbih digital"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           adaProgress ? (

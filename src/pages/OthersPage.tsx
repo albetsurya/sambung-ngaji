@@ -7,18 +7,18 @@ import {
   Settings,
   ScrollText,
   LogOut,
-  Sun,
-  Moon,
   Lock,
   ClipboardList,
   Sparkles,
   QrCode,
   User,
   Calendar,
+  CalendarCheck,
   Mosque,
   Home,
   FileText,
   UserPlus,
+  Search,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -30,7 +30,6 @@ import {
   ChangePasswordSheet,
 } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
 import { normalizeGender } from "../utils/format";
 import { pendingApi } from "../services/pendingApi";
@@ -51,17 +50,16 @@ interface MenuEntry {
   group: MenuGroup;
   badge?: number;
   badgeLoading?: boolean;
-  renderToggle?: boolean;
 }
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { isAdminLike, isSuperAdmin, role } = usePermission();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const { data: pendingList = [], isFetching: pendingLoading } = useQuery({
     queryKey: queryKeys.pendingMembers("PENDING"),
@@ -76,19 +74,9 @@ export default function OthersPage() {
   const menu = ([
     // Tampilan
     {
-      key: "mode-tampilan",
-      label: "Mode Tampilan",
-      description: theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif",
-      Icon: theme === "dark" ? Sun : Moon,
-      onClick: toggleTheme,
-      show: true,
-      group: "tampilan",
-      renderToggle: true,
-    },
-    {
-      key: "theme-preset",
-      label: "Preset Tema",
-      description: "Pilih warna tampilan",
+      key: "theme",
+      label: "Tampilan & Tema",
+      description: "Mode gelap-terang & warna",
       Icon: Settings,
       onClick: () => setThemePickerOpen(true),
       show: true,
@@ -152,6 +140,15 @@ export default function OthersPage() {
       Icon: Calendar,
       to: "/lainnya/jadwal",
       show: isAdminLike || role === "TIM_ABSENSI",
+      group: "jadwal",
+    },
+    {
+      key: "rekap-absensi",
+      label: "Rekap Absensi",
+      description: "Matriks kehadiran bulanan",
+      Icon: CalendarCheck,
+      to: "/lainnya/rekap-absensi",
+      show: isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS",
       group: "jadwal",
     },
     {
@@ -223,6 +220,15 @@ export default function OthersPage() {
     },
   ] satisfies MenuEntry[]).filter((m) => m.show);
 
+  const q = search.toLowerCase().trim();
+  const visibleMenu = q
+    ? menu.filter(
+        (m) =>
+          m.label.toLowerCase().includes(q) ||
+          (m.description || "").toLowerCase().includes(q),
+      )
+    : menu;
+
   const GROUP_LABEL: Record<MenuGroup, string> = {
     tampilan: "Tampilan",
     jamaah: "Jamaah & Pendaftaran",
@@ -240,7 +246,7 @@ export default function OthersPage() {
   ];
 
   function renderMenuGroup(groupKey: MenuGroup) {
-    const items = menu.filter((m) => m.group === groupKey);
+    const items = visibleMenu.filter((m) => m.group === groupKey);
     if (items.length === 0) return null;
     return (
       <section key={groupKey}>
@@ -265,54 +271,29 @@ export default function OthersPage() {
                 </span>
               }
             >
-              {m.renderToggle ? (
-                <div className="flex items-center gap-3 w-full">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-ios-body text-surface-text">{m.label}</p>
+              <ChevronRow>
+                <div className="flex items-center justify-between gap-2 w-full">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      {m.label}
+                    </p>
                     {m.description && (
                       <p className="text-ios-caption text-surface-muted truncate">
                         {m.description}
                       </p>
                     )}
                   </div>
-                  <span
-                    className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
-                      theme === "dark" ? "bg-accent" : "bg-surface-card2"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    <span
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                        theme === "dark" ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </span>
+                  {m.badgeLoading && showBadgeSkeleton ? (
+                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-surface-card2 animate-pulse shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-surface-muted/40" />
+                    </span>
+                  ) : m.badge !== undefined ? (
+                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
+                      {m.badge > 99 ? "99+" : m.badge}
+                    </span>
+                  ) : null}
                 </div>
-              ) : (
-                <ChevronRow>
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-ios-body font-medium text-surface-text truncate">
-                        {m.label}
-                      </p>
-                      {m.description && (
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {m.description}
-                        </p>
-                      )}
-                    </div>
-                    {m.badgeLoading && showBadgeSkeleton ? (
-                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-surface-card2 animate-pulse shrink-0">
-                        <span className="w-2 h-2 rounded-full bg-surface-muted/40" />
-                      </span>
-                    ) : m.badge !== undefined ? (
-                      <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold shrink-0">
-                        {m.badge > 99 ? "99+" : m.badge}
-                      </span>
-                    ) : null}
-                  </div>
-                </ChevronRow>
-              )}
+              </ChevronRow>
             </ListRow>
           );
         })}
@@ -350,7 +331,34 @@ export default function OthersPage() {
           </ListRow>
         </GroupedList>
 
+        <div className="px-4 mt-4">
+          <div className="relative">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari menu..."
+              aria-label="Cari menu"
+              className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-3.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+            />
+          </div>
+        </div>
+
         {GROUP_ORDER.map((g) => renderMenuGroup(g))}
+
+        {visibleMenu.length === 0 && (
+          <div className="px-4 mt-5">
+            <p className="text-ios-body font-medium text-surface-text text-center">
+              Tidak ditemukan
+            </p>
+            <p className="text-ios-caption text-surface-muted text-center mt-1">
+              Coba kata kunci lain
+            </p>
+          </div>
+        )}
 
         <GroupedList>
           <ListRow

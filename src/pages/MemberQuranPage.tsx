@@ -1,5 +1,6 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -67,8 +68,8 @@ export default function MemberQuranPage() {
       <Header
         title="Al-Quran"
         subtitle="114 surah"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">

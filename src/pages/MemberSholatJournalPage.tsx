@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Check,
   RefreshCw,
@@ -75,8 +76,8 @@ export default function MemberSholatJournalPage() {
       <Header
         title="Jurnal Sholat"
         subtitle={formatDateId(today)}
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           recorded > 0 ? (

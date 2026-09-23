@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Calendar,
   MapPin,
@@ -80,8 +81,8 @@ export default function MemberPrayerPage() {
       <Header
         title="Waktu Sholat"
         subtitle={LATUKAN_LABEL}
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 

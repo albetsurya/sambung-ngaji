@@ -1,4 +1,4 @@
-import { Check, Palette } from "./FontAwesomeIcons";
+import { Check, Palette, Sun, Moon } from "./FontAwesomeIcons";
 import { BottomSheet, GroupedList, ListRow, ChevronRow } from "./index";
 import {
   useTheme,
@@ -14,7 +14,7 @@ export function ThemePickerSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const { preset, setPreset } = useTheme();
+  const { preset, setPreset, theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
 
   function pick(key: ThemePreset, label: string) {
@@ -26,6 +26,33 @@ export function ThemePickerSheet({
   return (
     <BottomSheet open={open} onClose={onClose} title="Pilih Tema Aplikasi">
       <GroupedList>
+        <ListRow onClick={toggleTheme} insetDivider>
+          <div className="flex items-center gap-3 w-full">
+            <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-ios-body font-medium text-surface-text">
+                Mode {theme === "dark" ? "Gelap" : "Terang"}
+              </p>
+              <p className="text-ios-caption text-surface-muted truncate">
+                Ketuk untuk ganti
+              </p>
+            </div>
+            <span
+              className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
+                theme === "dark" ? "bg-accent" : "bg-surface-card2"
+              }`}
+              aria-hidden="true"
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                  theme === "dark" ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </span>
+          </div>
+        </ListRow>
         {THEME_PRESETS.map((t, i) => (
           <ListRow
             key={t.key}

@@ -9,18 +9,12 @@ import {
   Users,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import {
-  BottomSheet,
-  Card,
-  ErrorState,
-  Badge,
-} from "../components/common";
+import { BottomSheet, Card, ErrorState, Badge } from "../components/common";
 import { MemberCalendarView } from "../components/member/MemberCalendarView";
 import { MemberScheduleListView } from "../components/member/MemberScheduleListView";
 import { meetingApi } from "../services/domainApi";
 import { memberSelfApi } from "../services/memberSelfApi";
 import { useAuth } from "../contexts/AuthContext";
-import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { goBack } from "../utils/navigation";
@@ -88,11 +82,9 @@ function normalizeTargets(raw: unknown): MemberCategory[] {
 export default function MemberSchedulePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isMember } = usePermission();
 
   const [view, setView] = useState<ViewMode>(() => loadView());
-  const [kategoriFilter, setKategoriFilter] =
-    useState<KategoriFilter>("all");
+  const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>("all");
   const kategoriInitialized = useRef(false);
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("");
   const [selected, setSelected] = useState<Meeting | null>(null);
@@ -182,7 +174,7 @@ export default function MemberSchedulePage() {
             : `${filtered.length} dari ${meetings.length} jadwal`
         }
         onBack={handleBack}
-        backLabel={isMember ? "Home" : "Kembali"}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
@@ -218,9 +210,6 @@ export default function MemberSchedulePage() {
 
         {/* Kategori filter */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
-            Kategori
-          </p>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             <FilterChip
               active={kategoriFilter === "all"}
@@ -240,9 +229,6 @@ export default function MemberSchedulePage() {
 
         {/* Gender filter */}
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
-            Gender
-          </p>
           <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
             {(
               [
@@ -287,9 +273,7 @@ export default function MemberSchedulePage() {
         {!isLoading && error && (
           <ErrorState
             message={
-              error instanceof ApiError
-                ? error.message
-                : "Gagal memuat jadwal"
+              error instanceof ApiError ? error.message : "Gagal memuat jadwal"
             }
             onRetry={refetch}
           />
@@ -300,10 +284,7 @@ export default function MemberSchedulePage() {
         )}
 
         {!isLoading && !error && view === "list" && (
-          <MemberScheduleListView
-            meetings={filtered}
-            onSelect={setSelected}
-          />
+          <MemberScheduleListView meetings={filtered} onSelect={setSelected} />
         )}
 
         {/* Info footer */}
@@ -439,4 +420,3 @@ function MeetingDetailSheet({
     </BottomSheet>
   );
 }
-

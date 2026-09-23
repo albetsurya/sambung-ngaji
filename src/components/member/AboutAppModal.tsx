@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Modal } from "../common";
 import {
   Landmark,
@@ -5,6 +6,9 @@ import {
   CalendarCheck,
   Heart,
   Sparkles,
+  HelpCircle,
+  Shield,
+  ChevronRight,
 } from "../common/FontAwesomeIcons";
 
 interface AboutAppModalProps {
@@ -13,6 +17,12 @@ interface AboutAppModalProps {
 }
 
 export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
+  const navigate = useNavigate();
+
+  function go(to: string) {
+    onClose();
+    navigate(to);
+  }
   return (
     <Modal open={open} onClose={onClose} title="Tentang Aplikasi">
       <div className="flex flex-col items-center text-center mb-6">
@@ -92,8 +102,32 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-surface-border text-center">
-        <p className="text-ios-caption text-surface-muted">
+      <div className="pt-4 border-t border-surface-border space-y-2">
+        <button
+          onClick={() => go("/member/panduan")}
+          className="w-full rounded-xl border border-surface-border bg-surface-card p-3 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+        >
+          <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+            <HelpCircle size={16} />
+          </span>
+          <span className="flex-1 min-w-0 text-ios-body font-medium text-surface-text">
+            Panduan Penggunaan
+          </span>
+          <ChevronRight size={16} className="text-surface-muted shrink-0" />
+        </button>
+        <button
+          onClick={() => go("/member/privasi")}
+          className="w-full rounded-xl border border-surface-border bg-surface-card p-3 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+        >
+          <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+            <Shield size={16} />
+          </span>
+          <span className="flex-1 min-w-0 text-ios-body font-medium text-surface-text">
+            Kebijakan Privasi
+          </span>
+          <ChevronRight size={16} className="text-surface-muted shrink-0" />
+        </button>
+        <p className="text-ios-caption text-surface-muted text-center pt-1">
           Dibuat untuk pengurus Latukan
         </p>
       </div>

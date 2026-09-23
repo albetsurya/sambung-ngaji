@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   ScrollText,
   Sparkles,
@@ -66,9 +67,9 @@ export default function MemberMoodPage() {
         }
         onBack={() => {
           if (selected) setSearchParams({}, { replace: true });
-          else navigate("/member");
+          else goBack(navigate, "/member");
         }}
-        backLabel={selected ? "Kembali" : "Home"}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 

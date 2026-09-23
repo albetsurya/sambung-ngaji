@@ -1,11 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  ScrollText,
-  Sparkles,
   Calendar,
-  Compass,
-  Heart,
   CalendarCheck,
   BookOpen,
   RefreshCw,
@@ -14,14 +10,11 @@ import {
   Palette,
   Download,
   Info,
-  HelpCircle,
-  Shield,
   LogOut,
-  Sun,
-  Moon,
   User,
   Home,
   Trophy,
+  Search,
   Mosque,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
@@ -42,7 +35,6 @@ import {
 } from "../components/common/ThemePickerSheet";
 import { AboutAppModal } from "../components/member/AboutAppModal";
 import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext";
 import { normalizeGender } from "../utils/format";
 
 /* -------------------------------------------------------------------------- */
@@ -55,9 +47,8 @@ interface MenuItem {
   description?: string;
   Icon: (props: { size?: number; className?: string }) => React.ReactNode;
   to?: string;
-  action?: "changePassword" | "changeUsername" | "backup" | "about" | "theme" | "toggleTheme";
-  group: "tampilan" | "ibadah" | "data" | "akun" | "tentang";
-  render?: "toggle";
+  action?: "changePassword" | "changeUsername" | "backup" | "about" | "theme";
+  group: "tampilan" | "data" | "akun" | "tentang";
 }
 
 /* -------------------------------------------------------------------------- */
@@ -67,7 +58,6 @@ interface MenuItem {
 export default function MemberOthersPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [changeUsernameOpen, setChangeUsernameOpen] = useState(false);
@@ -75,6 +65,7 @@ export default function MemberOthersPage() {
   const [themeSheetOpen, setThemeSheetOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [search, setSearch] = useState("");
 
   // Halaman ini selalu di /member/* — tetap di konteks jamaah
   const profilePath = "/member/profil";
@@ -82,71 +73,12 @@ export default function MemberOthersPage() {
   const MENU: MenuItem[] = [
     // Grup Tampilan
     {
-      key: "mode-tampilan",
-      label: "Mode Tampilan",
-      description: theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif",
-      Icon: theme === "dark" ? Sun : Moon,
-      action: "toggleTheme",
-      group: "tampilan",
-      render: "toggle",
-    },
-    {
       key: "theme",
-      label: "Preset Tema",
-      description: "Pilih warna tampilan",
+      label: "Tampilan & Tema",
+      description: "Mode gelap-terang & warna",
       Icon: Palette,
       action: "theme",
       group: "tampilan",
-    },
-
-    // Grup Ibadah
-    {
-      key: "quran",
-      label: "Al-Quran",
-      description: "Baca 114 surah & mushaf",
-      Icon: ScrollText,
-      to: "/member/quran",
-      group: "ibadah",
-    },
-    {
-      key: "doa",
-      label: "Doa & Dzikir",
-      description: "Pagi, sore, harian",
-      Icon: Sparkles,
-      to: "/member/doa",
-      group: "ibadah",
-    },
-    {
-      key: "sholat",
-      label: "Waktu Sholat",
-      description: "Jadwal sholat hari ini",
-      Icon: Calendar,
-      to: "/member/prayer",
-      group: "ibadah",
-    },
-    {
-      key: "puasa",
-      label: "Puasa Sunnah",
-      description: "Jadwal 60 hari ke depan",
-      Icon: Calendar,
-      to: "/member/puasa",
-      group: "ibadah",
-    },
-    {
-      key: "kiblat",
-      label: "Arah Kiblat",
-      description: "Kompas real-time",
-      Icon: Compass,
-      to: "/member/kiblat",
-      group: "ibadah",
-    },
-    {
-      key: "mood",
-      label: "Tenangkan Hati",
-      description: "Ayat & doa untuk hatimu",
-      Icon: Heart,
-      to: "/member/mood",
-      group: "ibadah",
     },
 
     // Grup Data Saya
@@ -214,6 +146,14 @@ export default function MemberOthersPage() {
       to: "/member/dzikir",
       group: "data",
     },
+    {
+      key: "puasa",
+      label: "Puasa Sunnah",
+      description: "Jadwal 60 hari ke depan",
+      Icon: Calendar,
+      to: "/member/puasa",
+      group: "data",
+    },
 
     // Grup Akun & Lainnya
     {
@@ -243,25 +183,9 @@ export default function MemberOthersPage() {
     {
       key: "about",
       label: "Tentang Aplikasi",
-      description: "Info versi & fitur",
+      description: "Info, panduan & privasi",
       Icon: Info,
       action: "about",
-      group: "tentang",
-    },
-    {
-      key: "panduan",
-      label: "Panduan Penggunaan",
-      description: "Cara pakai aplikasi",
-      Icon: HelpCircle,
-      to: "/member/panduan",
-      group: "tentang",
-    },
-    {
-      key: "privasi",
-      label: "Kebijakan Privasi",
-      description: "Bagaimana data Anda dikelola",
-      Icon: Shield,
-      to: "/member/privasi",
       group: "tentang",
     },
   ];
@@ -277,6 +201,15 @@ export default function MemberOthersPage() {
       group: "akun",
     });
   }
+
+  const q = search.toLowerCase().trim();
+  const visibleMenu = q
+    ? MENU.filter(
+        (m) =>
+          m.label.toLowerCase().includes(q) ||
+          (m.description || "").toLowerCase().includes(q),
+      )
+    : MENU;
 
   function handleMenuClick(item: MenuItem) {
     if (item.to) {
@@ -299,14 +232,11 @@ export default function MemberOthersPage() {
       case "about":
         setAboutOpen(true);
         break;
-      case "toggleTheme":
-        toggleTheme();
-        break;
     }
   }
 
   function renderGroup(title: string, group: MenuItem["group"]) {
-    const items = MENU.filter((m) => m.group === group);
+    const items = visibleMenu.filter((m) => m.group === group);
     if (items.length === 0) return null;
     return (
       <section>
@@ -327,43 +257,18 @@ export default function MemberOthersPage() {
                   </span>
                 }
               >
-                {m.render === "toggle" ? (
-                  <div className="flex items-center gap-3 w-full">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-ios-body text-surface-text">{m.label}</p>
-                      {m.description && (
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {m.description}
-                        </p>
-                      )}
-                    </div>
-                    <span
-                      className={`relative inline-flex items-center w-11 h-6 rounded-full transition-colors duration-300 shrink-0 ${
-                        theme === "dark" ? "bg-accent" : "bg-surface-card2"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      <span
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                          theme === "dark" ? "translate-x-5" : "translate-x-0"
-                        }`}
-                      />
-                    </span>
-                  </div>
-                ) : (
-                  <ChevronRow>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-ios-body font-medium text-surface-text truncate">
-                        {m.label}
+                <ChevronRow>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      {m.label}
+                    </p>
+                    {m.description && (
+                      <p className="text-ios-caption text-surface-muted truncate">
+                        {m.description}
                       </p>
-                      {m.description && (
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {m.description}
-                        </p>
-                      )}
-                    </div>
-                  </ChevronRow>
-                )}
+                    )}
+                  </div>
+                </ChevronRow>
               </ListRow>
             );
           })}
@@ -406,11 +311,37 @@ export default function MemberOthersPage() {
           </ListRow>
         </GroupedList>
 
+        <div className="px-4 mt-4">
+          <div className="relative">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari menu..."
+              aria-label="Cari menu"
+              className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-3.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+            />
+          </div>
+        </div>
+
         {renderGroup("Tampilan", "tampilan")}
-        {renderGroup("Ibadah", "ibadah")}
         {renderGroup("Data Saya", "data")}
         {renderGroup("Akun", "akun")}
         {renderGroup("Tentang", "tentang")}
+
+        {visibleMenu.length === 0 && (
+          <div className="px-4 mt-5">
+            <p className="text-ios-body font-medium text-surface-text text-center">
+              Tidak ditemukan
+            </p>
+            <p className="text-ios-caption text-surface-muted text-center mt-1">
+              Coba kata kunci lain
+            </p>
+          </div>
+        )}
 
         {/* Logout */}
         <div className="mt-4">

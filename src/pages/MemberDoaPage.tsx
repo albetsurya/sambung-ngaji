@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Sun,
   Moon,
@@ -107,8 +108,8 @@ export default function MemberDoaPage() {
       <Header
         title={headerTitle}
         subtitle={headerSubtitle}
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           <button

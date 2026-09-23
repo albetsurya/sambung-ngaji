@@ -1,11 +1,6 @@
 import { useRef, useState } from "react";
 import { BottomSheet, Button, ConfirmDialog } from "./index";
-import {
-  Download,
-  Upload,
-  AlertTriangle,
-  Check,
-} from "./FontAwesomeIcons";
+import { Download, Upload, AlertTriangle, Check } from "./FontAwesomeIcons";
 import {
   collectBackup,
   downloadBackup,
@@ -75,7 +70,9 @@ export function BackupDataSheet({
     try {
       const res = restoreBackup(preview.file, userId);
       showToast(
-        "Berhasil restore " + res.restored + " data" +
+        "Berhasil restore " +
+          res.restored +
+          " data" +
           (res.skipped > 0 ? " (" + res.skipped + " dilewati)" : ""),
       );
       setConfirmRestoreOpen(false);
@@ -113,8 +110,8 @@ export function BackupDataSheet({
       <BottomSheet open={open} onClose={onClose} title="Backup Data">
         <div className="rounded-xl bg-accent-soft/60 border border-accent/15 p-3 mb-4">
           <p className="text-ios-footnote text-accent/90 leading-relaxed">
-            Data Anda tersimpan di HP ini saja. Lakukan backup rutin —
-            khususnya sebelum ganti HP atau bersihkan browser.
+            Data Anda tersimpan di HP ini saja. Lakukan backup rutin, khususnya
+            sebelum ganti HP atau bersihkan browser.
           </p>
         </div>
 
@@ -133,9 +130,7 @@ export function BackupDataSheet({
               </p>
             </div>
             <div className="text-right">
-              <p className="text-ios-caption text-surface-muted mb-1">
-                Ukuran
-              </p>
+              <p className="text-ios-caption text-surface-muted mb-1">Ukuran</p>
               <p className="text-[15px] font-semibold text-surface-text tabular-nums">
                 {stats.sizeFormatted}
               </p>
@@ -169,7 +164,7 @@ export function BackupDataSheet({
               Export Backup
             </p>
             <p className="text-ios-caption text-surface-muted">
-              Download file .json — simpan di Drive / WhatsApp sendiri
+              Download file .json, simpan di Drive / WhatsApp sendiri
             </p>
           </div>
         </button>
@@ -261,10 +256,7 @@ export function BackupDataSheet({
             >
               Batal
             </Button>
-            <Button
-              fullWidth
-              onClick={() => setConfirmRestoreOpen(true)}
-            >
+            <Button fullWidth onClick={() => setConfirmRestoreOpen(true)}>
               Restore Sekarang
             </Button>
           </div>

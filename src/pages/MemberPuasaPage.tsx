@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Calendar,
   Sparkles,
@@ -49,8 +50,8 @@ export default function MemberPuasaPage() {
       <Header
         title="Puasa Sunnah"
         subtitle="Jadwal 60 hari ke depan"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
