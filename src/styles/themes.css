@@ -324,3 +324,77 @@ html[data-preset="glass"].dark body::before {
     radial-gradient(420px 300px at -5% 25%, rgb(148 163 184 / 0.1), transparent 65%),
     radial-gradient(520px 360px at 50% 108%, rgb(255 255 255 / 0.05), transparent 65%);
 }
+
+/* ========================================================================
+   Utilitas kaca bening (standalone, bisa dipakai di mana saja).
+   ======================================================================== */
+
+.glass-clear-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+  color: #f8fafc;
+}
+
+.glass-clear-light {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.08),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+  color: #0f172a;
+}
+
+/* Terapkan ke permukaan frosted saat preset glass aktif (light). */
+[data-preset="glass"] header.sticky,
+[data-preset="glass"] nav[class~="rounded-3xl"],
+[data-preset="glass"] .sheet,
+[data-preset="glass"] .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.08),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Varian dark-nya. */
+[data-preset="glass"].dark header.sticky,
+[data-preset="glass"].dark nav[class~="rounded-3xl"],
+[data-preset="glass"].dark .sheet,
+[data-preset="glass"].dark .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+}
