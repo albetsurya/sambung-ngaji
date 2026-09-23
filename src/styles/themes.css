@@ -43,9 +43,11 @@
 }
 
 [data-preset="tiktok"] {
-  --c-accent: 20 184 179;
-  --c-accent-dark: 13 148 144;
-  --c-accent-light: 220 252 251;
+  /* Monokromatik: aksen = hitam solid (teks/hover), soft = abu terang.
+     Merah #FE2C55 dicadangkan untuk badge, focus input, & efek glitch FAB. */
+  --c-accent: 0 0 0;
+  --c-accent-dark: 0 0 0;
+  --c-accent-light: 232 232 232;
   --c-accent-2: 254 44 85;
   --c-accent-2-dark: 230 30 70;
   --c-accent-2-light: 255 220 230;
@@ -55,9 +57,10 @@
   --c-card: 22 22 22;
   --c-card2: 15 15 15;
   --c-border: 42 42 42;
-  --c-accent: 37 244 238;
-  --c-accent-dark: 94 248 242;
-  --c-accent-light: 10 40 40;
+  /* Aksen = putih solid; soft = abu gelap. */
+  --c-accent: 255 255 255;
+  --c-accent-dark: 255 255 255;
+  --c-accent-light: 38 38 38;
   --c-accent-2: 254 44 85;
   --c-accent-2-dark: 255 90 120;
   --c-accent-2-light: 40 10 20;
@@ -168,51 +171,51 @@
 }
 
 /* ========================================================================
-   TikTok preset — tombol aksen dichotomy (border samping cyan/merah).
-   Khusus preset tiktok saja: border kiri = cyan (#25F4EE), border kanan =
-   merah (#FE2C55), atas & bawah tanpa border. Body hitam, teks/icon putih.
-   Dipakai oleh <Button variant="primary"> (class btn-preset-special
-   di-inject dari komponen).
+   TikTok preset — monokromatik + glitch hanya di FAB add.
+   - Tombol primer/chip terpilih: solid terbalik (hitam di light,
+     putih di dark) — otomatis dari token --c-accent di atas.
+   - Badge default: merah solid #FE2C55 (seperti badge TikTok).
+   - Input/teks area/select: outline merah hanya saat focus
+     (abu saat rest, agar tidak dibaca sebagai error).
+   - FAB primer (add): efek glitch cyan-kiri/merah-kanan ala logo TikTok.
+   - Teks putih di atas aksen pada dark mode dikoreksi jadi hitam.
    ======================================================================== */
 
-[data-preset="tiktok"] .btn-preset-special {
-  position: relative;
-  color: #ffffff;
-  background-color: #010101;
-  border-left: 3px solid rgb(37 244 238);
-  border-right: 3px solid rgb(254 44 85);
-  border-top: 0 none;
-  border-bottom: 0 none;
+/* Teks putih di atas bg-accent pada dark = tak terbaca (aksen = putih).
+   Berlaku untuk Button primer, chip terpilih, toast sukses, dsb. */
+[data-preset="tiktok"].dark [class~="bg-accent"][class~="text-white"] {
+  color: #000000;
 }
 
-[data-preset="tiktok"] .btn-preset-special:hover {
+/* Badge default merah solid */
+[data-preset="tiktok"] .badge-emerald {
+  background-color: rgb(254 44 85);
   color: #ffffff;
-  background-color: #010101;
 }
 
-[data-preset="tiktok"] .btn-preset-special:disabled {
-  border-left-color: rgb(37 244 238 / 0.25);
-  border-right-color: rgb(254 44 85 / 0.25);
+/* Input focus merah */
+[data-preset="tiktok"] input:focus,
+[data-preset="tiktok"] textarea:focus,
+[data-preset="tiktok"] select:focus {
+  border-color: rgb(254 44 85);
+  --tw-ring-color: rgb(254 44 85 / 0.18);
 }
 
-/* ========================================================================
-   TikTok preset — chip & segmented (aksen penuh bg-accent text-white).
-   Sama seperti tombol: body hitam + teks putih + border kiri cyan & kanan
-   merah, atas/bawah tanpa border. Berlaku di light & dark.
-   Pengecualian: tombol yang sudah .btn-preset-special & badge mungil (w/h 4–5).
-   ======================================================================== */
-
-[data-preset="tiktok"]
-  [class~="bg-accent"][class~="text-white"]:not(
-    [class~="btn-preset-special"]
-  ):not([class~="w-4"]):not([class~="w-5"]):not([class~="h-4"]):not(
-    [class~="h-5"]
-  ):not([class~="min-w-[16px]"]):not([class~="rounded-2xl"]) {
-  position: relative;
+/* FAB add — glitch offset cyan/merah */
+[data-preset="tiktok"] .fab-primary {
+  background-color: #000000;
   color: #ffffff;
-  background-color: #010101;
-  border-left: 3px solid rgb(37 244 238);
-  border-right: 3px solid rgb(254 44 85);
-  border-top: 0 none;
-  border-bottom: 0 none;
+  border: 0 none;
+  box-shadow:
+    -3px 0 0 0 rgb(37 244 238),
+    3px 0 0 0 rgb(254 44 85),
+    0 8px 20px rgb(0 0 0 / 0.25);
+}
+[data-preset="tiktok"].dark .fab-primary {
+  background-color: #ffffff;
+  color: #000000;
+  box-shadow:
+    -3px 0 0 0 rgb(37 244 238),
+    3px 0 0 0 rgb(254 44 85),
+    0 8px 20px rgb(0 0 0 / 0.5);
 }

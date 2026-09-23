@@ -1,5 +1,4 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { useTheme } from "../../contexts/ThemeContext";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger" | "soft" | "softDanger";
@@ -77,9 +76,8 @@ export function Button({
   ...rest
 }: Props) {
   const s = SIZES[size];
-  const { preset } = useTheme();
-  const tiktokSpecial =
-    variant === "primary" && preset === "tiktok" ? "btn-preset-special" : "";
+  // Class stabil untuk override per-preset tema (lihat styles/themes.css).
+  const stable = `btn btn-${variant} btn-${size}`;
 
   if (iconOnly) {
     const width =
@@ -92,7 +90,7 @@ export function Button({
             : "w-12";
     return (
       <button
-        className={`inline-flex items-center justify-center ${s.height} ${width} rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${className}`}
+        className={`inline-flex items-center justify-center ${s.height} ${width} rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${className}`}
         {...rest}
       >
         <span className={`flex items-center justify-center ${s.iconSize}`}>
@@ -104,7 +102,7 @@ export function Button({
 
   return (
     <button
-      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${fullWidth ? "w-full" : ""} ${className}`}
       {...rest}
     >
       {leftIcon && (

@@ -217,15 +217,12 @@ export function FloatingActionButton({
 }) {
   const isPrimary = variant === "primary";
   const resolvedSize = size ?? (isPrimary ? "md" : "sm");
-  const { preset } = useTheme();
-  const tiktokSpecial =
-    isPrimary && preset === "tiktok" ? "btn-preset-special" : "";
 
   const sizeClass = resolvedSize === "sm" ? "w-12 h-12" : "w-14 h-14";
 
   const variantClass = isPrimary
-    ? `bg-accent text-white fab-glow-primary ${tiktokSpecial}`
-    : "bg-surface-card text-accent border border-accent/30 fab-glow-secondary";
+    ? `bg-accent text-white fab fab-primary fab-glow-primary`
+    : "bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary";
 
   const content = children ? (
     children
