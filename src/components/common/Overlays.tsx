@@ -1,4 +1,5 @@
 import { X } from "./FontAwesomeIcons";
+import { Button } from "./Button";
 import type { ReactNode } from "react";
 
 interface SheetProps {
@@ -16,7 +17,7 @@ export function BottomSheet({ open, onClose, title, children }: SheetProps) {
         className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
         onClick={onClose}
       />
-      <div className="app-shell relative w-full bg-surface-card rounded-t-[28px] border-t border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
+      <div className="app-shell sheet relative w-full bg-surface-card rounded-t-[28px] border-t border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
         <div className="flex items-center justify-center pt-2.5 pb-2">
           <div className="w-9 h-[5px] rounded-full bg-surface-muted/25" />
         </div>
@@ -110,22 +111,22 @@ export function ConfirmDialog({
           )}
         </div>
         <div className="flex gap-2.5 px-4 pb-4">
-          <button
+          <Button
+            variant="ghost"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 h-11 rounded-2xl text-[15px] font-medium text-surface-text border border-surface-border bg-surface-card transition-colors hover:bg-surface-card2 active:scale-[0.97]"
+            className="flex-1 border border-surface-border"
           >
             Batal
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={danger ? "danger" : "primary"}
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 h-11 rounded-2xl text-[15px] font-semibold text-white shadow-sm transition-all hover:shadow-md active:scale-[0.97] ${
-              danger ? "bg-danger" : "bg-accent"
-            }`}
+            className="flex-1"
           >
             {loading ? "Memproses..." : confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

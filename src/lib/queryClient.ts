@@ -38,8 +38,8 @@ export const queryKeys = {
   users: () => ["users"],
   userDetail: (userId: string) => ["user-detail", userId],
   auditLogs: (limit: number) => ["audit-logs", { limit }],
-  settings: () => ["settings"],
   aiUsage: () => ["ai-usage"],
+  fridaySchedules: () => ["friday-schedules", "v2"],
   monitoring: (memberId: string) => ["monitoring", memberId],
   monitoringPaged: (memberId: string, filters?: object) =>
     filters

@@ -26,6 +26,8 @@ import {
   faPaperPlane,
   faUser,
   faBolt,
+  faFire,
+  faTrophy,
   faChevronDown,
   faUserPlus,
   faKey,
@@ -76,6 +78,14 @@ import {
   faLocationArrow,
   faUpload,
   faFileAlt,
+  faUtensils,
+  faToilet,
+  faCarSide,
+  faMosque,
+  faShirt,
+  faCloudRain,
+  faSeedling,
+  faSprout,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -172,6 +182,8 @@ export const LayoutGrid = createIcon(faTableCells);
 export const List = createIcon(faList);
 
 export const Star = createIcon(faStar);
+export const Fire = createIcon(faFire);
+export const Trophy = createIcon(faTrophy);
 
 export const Bookmark = createIcon(faBookmark);
 
@@ -198,3 +210,12 @@ export const Navigation = createIcon(faLocationArrow);
 export const Upload = createIcon(faUpload);
 
 export const FileText = createIcon(faFileAlt);
+
+export const Utensils = createIcon(faUtensils);
+export const Toilet = createIcon(faToilet);
+export const CarSide = createIcon(faCarSide);
+export const Mosque = createIcon(faMosque);
+export const Shirt = createIcon(faShirt);
+export const CloudRain = createIcon(faCloudRain);
+export const Seedling = createIcon(faSeedling);
+export const Sprout = createIcon(faSprout);

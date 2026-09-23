@@ -86,15 +86,17 @@ export default function MemberRequestsPage() {
         title="Permintaan Member"
         subtitle={`${list.length} menunggu`}
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
         right={
-          <button
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
             onClick={() => refetch()}
             aria-label="Refresh"
-            className="w-9 h-9 flex items-center justify-center rounded-xl text-accent transition-colors hover:bg-accent-soft/60 active:scale-95"
           >
             <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
-          </button>
+          </Button>
         }
       />
 

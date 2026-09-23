@@ -53,15 +53,16 @@ function releaseSlot(): void {
 /* -------------------------------------------------------------------------- */
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  const match = document.cookie.match(/(?:^|;\s*)pengajian_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 export function setToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token);
+  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict`;
 }
 
 export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
+  document.cookie = "pengajian_token=; path=/; SameSite=Strict; Max-Age=-1";
 }
 
 /* -------------------------------------------------------------------------- */
@@ -72,27 +73,75 @@ export class ApiError extends Error {
   response?: ApiResponse<unknown>;
   retryable: boolean;
   statusCode?: number;
+  cancelled?: boolean;
 
   constructor(
     message: string,
     response?: ApiResponse<unknown>,
-    options: { retryable?: boolean; statusCode?: number } = {},
+    options: { retryable?: boolean; statusCode?: number; cancelled?: boolean } = {},
   ) {
     super(message);
     this.name = "ApiError";
     this.response = response;
     this.retryable = options.retryable ?? false;
     this.statusCode = options.statusCode;
+    this.cancelled = options.cancelled ?? false;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                     Pembatalan + notifikasi retry                          */
+/* -------------------------------------------------------------------------- */
+
+const inflight = new Set<AbortController>();
+let abortEpoch = 0;
+
+/** Batalkan semua request API yang sedang berjalan (tombol Batal). */
+export function abortAllApiCalls() {
+  abortEpoch++;
+  for (const c of inflight) {
+    try {
+      c.abort("cancelled");
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/** Tidur yang bisa diinterupsi oleh abortAllApiCalls. false = dibatalkan. */
+function sleepCancellable(ms: number, epoch: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    const id = window.setInterval(() => {
+      if (epoch !== abortEpoch) {
+        window.clearInterval(id);
+        resolve(false);
+        return;
+      }
+      if (Date.now() - start >= ms) {
+        window.clearInterval(id);
+        resolve(true);
+      }
+    }, 200);
+  });
+}
+
+export interface RetryInfo {
+  action: string;
+  attempt: number;
+  total: number;
+}
+
+let retryNotifier: ((info: RetryInfo) => void) | null = null;
+
+/** Daftarkan notifikasi retry (dipasang sekali dari App → toast). */
+export function setRetryNotifier(fn: ((info: RetryInfo) => void) | null) {
+  retryNotifier = fn;
 }
 
 /* -------------------------------------------------------------------------- */
 /*                              Helpers                                       */
 /* -------------------------------------------------------------------------- */
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function isHtmlResponse(text: string): boolean {
   const head = text.slice(0, 200).toLowerCase();
@@ -127,12 +176,24 @@ export async function call<T>(
   params: Record<string, any> = {},
 ): Promise<T> {
   let lastError: unknown = null;
+  const epoch = abortEpoch;
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (epoch !== abortEpoch) {
+      throw new ApiError("Permintaan dibatalkan", undefined, {
+        retryable: false,
+        cancelled: true,
+      });
+    }
     try {
       return await callOnce<T>(action, params, attempt);
     } catch (error) {
       lastError = error;
+
+      // Jangan retry request yang dibatalkan user.
+      if (error instanceof ApiError && error.cancelled) {
+        throw error;
+      }
 
       const retryable = error instanceof ApiError && error.retryable === true;
 
@@ -145,7 +206,25 @@ export async function call<T>(
         `⚠️ API [${action}] gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
         error instanceof Error ? error.message : error,
       );
-      await sleep(delay);
+      // Beri tahu UI sekali (retry pertama) agar tidak diam.
+      if (attempt === 0 && retryNotifier) {
+        try {
+          retryNotifier({
+            action,
+            attempt: attempt + 1,
+            total: MAX_RETRIES + 1,
+          });
+        } catch {
+          // ignore
+        }
+      }
+      const slept = await sleepCancellable(delay, epoch);
+      if (!slept) {
+        throw new ApiError("Permintaan dibatalkan", undefined, {
+          retryable: false,
+          cancelled: true,
+        });
+      }
     }
   }
 
@@ -163,6 +242,9 @@ async function callOnce<T>(
 ): Promise<T> {
   await acquireSlot();
 
+  const controller = new AbortController();
+  inflight.add(controller);
+
   try {
     const token = getToken();
 
@@ -170,9 +252,12 @@ async function callOnce<T>(
       action,
       ...params,
     };
-    if (token) payload.token = token;
-
     const body = JSON.stringify(payload);
+
+    const headers: Record<string, string> = {
+      "Content-Type": "text/plain;charset=utf-8",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     // Cache buster hanya di attempt 0. Retry tanpa buster (pakai cache GAS).
     const url =
@@ -182,25 +267,32 @@ async function callOnce<T>(
           : `${API_BASE_URL}?_t=${Date.now()}`
         : API_BASE_URL;
 
-    const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     let response: Response;
     try {
       response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
+        headers,
         body,
         redirect: "follow",
         cache: "no-store",
+        // Kirim HttpOnly cookie sesi (backend juga pakai header sbg fallback).
+        credentials: "include",
         signal: controller.signal,
       });
     } catch (err: any) {
       clearTimeout(timeoutId);
 
       if (err?.name === "AbortError") {
+        // Dibatalkan user via abortAllApiCalls (reason "cancelled")
+        // vs timeout internal (tanpa reason).
+        if (controller.signal.reason === "cancelled") {
+          throw new ApiError("Permintaan dibatalkan", undefined, {
+            retryable: false,
+            cancelled: true,
+          });
+        }
         throw new ApiError(
           `Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik. Coba lagi.`,
           undefined,
@@ -324,6 +416,7 @@ async function callOnce<T>(
 
     return data.data;
   } finally {
+    inflight.delete(controller);
     releaseSlot();
   }
 }
@@ -411,6 +504,8 @@ export default {
   setToken,
   clearToken,
   ApiError,
+  abortAllApiCalls,
+  setRetryNotifier,
   testApiConnection,
   testApiGet,
 };

@@ -1,16 +1,55 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
-  ChevronLeft,
   ScrollText,
   Sparkles,
   RefreshCw,
   Heart,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MOOD_LIST, getMood, type Mood, type MoodKey } from "../data/mood";
-import { useMoodPick } from "../hooks/useMoodPick";
+import { Button } from "../components/common";
+import {
+  MOOD_LIST,
+  getMood,
+  type Mood,
+  type MoodAyat,
+  type MoodDoa,
+  type MoodHadits,
+  type MoodKey,
+} from "../data/mood";
 import { moodApi } from "../services/domainApi";
+
+/* -------------------------------------------------------------------------- */
+/*                                  Helpers                                   */
+/* -------------------------------------------------------------------------- */
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+type Dalil =
+  | { kind: "ayat"; data: MoodAyat }
+  | { kind: "hadits"; data: MoodHadits };
+
+/**
+ * Pilih 1 dalil acak: bisa ayat, bisa hadits.
+ * Kalau salah satu kosong, otomatis pakai yang tersedia.
+ */
+function pickDalil(mood: Mood): Dalil | null {
+  const hasAyat = mood.ayat.length > 0;
+  const hasHadits = mood.hadits.length > 0;
+  if (!hasAyat && !hasHadits) return null;
+
+  const preferAyat = hasAyat && (!hasHadits || Math.random() < 0.5);
+  return preferAyat
+    ? { kind: "ayat", data: pickRandom(mood.ayat) }
+    : { kind: "hadits", data: pickRandom(mood.hadits) };
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  Page                                      */
+/* -------------------------------------------------------------------------- */
 
 export default function MemberMoodPage() {
   const navigate = useNavigate();
@@ -24,30 +63,30 @@ export default function MemberMoodPage() {
         title={selected ? "Untukmu" : "Tenangkan Hati"}
         subtitle={
           selected
-            ? "Ayat & doa untuk hatimu"
+            ? "Ayat, doa & hadits untuk hatimu"
             : "Pilih yang paling dekat dengan perasaanmu"
         }
         onBack={() => {
-          if (selected) {
-            setSearchParams({}, { replace: true });
-          } else {
-            navigate("/member");
-          }
+          if (selected) setSearchParams({}, { replace: true });
+          else goBack(navigate, "/member");
         }}
-        backLabel={selected ? "Kembali" : "Home"}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {!selected && <MoodPicker onSelect={(k) => setSearchParams({ mood: k })} />}
-        {selected && <MoodResult mood={selected} />}
+        {!selected && (
+          <MoodPicker onSelect={(k) => setSearchParams({ mood: k })} />
+        )}
+        {/* key={selected.key} → remount & re-random tiap kali pilih mood */}
+        {selected && <MoodResult key={selected.key} mood={selected} />}
       </div>
     </AppLayout>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              Mood Picker                                   */
+/*                                Mood Picker                                 */
 /* -------------------------------------------------------------------------- */
 
 function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
@@ -58,7 +97,7 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       <div className="rounded-2xl border border-accent/15 bg-accent-soft/60 px-4 py-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
           Tidak ada perasaan yang salah. Pilih yang paling dekat, kami akan
-          temani dengan ayat & doa yang menenangkan.
+          temani dengan ayat, doa & hadits yang menenangkan.
         </p>
       </div>
 
@@ -93,31 +132,37 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
         })}
       </div>
 
-      <button
+      <Button
         onClick={() => {
           if (selected) {
-            // Best-effort sync mood harian ke backend (upsert per hari). Gagal tidak memblok UX.
             moodApi.save(selected).catch(() => {});
             onSelect(selected);
           }
         }}
         disabled={!selected}
-        className="w-full min-h-[52px] rounded-2xl bg-accent text-white text-ios-body font-semibold transition-all duration-200 hover:bg-accent-dark active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        variant="primary"
+        size="lg"
+        fullWidth
+        leftIcon={<Sparkles size={16} />}
       >
-        <Sparkles size={16} />
         {selected ? "Tampilkan untuk saya" : "Pilih mood dulu"}
-      </button>
+      </Button>
     </>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              Mood Result                                   */
+/*                                Mood Result                                 */
 /* -------------------------------------------------------------------------- */
 
 function MoodResult({ mood }: { mood: Mood }) {
   const navigate = useNavigate();
-  const pick = useMoodPick(mood);
+
+  // Random dipilih SEKALI per mount (per buka halaman / per ganti mood).
+  const [dalil] = useState<Dalil | null>(() => pickDalil(mood));
+  const [doa] = useState<MoodDoa | null>(() =>
+    mood.doa.length > 0 ? pickRandom(mood.doa) : null,
+  );
 
   return (
     <>
@@ -134,136 +179,221 @@ function MoodResult({ mood }: { mood: Mood }) {
         </p>
       </div>
 
-      {/* Ayat */}
-      <section className="space-y-2.5">
-        <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
-          <ScrollText size={13} className="text-accent" />
-          Ayat untukmu
-        </p>
+      {/* Dalil: ayat atau hadits */}
+      {dalil && (
+        <Section
+          title={dalil.kind === "ayat" ? "Ayat untukmu" : "Hadits untukmu"}
+          icon={
+            dalil.kind === "ayat" ? (
+              <ScrollText size={14} className="text-accent" />
+            ) : (
+              <Heart size={14} className="text-success" />
+            )
+          }
+        >
+          {dalil.kind === "ayat" ? (
+            <AyatCard
+              ayat={dalil.data}
+              onOpen={() => navigate("/member/quran/" + dalil.data.surah)}
+            />
+          ) : (
+            <HaditsCard hadits={dalil.data} />
+          )}
+        </Section>
+      )}
 
-        <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-surface-border flex items-center justify-between gap-2">
-            <span className="text-ios-caption font-medium text-surface-text">
-              {pick.ayat.surahNama} : {pick.ayat.ayat}
-            </span>
-            <button
-              onClick={() => navigate("/member/quran/" + pick.ayat.surah)}
-              className="text-ios-caption font-medium text-accent transition-colors duration-200 hover:text-accent-dark"
-            >
-              Buka surah →
-            </button>
-          </div>
-          <div className="px-4 py-4 space-y-3">
-            <p
-              className="text-surface-text"
-              style={{
-                fontFamily:
-                  '"Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif',
-                fontSize: "22px",
-                fontWeight: 400,
-                lineHeight: 2.2,
-                wordSpacing: "0.1em",
-                direction: "rtl",
-                textAlign: "right",
-              }}
-            >
-              {pick.ayat.teksArab}
-            </p>
-            <p className="text-ios-footnote text-surface-text leading-relaxed">
-              &ldquo;{pick.ayat.teksIndonesia}&rdquo;
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Doa */}
-      <section className="space-y-2.5">
-        <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
-          <Sparkles size={13} className="text-accent" />
-          Doa yang bisa dibaca
-        </p>
-
-        <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-surface-border">
-            <p className="text-ios-caption font-medium text-surface-text">
-              {pick.doa.judul}
-            </p>
-          </div>
-          <div className="px-4 py-4 space-y-3">
-            <p
-              className="text-surface-text"
-              style={{
-                fontFamily:
-                  '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
-                fontSize: "20px",
-                fontWeight: 400,
-                lineHeight: 2.1,
-                wordSpacing: "0.1em",
-                direction: "rtl",
-                textAlign: "right",
-              }}
-            >
-              {pick.doa.arab}
-            </p>
-            <p className="text-ios-footnote italic text-surface-muted leading-relaxed">
-              {pick.doa.latin}
-            </p>
-            <div className="rounded-xl bg-accent-soft/50 border border-accent/10 px-3.5 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-1">
-                Artinya
-              </p>
-              <p className="text-ios-footnote text-surface-text leading-relaxed">
-                {pick.doa.arti}
-              </p>
-            </div>
-            {pick.doa.sumber && (
-              <p className="text-ios-caption text-surface-muted">
-                <span className="font-medium">Sumber:</span> {pick.doa.sumber}
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      {/* Doa (1 saja) */}
+      {doa && (
+        <Section
+          title="Doa untukmu"
+          icon={<Sparkles size={14} className="text-accent" />}
+        >
+          <DoaCard doa={doa} />
+        </Section>
+      )}
 
       {/* Nasehat & Hikmah */}
-      <section className="space-y-2.5">
-        <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
-          <Heart size={13} className="text-success" />
-          Nasehat & Hikmah
-        </p>
-
+      <Section
+        title="Nasehat & Hikmah"
+        icon={<Heart size={14} className="text-success" />}
+      >
         <div className="rounded-2xl border border-success/20 bg-success-soft/60 px-4 py-4">
           <p className="text-ios-footnote text-surface-text leading-relaxed">
             {mood.nasehat}
           </p>
         </div>
-      </section>
+      </Section>
 
       {/* Aksi */}
       <div className="flex flex-col gap-2 pt-2">
-        <button
+        <Button
           onClick={() => navigate("/member/dzikir")}
-          className="min-h-[48px] rounded-2xl border border-accent/25 bg-accent-soft text-accent text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-soft/80 active:scale-[0.98] flex items-center justify-center gap-2"
+          variant="soft"
+          size="md"
+          fullWidth
+          leftIcon={<RefreshCw size={14} />}
         >
-          <RefreshCw size={14} />
           Lanjutkan dengan dzikir
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => navigate("/member/quran")}
-          className="min-h-[48px] rounded-2xl border border-surface-border bg-surface-card text-surface-text text-ios-footnote font-medium transition-all duration-200 hover:bg-surface-card2 active:scale-[0.98] flex items-center justify-center gap-2"
+          variant="secondary"
+          size="md"
+          fullWidth
+          leftIcon={<ScrollText size={14} />}
         >
-          <ScrollText size={14} />
           Baca Al-Quran
-        </button>
+        </Button>
       </div>
 
-      {/* Info refresh */}
       <p className="text-ios-caption text-surface-muted text-center pt-1">
-        Ayat & doa berganti tiap hari. Buka lagi besok untuk pilihan baru.
+        Dalil & doa berganti setiap kamu membuka halaman ini.
       </p>
     </>
   );
 }
 
-/* Suppress unused */
-void ChevronLeft;
+/* -------------------------------------------------------------------------- */
+/*                               Sub-components                               */
+/* -------------------------------------------------------------------------- */
+
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-2.5">
+      <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
+        {icon}
+        {title}
+      </p>
+      {children}
+    </section>
+  );
+}
+
+function AyatCard({ ayat, onOpen }: { ayat: MoodAyat; onOpen: () => void }) {
+  return (
+    <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-surface-border flex items-center justify-between gap-2">
+        <span className="text-ios-caption font-medium text-surface-text">
+          {ayat.surahNama} : {ayat.ayat}
+        </span>
+        <button
+          onClick={onOpen}
+          className="text-ios-caption font-medium text-accent transition-colors duration-200 hover:text-accent-dark"
+        >
+          Buka surah →
+        </button>
+      </div>
+      <div className="px-4 py-4 space-y-3">
+        <p
+          className="text-surface-text"
+          style={{
+            fontFamily:
+              '"Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif',
+            fontSize: "22px",
+            fontWeight: 400,
+            lineHeight: 2.2,
+            wordSpacing: "0.1em",
+            direction: "rtl",
+            textAlign: "right",
+          }}
+        >
+          {ayat.teksArab}
+        </p>
+        <p className="text-ios-footnote text-surface-text leading-relaxed">
+          &ldquo;{ayat.teksIndonesia}&rdquo;
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function DoaCard({ doa }: { doa: MoodDoa }) {
+  return (
+    <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-surface-border">
+        <p className="text-ios-caption font-medium text-surface-text">
+          {doa.judul}
+        </p>
+      </div>
+      <div className="px-4 py-4 space-y-3">
+        <p
+          className="text-surface-text"
+          style={{
+            fontFamily:
+              '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
+            fontSize: "20px",
+            fontWeight: 400,
+            lineHeight: 2.1,
+            wordSpacing: "0.1em",
+            direction: "rtl",
+            textAlign: "right",
+          }}
+        >
+          {doa.arab}
+        </p>
+        <p className="text-ios-footnote italic text-surface-muted leading-relaxed">
+          {doa.latin}
+        </p>
+        <div className="rounded-xl bg-accent-soft/50 border border-accent/10 px-3.5 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-1">
+            Artinya
+          </p>
+          <p className="text-ios-footnote text-surface-text leading-relaxed">
+            {doa.arti}
+          </p>
+        </div>
+        {doa.sumber && (
+          <p className="text-ios-caption text-surface-muted">
+            <span className="font-medium">Sumber:</span> {doa.sumber}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HaditsCard({ hadits }: { hadits: MoodHadits }) {
+  return (
+    <div className="rounded-2xl border border-success/20 bg-surface-card overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-success/15 bg-success-soft/40">
+        <p className="text-ios-caption font-medium text-surface-text">
+          {hadits.judul}
+        </p>
+      </div>
+      <div className="px-4 py-4 space-y-3">
+        <p
+          className="text-surface-text"
+          style={{
+            fontFamily:
+              '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
+            fontSize: "20px",
+            fontWeight: 400,
+            lineHeight: 2.1,
+            wordSpacing: "0.1em",
+            direction: "rtl",
+            textAlign: "right",
+          }}
+        >
+          {hadits.arab}
+        </p>
+        <p className="text-ios-footnote italic text-surface-muted leading-relaxed">
+          {hadits.latin}
+        </p>
+        <p className="text-ios-footnote text-surface-text leading-relaxed">
+          &ldquo;{hadits.arti}&rdquo;
+        </p>
+        <p className="text-ios-caption text-surface-muted">
+          <span className="font-medium">Sumber:</span> {hadits.sumber}
+        </p>
+      </div>
+    </div>
+  );
+}

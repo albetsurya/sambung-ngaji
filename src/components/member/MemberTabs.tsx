@@ -162,7 +162,7 @@ export function TimelineTab({ events }: { events: TimelineEvent[] }) {
                 {formatDateShort(ev.date)}
               </p>
               <p className="text-ios-subhead text-surface-text flex items-center gap-1.5">
-                <Icon size={13} className={color} /> {ev.label}
+                <Icon size={14} className={color} /> {ev.label}
               </p>
               {ev.detail && (
                 <p className="text-ios-footnote text-surface-muted">
@@ -330,7 +330,7 @@ export function AttendanceTab({
       <Card>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
-            <span className="text-accent font-semibold text-lg">%</span>
+            <span className="text-accent font-semibold text-ios-nav">%</span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-ios-footnote text-surface-muted">
@@ -400,11 +400,11 @@ export function AttendanceTab({
                 return (
                   <Card key={it.id} className="flex items-center gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-surface-text truncate">
+                      <p className="font-medium text-ios-subhead text-surface-text truncate">
                         {it.label}
                       </p>
                       {it.sublabel && (
-                        <p className="text-xs text-surface-muted truncate">
+                        <p className="text-ios-caption text-surface-muted truncate">
                           {it.sublabel}
                         </p>
                       )}
@@ -556,7 +556,7 @@ export function CategoryHeaderBadge({ member }: { member: Member }) {
 
 function moodMeta(key: string): { emoji: string; label: string } {
   const m = getMood(key as Parameters<typeof getMood>[0]);
-  return m ? { emoji: m.emoji, label: m.label } : { emoji: "😶", label: key };
+  return m ? { emoji: m.emoji, label: m.label } : { emoji: "•", label: key };
 }
 
 export function MoodTab({ entries }: { entries: MoodEntry[] }) {

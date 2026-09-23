@@ -11,6 +11,7 @@ import type {
   DashboardPNKB,
   DashboardAbsensi,
   Member,
+  FridaySchedule,
 } from "../types";
 export const educationApi = {
   list: (member_id: string) => call<Education[]>("getEducation", { member_id }),
@@ -50,6 +51,7 @@ export const meetingApi = {
     catatan?: string;
     kategori_target?: string[];
     gender_target?: "" | "L" | "P";
+    send_reminder?: boolean;
   }) => call<Meeting>("createMeeting", payload),
 
   update: (payload: {
@@ -63,6 +65,7 @@ export const meetingApi = {
     catatan?: string;
     kategori_target?: string[];
     gender_target?: "" | "L" | "P";
+    send_reminder?: boolean;
   }) => call<Meeting>("updateMeeting", payload),
 
   remove: (meeting_id: string) =>
@@ -73,6 +76,40 @@ export const meetingApi = {
   removeBulk: (meeting_ids: string[]) =>
     call<{ requested: number; deleted: number }>("deleteMeetingsBulk", {
       meeting_ids,
+    }),
+};
+
+/* -------------------------------------------------------------------------- */
+/*                              FRIDAY API (Petugas Jumat)                  */
+/* -------------------------------------------------------------------------- */
+/*
+ * Backend actions:
+ * - getFridaySchedules → list (terima: from, to — YYYY-MM-DD, opsional)
+ * - saveFridaySchedule → upsert by tanggal (terima: tanggal wajib hari Jumat,
+ *   khatib_imam, muadzin, penasihat, petugas_parkir, penata_sandal, catatan)
+ * - deleteFridaySchedule → remove (terima: tanggal)
+ */
+
+export interface FridaySchedulePayload {
+  tanggal: string;
+  khatib_imam?: string;
+  muadzin?: string;
+  penasihat?: string;
+  petugas_parkir?: string;
+  penata_sandal?: string;
+  catatan?: string;
+}
+
+export const fridayApi = {
+  list: (params?: { from?: string; to?: string }) =>
+    call<FridaySchedule[]>("getFridaySchedules", params || {}),
+
+  save: (payload: FridaySchedulePayload) =>
+    call<FridaySchedule>("saveFridaySchedule", payload),
+
+  remove: (tanggal: string) =>
+    call<{ tanggal: string; deleted: boolean }>("deleteFridaySchedule", {
+      tanggal,
     }),
 };
 
@@ -271,12 +308,6 @@ export const userApi = {
     call<{ deleted: boolean; user_id: string }>("deleteUserPermanent", {
       user_id,
     }),
-};
-
-export const settingsApi = {
-  get: () => call<Record<string, unknown>>("getSettings"),
-  update: (key: string, value: unknown) =>
-    call<{ key: string; value: unknown }>("updateSettings", { key, value }),
 };
 
 export interface AuditLogEntry {

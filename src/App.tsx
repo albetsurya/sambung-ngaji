@@ -1,12 +1,26 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ToastProvider } from "./contexts/ToastContext";
+import { ToastProvider, useToast } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
+import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
+import { setRetryNotifier } from "./services/api";
+
+/** Teruskan notifikasi retry API menjadi toast (sekali per rantai retry). */
+function ApiRetryWire() {
+  const { showToast } = useToast();
+  useEffect(() => {
+    setRetryNotifier(() =>
+      showToast("Koneksi lambat, mencoba ulang…", "warning"),
+    );
+    return () => setRetryNotifier(null);
+  }, [showToast]);
+  return null;
+}
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -18,7 +32,6 @@ const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const OthersPage = lazy(() => import("./pages/OthersPage"));
 const GroupsPage = lazy(() => import("./pages/GroupsPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
-const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const AiChatPage = lazy(() => import("./pages/AiChatPage"));
 const AnnouncementTemplatesPage = lazy(
@@ -43,6 +56,10 @@ const MemberTahfidzPage = lazy(
 );
 const MemberSchedulePage = lazy(
   () => import("./pages/MemberSchedulePage"),
+);
+const MemberFridayPage = lazy(() => import("./pages/MemberFridayPage"));
+const FridaySchedulesPage = lazy(
+  () => import("./pages/FridaySchedulesPage"),
 );
 const MemberTahfidzSurahPage = lazy(
   () => import("./pages/MemberTahfidzSurahPage"),
@@ -88,6 +105,9 @@ const RegistrationSuccessPage = lazy(
   () => import("./pages/RegistrationSuccessPage"),
 );
 const MemberAiChatPage = lazy(() => import("./pages/MemberAiChatPage"));
+const MemberProgressPage = lazy(() => import("./pages/MemberProgressPage"));
+const MemberAttendancePage = lazy(() => import("./pages/MemberAttendancePage"));
+const MemberAttendanceRecapPage = lazy(() => import("./pages/MemberAttendanceRecapPage"));
 const AiUsagePage = lazy(() => import("./pages/AiUsagePage"));
 const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 
@@ -160,6 +180,14 @@ function AppRoutes() {
           element={
             <PersonalRoute>
               <MemberSchedulePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/petugas-jumat"
+          element={
+            <PersonalRoute>
+              <MemberFridayPage />
             </PersonalRoute>
           }
         />
@@ -295,6 +323,26 @@ function AppRoutes() {
             </PersonalRoute>
           }
         />
+        <Route
+          path="/member/progres"
+          element={
+            <PersonalRoute>
+              <MemberProgressPage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/rekap-absen"
+          element={<Navigate to="/member/absensi" replace />}
+        />
+        <Route
+          path="/member/absensi"
+          element={
+            <PersonalRoute>
+              <MemberAttendancePage />
+            </PersonalRoute>
+          }
+        />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
@@ -326,10 +374,11 @@ function AppRoutes() {
             <Route path="qr-code" element={<QrCodePage />} />
             <Route path="ai-usage" element={<AiUsagePage />} />
             <Route path="users" element={<UsersPage />} />
-            <Route path="pengaturan" element={<SettingsPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
             <Route path="jadwal" element={<JadwalPage />} />
+            <Route path="petugas-jumat" element={<FridaySchedulesPage />} />
             <Route path="import-jamaah" element={<MemberImportPage />} />
+            <Route path="rekap-absensi" element={<MemberAttendanceRecapPage />} />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />
@@ -349,6 +398,8 @@ export default function App() {
         <AuthProvider>
           <ToastProvider>
             <AppRoutes />
+            <PwaUpdatePrompt />
+            <ApiRetryWire />
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>

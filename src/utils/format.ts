@@ -103,6 +103,17 @@ export function formatDateMedium(dateStr?: string): string {
 }
 
 /**
+ * Format: D MMM (tanpa tahun, bulan singkat).
+ * Dipakai untuk header kolom tanggal yang sempit, mis. tabel rekap.
+ * Contoh: "12 Jun", "5 Sep"
+ */
+export function formatDayMonth(dateStr?: string): string {
+  const p = parseIsoParts(dateStr);
+  if (!p) return "";
+  return `${p.day} ${BULAN_ID[p.month - 1]}`;
+}
+
+/**
  * Format: D MMMM YYYY (bulan panjang, day tanpa leading zero).
  * Dipakai untuk display formal / biodata / laporan.
  * Contoh: "6 Januari 2016", "15 September 2026"

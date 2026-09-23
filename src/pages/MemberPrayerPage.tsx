@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Calendar,
   MapPin,
@@ -7,8 +8,12 @@ import {
   ChevronRight,
   Copy,
   Check,
+  Sun,
+  Sparkles,
+  Moon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { useToast } from "../contexts/ToastContext";
 import {
   getPrayerTimesForDate,
@@ -77,8 +82,8 @@ export default function MemberPrayerPage() {
       <Header
         title="Waktu Sholat"
         subtitle={LATUKAN_LABEL}
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
@@ -127,13 +132,14 @@ export default function MemberPrayerPage() {
             <p className="text-ios-footnote font-semibold text-surface-text">
               Hari Ini
             </p>
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={handleShare}
-              className="flex items-center gap-1 text-ios-caption font-medium text-accent hover:text-accent-dark transition-colors"
+              leftIcon={copied ? <Check size={12} /> : <Copy size={12} />}
             >
-              {copied ? <Check size={12} /> : <Copy size={12} />}
               {copied ? "Tersalin" : "Bagikan"}
-            </button>
+            </Button>
           </div>
 
           <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
@@ -308,10 +314,10 @@ function SunnahRow({
   info: SunnahTimeInfo;
   last?: boolean;
 }) {
-  const icons: Record<string, string> = {
-    syuruq: "☀️",
-    dhuha: "🌤️",
-    nisfulLail: "🌙",
+  const icons: Record<string, typeof Sun> = {
+    syuruq: Sun,
+    dhuha: Sparkles,
+    nisfulLail: Moon,
   };
 
   return (
@@ -321,10 +327,11 @@ function SunnahRow({
         (last ? "" : "border-b border-surface-border")
       }
     >
-      <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center flex-shrink-0">
-        <span className="text-[18px] leading-none">
-          {icons[info.key] || "•"}
-        </span>
+      <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center flex-shrink-0 text-accent">
+        {(() => {
+          const Icon = icons[info.key] || Sun;
+          return <Icon size={18} />;
+        })()}
       </div>
 
       <div className="flex-1 min-w-0">

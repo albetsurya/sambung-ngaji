@@ -9,14 +9,17 @@ import {
   Search,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ConfirmDialog } from "../components/common";
+import { ConfirmDialog, Button } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
+import { useIsMuballigh } from "../hooks/useIsMuballigh";
+import { TranslationLockedNote } from "../components/member/TranslationLockedNote";
 import { useToast } from "../contexts/ToastContext";
 
 export default function MemberQuranBookmarkPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const showTranslation = useIsMuballigh();
   const { bookmarks, toggleBookmark, clearBookmarks } = useQuranBookmark();
 
   const [search, setSearch] = useState("");
@@ -112,14 +115,16 @@ export default function MemberQuranBookmarkPage() {
         showSyncButton={false}
         right={
           bookmarks.length > 0 ? (
-            <button
+            <Button
               onClick={() => setConfirmClearOpen(true)}
               aria-label="Hapus semua"
               title="Hapus semua bookmark"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all duration-200 hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+              variant="softDanger"
+              size="xs"
+              iconOnly
             >
-              <Trash2 size={15} />
-            </button>
+              <Trash2 size={16} />
+            </Button>
           ) : undefined
         }
       />
@@ -144,7 +149,7 @@ export default function MemberQuranBookmarkPage() {
                 aria-label="Hapus"
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             )}
           </div>
@@ -163,12 +168,13 @@ export default function MemberQuranBookmarkPage() {
               Saat membaca Al-Quran, tap ikon bookmark di ayat untuk
               menyimpannya di sini.
             </p>
-            <button
+            <Button
               onClick={() => navigate("/member/quran")}
-              className="inline-flex items-center gap-1.5 min-h-[40px] px-5 rounded-xl bg-accent text-white text-ios-footnote font-medium transition-all duration-200 hover:bg-accent-dark active:scale-95"
+              variant="primary"
+              size="sm"
             >
               Buka Al-Quran
-            </button>
+            </Button>
           </div>
         )}
 
@@ -226,21 +232,28 @@ export default function MemberQuranBookmarkPage() {
                           · {formatDate(b.timestamp)}
                         </span>
                       </div>
-                      <p className="text-ios-footnote text-surface-text truncate">
-                        {b.ayatPreview || "(tanpa preview)"}
-                      </p>
+                      {showTranslation ? (
+                        <p className="text-ios-footnote text-surface-text truncate">
+                          {b.ayatPreview || "(tanpa preview)"}
+                        </p>
+                      ) : (
+                        <TranslationLockedNote className="truncate" />
+                      )}
                     </button>
 
-                    <button
+                    <Button
                       onClick={(e) =>
                         handleRemove(b.surahNomor, b.ayatNomor, e)
                       }
                       aria-label="Hapus bookmark"
                       title="Hapus bookmark"
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-surface-muted transition-colors duration-200 hover:bg-danger-soft hover:text-danger active:scale-95"
+                      variant="softDanger"
+                      size="xs"
+                      iconOnly
+                      className="flex-shrink-0"
                     >
                       <X size={14} />
-                    </button>
+                    </Button>
 
                     <button
                       onClick={() => handleOpen(b.surahNomor, b.ayatNomor)}

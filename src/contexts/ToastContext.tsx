@@ -61,7 +61,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`app-shell w-full pointer-events-auto rounded-2xl px-4 py-3 text-sm font-medium shadow-neu-float text-white animate-toast-in ${VARIANT_CLASS[t.variant]}`}
+            className={`app-shell toast toast-${t.variant} w-full pointer-events-auto rounded-2xl px-4 py-3 text-ios-subhead font-medium shadow-neu-float text-white animate-toast-in ${VARIANT_CLASS[t.variant]}`}
             style={{
               fontSize: "var(--toast-font-size, 0.875rem)",
             }}

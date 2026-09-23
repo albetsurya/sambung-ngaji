@@ -163,7 +163,7 @@ export default function AuditLogPage() {
       <Header
         title="Audit Log"
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
 
       {/* ---------------------- Search + Filter Bar ---------------------- */}
@@ -185,15 +185,18 @@ export default function AuditLogPage() {
               aria-label="Hapus pencarian"
               className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
             >
-              <X size={13} />
+              <X size={14} />
             </button>
           )}
         </div>
 
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
+          iconOnly
           onClick={() => setFilterSheetOpen(true)}
           aria-label="Filter"
-          className="relative min-h-[40px] w-[40px] rounded-xl bg-surface-card border border-surface-border text-surface-text flex items-center justify-center transition-colors hover:bg-surface-card2 active:scale-[0.97]"
+          className="relative bg-surface-card border border-surface-border hover:bg-surface-card2"
         >
           <SlidersHorizontal size={16} />
           {activeFilterCount > 0 && (
@@ -201,7 +204,7 @@ export default function AuditLogPage() {
               {activeFilterCount}
             </span>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* ---------------------- Active filter summary ---------------------- */}
@@ -210,12 +213,9 @@ export default function AuditLogPage() {
           <p className="text-ios-caption text-surface-muted truncate">
             {filteredLogs.length} dari {rawLogs.length} log
           </p>
-          <button
-            onClick={resetAllFilters}
-            className="text-ios-caption font-medium text-accent hover:text-accent-dark transition-colors shrink-0"
-          >
+          <Button variant="ghost" size="xs" onClick={resetAllFilters}>
             Reset filter
-          </button>
+          </Button>
         </div>
       )}
 
@@ -328,12 +328,13 @@ export default function AuditLogPage() {
                 Aksi
               </p>
               {actionFilter.length > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="xs"
                   onClick={() => setActionFilter([])}
-                  className="text-ios-caption text-accent hover:text-accent-dark transition-colors"
                 >
                   Reset
-                </button>
+                </Button>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -365,12 +366,13 @@ export default function AuditLogPage() {
                 Tipe Target
               </p>
               {targetFilter.length > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="xs"
                   onClick={() => setTargetFilter([])}
-                  className="text-ios-caption text-accent hover:text-accent-dark transition-colors"
                 >
                   Reset
-                </button>
+                </Button>
               )}
             </div>
             <div className="flex flex-wrap gap-2">

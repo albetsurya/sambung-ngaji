@@ -31,13 +31,16 @@ export function Card({
 export function GroupedList({
   children,
   className = "",
+  flush = false,
 }: {
   children: ReactNode;
   className?: string;
+  /** true = tanpa margin horizontal (untuk di dalam BottomSheet yang sudah px-5). */
+  flush?: boolean;
 }) {
   return (
     <div
-      className={`mx-4 my-2 bg-surface-card rounded-2xl border border-surface-border overflow-hidden shadow-sm ${className}`}
+      className={`${flush ? "" : "mx-4 "}my-2 bg-surface-card rounded-2xl border border-surface-border overflow-hidden shadow-sm ${className}`}
     >
       {children}
     </div>
@@ -238,7 +241,7 @@ export function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide ${BADGE_COLORS[color]}`}
+      className={`badge badge-${color} inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide ${BADGE_COLORS[color]}`}
     >
       {children}
     </span>
@@ -256,7 +259,7 @@ export function ChevronRow({
     <div onClick={onClick} className="flex items-center gap-3">
       <div className="flex-1 min-w-0">{children}</div>
       <ChevronRight
-        size={17}
+        size={16}
         strokeWidth={2.3}
         className="text-surface-muted/60 flex-shrink-0"
       />

@@ -227,16 +227,19 @@ export default function LoginPage() {
                 required
                 className="w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-bg/60 pl-10 pr-12 text-[16px] text-surface-text placeholder:text-surface-muted/60 transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
               />
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              </Button>
             </div>
           </div>
 

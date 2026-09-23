@@ -71,7 +71,7 @@ export function DoaCard({
               : "bg-accent-soft text-accent hover:bg-accent/20")
           }
         >
-          {isRead ? <Check size={15} strokeWidth={3} /> : index + 1}
+          {isRead ? <Check size={16} strokeWidth={3} /> : index + 1}
         </button>
 
         <button
@@ -106,7 +106,7 @@ export function DoaCard({
             }
           >
             <Star
-              size={17}
+              size={16}
               strokeWidth={2.2}
               className={isFavorite ? "fill-warning" : ""}
             />

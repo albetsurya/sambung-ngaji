@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { calculateStreak } from "./useStreak";
 import { useAuth } from "../contexts/AuthContext";
 import { scopedKey, migrateKey } from "../lib/scopedStorage";
 import {
@@ -78,6 +79,33 @@ export function getSurahProgress(
   };
 }
 
+export function getJuzHafal(data: TahfidzData): number {
+  let juzCount = 0;
+  // Juz 30 is 37 surahs
+  let juz30Complete = true;
+  for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz30")) {
+    const p = getSurahProgress(data, t);
+    if (!p.complete) {
+      juz30Complete = false;
+      break;
+    }
+  }
+  if (juz30Complete) juzCount += 1;
+
+  // Juz 1 is 2 surahs
+  let juz1Complete = true;
+  for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz1")) {
+    const p = getSurahProgress(data, t);
+    if (!p.complete) {
+      juz1Complete = false;
+      break;
+    }
+  }
+  if (juz1Complete) juzCount += 1;
+
+  return juzCount;
+}
+
 export function getOverallStats(data: TahfidzData) {
   let totalHafal = 0;
   let totalAyat = 0;
@@ -138,6 +166,35 @@ export function getReviewQueue(
 }
 
 /* -------------------------------------------------------------------------- */
+/*                              Activity tracking                           */
+/* -------------------------------------------------------------------------- */
+
+const ACTIVITY_PREFIX = "tahfidz-activity";
+
+function loadActivity(key: string): string[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((d: unknown) => typeof d === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistActivity(key: string, dates: string[]) {
+  try {
+    localStorage.setItem(key, JSON.stringify(dates));
+  } catch {
+    // ignore
+  }
+}
+
+export function getTahfidzStreak(data: TahfidzData, activityDates: string[]): number {
+  return calculateStreak(activityDates);
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              Hook                                          */
 /* -------------------------------------------------------------------------- */
 
@@ -145,8 +202,10 @@ export function useTahfidz() {
   const { user } = useAuth();
   const userId = user?.user_id ?? null;
   const storageKey = scopedKey(BASE_KEY, userId);
+  const activityKey = scopedKey(ACTIVITY_PREFIX, userId);
 
   const [data, setData] = useState<TahfidzData>(() => load(storageKey));
+  const [activityDates, setActivityDates] = useState<string[]>(() => loadActivity(activityKey));
 
   // Reload saat user berubah + migrasi key lama
   useEffect(() => {
@@ -154,7 +213,8 @@ export function useTahfidz() {
       migrateKey(BASE_KEY, storageKey);
     }
     setData(load(storageKey));
-  }, [storageKey, userId]);
+    setActivityDates(loadActivity(activityKey));
+  }, [storageKey, userId, activityKey]);
 
   // Sinkron antar tab
   useEffect(() => {
@@ -191,10 +251,18 @@ export function useTahfidz() {
         }
 
         persist(storageKey, next);
+        // Record daily activity
+        const iso = new Date().toISOString().slice(0, 10);
+        setActivityDates((prev) => {
+          if (prev.includes(iso)) return prev;
+          const updated = [...prev, iso];
+          persistActivity(activityKey, updated);
+          return updated;
+        });
         return next;
       });
     },
-    [storageKey],
+    [storageKey, activityKey],
   );
 
   const markReviewed = useCallback(
@@ -225,6 +293,8 @@ export function useTahfidz() {
     [data],
   );
 
+  const streak = getTahfidzStreak(data, activityDates);
+
   return {
     data,
     isHafal,
@@ -232,5 +302,7 @@ export function useTahfidz() {
     markReviewed,
     getState,
     reset,
+    streak,
+    activityDates,
   };
 }

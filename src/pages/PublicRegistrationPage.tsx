@@ -19,7 +19,7 @@ import {
 } from "../components/common";
 import { publicApi } from "../services/publicApi";
 import { normalizePhoneNumber } from "../utils/format";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
 
 /* -------------------------------------------------------------------------- */
@@ -283,12 +283,15 @@ export default function PublicRegistrationPage() {
         <div className="sticky top-0 z-20 backdrop-blur-xl bg-surface-bg/80 pt-safe border-b border-surface-border/50">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
             <div className="flex items-center justify-start min-w-0">
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
                 onClick={handleBack}
-                className="flex items-center gap-0.5 pl-1 pr-2 h-9 rounded-xl text-accent transition-colors hover:bg-accent-soft/60 active:scale-[0.97]"
+                aria-label="Kembali"
               >
                 <ChevronLeft size={24} strokeWidth={2.2} className="-ml-1" />
-              </button>
+              </Button>
             </div>
 
             <div className="flex flex-col items-center justify-center min-w-0 max-w-[60vw]">
@@ -604,7 +607,7 @@ export default function PublicRegistrationPage() {
                   onClick={() => setShowPassword((v) => !v)}
                   className="inline-flex items-center gap-1.5 text-ios-footnote text-accent mt-1 mb-2 px-1"
                 >
-                  {showPassword ? <EyeOff size={13} /> : <Eye size={13} />}
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   {showPassword ? "Sembunyikan password" : "Lihat password"}
                 </button>
 
@@ -656,7 +659,7 @@ export default function PublicRegistrationPage() {
         </div>
       </div>
 
-      <LoadingOverlay open={submitting} label="Mengirim pendaftaran..." />
+      <LoadingOverlay open={submitting} label="Mengirim pendaftaran..." onCancel={() => abortAllApiCalls()} />
     </div>
   );
 }

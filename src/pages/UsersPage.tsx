@@ -32,7 +32,7 @@ import { userApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
 import type { Member, Role, User } from "../types";
 import { useToast } from "../contexts/ToastContext";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
 import { queryKeys } from "../lib/queryClient";
 import { ROLE_LABEL } from "../hooks/usePermission";
@@ -91,7 +91,7 @@ export default function UsersPage() {
         title="Manajemen User"
         subtitle={`${users.length} user`}
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
 
       <div className="py-3">
@@ -148,7 +148,10 @@ export default function UsersPage() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Badge>{ROLE_LABEL[u.role]}</Badge>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        iconOnly
                         onClick={(e) => {
                           e.stopPropagation();
                           setResetTarget({
@@ -156,12 +159,12 @@ export default function UsersPage() {
                             userName: u.nama || u.username,
                           });
                         }}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted transition-colors hover:bg-accent-soft hover:text-accent active:scale-[0.95]"
                         aria-label={`Reset password ${u.nama}`}
                         title="Reset password"
+                        className="hover:bg-accent-soft hover:text-accent"
                       >
                         <KeyRound size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </ListRow>
@@ -348,7 +351,7 @@ function CreateUserSheet({
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={mutation.isPending} label="Membuat user..." />
+      <LoadingOverlay open={mutation.isPending} label="Membuat user..." onCancel={() => abortAllApiCalls()} />
     </>
   );
 }
@@ -655,7 +658,7 @@ function DeleteUserConfirmModal({
         </Button>
       </div>
 
-      <LoadingOverlay open={mutation.isPending} label="Menghapus user..." />
+      <LoadingOverlay open={mutation.isPending} label="Menghapus user..." onCancel={() => abortAllApiCalls()} />
     </BottomSheet>
   );
 }

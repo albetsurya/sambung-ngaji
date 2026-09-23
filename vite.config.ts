@@ -6,7 +6,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate",
+      // "prompt": user diberi tahu + tombol muat ulang saat versi baru ada.
+      // Jangan autoUpdate: user perlu sadar kapan UI berubah.
+      registerType: "prompt",
       manifest: false,
       includeAssets: [
         "favicon.ico",
@@ -31,19 +33,32 @@ export default defineConfig({
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/],
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
-        // Increase max file size to cache (pdf chunk 483KB)
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {
-        enabled: true,
+        // MATI di dev: SW dev menyajikan CSS/JS basi dan menyulitkan
+        // verifikasi perubahan tema. Aktifkan hanya bila menguji offline.
+        enabled: false,
         type: "module",
       },
     }),
   ],
+  // Hapus console.* & debugger dari production build (dev tetap ada).
+  esbuild: {
+    drop: ["console", "debugger"],
+  },
   server: {
     host: true,
     port: 5173,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-excel": ["exceljs"],
+          "vendor-pdf": ["jspdf", "jspdf-autotable"],
+        },
+      },
+    },
   },
 });

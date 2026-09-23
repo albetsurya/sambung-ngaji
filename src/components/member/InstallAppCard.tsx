@@ -112,11 +112,11 @@ export function InstallAppCard() {
                 </p>
                 <div className="flex gap-2 mt-2">
                   <Button variant="secondary" size="sm" onClick={handleCopy}>
-                    {copied ? <Check size={13} /> : <Copy size={13} />}
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
                     {copied ? "Tersalin" : "Salin"}
                   </Button>
                   <Button variant="secondary" size="sm" onClick={handleShare}>
-                    <Share2 size={13} /> Bagikan
+                    <Share2 size={14} /> Bagikan
                   </Button>
                 </div>
               </div>

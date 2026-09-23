@@ -13,7 +13,8 @@ import {
   Trash2,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
-import { BottomSheet, LoadingOverlay } from "../components/common";
+import { BottomSheet, Button, LoadingOverlay } from "../components/common";
+import { abortAllApiCalls } from "../services/api";
 import { aiApi } from "../services/aiApi";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -275,13 +276,16 @@ export default function AiChatPage() {
       {/* -------------------- Custom Header (compact) -------------------- */}
       <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
         <div className="flex items-center gap-1 h-[56px] px-2">
-          <button
+          <Button
             onClick={() => history.back()}
             aria-label="Kembali"
-            className="flex items-center justify-center w-10 h-10 rounded-xl text-accent transition-colors hover:bg-accent-soft/60 active:scale-[0.97] flex-shrink-0"
+            variant="ghost"
+            size="sm"
+            iconOnly
+            className="flex-shrink-0"
           >
             <ChevronLeft size={24} strokeWidth={2.2} />
-          </button>
+          </Button>
 
           <div className="flex-1 min-w-0 flex flex-col justify-center px-1">
             <div className="flex items-center gap-1.5 min-w-0">
@@ -300,24 +304,28 @@ export default function AiChatPage() {
           </div>
 
           <div className="flex items-center gap-1 flex-shrink-0">
-            <button
+            <Button
               onClick={() => setProviderSheetOpen(true)}
               aria-label="Ganti model AI"
               title="Ganti model AI"
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-card border border-surface-border text-accent transition-all hover:bg-surface-card2 active:scale-95"
+              variant="secondary"
+              size="sm"
+              iconOnly
             >
               <Zap size={16} strokeWidth={2.3} />
-            </button>
+            </Button>
 
             {messages.length > 0 && (
-              <button
+              <Button
                 onClick={handleResetClick}
                 aria-label="Reset percakapan"
                 title="Reset percakapan"
-                className="flex items-center justify-center w-10 h-10 rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+                variant="softDanger"
+                size="sm"
+                iconOnly
               >
                 <Trash2 size={16} strokeWidth={2.2} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -372,18 +380,21 @@ export default function AiChatPage() {
                 disabled={loading || !hydrated}
                 className="flex-1 min-h-[44px] max-h-[120px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all resize-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 disabled:opacity-50"
               />
-              <button
+              <Button
                 onClick={() => handleSend()}
                 disabled={!input.trim() || loading || !hydrated}
                 aria-label="Kirim"
-                className="w-11 h-11 rounded-2xl bg-accent text-white flex items-center justify-center flex-shrink-0 transition-all hover:bg-accent-dark active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                variant="primary"
+                size="sm"
+                iconOnly
+                className="flex-shrink-0"
               >
                 {loading ? (
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <Send size={18} />
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -472,23 +483,27 @@ export default function AiChatPage() {
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button
+            <Button
               onClick={() => setConfirmResetOpen(false)}
-              className="flex-1 min-h-[46px] rounded-2xl border border-surface-border bg-surface-card text-surface-text text-ios-body font-medium transition-all hover:bg-surface-card2 active:scale-[0.98]"
+              variant="secondary"
+              size="sm"
+              className="flex-1"
             >
               Batal
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={confirmReset}
-              className="flex-1 min-h-[46px] rounded-2xl bg-danger text-white text-ios-body font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+              variant="danger"
+              size="sm"
+              className="flex-1"
             >
               Reset
-            </button>
+            </Button>
           </div>
         </div>
       </BottomSheet>
 
-      <LoadingOverlay open={switchingProvider} label="Mengganti model..." />
+      <LoadingOverlay open={switchingProvider} label="Mengganti model..." onCancel={() => abortAllApiCalls()} />
     </AppLayout>
   );
 }
@@ -626,16 +641,17 @@ function ActionButton({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
-      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-[0.95]"
+      variant="ghost"
+      size="xs"
+      leftIcon={icon}
     >
-      {icon}
-      <span>{label}</span>
-    </button>
+      {label}
+    </Button>
   );
 }
 
@@ -995,12 +1011,9 @@ function CodeBlock({
         <span className="text-[10px] font-mono opacity-70 uppercase tracking-wide">
           {language || "code"}
         </span>
-        <button
-          onClick={handleCopy}
-          className="text-[10px] font-medium opacity-70 hover:opacity-100 transition-opacity px-2 py-0.5 rounded-md"
-        >
+        <Button onClick={handleCopy} variant="ghost" size="xs">
           {copied ? "Tersalin" : "Salin"}
-        </button>
+        </Button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
         <code className="font-mono whitespace-pre">{content}</code>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Sun,
   Moon,
@@ -7,8 +8,16 @@ import {
   CheckCircle2,
   RefreshCw,
   Star,
+  Home,
+  Utensils,
+  Toilet,
+  CarSide,
+  Mosque,
+  Shirt,
+  CloudRain,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { DoaCard } from "../components/member/DoaCard";
 import { DoaFontSizeSheet } from "../components/member/DoaFontSizeSheet";
 import { useDoaProgress } from "../hooks/useDoaProgress";
@@ -19,6 +28,18 @@ import { DOA_HARIAN, getDoaHarianKategori } from "../data/doa-harian";
 
 type Tab = "pagi" | "sore" | "harian";
 type FilterMode = "all" | "favorites";
+
+/* Ikon kategori doa harian — FontAwesome, mengikuti ikon tab Pagi/Sore. */
+const HARIAN_ICON: Record<string, typeof Moon> = {
+  makan: Utensils,
+  tidur: Moon,
+  rumah: Home,
+  wc: Toilet,
+  perjalanan: CarSide,
+  masjid: Mosque,
+  pakaian: Shirt,
+  hujan: CloudRain,
+};
 
 export default function MemberDoaPage() {
   const navigate = useNavigate();
@@ -88,15 +109,16 @@ export default function MemberDoaPage() {
       <Header
         title={headerTitle}
         subtitle={headerSubtitle}
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
-          <button
+          <Button
             onClick={() => setFontSheetOpen(true)}
             aria-label="Ubah ukuran teks"
             title="Ubah ukuran teks"
-            className="flex items-center gap-1 h-9 px-3 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+            variant="secondary"
+            size="sm"
           >
             <span
               className="text-[11px] font-bold"
@@ -108,7 +130,7 @@ export default function MemberDoaPage() {
             >
               Aa
             </span>
-          </button>
+          </Button>
         }
       />
 
@@ -133,7 +155,7 @@ export default function MemberDoaPage() {
                       : "text-surface-muted hover:bg-surface-card")
                   }
                 >
-                  <t.Icon size={15} />
+                  <t.Icon size={16} />
                   {t.label}
                 </button>
               </div>
@@ -146,6 +168,7 @@ export default function MemberDoaPage() {
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             {DOA_HARIAN.map((k) => {
               const active = k.key === harianKategori;
+              const Icon = HARIAN_ICON[k.key] || Sparkles;
               return (
                 <button
                   key={k.key}
@@ -157,7 +180,7 @@ export default function MemberDoaPage() {
                       : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2")
                   }
                 >
-                  <span className="text-[14px]">{k.emoji}</span>
+                  <Icon size={14} />
                   {k.label}
                 </button>
               );
@@ -236,13 +259,14 @@ export default function MemberDoaPage() {
                     ? "Alhamdulillah, semua doa sudah dibaca"
                     : "Teruskan, tinggal " + (total - count) + " lagi"}
                 </p>
-                <button
+                <Button
                   onClick={reset}
-                  className="flex items-center gap-1 text-ios-caption font-medium text-surface-muted transition-colors duration-200 hover:text-danger"
+                  variant="ghost"
+                  size="xs"
+                  leftIcon={<RefreshCw size={12} />}
                 >
-                  <RefreshCw size={11} />
                   Reset
-                </button>
+                </Button>
               </div>
             )}
           </div>

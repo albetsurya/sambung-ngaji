@@ -29,6 +29,7 @@ import {
   ListRow,
   Modal,
 } from "../components/common";
+import { AnnouncementListSkeleton } from "../components/common/Skeleton";
 import { announcementTemplateApi } from "../services/domainApi";
 import type { AnnouncementTemplate } from "../types";
 import { useToast } from "../contexts/ToastContext";
@@ -134,11 +135,7 @@ export default function AnnouncementTemplatesPage() {
       />
 
       <div className="flex flex-col flex-1">
-        {isLoading && (
-          <div className="py-8 text-center text-ios-footnote text-surface-muted">
-            Memuat...
-          </div>
-        )}
+        {isLoading && <AnnouncementListSkeleton rows={4} />}
 
         {!isLoading && error && (
           <ErrorState
@@ -198,48 +195,58 @@ export default function AnnouncementTemplatesPage() {
 
                       <div className="flex items-center gap-1 shrink-0">
                         {!active && <Badge color="ink">Nonaktif</Badge>}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          iconOnly
                           onClick={(e) => {
                             e.stopPropagation();
                             setPreview(t);
                           }}
                           aria-label="Lihat template"
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted hover:bg-surface-card2 hover:text-accent transition-colors"
                         >
                           <Eye size={14} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          iconOnly
                           onClick={(e) => {
                             e.stopPropagation();
                             openEdit(t);
                           }}
                           aria-label="Edit template"
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted hover:bg-info-soft hover:text-info transition-colors"
                         >
                           <Pencil size={14} />
-                        </button>
+                        </Button>
                         {active ? (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            iconOnly
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteTarget(t);
                             }}
                             aria-label="Nonaktifkan template"
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted hover:bg-danger-soft hover:text-danger transition-colors"
+                            className="hover:bg-danger-soft hover:text-danger"
                           >
                             <Trash2 size={14} />
-                          </button>
+                          </Button>
                         ) : (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            iconOnly
                             onClick={(e) => {
                               e.stopPropagation();
                               reactivateMutation.mutate(t.template_id);
                             }}
                             aria-label="Aktifkan template"
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-surface-muted hover:bg-accent-soft hover:text-accent transition-colors"
+                            className="hover:bg-accent-soft hover:text-accent"
                           >
                             <EyeOff size={14} />
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>

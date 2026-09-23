@@ -5,6 +5,7 @@ import {
   RefreshCw,
   Loader2,
 } from "./FontAwesomeIcons";
+import { Button } from "./Button";
 
 const STATE_WRAPPER =
   "flex flex-col items-center justify-center text-center flex-1 min-h-[60vh] px-6";
@@ -23,6 +24,9 @@ interface LoadingOverlayProps {
   label?: string;
   blockInteraction?: boolean;
   children?: ReactNode;
+  /** Tampilkan tombol Batal (panggil abortAllApiCalls dari pemanggil). */
+  onCancel?: () => void;
+  cancelLabel?: string;
 }
 
 export function LoadingScreen({ label = "Memuat..." }: { label?: string }) {
@@ -48,6 +52,8 @@ export function LoadingOverlay({
   label = "Memuat...",
   blockInteraction = true,
   children,
+  onCancel,
+  cancelLabel = "Batal",
 }: LoadingOverlayProps) {
   if (!open) return null;
 
@@ -69,6 +75,12 @@ export function LoadingOverlay({
           <span className="text-ios-subhead text-surface-text font-medium text-center">
             {label}
           </span>
+        )}
+
+        {onCancel && (
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            {cancelLabel}
+          </Button>
         )}
 
         {children}
@@ -136,12 +148,15 @@ export function ErrorState({
         {message}
       </p>
       {onRetry && (
-        <button
+        <Button
+          variant="soft"
+          size="sm"
           onClick={onRetry}
-          className="mt-5 inline-flex items-center gap-1.5 px-4 h-10 rounded-xl text-ios-subhead font-medium text-accent bg-accent-soft transition-colors hover:bg-accent-soft/70 active:scale-[0.97]"
+          leftIcon={<RefreshCw size={14} />}
+          className="mt-5"
         >
-          <RefreshCw size={14} /> Coba lagi
-        </button>
+          Coba lagi
+        </Button>
       )}
     </div>
   );

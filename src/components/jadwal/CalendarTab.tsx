@@ -20,10 +20,11 @@ import {
   getTodayIso,
 } from "../../utils/format";
 import { ApiError } from "../../services/api";
-import { Calendar, ChevronRight, Pencil, Trash2 } from "../common/FontAwesomeIcons";
+import { Calendar, Check, ChevronRight, Pencil, Trash2 } from "../common/FontAwesomeIcons";
 import type { Meeting, MemberCategory } from "../../types";
 import { EventClickArg } from "@fullcalendar/core/index.js";
 import { BottomSheet, Button, ConfirmDialog, Input, Select } from "../common";
+import { CalendarSkeleton } from "../common/Skeleton";
 
 type ModalState =
   | { view: "closed" }
@@ -119,11 +120,7 @@ export function CalendarTab() {
 
   return (
     <div className="px-4 py-4 space-y-4">
-      {meetingsQuery.isLoading && (
-        <p className="text-center text-ios-caption text-surface-muted">
-          Memuat jadwal…
-        </p>
-      )}
+      {meetingsQuery.isLoading && <CalendarSkeleton />}
 
       <div className="bg-surface-card rounded-2xl border border-surface-border overflow-hidden">
         <FullCalendar
@@ -281,7 +278,7 @@ function AgendaList({
                   <span className="text-[9px] font-semibold uppercase tracking-wide leading-none">
                     {m.hari.slice(0, 3)}
                   </span>
-                  <span className="text-sm font-bold leading-none mt-0.5 tabular-nums">
+                  <span className="text-ios-subhead font-bold leading-none mt-0.5 tabular-nums">
                     {parseInt(m.tanggal.slice(8, 10), 10)}
                   </span>
                 </div>
@@ -349,7 +346,7 @@ function MeetingDetailContent({
         <p className="text-[11px] font-medium text-accent uppercase tracking-wide mb-1">
           {meeting.hari}
         </p>
-        <p className="text-lg font-semibold text-surface-text mb-1">
+        <p className="text-ios-nav font-semibold text-surface-text mb-1">
           {meeting.acara || "Pengajian"}
         </p>
         <div className="flex items-center gap-3 text-ios-footnote text-surface-muted flex-wrap">
@@ -444,6 +441,9 @@ function MeetingFormContent({
   const [genderTarget, setGenderTarget] = useState<GenderTarget>(
     getGenderTarget(meeting),
   );
+  const [sendReminder, setSendReminder] = useState(
+    meeting?.send_reminder !== false,
+  );
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -460,6 +460,7 @@ function MeetingFormContent({
         acara,
         kategori_target: kategoriTarget,
         gender_target: genderTarget,
+        send_reminder: sendReminder,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -559,6 +560,13 @@ function MeetingFormContent({
         onChange={setGenderTarget}
       />
 
+      <ModernCheckbox
+        checked={sendReminder}
+        onChange={setSendReminder}
+        label="Kirim Reminder WA"
+        description="Kirim otomatis H-8 jam sebelum acara ke grup pengajian"
+      />
+
       <Button
         fullWidth
         onClick={() => mutation.mutate()}
@@ -571,5 +579,51 @@ function MeetingFormContent({
             : "Buat Jadwal"}
       </Button>
     </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Modern Checkbox                               */
+/* -------------------------------------------------------------------------- */
+
+function ModernCheckbox({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 active:scale-[0.99] text-left ${
+        checked
+          ? "bg-accent-soft border-accent/40"
+          : "bg-surface-card border-surface-border hover:bg-surface-card2"
+      }`}
+    >
+      <div
+        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+          checked
+            ? "bg-accent text-white"
+            : "bg-surface-card2 border border-surface-border"
+        }`}
+      >
+        {checked && <Check size={14} strokeWidth={3} />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-ios-body font-medium text-surface-text">{label}</p>
+        {description && (
+          <p className="text-ios-caption text-surface-muted mt-0.5">
+            {description}
+          </p>
+        )}
+      </div>
+    </button>
   );
 }

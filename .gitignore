@@ -188,3 +188,4 @@ private/
 .env.test
 .env.staging
 .env.*.localpackage-lock.json
+EternalTerminal/

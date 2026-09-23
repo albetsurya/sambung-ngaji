@@ -8,12 +8,15 @@ import {
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Card,
-  LoadingState,
   ErrorState,
   EmptyState,
   GroupedList,
   ListRow,
 } from "../components/common";
+import {
+  StatTileSkeleton,
+  GroupedListSkeleton,
+} from "../components/common/Skeleton";
 import { aiUsageApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
@@ -50,11 +53,19 @@ export default function AiUsagePage() {
       <Header
         title="Monitoring AI"
         onBack={() => history.back()}
-        backLabel="Lainnya"
+        backLabel="Kembali"
       />
 
       <div className="py-4">
-        {isLoading && <LoadingState label="Memuat statistik AI..." />}
+        {isLoading && (
+          <div className="space-y-4">
+            <div className="px-4 flex gap-3">
+              <StatTileSkeleton />
+              <StatTileSkeleton />
+            </div>
+            <GroupedListSkeleton rows={5} />
+          </div>
+        )}
 
         {!isLoading && error && (
           <ErrorState
@@ -70,7 +81,7 @@ export default function AiUsagePage() {
             <div className="px-4 grid grid-cols-2 gap-3">
               <Card>
                 <div className="flex items-start justify-between mb-3">
-                  <p className="text-xs text-surface-muted font-medium">
+                  <p className="text-ios-caption text-surface-muted font-medium">
                     Chat Hari Ini
                   </p>
                   <span className="w-7 h-7 rounded-lg bg-accent-soft flex items-center justify-center">
@@ -87,7 +98,7 @@ export default function AiUsagePage() {
 
               <Card>
                 <div className="flex items-start justify-between mb-3">
-                  <p className="text-xs text-surface-muted font-medium">
+                  <p className="text-ios-caption text-surface-muted font-medium">
                     Bulan Ini
                   </p>
                   <span className="w-7 h-7 rounded-lg bg-warning-soft flex items-center justify-center">

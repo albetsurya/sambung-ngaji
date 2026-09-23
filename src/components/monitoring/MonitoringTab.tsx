@@ -163,7 +163,7 @@ export function MonitoringTab({
         {analysis.hasWarning && (
           <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
             <p className="text-ios-caption text-accent/90 leading-relaxed">
-              💡 Catatan di bawah sudah <strong>diisi otomatis</strong>{" "}
+              Catatan di bawah sudah <strong>diisi otomatis</strong>{" "}
               berdasarkan analisis kehadiran. Silakan edit sesuai kebutuhan.
             </p>
           </div>

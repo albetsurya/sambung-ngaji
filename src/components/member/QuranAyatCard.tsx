@@ -1,6 +1,7 @@
 import { Play, Bookmark, Check } from "../common/FontAwesomeIcons";
 import type { Ayat } from "../../data/quran";
 import { FONT_SIZE_SPECS, type DoaFontSize } from "../../hooks/useDoaFontSize";
+import { TranslationLockedNote } from "./TranslationLockedNote";
 
 interface QuranAyatCardProps {
   ayat: Ayat;
@@ -10,6 +11,8 @@ interface QuranAyatCardProps {
   onPlay: () => void;
   onToggleBookmark: () => void;
   fontSize?: DoaFontSize;
+  /** Tampilkan terjemahan Indonesia. Default false (fail-closed). */
+  showTranslation?: boolean;
 }
 
 export function QuranAyatCard({
@@ -19,6 +22,7 @@ export function QuranAyatCard({
   onPlay,
   onToggleBookmark,
   fontSize = "medium",
+  showTranslation = false,
 }: QuranAyatCardProps) {
   const spec = FONT_SIZE_SPECS[fontSize];
 
@@ -65,9 +69,9 @@ export function QuranAyatCard({
             }
           >
             {isBookmarked ? (
-              <Check size={15} strokeWidth={2.6} />
+              <Check size={16} strokeWidth={2.6} />
             ) : (
-              <Bookmark size={15} />
+              <Bookmark size={16} />
             )}
           </button>
         </div>
@@ -99,12 +103,16 @@ export function QuranAyatCard({
           {ayat.teksLatin}
         </p>
 
-        <p
-          className="text-ios-footnote text-surface-text leading-relaxed"
-          style={{ fontSize: spec.body + "px", lineHeight: spec.bodyLineHeight }}
-        >
-          {ayat.teksIndonesia}
-        </p>
+        {showTranslation ? (
+          <p
+            className="text-ios-footnote text-surface-text leading-relaxed"
+            style={{ fontSize: spec.body + "px", lineHeight: spec.bodyLineHeight }}
+          >
+            {ayat.teksIndonesia}
+          </p>
+        ) : (
+          <TranslationLockedNote />
+        )}
       </div>
     </div>
   );

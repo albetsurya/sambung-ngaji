@@ -9,7 +9,7 @@ import {
   Bookmark,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ErrorState } from "../components/common";
+import { Button, ErrorState } from "../components/common";
 import { QuranAyatCard } from "../components/member/QuranAyatCard";
 import {
   AudioPlayerMini,
@@ -32,6 +32,7 @@ import {
 } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
 import { useDoaFontSize } from "../hooks/useDoaFontSize";
+import { useIsMuballigh } from "../hooks/useIsMuballigh";
 
 type BacaMode = "scroll" | "ayat";
 const MODE_KEY = "quran-baca-mode";
@@ -77,6 +78,7 @@ export default function MemberQuranSurahPage() {
 
   const { setLastRead, isBookmarked, toggleBookmark } = useQuranBookmark();
   const { size: fontSize } = useDoaFontSize();
+  const showTranslation = useIsMuballigh();
   const topRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, error, refetch } = useQuery<SurahDetail>({
@@ -249,23 +251,25 @@ export default function MemberQuranSurahPage() {
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={() => setNavSheetOpen(true)}
               aria-label="Lompat ke surah / juz"
               title="Lompat ke..."
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+              variant="secondary"
+              size="xs"
+              iconOnly
             >
-              <List size={15} />
-            </button>
-            <button
+              <List size={16} />
+            </Button>
+            <Button
               onClick={() => setQariSheetOpen(true)}
               aria-label="Pilih qari"
               title="Pilih qari"
-              className="flex items-center gap-1 h-9 px-2.5 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
-            >
-              <Play size={13} />
-              <ChevronDown size={12} className="text-surface-muted" />
-            </button>
+              variant="secondary"
+              size="sm"
+              leftIcon={<Play size={14} />}
+              rightIcon={<ChevronDown size={12} className="text-surface-muted" />}
+            />
           </div>
         }
       />
@@ -285,7 +289,7 @@ export default function MemberQuranSurahPage() {
                     : "text-surface-muted hover:bg-surface-card")
                 }
               >
-                <AlignLeft size={13} />
+                <AlignLeft size={14} />
                 Scroll
               </button>
             </div>
@@ -300,7 +304,7 @@ export default function MemberQuranSurahPage() {
                     : "text-surface-muted hover:bg-surface-card")
                 }
               >
-                <Bookmark size={13} />
+                <Bookmark size={14} />
                 Per Ayat
               </button>
             </div>
@@ -323,7 +327,9 @@ export default function MemberQuranSurahPage() {
         {!isLoading && data && mode === "scroll" && (
           <>
             <SurahHeaderCard data={data} />
-            {data.nomor !== 1 && data.nomor !== 9 && <BismillahBlock />}
+            {data.nomor !== 1 && data.nomor !== 9 && (
+              <BismillahBlock showTranslation={showTranslation} />
+            )}
             {data.ayat.map((ayat) => (
               <QuranAyatCard
                 key={ayat.nomorAyat}
@@ -342,6 +348,7 @@ export default function MemberQuranSurahPage() {
                   })
                 }
                 fontSize={fontSize}
+                showTranslation={showTranslation}
               />
             ))}
             <SurahNavFooter
@@ -379,6 +386,7 @@ export default function MemberQuranSurahPage() {
             onPrev={goPrevAyat}
             fontSize={fontSize}
             onJump={(idx) => setAyatIndex(idx)}
+            showTranslation={showTranslation}
           />
         )}
       </div>

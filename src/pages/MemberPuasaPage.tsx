@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import {
   Calendar,
   Sparkles,
@@ -7,6 +8,7 @@ import {
   Info,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import {
   formatDateShort,
   formatDayName,
@@ -49,8 +51,8 @@ export default function MemberPuasaPage() {
       <Header
         title="Puasa Sunnah"
         subtitle="Jadwal 60 hari ke depan"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
       />
 
@@ -65,7 +67,7 @@ export default function MemberPuasaPage() {
 
             <div className="relative">
               <div className="flex items-center gap-1.5 mb-2">
-                <Sparkles size={13} className="text-accent/80" />
+                <Sparkles size={14} className="text-accent/80" />
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-accent/80">
                   {nextPuasaDays === 0
                     ? "Hari ini"
@@ -163,23 +165,25 @@ export default function MemberPuasaPage() {
           </div>
 
           {puasaDays.length > 10 && (
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
+              fullWidth
               onClick={() => setShowAll((v) => !v)}
-              className="w-full min-h-[44px] rounded-2xl border border-surface-border bg-surface-card hover:bg-surface-card2 flex items-center justify-center gap-2 text-ios-subhead font-medium text-accent transition-all active:scale-[0.98]"
+              rightIcon={
+                <ChevronDown
+                  size={16}
+                  className={
+                    "transition-transform duration-200 " +
+                    (showAll ? "rotate-180" : "")
+                  }
+                />
+              }
             >
-              <span>
-                {showAll
-                  ? "Tampilkan Lebih Sedikit"
-                  : "Lihat Semua (" + puasaDays.length + ")"}
-              </span>
-              <ChevronDown
-                size={16}
-                className={
-                  "transition-transform duration-200 " +
-                  (showAll ? "rotate-180" : "")
-                }
-              />
-            </button>
+              {showAll
+                ? "Tampilkan Lebih Sedikit"
+                : "Lihat Semua (" + puasaDays.length + ")"}
+            </Button>
           )}
         </section>
 

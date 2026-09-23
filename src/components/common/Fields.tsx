@@ -5,8 +5,8 @@ import type {
   TextareaHTMLAttributes,
   ReactNode,
 } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faLock } from "@fortawesome/free-solid-svg-icons";
+import { Lock, Eye, EyeOff } from "./FontAwesomeIcons";
+import { Button } from "./Button";
 
 interface FieldWrapProps {
   label?: string;
@@ -56,9 +56,9 @@ export function Input({
     <FieldWrap label={label} hint={hint}>
       <div className="relative">
         {isPassword && (
-          <FontAwesomeIcon
-            icon={faLock}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-muted pointer-events-none text-[16px] z-[1]"
+          <Lock
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-muted pointer-events-none z-[1]"
           />
         )}
 
@@ -71,19 +71,19 @@ export function Input({
         />
 
         {isPassword && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="xs"
+            iconOnly
             onClick={() => setShowPassword((v) => !v)}
             aria-label={
               showPassword ? "Sembunyikan password" : "Tampilkan password"
             }
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-xl text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 hover:bg-surface-card2 hover:text-surface-text"
           >
-            <FontAwesomeIcon
-              icon={showPassword ? faEyeSlash : faEye}
-              className="text-[16px]"
-            />
-          </button>
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </Button>
         )}
       </div>
     </FieldWrap>

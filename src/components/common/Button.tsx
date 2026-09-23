@@ -1,9 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { useTheme } from "../../contexts/ThemeContext";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "soft" | "softDanger";
+  size?: "xs" | "sm" | "md" | "lg";
   fullWidth?: boolean;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
@@ -20,6 +19,9 @@ const VARIANTS: Record<string, string> = {
     "bg-transparent text-surface-text hover:bg-surface-card2 active:bg-surface-card2/70 disabled:opacity-40",
   danger:
     "bg-danger text-white shadow-sm hover:shadow-md hover:opacity-95 active:opacity-90 active:shadow-sm disabled:opacity-40 disabled:shadow-none",
+  soft: "bg-accent-soft text-accent hover:bg-accent-soft/70 active:bg-accent-soft/60 disabled:opacity-40",
+  softDanger:
+    "bg-danger-soft text-danger hover:bg-danger-soft/70 active:bg-danger-soft/60 disabled:opacity-40",
 };
 
 const SIZES: Record<
@@ -32,6 +34,13 @@ const SIZES: Record<
     gap: string;
   }
 > = {
+  xs: {
+    height: "min-h-[36px]",
+    px: "px-3",
+    text: "text-[13px]",
+    iconSize: "w-3.5 h-3.5",
+    gap: "gap-1.5",
+  },
   sm: {
     height: "min-h-[40px]",
     px: "px-3.5",
@@ -67,16 +76,21 @@ export function Button({
   ...rest
 }: Props) {
   const s = SIZES[size];
-  const { preset } = useTheme();
-  const tiktokSpecial =
-    variant === "primary" && preset === "tiktok" ? "btn-preset-special" : "";
+  // Class stabil untuk override per-preset tema (lihat styles/themes.css).
+  const stable = `btn btn-${variant} btn-${size}`;
 
   if (iconOnly) {
+    const width =
+      size === "xs"
+        ? "w-9"
+        : size === "sm"
+          ? "w-10"
+          : size === "lg"
+            ? "w-[52px]"
+            : "w-12";
     return (
       <button
-        className={`inline-flex items-center justify-center ${s.height} ${
-          size === "sm" ? "w-10" : size === "lg" ? "w-[52px]" : "w-12"
-        } rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${className}`}
+        className={`inline-flex items-center justify-center ${s.height} ${width} rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${className}`}
         {...rest}
       >
         <span className={`flex items-center justify-center ${s.iconSize}`}>
@@ -88,7 +102,7 @@ export function Button({
 
   return (
     <button
-      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${tiktokSpecial} ${VARIANTS[variant]} ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${fullWidth ? "w-full" : ""} ${className}`}
       {...rest}
     >
       {leftIcon && (

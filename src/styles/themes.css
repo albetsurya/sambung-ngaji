@@ -43,9 +43,11 @@
 }
 
 [data-preset="tiktok"] {
-  --c-accent: 20 184 179;
-  --c-accent-dark: 13 148 144;
-  --c-accent-light: 220 252 251;
+  /* Monokromatik: aksen = hitam solid (teks/hover), soft = abu terang.
+     Merah #FE2C55 dicadangkan untuk badge, focus input, & efek glitch FAB. */
+  --c-accent: 0 0 0;
+  --c-accent-dark: 0 0 0;
+  --c-accent-light: 232 232 232;
   --c-accent-2: 254 44 85;
   --c-accent-2-dark: 230 30 70;
   --c-accent-2-light: 255 220 230;
@@ -55,9 +57,10 @@
   --c-card: 22 22 22;
   --c-card2: 15 15 15;
   --c-border: 42 42 42;
-  --c-accent: 37 244 238;
-  --c-accent-dark: 94 248 242;
-  --c-accent-light: 10 40 40;
+  /* Aksen = putih solid; soft = abu gelap. */
+  --c-accent: 255 255 255;
+  --c-accent-dark: 255 255 255;
+  --c-accent-light: 38 38 38;
   --c-accent-2: 254 44 85;
   --c-accent-2-dark: 255 90 120;
   --c-accent-2-light: 40 10 20;
@@ -168,51 +171,230 @@
 }
 
 /* ========================================================================
-   TikTok preset — tombol aksen dichotomy (border samping cyan/merah).
-   Khusus preset tiktok saja: border kiri = cyan (#25F4EE), border kanan =
-   merah (#FE2C55), atas & bawah tanpa border. Body hitam, teks/icon putih.
-   Dipakai oleh <Button variant="primary"> (class btn-preset-special
-   di-inject dari komponen).
+   TikTok preset — monokromatik + glitch hanya di FAB add.
+   - Tombol primer/chip terpilih: solid terbalik (hitam di light,
+     putih di dark) — otomatis dari token --c-accent di atas.
+   - Badge default: merah solid #FE2C55 (seperti badge TikTok).
+   - Input/teks area/select: outline merah hanya saat focus
+     (abu saat rest, agar tidak dibaca sebagai error).
+   - FAB primer (add): efek glitch cyan-kiri/merah-kanan ala logo TikTok.
+   - Teks putih di atas aksen pada dark mode dikoreksi jadi hitam.
    ======================================================================== */
 
-[data-preset="tiktok"] .btn-preset-special {
-  position: relative;
+/* Teks putih di atas bg-accent pada dark = tak terbaca (aksen = putih).
+   Backstop untuk elemen mentah; Button/FAB/toast/badge punya aturan
+   sendiri di bawah dan dikecualikan agar tidak tertimpa. */
+[data-preset="tiktok"].dark
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  color: #000000;
+}
+
+/* Toast sukses (dark): teks hitam di atas bg putih. */
+[data-preset="tiktok"].dark .toast-success {
+  color: #000000;
+}
+
+/* Tombol mengikuti background aplikasi + outline (tanpa fill aksen).
+   Primer/sekunder: fill sangat halus + outline mengikuti warna teks
+   (hitam di light, putih di dark) agar tetap terlihat di semua surface
+   termasuk di dalam sheet. Danger: outline + teks merah. */
+[data-preset="tiktok"] .btn-primary,
+[data-preset="tiktok"] .btn-secondary {
+  background-color: rgb(0 0 0 / 0.05);
+  border: 1.5px solid currentColor;
+  color: #000000;
+}
+[data-preset="tiktok"].dark .btn-primary,
+[data-preset="tiktok"].dark .btn-secondary {
+  background-color: rgb(255 255 255 / 0.09);
   color: #ffffff;
-  background-color: #010101;
+}
+[data-preset="tiktok"] .btn-danger {
+  background-color: transparent;
+  border: 1.5px solid currentColor;
+  color: rgb(var(--c-danger));
+}
+
+/* Chip/segmented/tab terpilih: outline abu saja — tanpa fill, tanpa glitch.
+   Mengecualikan Button, FAB, toast, badge (diatur aturannya sendiri). */
+[data-preset="tiktok"]
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  background-color: transparent;
+  border: 1px solid rgb(150 150 150);
+  color: #000000;
+}
+[data-preset="tiktok"].dark
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  color: #ffffff;
+}
+
+/* Badge default merah solid */
+[data-preset="tiktok"] .badge-emerald {
+  background-color: rgb(254 44 85);
+  color: #ffffff;
+}
+
+/* Input/teks area/select: border abu saat rest, merah hanya saat focus. */
+[data-preset="tiktok"] input:focus,
+[data-preset="tiktok"] textarea:focus,
+[data-preset="tiktok"] select:focus {
+  border-color: rgb(254 44 85);
+  --tw-ring-color: rgb(254 44 85 / 0.18);
+}
+
+/* Tombol di dalam sheet (dark): teks putih + border abu muda. */
+[data-preset="tiktok"].dark .sheet .btn-primary,
+[data-preset="tiktok"].dark .sheet .btn-secondary {
+  color: #ffffff;
+  border-color: rgb(200 200 200);
+}
+
+/* FAB add — glitch berupa border kiri cyan & border kanan merah
+   (tanpa border atas/bawah), mengikuti warna mode. */
+[data-preset="tiktok"] .fab-primary {
+  background-color: #000000;
+  color: #ffffff;
   border-left: 3px solid rgb(37 244 238);
   border-right: 3px solid rgb(254 44 85);
   border-top: 0 none;
   border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
+}
+[data-preset="tiktok"].dark .fab-primary {
+  background-color: #ffffff;
+  color: #000000;
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
 }
 
-[data-preset="tiktok"] .btn-preset-special:hover {
-  color: #ffffff;
-  background-color: #010101;
-}
-
-[data-preset="tiktok"] .btn-preset-special:disabled {
-  border-left-color: rgb(37 244 238 / 0.25);
-  border-right-color: rgb(254 44 85 / 0.25);
+/* Toggle switch tiktok (dark): knob hitam agar kontras di atas track putih. */
+[data-preset="tiktok"].dark .toggle-knob {
+  background-color: #000000;
 }
 
 /* ========================================================================
-   TikTok preset — chip & segmented (aksen penuh bg-accent text-white).
-   Sama seperti tombol: body hitam + teks putih + border kiri cyan & kanan
-   merah, atas/bawah tanpa border. Berlaku di light & dark.
-   Pengecualian: tombol yang sudah .btn-preset-special & badge mungil (w/h 4–5).
+   Glass preset — kaca frosted modern TANPA mengubah komponen.
+   Mekanisme: veil gradient tetap (body::before, di atas konten statis tapi
+   di bawah header/nav/sheet/toast) + token base bernuansa + aksen indigo.
+   Permukaan yang sudah blur (header, bottom-nav, kartu login, sheet,
+   overlay) otomatis tampil frosted; permukaan solid (input, tabel, kartu
+   isi) tetap solid demi keterbacaan. Komponen lain tidak tersentuh.
    ======================================================================== */
 
-[data-preset="tiktok"]
-  [class~="bg-accent"][class~="text-white"]:not(
-    [class~="btn-preset-special"]
-  ):not([class~="w-4"]):not([class~="w-5"]):not([class~="h-4"]):not(
-    [class~="h-5"]
-  ):not([class~="min-w-[16px]"]):not([class~="rounded-2xl"]) {
-  position: relative;
-  color: #ffffff;
-  background-color: #010101;
-  border-left: 3px solid rgb(37 244 238);
-  border-right: 3px solid rgb(254 44 85);
-  border-top: 0 none;
-  border-bottom: 0 none;
+[data-preset="glass"] {
+  --c-bg: 240 243 248;
+  --c-card: 255 255 255;
+  --c-card2: 244 247 252;
+  --c-border: 218 226 238;
+  --c-text: 20 28 45;
+  --c-muted: 100 112 140;
+}
+[data-preset="glass"].dark {
+  --c-bg: 8 10 18;
+  --c-card: 16 20 34;
+  --c-card2: 11 14 26;
+  --c-border: 38 46 72;
+  --c-text: 238 242 250;
+  --c-muted: 150 160 190;
+}
+
+html[data-preset="glass"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.9), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(203 213 225 / 0.5), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(226 232 240 / 0.7), transparent 65%);
+}
+html[data-preset="glass"].dark body::before {
+  background:
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.07), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(148 163 184 / 0.1), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(255 255 255 / 0.05), transparent 65%);
+}
+
+/* ========================================================================
+   Utilitas kaca bening (standalone, bisa dipakai di mana saja).
+   ======================================================================== */
+
+.glass-clear-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+  color: #f8fafc;
+}
+
+.glass-clear-light {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}
+
+/* Terapkan ke permukaan frosted saat preset glass aktif (light). */
+[data-preset="glass"] header.sticky,
+[data-preset="glass"] nav[class~="rounded-3xl"],
+[data-preset="glass"] .sheet,
+[data-preset="glass"] .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
+}
+
+/* Varian dark-nya. */
+[data-preset="glass"].dark header.sticky,
+[data-preset="glass"].dark nav[class~="rounded-3xl"],
+[data-preset="glass"].dark .sheet,
+[data-preset="glass"].dark .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
 }

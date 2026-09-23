@@ -81,25 +81,25 @@ export function analyzeAttendance(
 
   if (alpaStreak >= ALPA_STREAK_THRESHOLD) {
     suggestions.push(
-      `⚠️ Tidak hadir tanpa keterangan ${alpaStreak}× berturut-turut. Mohon dihubungi dan ditanyakan kondisinya.`,
+      `Tidak hadir tanpa keterangan ${alpaStreak}x berturut-turut. Mohon dihubungi dan ditanyakan kondisinya.`,
     );
   }
 
   if (sakitStreak >= SAKIT_STREAK_THRESHOLD) {
     suggestions.push(
-      `🤲 Sedang sakit selama ${sakitStreak} pertemuan berturut-turut. Mari kita doakan kesembuhannya.`,
+      `Sedang sakit selama ${sakitStreak} pertemuan berturut-turut. Mari kita doakan kesembuhannya.`,
     );
   }
 
   if (ijinStreak >= IJIN_STREAK_THRESHOLD) {
     suggestions.push(
-      `🤲 Izin ${ijinStreak}× berturut-turut. Mari doakan agar diberikan kelapangan waktu untuk hadir kembali.`,
+      `Izin ${ijinStreak}x berturut-turut. Mari doakan agar diberikan kelapangan waktu untuk hadir kembali.`,
     );
   }
 
   if (last30Total >= MIN_ATTENDANCE_FOR_RATE && last30Rate < RATE_THRESHOLD) {
     suggestions.push(
-      `📉 Kehadiran 30 hari terakhir ${last30Rate}% (${last30Hadir}/${last30Total}). Perlu perhatian khusus.`,
+      `Kehadiran 30 hari terakhir ${last30Rate}% (${last30Hadir}/${last30Total}). Perlu perhatian khusus.`,
     );
   }
 

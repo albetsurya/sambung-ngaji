@@ -24,7 +24,7 @@ import {
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
-import { Card, Avatar, ErrorState, BottomSheet } from "../components/common";
+import { Card, Avatar, ErrorState, BottomSheet, Button } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
@@ -163,17 +163,14 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center justify-between px-0.5 pt-1">
-      <h2 className="flex items-center gap-1.5 font-display text-base font-semibold text-surface-text tracking-[-0.01em]">
+      <h2 className="flex items-center gap-1.5 font-display text-ios-body font-semibold text-surface-text tracking-[-0.01em]">
         {Icon && <Icon size={16} className={iconColor} />}
         {title}
       </h2>
       {onSeeAll && (
-        <button
-          onClick={onSeeAll}
-          className="text-xs font-medium text-accent transition-colors hover:text-accent-dark"
-        >
+        <Button variant="ghost" size="xs" onClick={onSeeAll}>
           Lihat semua
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -221,9 +218,9 @@ function HeroStatCard({
         )}
 
         <div className="flex items-start justify-between">
-          <p className="text-xs font-medium text-accent/75">{label}</p>
+          <p className="text-ios-caption font-medium text-accent/75">{label}</p>
           <span className="w-9 h-9 rounded-xl bg-accent/10 backdrop-blur-sm flex items-center justify-center">
-            <Icon size={17} className="text-accent" />
+            <Icon size={16} className="text-accent" />
           </span>
         </div>
 
@@ -234,8 +231,8 @@ function HeroStatCard({
         </div>
 
         {footer && (
-          <p className="text-xs text-accent/75 mt-3 flex items-center gap-1">
-            <ArrowUpRight size={13} className="text-accent" /> {footer}
+          <p className="text-ios-caption text-accent/75 mt-3 flex items-center gap-1">
+            <ArrowUpRight size={14} className="text-accent" /> {footer}
           </p>
         )}
       </div>
@@ -295,7 +292,7 @@ function StatTile({
   return (
     <Card className="flex-1">
       <div className="flex items-start justify-between mb-3">
-        <p className="text-xs text-surface-muted font-medium">{label}</p>
+        <p className="text-ios-caption text-surface-muted font-medium">{label}</p>
         <span
           className={`w-7 h-7 rounded-lg flex items-center justify-center ${config.iconBg}`}
         >
@@ -333,7 +330,7 @@ function MeetingCard({
     <Card onClick={onClick} className="flex items-center gap-3">
       <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
         <Calendar size={12} className="text-accent" />
-        <span className="text-sm font-bold text-accent leading-none mt-0.5 tabular-nums">
+        <span className="text-ios-subhead font-bold text-accent leading-none mt-0.5 tabular-nums">
           {dateNum}
         </span>
       </div>
@@ -341,11 +338,11 @@ function MeetingCard({
         <span className="inline-block text-[10px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 mb-1 uppercase">
           {meeting.hari}
         </span>
-        <p className="font-medium text-sm text-surface-text truncate">
+        <p className="font-medium text-ios-subhead text-surface-text truncate">
           {meeting.acara || "Pengajian"}
         </p>
         {meeting.jam && (
-          <p className="text-xs text-surface-muted truncate">{meeting.jam}</p>
+          <p className="text-ios-caption text-surface-muted truncate">{meeting.jam}</p>
         )}
       </div>
       <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
@@ -383,10 +380,10 @@ function AttentionListSection({
             <CheckCircle2 size={18} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm text-surface-text">
+            <p className="font-medium text-ios-subhead text-surface-text">
               Semua jamaah dalam kondisi baik
             </p>
-            <p className="text-xs text-surface-muted">
+            <p className="text-ios-caption text-surface-muted">
               Tidak ada jamaah yang perlu perhatian saat ini
             </p>
           </div>
@@ -405,10 +402,10 @@ function AttentionListSection({
                 gender={normalizeGender(m?.jenis_kelamin)}
               />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm text-surface-text truncate">
+                <p className="font-medium text-ios-subhead text-surface-text truncate">
                   {m.nama_lengkap}
                 </p>
-                <p className="text-xs text-surface-muted truncate">
+                <p className="text-ios-caption text-surface-muted truncate">
                   {m.reasons[0]}
                 </p>
               </div>
@@ -492,7 +489,7 @@ function GeneralDashboard({
       {/* ============ FIX: kategori → button, navigate ke /jamaah?kategori=X ============ */}
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs text-surface-muted font-medium">
+          <p className="text-ios-caption text-surface-muted font-medium">
             Jamaah per Kategori
           </p>
           <span className="text-[10px] font-medium text-surface-muted tabular-nums">
@@ -517,7 +514,7 @@ function GeneralDashboard({
                 <span className="text-ios-footnote text-surface-text truncate">
                   {CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]}
                 </span>
-                <span className="text-xs font-semibold text-surface-text tabular-nums flex-shrink-0 flex items-center gap-1">
+                <span className="text-ios-caption font-semibold text-surface-text tabular-nums flex-shrink-0 flex items-center gap-1">
                   {v}
                   <ChevronRight
                     size={12}
@@ -549,10 +546,10 @@ function GeneralDashboard({
               <Calendar size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-sm text-surface-text">
+              <p className="font-medium text-ios-subhead text-surface-text">
                 Belum ada jadwal pengajian
               </p>
-              <p className="text-xs text-surface-muted">
+              <p className="text-ios-caption text-surface-muted">
                 Jadwal akan muncul setelah dibuat
               </p>
             </div>
@@ -654,10 +651,10 @@ function AbsensiDashboard({
               <Calendar size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-sm text-surface-text">
+              <p className="font-medium text-ios-subhead text-surface-text">
                 Tidak ada pengajian hari ini
               </p>
-              <p className="text-xs text-surface-muted">
+              <p className="text-ios-caption text-surface-muted">
                 Jadwal pengajian berikutnya akan muncul di sini
               </p>
             </div>
@@ -677,7 +674,7 @@ function AbsensiDashboard({
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-surface-text truncate">
+                  <p className="font-medium text-ios-subhead text-surface-text truncate">
                     {m.acara || "Pengajian"}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5 flex-wrap">
@@ -758,7 +755,7 @@ function AbsensiDashboard({
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-display text-lg font-semibold text-surface-text tabular-nums">
+                    <p className="font-display text-ios-nav font-semibold text-surface-text tabular-nums">
                       {cat.persentase}%
                     </p>
                     <p className="text-ios-caption text-surface-muted">

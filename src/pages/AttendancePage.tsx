@@ -37,6 +37,7 @@ import {
   ConfirmDialog,
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
+import { memberApi } from "../services/memberApi";
 import type {
   Meeting,
   Member,
@@ -692,6 +693,17 @@ export default function AttendancePage() {
           selectedMeeting ? formatDateLong(selectedMeeting.tanggal) : undefined
         }
         showSyncButton={false}
+        right={
+          <Button
+            variant="soft"
+            size="xs"
+            onClick={() => navigate("/lainnya/rekap-absensi")}
+            aria-label="Rekap absensi bulanan"
+            leftIcon={<CalendarCheck size={14} />}
+          >
+            Rekap
+          </Button>
+        }
       />
 
       {isReadonly && (
@@ -711,7 +723,13 @@ export default function AttendancePage() {
         <AttendancePageSkeleton rows={8} />
       ) : (
         <>
-          <div className="pt-3 pb-2 flex-1 flex flex-col">
+          <div
+            className={
+              meetings.length === 0
+                ? "pt-3 pb-2 flex-1 flex flex-col"
+                : "pt-3 pb-2"
+            }
+          >
             {meetings.length > 0 ? (
               <div className="px-4">
                 <div className="w-full min-h-[52px] rounded-2xl border border-surface-border bg-surface-card px-4 py-2.5 flex items-center gap-3 transition-all hover:border-accent/40">
@@ -842,27 +860,30 @@ export default function AttendancePage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {!isReadonly && totalRecords > 0 && (
-                      <button
+                      <Button
+                        variant="softDanger"
+                        size="xs"
+                        iconOnly
                         onClick={() => setConfirmResetAll(true)}
                         disabled={loadingAttendance || resetMutation.isPending}
                         aria-label="Reset semua absensi"
                         title="Reset semua absensi"
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-danger transition-colors hover:bg-danger-soft active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     )}
                     {!isReadonly && (
-                      <button
+                      <Button
+                        variant="soft"
+                        size="xs"
                         onClick={markAllPresent}
                         disabled={
                           loadingAttendance ||
                           hadirCount === filteredMembers.length
                         }
-                        className="text-ios-footnote font-medium bg-accent-soft text-accent px-3 h-8 rounded-lg transition-colors hover:opacity-80 active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         Hadir semua
-                      </button>
+                      </Button>
                     )}
                     {isReadonly && (
                       <span className="text-ios-caption text-surface-muted italic">
@@ -1126,7 +1147,7 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 h-8 rounded-lg text-ios-footnote font-medium ${config.activeClass}`}
           >
-            <Icon size={13} strokeWidth={2.4} />
+            <Icon size={14} strokeWidth={2.4} />
             {config.label}
           </span>
         ) : (
@@ -1478,12 +1499,13 @@ function MeetingPickerContent({
         meetings.length > 0 &&
         canCreate && (
           <div className="flex justify-end mb-3">
-            <button
+            <Button
+              variant="soft"
+              size="xs"
               onClick={() => enterSelectionMode()}
-              className="text-ios-caption font-medium text-accent px-3 py-1.5 rounded-lg transition-colors hover:bg-accent-soft active:scale-[0.97]"
             >
               Pilih
-            </button>
+            </Button>
           </div>
         )
       )}
@@ -1673,17 +1695,20 @@ function MeetingPickerContent({
                   </button>
 
                   {canCreate && !selectionMode && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      iconOnly
                       onClick={(e) => {
                         e.stopPropagation();
                         onRequestAction(m);
                       }}
                       aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
                       title="Aksi jadwal"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-surface-text active:scale-95 flex-shrink-0"
+                      className="flex-shrink-0"
                     >
                       <MoreVertical size={16} strokeWidth={2.2} />
-                    </button>
+                    </Button>
                   )}
                 </div>
               );
@@ -1694,32 +1719,41 @@ function MeetingPickerContent({
 
       {canCreate && !selectionMode && (
         <div className="pt-2 space-y-2">
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
+            fullWidth
             onClick={onCreateNew}
-            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-surface-border text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/50 active:scale-[0.99]"
+            leftIcon={<Plus size={14} />}
+            className="border-dashed"
           >
-            <Plus size={14} /> Buat 1 jadwal
-          </button>
+            Buat 1 jadwal
+          </Button>
 
-          <button
+          <Button
+            variant="soft"
+            size="sm"
+            fullWidth
             onClick={onCreateBulk}
-            className="w-full min-h-[44px] rounded-2xl border-2 border-dashed border-accent/30 bg-accent-soft/30 text-ios-footnote font-medium text-accent flex items-center justify-center gap-1.5 transition-colors hover:bg-accent-soft/60 active:scale-[0.99]"
+            leftIcon={<Calendar size={14} />}
+            className="border-2 border-dashed border-accent/30"
           >
-            <Calendar size={14} /> Buat jadwal massal
-          </button>
+            Buat jadwal massal
+          </Button>
         </div>
       )}
 
       {selectionMode && (
         <div className="sticky bottom-0 -mx-4 px-4 pt-3 pb-2 bg-surface-bg/95 backdrop-blur border-t border-surface-border">
-          <button
+          <Button
+            variant="danger"
+            fullWidth
             onClick={() => setConfirmOpen(true)}
             disabled={selectedCount === 0 || deleting}
-            className="w-full min-h-[48px] rounded-2xl bg-danger text-white text-ios-footnote font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+            leftIcon={<Trash2 size={16} strokeWidth={2.4} />}
           >
-            <Trash2 size={16} strokeWidth={2.4} />
             Hapus {selectedCount > 0 ? selectedCount + " " : ""}Jadwal
-          </button>
+          </Button>
         </div>
       )}
 
@@ -1893,6 +1927,7 @@ function MeetingFormContent({
   const [acara, setAcara] = useState("Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>([]);
   const [genderTarget, setGenderTarget] = useState<GenderTarget>("");
+  const [sendReminder, setSendReminder] = useState(true);
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -1912,6 +1947,7 @@ function MeetingFormContent({
           : [],
       );
       setGenderTarget(getGenderTarget(meeting));
+      setSendReminder(meeting.send_reminder !== false);
     } else {
       setTanggal(getTodayIso());
       setJam("Isya di tempat");
@@ -1919,6 +1955,7 @@ function MeetingFormContent({
       setAcara("Sambung Kelompok");
       setKategoriTarget([]);
       setGenderTarget("");
+      setSendReminder(true);
     }
   }, [isEdit, meeting]);
 
@@ -1931,6 +1968,7 @@ function MeetingFormContent({
         acara,
         kategori_target: kategoriTarget,
         gender_target: genderTarget,
+        send_reminder: sendReminder,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -2022,6 +2060,13 @@ function MeetingFormContent({
         onChange={setGenderTarget}
       />
 
+      <ModernCheckbox
+        checked={sendReminder}
+        onChange={setSendReminder}
+        label="Kirim Reminder WA"
+        description="Kirim otomatis H-8 jam sebelum acara ke grup pengajian"
+      />
+
       <Button
         fullWidth
         onClick={() => mutation.mutate()}
@@ -2034,5 +2079,51 @@ function MeetingFormContent({
             : "Buat Jadwal"}
       </Button>
     </>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Modern Checkbox                               */
+/* -------------------------------------------------------------------------- */
+
+function ModernCheckbox({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 active:scale-[0.99] text-left ${
+        checked
+          ? "bg-accent-soft border-accent/40"
+          : "bg-surface-card border-surface-border hover:bg-surface-card2"
+      }`}
+    >
+      <div
+        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+          checked
+            ? "bg-accent text-white"
+            : "bg-surface-card2 border border-surface-border"
+        }`}
+      >
+        {checked && <Check size={14} strokeWidth={3} />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-ios-body font-medium text-surface-text">{label}</p>
+        {description && (
+          <p className="text-ios-caption text-surface-muted mt-0.5">
+            {description}
+          </p>
+        )}
+      </div>
+    </button>
   );
 }

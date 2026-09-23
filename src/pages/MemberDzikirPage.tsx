@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { RefreshCw } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { Button } from "../components/common";
 import { DZIKIR_PRESETS } from "../data/dzikir";
 import { useDzikirCounters } from "../hooks/useDzikirCounters";
 
@@ -16,20 +18,24 @@ export default function MemberDzikirPage() {
       <Header
         title="Dzikir"
         subtitle="Tasbih digital"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           adaProgress ? (
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
               onClick={() => {
                 if (confirm("Reset semua dzikir hari ini?")) resetAll();
               }}
               aria-label="Reset semua"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-surface-card border border-surface-border text-surface-muted transition-all duration-200 hover:bg-danger-soft hover:text-danger hover:border-danger/30 active:scale-95"
+              title="Reset semua"
+              className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
             >
-              <RefreshCw size={15} />
-            </button>
+              <RefreshCw size={16} />
+            </Button>
           ) : undefined
         }
       />

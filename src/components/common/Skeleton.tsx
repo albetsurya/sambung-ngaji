@@ -708,3 +708,152 @@ export function PendingMembersSkeleton({ rows = 5 }: { rows?: number }) {
     </>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                              Calendar Skeleton                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Skeleton untuk kalender bulanan (FullCalendar dayGrid + MemberCalendarView).
+ * Mirror: toolbar (prev/title/next) + header 7 hari + grid 5x7 sel tanggal.
+ */
+export function CalendarSkeleton() {
+  return (
+    <div className="rounded-2xl border border-surface-border bg-surface-card p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <Skeleton variant="rect" width={32} height={32} />
+        <Skeleton width={140} height={18} />
+        <Skeleton variant="rect" width={32} height={32} />
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <Skeleton key={`h-${i}`} height={14} />
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: 35 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-lg bg-surface-card2 animate-pulse min-h-[44px] p-1"
+          >
+            <div className="w-5 h-3.5 rounded bg-surface-border" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Mushaf Skeleton                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Skeleton untuk halaman mushaf — mirror MushafPageView:
+ * frame max-w-2xl + baris header/footer + ~14 baris teks ayat.
+ */
+const MUSHAF_LINE_WIDTHS = [
+  "100%", "100%", "96%", "100%", "88%", "100%", "100%", "94%", "100%",
+  "90%", "100%", "100%", "72%", "100%",
+];
+
+export function MushafPageSkeleton() {
+  return (
+    <div className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl pb-[140px]">
+      <div className="min-h-full flex flex-col px-5 py-4">
+        <div className="flex items-center justify-between pb-2 mb-3 border-b border-surface-border/60">
+          <Skeleton width={72} height={12} />
+          <Skeleton width={48} height={12} />
+        </div>
+        <div className="flex justify-center my-3">
+          <Skeleton width={180} height={20} />
+        </div>
+        <div className="flex-1 space-y-3">
+          {MUSHAF_LINE_WIDTHS.map((w, i) => (
+            <Skeleton key={i} height={18} style={{ width: w }} />
+          ))}
+        </div>
+        <div className="flex items-center justify-between pt-3 mt-3 border-t border-surface-border/60">
+          <Skeleton width={32} height={12} />
+          <Skeleton width={32} height={12} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Recap Table Skeleton                          */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Skeleton untuk tabel rekap bulanan — mirror MemberAttendanceRecapPage:
+ * toolbar (ringkasan + 2 tombol) + header (No/Nama/tanggal/%)
+ * + 8 baris dengan sel No/Nama frozen.
+ */
+export function RecapTableSkeleton({ rows = 8 }: { rows?: number }) {
+  return (
+    <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
+      <div className="flex items-center justify-between gap-2 pl-3 pr-2 py-1.5 border-b border-surface-border">
+        <Skeleton width={160} height={12} />
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <Skeleton variant="rect" width={32} height={32} />
+          <Skeleton variant="rect" width={32} height={32} />
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-separate border-spacing-0">
+          <thead>
+            <tr className="bg-surface-card2">
+              <th className="sticky left-0 z-20 bg-surface-card2 px-1 py-2 w-8 min-w-8 border-b border-surface-border">
+                <Skeleton height={14} />
+              </th>
+              <th className="sticky left-8 z-20 bg-surface-card2 px-2 py-2 min-w-[88px] border-b border-surface-border">
+                <Skeleton width="70%" height={14} />
+              </th>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <th
+                  key={i}
+                  className="px-2 py-2 min-w-[56px] border-b border-surface-border"
+                >
+                  <Skeleton height={12} className="mx-auto" width="70%" />
+                </th>
+              ))}
+              <th className="sticky right-0 z-20 bg-surface-card2 px-2 py-2 w-12 border-b border-surface-border">
+                <Skeleton height={14} />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: rows }).map((_, i) => (
+              <tr key={i}>
+                <td className="sticky left-0 z-10 bg-surface-card px-1 py-1.5 w-8 min-w-8 border-b border-surface-border">
+                  <Skeleton height={12} />
+                </td>
+                <td className="sticky left-8 z-10 bg-surface-card px-2 py-1.5 min-w-[88px] border-b border-surface-border">
+                  <Skeleton width={`${55 + ((i * 13) % 30)}%`} height={12} />
+                </td>
+                {Array.from({ length: 4 }).map((_, j) => (
+                  <td
+                    key={j}
+                    className="px-2 py-1.5 min-w-[56px] border-b border-surface-border"
+                  >
+                    <Skeleton
+                      variant="circle"
+                      width={16}
+                      height={16}
+                      className="mx-auto"
+                    />
+                  </td>
+                ))}
+                <td className="sticky right-0 z-10 bg-surface-card px-2 py-1.5 w-12 border-b border-surface-border">
+                  <Skeleton height={12} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

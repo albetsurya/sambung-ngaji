@@ -1,5 +1,6 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -10,7 +11,7 @@ import {
   BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ErrorState } from "../components/common";
+import { Button, ErrorState } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
 
@@ -67,31 +68,38 @@ export default function MemberQuranPage() {
       <Header
         title="Al-Quran"
         subtitle="114 surah"
-        onBack={() => navigate("/member")}
-        backLabel="Home"
+        onBack={() => goBack(navigate, "/member")}
+        backLabel="Kembali"
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={() => navigate("/member/quran/mushaf")}
               aria-label="Baca mushaf"
               title="Baca mushaf (halaman per halaman)"
-              className="flex items-center justify-center w-9 h-9 rounded-xl bg-accent-soft border border-accent/30 text-accent transition-all duration-200 hover:bg-accent-soft/80 active:scale-95"
+              variant="soft"
+              size="xs"
+              iconOnly
             >
-              <BookOpen size={15} />
-            </button>
+              <BookOpen size={16} />
+            </Button>
             {bookmarkCount > 0 && (
-              <button
+              <Button
                 onClick={() => navigate("/member/quran/bookmark")}
                 aria-label="Bookmark"
                 title="Ayat yang di-bookmark"
-                className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-surface-card border border-surface-border text-surface-text transition-all duration-200 hover:bg-surface-card2 active:scale-95"
+                variant="secondary"
+                size="xs"
+                iconOnly
+                className="relative"
               >
-                <Bookmark size={15} />
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
-                  {bookmarkCount}
-                </span>
-              </button>
+                <>
+                  <Bookmark size={16} />
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
+                    {bookmarkCount}
+                  </span>
+                </>
+              </Button>
             )}
           </div>
         }
@@ -115,7 +123,7 @@ export default function MemberQuranPage() {
               aria-label="Hapus pencarian"
               className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
             >
-              <X size={13} />
+              <X size={14} />
             </button>
           )}
         </div>
@@ -144,7 +152,7 @@ export default function MemberQuranPage() {
                 className="w-full mb-3 rounded-2xl border border-accent/25 bg-accent-soft/60 p-3.5 flex items-center gap-3 transition-all duration-200 hover:bg-accent-soft active:scale-[0.99]"
               >
                 <span className="w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center flex-shrink-0">
-                  <ScrollText size={17} />
+                  <ScrollText size={16} />
                 </span>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-0.5">

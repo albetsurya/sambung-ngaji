@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+import { goBack } from "../utils/navigation";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   User,
@@ -9,12 +11,13 @@ import {
 } from "../components/common/FontAwesomeIcons";
 
 export default function MemberGuidePage() {
+  const navigate = useNavigate();
   return (
     <AppLayout hideNav>
       <Header
         title="Panduan Penggunaan"
-        onBack={() => history.back()}
-        backLabel="Pengaturan"
+        onBack={() => goBack(navigate, "/member/lainnya")}
+        backLabel="Kembali"
       />
 
       <div className="px-4 py-4 space-y-4">

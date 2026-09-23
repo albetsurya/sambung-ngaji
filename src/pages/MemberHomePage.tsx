@@ -10,6 +10,7 @@ import {
   Compass,
   BookOpen,
   ChevronRight,
+  Trophy,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -19,13 +20,13 @@ import {
 } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
 import { Avatar } from "../components/common";
+import { MeetingCardSkeleton } from "../components/common/Skeleton";
 import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { meetingApi } from "../services/domainApi";
 import { memberSelfApi } from "../services/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
-import { CATEGORY_LABEL } from "../utils/format";
 import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";
 
@@ -177,6 +178,47 @@ export default function MemberHomePage() {
           onSeeAll={() => navigate("/member/jadwal")}
         />
 
+        {/* Perkembangan Saya */}
+        <section>
+          <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
+            Perkembangan Saya
+          </p>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              onClick={() => navigate("/member/progres")}
+              className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-card p-3.5 text-left transition-all active:scale-[0.98] hover:bg-surface-card2 hover:border-accent/30"
+            >
+              <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
+                <Trophy size={18} />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-ios-body font-medium text-surface-text">
+                  Progres
+                </span>
+                <span className="block text-ios-caption text-surface-muted truncate">
+                  Streak & badge
+                </span>
+              </span>
+            </button>
+            <button
+              onClick={() => navigate("/member/absensi")}
+              className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-card p-3.5 text-left transition-all active:scale-[0.98] hover:bg-surface-card2 hover:border-accent/30"
+            >
+              <span className="w-10 h-10 rounded-xl bg-success-soft text-success flex items-center justify-center flex-shrink-0">
+                <CalendarCheck size={18} />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-ios-body font-medium text-surface-text">
+                  Absensi
+                </span>
+                <span className="block text-ios-caption text-surface-muted truncate">
+                  Rekap kehadiran
+                </span>
+              </span>
+            </button>
+          </div>
+        </section>
+
         {/* Sering Dipakai */}
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
@@ -268,7 +310,7 @@ function SchedulePreviewCard({
     return { from: isoDate(from), to: isoDate(to) };
   }, []);
 
-  const { data: meetings = [] } = useQuery({
+  const { data: meetings = [], isLoading } = useQuery({
     queryKey: ["member-schedule", range],
     queryFn: () => meetingApi.list({ from: range.from, to: range.to }),
     staleTime: 2 * 60_000,
@@ -290,13 +332,15 @@ function SchedulePreviewCard({
     );
   }, [meetings, userKategori]);
 
+  if (isLoading) return <MeetingCardSkeleton />;
+
   return (
     <button
       onClick={onSeeAll}
       className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2 hover:border-accent/30"
     >
       <span className="w-11 h-11 rounded-2xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-        <Calendar size={19} strokeWidth={2.2} />
+        <Calendar size={18} strokeWidth={2.2} />
       </span>
 
       <div className="flex-1 min-w-0">

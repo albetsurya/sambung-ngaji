@@ -298,15 +298,18 @@ export default function MembersListPage() {
                 aria-label="Hapus pencarian"
                 className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             )}
           </div>
 
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            iconOnly
             onClick={() => setActionsOpen(true)}
             aria-label="Aksi & filter"
-            className="relative min-h-[40px] w-[40px] rounded-xl bg-surface-card border border-surface-border text-surface-text flex items-center justify-center transition-colors hover:bg-surface-card2 active:scale-[0.97]"
+            className="relative bg-surface-card border border-surface-border hover:bg-surface-card2"
           >
             <SlidersHorizontal size={16} />
             {activeFilterCount > 0 && (
@@ -314,7 +317,7 @@ export default function MembersListPage() {
                 {activeFilterCount}
               </span>
             )}
-          </button>
+          </Button>
         </div>
 
         <div className="px-4 pb-2.5 flex gap-2 overflow-x-auto no-scrollbar">
@@ -435,20 +438,21 @@ export default function MembersListPage() {
 
             {query.hasNextPage && (
               <div className="flex justify-center py-4">
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => query.fetchNextPage()}
                   disabled={query.isFetchingNextPage}
-                  className="min-h-[40px] px-5 rounded-xl bg-accent text-white text-ios-subhead font-medium transition-all hover:bg-accent-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
-                >
-                  {query.isFetchingNextPage ? (
-                    <>
+                  leftIcon={
+                    query.isFetchingNextPage ? (
                       <Loader2 size={14} className="animate-spin" />
-                      Memuat...
-                    </>
-                  ) : (
-                    `Muat lebih banyak (${allMembers.length}/${total})`
-                  )}
-                </button>
+                    ) : undefined
+                  }
+                >
+                  {query.isFetchingNextPage
+                    ? "Memuat..."
+                    : `Muat lebih banyak (${allMembers.length}/${total})`}
+                </Button>
               </div>
             )}
 
@@ -475,21 +479,21 @@ export default function MembersListPage() {
               <ViewButton
                 active={view === "row"}
                 onClick={() => setView("row")}
-                icon={<RowsIcon size={15} />}
+                icon={<RowsIcon size={16} />}
                 label="Row"
               />
               <div className="w-px bg-surface-border" />
               <ViewButton
                 active={view === "list"}
                 onClick={() => setView("list")}
-                icon={<List size={15} />}
+                icon={<List size={16} />}
                 label="List"
               />
               <div className="w-px bg-surface-border" />
               <ViewButton
                 active={view === "grid"}
                 onClick={() => setView("grid")}
-                icon={<LayoutGrid size={15} />}
+                icon={<LayoutGrid size={16} />}
                 label="Grid"
               />
             </div>
@@ -611,16 +615,17 @@ export default function MembersListPage() {
           </div>
 
           {(activeFilterCount > 0 || view === "grid") && (
-            <button
+            <Button
+              variant="softDanger"
+              fullWidth
               onClick={() => {
                 setJenisKelamin("");
                 setKategori("");
                 setActionsOpen(false);
               }}
-              className="w-full min-h-[44px] rounded-xl border border-danger/30 bg-danger-soft text-danger text-ios-subhead font-medium transition-all hover:bg-danger-soft/80 active:scale-[0.97]"
             >
               Reset Semua Filter
-            </button>
+            </Button>
           )}
         </div>
       </BottomSheet>
@@ -753,10 +758,10 @@ const JamaahCard = memo(function JamaahCard({
           gender={normalizeGender(member?.jenis_kelamin)}
         />
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm text-surface-text truncate">
+          <p className="font-medium text-ios-subhead text-surface-text truncate">
             {getDisplayName(member)}
           </p>
-          <p className="text-xs text-surface-muted truncate">
+          <p className="text-ios-caption text-surface-muted truncate">
             {member.kelompok || "Belum ada kelompok"}
           </p>
         </div>
@@ -778,7 +783,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
   const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
   const padding =
     cols === 2 ? "py-4 px-3" : cols === 3 ? "py-3 px-2" : "py-2.5 px-1.5";
-  const nameSize = cols === 2 ? "text-sm" : "text-xs";
+  const nameSize = cols === 2 ? "text-ios-subhead" : "text-ios-caption";
   const badgeSize = cols === 2 ? "text-[10px]" : "text-[9px]";
 
   return (
