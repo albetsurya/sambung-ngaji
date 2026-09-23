@@ -237,21 +237,23 @@
   --tw-ring-color: rgb(254 44 85 / 0.18);
 }
 
-/* FAB add — glitch offset cyan/merah */
+/* FAB add — glitch berupa border kiri cyan & border kanan merah
+   (tanpa border atas/bawah), mengikuti warna mode. */
 [data-preset="tiktok"] .fab-primary {
   background-color: #000000;
   color: #ffffff;
-  border: 0 none;
-  box-shadow:
-    -3px 0 0 0 rgb(37 244 238),
-    3px 0 0 0 rgb(254 44 85),
-    0 8px 20px rgb(0 0 0 / 0.25);
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
 }
 [data-preset="tiktok"].dark .fab-primary {
   background-color: #ffffff;
   color: #000000;
-  box-shadow:
-    -3px 0 0 0 rgb(37 244 238),
-    3px 0 0 0 rgb(254 44 85),
-    0 8px 20px rgb(0 0 0 / 0.5);
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
 }
