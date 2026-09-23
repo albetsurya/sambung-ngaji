@@ -32,7 +32,7 @@ import { userApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
 import type { Member, Role, User } from "../types";
 import { useToast } from "../contexts/ToastContext";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
 import { queryKeys } from "../lib/queryClient";
 import { ROLE_LABEL } from "../hooks/usePermission";
@@ -351,7 +351,7 @@ function CreateUserSheet({
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={mutation.isPending} label="Membuat user..." />
+      <LoadingOverlay open={mutation.isPending} label="Membuat user..." onCancel={() => abortAllApiCalls()} />
     </>
   );
 }
@@ -658,7 +658,7 @@ function DeleteUserConfirmModal({
         </Button>
       </div>
 
-      <LoadingOverlay open={mutation.isPending} label="Menghapus user..." />
+      <LoadingOverlay open={mutation.isPending} label="Menghapus user..." onCancel={() => abortAllApiCalls()} />
     </BottomSheet>
   );
 }

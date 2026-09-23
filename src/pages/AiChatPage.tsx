@@ -14,6 +14,7 @@ import {
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
 import { BottomSheet, Button, LoadingOverlay } from "../components/common";
+import { abortAllApiCalls } from "../services/api";
 import { aiApi } from "../services/aiApi";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -502,7 +503,7 @@ export default function AiChatPage() {
         </div>
       </BottomSheet>
 
-      <LoadingOverlay open={switchingProvider} label="Mengganti model..." />
+      <LoadingOverlay open={switchingProvider} label="Mengganti model..." onCancel={() => abortAllApiCalls()} />
     </AppLayout>
   );
 }

@@ -19,7 +19,7 @@ import {
 } from "../components/common";
 import { publicApi } from "../services/publicApi";
 import { normalizePhoneNumber } from "../utils/format";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
 
 /* -------------------------------------------------------------------------- */
@@ -659,7 +659,7 @@ export default function PublicRegistrationPage() {
         </div>
       </div>
 
-      <LoadingOverlay open={submitting} label="Mengirim pendaftaran..." />
+      <LoadingOverlay open={submitting} label="Mengirim pendaftaran..." onCancel={() => abortAllApiCalls()} />
     </div>
   );
 }

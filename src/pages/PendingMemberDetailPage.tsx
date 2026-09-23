@@ -24,7 +24,7 @@ import { groupApi } from "../services/domainApi";
 import type { PendingMember } from "../types";
 import { formatDateShort, normalizeGender } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 
 const STATUS_BADGE = {
@@ -386,7 +386,7 @@ function ApproveSheet({
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={mutation.isPending} label="Memproses..." />
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." onCancel={() => abortAllApiCalls()} />
     </>
   );
 }
@@ -459,7 +459,7 @@ function RejectSheet({
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={mutation.isPending} label="Memproses..." />
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." onCancel={() => abortAllApiCalls()} />
     </>
   );
 }

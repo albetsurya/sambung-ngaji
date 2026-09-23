@@ -32,7 +32,7 @@ import { fridayApi } from "../services/domainApi";
 import type { FridaySchedule } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { formatDateLongText } from "../utils/format";
 import {
@@ -521,8 +521,7 @@ export default function FridaySchedulesPage() {
 
       <LoadingOverlay
         open={saveMutation.isPending}
-        label="Menyimpan jadwal..."
-      />
+        label="Menyimpan jadwal..." onCancel={() => abortAllApiCalls()} />
     </AppLayout>
   );
 }

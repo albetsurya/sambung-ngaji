@@ -1,13 +1,26 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
-import { ToastProvider } from "./contexts/ToastContext";
+import { ToastProvider, useToast } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
+import { setRetryNotifier } from "./services/api";
+
+/** Teruskan notifikasi retry API menjadi toast (sekali per rantai retry). */
+function ApiRetryWire() {
+  const { showToast } = useToast();
+  useEffect(() => {
+    setRetryNotifier(() =>
+      showToast("Koneksi lambat, mencoba ulang…", "warning"),
+    );
+    return () => setRetryNotifier(null);
+  }, [showToast]);
+  return null;
+}
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -386,6 +399,7 @@ export default function App() {
           <ToastProvider>
             <AppRoutes />
             <PwaUpdatePrompt />
+            <ApiRetryWire />
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>

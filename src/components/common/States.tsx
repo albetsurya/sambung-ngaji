@@ -24,6 +24,9 @@ interface LoadingOverlayProps {
   label?: string;
   blockInteraction?: boolean;
   children?: ReactNode;
+  /** Tampilkan tombol Batal (panggil abortAllApiCalls dari pemanggil). */
+  onCancel?: () => void;
+  cancelLabel?: string;
 }
 
 export function LoadingScreen({ label = "Memuat..." }: { label?: string }) {
@@ -49,6 +52,8 @@ export function LoadingOverlay({
   label = "Memuat...",
   blockInteraction = true,
   children,
+  onCancel,
+  cancelLabel = "Batal",
 }: LoadingOverlayProps) {
   if (!open) return null;
 
@@ -70,6 +75,12 @@ export function LoadingOverlay({
           <span className="text-ios-subhead text-surface-text font-medium text-center">
             {label}
           </span>
+        )}
+
+        {onCancel && (
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            {cancelLabel}
+          </Button>
         )}
 
         {children}

@@ -43,7 +43,7 @@ import {
   type AttendanceItem,
 } from "../components/member/MemberTabs";
 import { usePermission } from "../hooks/usePermission";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
@@ -505,7 +505,7 @@ function CreateUserFromMemberSheet({
         </Button>
       </BottomSheet>
 
-      <LoadingOverlay open={mutation.isPending} label="Membuat akun..." />
+      <LoadingOverlay open={mutation.isPending} label="Membuat akun..." onCancel={() => abortAllApiCalls()} />
     </>
   );
 }

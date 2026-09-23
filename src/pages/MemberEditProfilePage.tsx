@@ -23,7 +23,7 @@ import { uploadApi } from "../services/domainApi";
 import type { Member } from "../types";
 import { normalizePhoneNumber, formatDateShort } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
-import { ApiError } from "../services/api";
+import { ApiError, abortAllApiCalls } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { queryKeys } from "../lib/queryClient";
 
@@ -488,8 +488,8 @@ export default function MemberEditProfilePage() {
         onConfirm={handleDeletePhoto}
       />
 
-      <LoadingOverlay open={submitting} label="Menyimpan biodata..." />
-      <LoadingOverlay open={deletingPhoto} label="Menghapus foto..." />
+      <LoadingOverlay open={submitting} label="Menyimpan biodata..." onCancel={() => abortAllApiCalls()} />
+      <LoadingOverlay open={deletingPhoto} label="Menghapus foto..." onCancel={() => abortAllApiCalls()} />
     </AppLayout>
   );
 }
