@@ -7,6 +7,9 @@ import {
   ChevronRight,
   Copy,
   Check,
+  Sun,
+  Sparkles,
+  Moon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { useToast } from "../contexts/ToastContext";
@@ -308,10 +311,10 @@ function SunnahRow({
   info: SunnahTimeInfo;
   last?: boolean;
 }) {
-  const icons: Record<string, string> = {
-    syuruq: "☀️",
-    dhuha: "🌤️",
-    nisfulLail: "🌙",
+  const icons: Record<string, typeof Sun> = {
+    syuruq: Sun,
+    dhuha: Sparkles,
+    nisfulLail: Moon,
   };
 
   return (
@@ -321,10 +324,11 @@ function SunnahRow({
         (last ? "" : "border-b border-surface-border")
       }
     >
-      <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center flex-shrink-0">
-        <span className="text-[18px] leading-none">
-          {icons[info.key] || "•"}
-        </span>
+      <div className="w-10 h-10 rounded-xl bg-surface-card2 flex items-center justify-center flex-shrink-0 text-accent">
+        {(() => {
+          const Icon = icons[info.key] || Sun;
+          return <Icon size={18} />;
+        })()}
       </div>
 
       <div className="flex-1 min-w-0">

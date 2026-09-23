@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { LoadingScreen } from "../common";
+import { User } from "../common/FontAwesomeIcons";
 
 /**
  * PersonalRoute — akses halaman personal (tampilan jamaah).
@@ -20,10 +21,8 @@ export function PersonalRoute({ children }: { children: ReactNode }) {
   if (!user.member_id) {
     return (
       <div className="app-shell min-h-screen flex flex-col items-center justify-center px-6 text-center bg-surface-bg">
-        <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-4">
-          <span className="text-2xl" role="img" aria-label="user">
-            👤
-          </span>
+        <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-4 text-accent">
+          <User size={28} />
         </div>
         <p className="text-ios-nav font-semibold text-surface-text mb-2">
           Akun Belum Terhubung

@@ -222,8 +222,9 @@ export function ImportTextTab() {
       {phase === "preview" && (
         <>
           <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-card2 border border-surface-border">
-            <p className="text-ios-caption text-surface-muted truncate flex-1">
-              📝 Teks tempel · {lineCount} baris
+            <p className="text-ios-caption text-surface-muted truncate flex-1 flex items-center gap-1.5">
+              <ScrollText size={13} className="flex-shrink-0" />
+              Teks tempel · {lineCount} baris
             </p>
             <button
               onClick={resetAll}
@@ -354,7 +355,10 @@ function DraftCard({
                 {draft.jam && <span>· {draft.jam}</span>}
               </>
             ) : (
-              <span className="text-danger">⚠ Tanggal tidak terdeteksi</span>
+              <span className="text-danger inline-flex items-center gap-1">
+                <AlertTriangle size={12} className="flex-shrink-0" />
+                Tanggal tidak terdeteksi
+              </span>
             )}
           </div>
 
@@ -383,8 +387,9 @@ function DraftCard({
           )}
 
           {draft.warning && (
-            <p className="text-ios-caption text-warning mt-1">
-              ⚠ {draft.warning}
+            <p className="text-ios-caption text-warning mt-1 flex items-center gap-1.5">
+              <AlertTriangle size={12} className="flex-shrink-0" />
+              {draft.warning}
             </p>
           )}
         </div>

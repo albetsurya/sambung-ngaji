@@ -556,7 +556,7 @@ export function CategoryHeaderBadge({ member }: { member: Member }) {
 
 function moodMeta(key: string): { emoji: string; label: string } {
   const m = getMood(key as Parameters<typeof getMood>[0]);
-  return m ? { emoji: m.emoji, label: m.label } : { emoji: "😶", label: key };
+  return m ? { emoji: m.emoji, label: m.label } : { emoji: "•", label: key };
 }
 
 export function MoodTab({ entries }: { entries: MoodEntry[] }) {

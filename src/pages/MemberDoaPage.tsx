@@ -7,6 +7,13 @@ import {
   CheckCircle2,
   RefreshCw,
   Star,
+  Home,
+  Utensils,
+  Toilet,
+  CarSide,
+  Mosque,
+  Shirt,
+  CloudRain,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { DoaCard } from "../components/member/DoaCard";
@@ -19,6 +26,18 @@ import { DOA_HARIAN, getDoaHarianKategori } from "../data/doa-harian";
 
 type Tab = "pagi" | "sore" | "harian";
 type FilterMode = "all" | "favorites";
+
+/* Ikon kategori doa harian — FontAwesome, mengikuti ikon tab Pagi/Sore. */
+const HARIAN_ICON: Record<string, typeof Moon> = {
+  makan: Utensils,
+  tidur: Moon,
+  rumah: Home,
+  wc: Toilet,
+  perjalanan: CarSide,
+  masjid: Mosque,
+  pakaian: Shirt,
+  hujan: CloudRain,
+};
 
 export default function MemberDoaPage() {
   const navigate = useNavigate();
@@ -146,6 +165,7 @@ export default function MemberDoaPage() {
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             {DOA_HARIAN.map((k) => {
               const active = k.key === harianKategori;
+              const Icon = HARIAN_ICON[k.key] || Sparkles;
               return (
                 <button
                   key={k.key}
@@ -157,7 +177,7 @@ export default function MemberDoaPage() {
                       : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2")
                   }
                 >
-                  <span className="text-[14px]">{k.emoji}</span>
+                  <Icon size={13} />
                   {k.label}
                 </button>
               );

@@ -94,7 +94,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
 
       <div className="pt-4 border-t border-surface-border text-center">
         <p className="text-ios-caption text-surface-muted">
-          Dibuat dengan ❤️ untuk pengurus Latukan
+          Dibuat untuk pengurus Latukan
         </p>
       </div>
     </Modal>

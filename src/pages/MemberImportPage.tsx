@@ -488,8 +488,9 @@ function MemberPreviewCard({
           {hasWarning && (
             <div className="pt-2 mt-2 border-t border-surface-border">
               {member.warnings.map((w, i) => (
-                <p key={i} className="text-ios-caption text-warning">
-                  ⚠ {w}
+                <p key={i} className="text-ios-caption text-warning flex items-center gap-1.5">
+                  <AlertTriangle size={12} className="flex-shrink-0" />
+                  {w}
                 </p>
               ))}
             </div>

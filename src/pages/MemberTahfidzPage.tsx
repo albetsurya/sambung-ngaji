@@ -8,6 +8,9 @@ import {
   Check,
   ChevronRight,
   ScrollText,
+  Seedling,
+  Sprout,
+  Star,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -25,6 +28,13 @@ import {
 } from "../hooks/useTahfidz";
 
 type Tab = TahfidzKategori;
+
+/* Ikon tab kategori tahfidz — FontAwesome, konsisten dengan tab lain. */
+const KATEGORI_ICON: Record<TahfidzKategori, typeof Star> = {
+  juz30: Seedling,
+  juz1: Sprout,
+  pilihan: Star,
+};
 
 export default function MemberTahfidzPage() {
   const navigate = useNavigate();
@@ -184,6 +194,7 @@ export default function MemberTahfidzPage() {
         <div className="flex rounded-2xl bg-surface-card2 border border-surface-border overflow-hidden">
           {TAHFIDZ_KATEGORI.map((k, idx) => {
             const active = tab === k.key;
+            const Icon = KATEGORI_ICON[k.key];
             return (
               <div key={k.key} className="flex-1 flex">
                 {idx > 0 && <div className="w-px bg-surface-border" />}
@@ -196,7 +207,7 @@ export default function MemberTahfidzPage() {
                       : "text-surface-muted hover:bg-surface-card")
                   }
                 >
-                  <span>{k.emoji}</span>
+                  <Icon size={14} />
                   {k.label}
                 </button>
               </div>
