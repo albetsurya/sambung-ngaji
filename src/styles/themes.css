@@ -182,8 +182,17 @@
    ======================================================================== */
 
 /* Teks putih di atas bg-accent pada dark = tak terbaca (aksen = putih).
-   Berlaku untuk toast sukses & elemen non-Button. */
-[data-preset="tiktok"].dark [class~="bg-accent"][class~="text-white"] {
+   Backstop untuk elemen mentah; Button/FAB/toast/badge punya aturan
+   sendiri di bawah dan dikecualikan agar tidak tertimpa. */
+[data-preset="tiktok"].dark
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  color: #000000;
+}
+
+/* Toast sukses (dark): teks hitam di atas bg putih. */
+[data-preset="tiktok"].dark .toast-success {
   color: #000000;
 }
 
