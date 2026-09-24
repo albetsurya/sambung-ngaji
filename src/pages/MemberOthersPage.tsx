@@ -34,6 +34,7 @@ import {
   ThemePickerSheet,
 } from "../components/common/ThemePickerSheet";
 import { AboutAppModal } from "../components/member/AboutAppModal";
+import { AppMaintenanceSection } from "../components/common/AppMaintenanceSection";
 import { useAuth } from "../contexts/AuthContext";
 import { normalizeGender } from "../utils/format";
 
@@ -331,6 +332,8 @@ export default function MemberOthersPage() {
         {renderGroup("Data Saya", "data")}
         {renderGroup("Akun", "akun")}
         {renderGroup("Tentang", "tentang")}
+
+        <AppMaintenanceSection />
 
         {visibleMenu.length === 0 && (
           <div className="px-4 mt-5">
