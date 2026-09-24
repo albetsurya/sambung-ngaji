@@ -235,9 +235,9 @@ function AppRoutes() {
         <Route
           path="/member/mood"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberMoodPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route

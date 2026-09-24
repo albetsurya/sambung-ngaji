@@ -12,6 +12,7 @@ import {
   BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button, ErrorState } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
@@ -75,14 +76,7 @@ export default function MemberQuranPage() {
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
-            {!user && (
-              <button
-                onClick={() => navigate("/login")}
-                className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97] mr-1"
-              >
-                Masuk
-              </button>
-            )}
+            {!user && <MasukButton />}
             <Button
               onClick={() => navigate("/member/quran/mushaf")}
               aria-label="Baca mushaf"

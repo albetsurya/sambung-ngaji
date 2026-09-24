@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import {
   User,
   Calendar,
@@ -22,12 +23,7 @@ export default function MemberGuidePage() {
         backLabel="Kembali"
         right={
           !user ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
-            >
-              Masuk
-            </button>
+              <MasukButton />
           ) : undefined
         }
       />

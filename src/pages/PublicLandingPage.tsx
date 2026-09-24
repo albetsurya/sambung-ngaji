@@ -12,10 +12,14 @@ import {
   Sparkles,
   Info,
   ArrowRight,
+  ChevronRight,
 } from "../components/common/FontAwesomeIcons";
-import { Button, Card } from "../components/common";
+import { Card } from "../components/common";
+import { MasukButton } from "../components/common";
+import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
 import { meetingApi } from "../services/domainApi";
 import { formatDateLongText } from "../utils/format";
+import { MOOD_LIST } from "../data/mood";
 
 const FEATURES = [
   { label: "Jadwal", desc: "Pengajian", Icon: Calendar, to: "/member/jadwal" },
@@ -28,6 +32,8 @@ const FEATURES = [
   { label: "Puasa", desc: "Sunnah", Icon: Sparkles, to: "/member/puasa" },
   { label: "Panduan", desc: "Bantuan", Icon: Info, to: "/member/panduan" },
 ];
+
+const MOOD_TEASER_KEYS = ["sedih", "cemas", "syukur", "lelah", "tenang"];
 
 function todayIso(): string {
   const d = new Date();
@@ -51,39 +57,90 @@ export default function PublicLandingPage() {
       .slice(0, 3);
   }, [meetings]);
 
+  const moods = useMemo(
+    () =>
+      MOOD_TEASER_KEYS.map((k) => MOOD_LIST.find((m) => m.key === k)).filter(
+        (m): m is (typeof MOOD_LIST)[number] => !!m,
+      ),
+    [],
+  );
+
   return (
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
-      <div className="px-5 pt-10 pb-6 text-center">
-        <div className="w-16 h-16 rounded-3xl bg-accent flex items-center justify-center shadow-lg shadow-accent/30 mx-auto mb-4">
-          <Mosque size={30} className="text-white" />
-        </div>
-        <h1 className="text-[24px] font-bold text-surface-text tracking-[-0.02em]">
-          Sambung Ngaji
-        </h1>
-        <p className="text-ios-footnote text-surface-muted mt-1 max-w-xs mx-auto leading-relaxed">
-          Jadwal pengajian, waktu sholat, doa, dzikir, dan Al-Quran. Terbuka
-          untuk semua.
-        </p>
-        <div className="flex gap-2 mt-5 max-w-xs mx-auto">
-          <Button fullWidth onClick={() => navigate("/login")}>
-            Masuk
-          </Button>
-          <Button
-            fullWidth
-            variant="secondary"
-            onClick={() => navigate("/daftar")}
-            rightIcon={<ArrowRight size={15} />}
+      {/* Topbar ramping */}
+      <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80">
+        <div className="flex items-center justify-between h-[52px] px-4 gap-2">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-2 min-w-0"
           >
-            Daftar
-          </Button>
+            <span className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center shrink-0">
+              <Mosque size={16} className="text-white" />
+            </span>
+            <span className="text-ios-subhead font-bold text-surface-text truncate hidden min-[380px]:block">
+              Sambung Ngaji
+            </span>
+          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <MasukButton />
+            <MasukButton variant="secondary" />
+          </div>
+        </div>
+      </header>
+
+      {/* Hero: sama seperti di beranda member */}
+      <div className="px-4 pt-4">
+        <PrayerTimesCard />
+      </div>
+
+      {/* Mood teaser */}
+      <div className="px-4 pt-4">
+        <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
+          <p className="text-ios-body font-semibold text-surface-text">
+            Gimana perasaanmu hari ini?
+          </p>
+          <p className="text-ios-caption text-surface-muted mt-0.5 mb-3">
+            Ketuk satu, dapatkan ayat dan doa penguatnya
+          </p>
+          <div className="flex items-center justify-between gap-1">
+            {moods.map((m) => (
+              <button
+                key={m.key}
+                onClick={() => navigate("/member/mood")}
+                className="flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all active:scale-90 hover:bg-surface-card2"
+                aria-label={m.label}
+              >
+                <span className="text-[26px] leading-none">{m.emoji}</span>
+                <span className="text-[10px] text-surface-muted font-medium">
+                  {m.label}
+                </span>
+              </button>
+            ))}
+            <button
+              onClick={() => navigate("/member/mood")}
+              aria-label="Lihat semua"
+              className="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center shrink-0 transition-all active:scale-90"
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Pengajian terdekat */}
       {upcoming.length > 0 && (
-        <div className="px-4 pb-2">
-          <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
-            Pengajian terdekat
-          </p>
+        <div className="px-4 pt-4">
+          <div className="flex items-center justify-between mb-2 px-0.5">
+            <p className="text-ios-footnote font-medium text-surface-muted">
+              Pengajian terdekat
+            </p>
+            <button
+              onClick={() => navigate("/member/jadwal")}
+              className="text-ios-footnote font-semibold text-accent transition-all active:scale-95"
+            >
+              Semua
+            </button>
+          </div>
           <div className="space-y-2">
             {upcoming.map((m) => (
               <Card key={m.meeting_id} className="flex items-center gap-3">
@@ -107,6 +164,7 @@ export default function PublicLandingPage() {
         </div>
       )}
 
+      {/* Fitur umum */}
       <div className="px-4 py-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Fitur umum
@@ -135,8 +193,15 @@ export default function PublicLandingPage() {
             );
           })}
         </div>
-        <p className="text-ios-caption text-surface-muted text-center pt-5 pb-3">
-          Masuk untuk absensi, progres, dan data pribadi Anda.
+        <button
+          onClick={() => navigate("/login")}
+          className="w-full mt-4 rounded-2xl border border-accent/30 bg-accent-soft p-3.5 flex items-center justify-center gap-2 text-ios-body font-semibold text-accent transition-all active:scale-[0.99]"
+        >
+          Masuk untuk absensi dan data pribadi
+          <ArrowRight size={16} />
+        </button>
+        <p className="text-ios-caption text-surface-muted text-center pt-4 pb-3">
+          Sambung Ngaji · v1.0.0
         </p>
       </div>
     </div>

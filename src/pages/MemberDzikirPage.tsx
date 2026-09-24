@@ -3,6 +3,7 @@ import { goBack } from "../utils/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { RefreshCw } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button } from "../components/common";
 import { DZIKIR_PRESETS } from "../data/dzikir";
 import { useDzikirCounters } from "../hooks/useDzikirCounters";
@@ -25,14 +26,7 @@ export default function MemberDzikirPage() {
         showSyncButton={false}
         right={
           <>
-            {!user && (
-              <button
-                onClick={() => navigate("/login")}
-                className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97] mr-1.5"
-              >
-                Masuk
-              </button>
-            )}
+            {!user && <MasukButton />}
             {adaProgress ? (
               <Button
                 variant="ghost"

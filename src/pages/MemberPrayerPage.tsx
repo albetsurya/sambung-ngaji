@@ -14,6 +14,7 @@ import {
   Moon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button } from "../components/common";
 import { useToast } from "../contexts/ToastContext";
 import {
@@ -89,12 +90,7 @@ export default function MemberPrayerPage() {
         showSyncButton={false}
         right={
           !user ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
-            >
-              Masuk
-            </button>
+              <MasukButton />
           ) : undefined
         }
       />

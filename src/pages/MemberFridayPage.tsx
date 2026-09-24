@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Mosque } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import {
   EmptyState,
   ErrorState,
@@ -55,12 +56,7 @@ export default function MemberFridayPage() {
         showSyncButton={false}
         right={
           !user ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
-            >
-              Masuk
-            </button>
+              <MasukButton />
           ) : undefined
         }
       />
