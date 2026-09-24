@@ -7,9 +7,10 @@ import {
   Calendar,
   Zap,
   Users,
+  SlidersHorizontal,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { BottomSheet, Button, Card, ErrorState, Badge } from "../components/common";
+import { BottomSheet, Button, Card, ErrorState, Badge, Segmented } from "../components/common";
 import { MemberCalendarView } from "../components/member/MemberCalendarView";
 import { MemberScheduleListView } from "../components/member/MemberScheduleListView";
 import { meetingApi } from "../services/domainApi";
@@ -88,6 +89,7 @@ export default function MemberSchedulePage() {
   const kategoriInitialized = useRef(false);
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("");
   const [selected, setSelected] = useState<Meeting | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const backPath = "/member";
   const handleBack = () => goBack(navigate, backPath);
@@ -164,6 +166,27 @@ export default function MemberSchedulePage() {
     persistView(v);
   }
 
+  const activeFilterCount =
+    (kategoriFilter !== "all" ? 1 : 0) + (genderFilter !== "" ? 1 : 0);
+  const filterSummary =
+    kategoriFilter === "all" && genderFilter === ""
+      ? "Semua jadwal"
+      : [
+          kategoriFilter === "all" ? null : CATEGORY_LABEL[kategoriFilter],
+          genderFilter === ""
+            ? null
+            : genderFilter === "L"
+              ? "Laki-laki"
+              : "Perempuan",
+        ]
+          .filter(Boolean)
+          .join(" · ");
+
+  function resetFilter() {
+    setKategoriFilter("all");
+    setGenderFilter("");
+  }
+
   return (
     <AppLayout hideNav showAiChat={false}>
       <Header
@@ -180,83 +203,33 @@ export default function MemberSchedulePage() {
 
       <div className="px-4 py-4 space-y-3 pb-8">
         {/* Tab Kalender / List */}
-        <div className="flex rounded-2xl bg-surface-card2 border border-surface-border overflow-hidden">
-          <button
-            onClick={() => handleViewChange("calendar")}
-            className={
-              "flex-1 min-h-[44px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-              (view === "calendar"
-                ? "bg-accent text-white"
-                : "text-surface-muted hover:bg-surface-card")
-            }
-          >
-            <CalendarIcon size={14} />
-            Kalender
-          </button>
-          <div className="w-px bg-surface-border" />
-          <button
-            onClick={() => handleViewChange("list")}
-            className={
-              "flex-1 min-h-[44px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-              (view === "list"
-                ? "bg-accent text-white"
-                : "text-surface-muted hover:bg-surface-card")
-            }
-          >
-            <List size={14} />
-            Daftar
-          </button>
-        </div>
+        <Segmented
+          ariaLabel="Tampilan jadwal"
+          value={view}
+          onChange={handleViewChange}
+          options={[
+            { value: "calendar", label: "Kalender", icon: <CalendarIcon size={14} /> },
+            { value: "list", label: "Daftar", icon: <List size={14} /> },
+          ]}
+        />
 
-        {/* Kategori filter */}
-        <div>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
-            <FilterChip
-              active={kategoriFilter === "all"}
-              label="Semua"
-              onClick={() => setKategoriFilter("all")}
-            />
-            {MEMBER_CATEGORIES.map((c) => (
-              <FilterChip
-                key={c}
-                active={kategoriFilter === c}
-                label={CATEGORY_LABEL[c]}
-                onClick={() => setKategoriFilter(c)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Gender filter */}
-        <div>
-          <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-            {(
-              [
-                { value: "", label: "Semua" },
-                { value: "L", label: "Laki-laki" },
-                { value: "P", label: "Perempuan" },
-              ] as { value: GenderFilter; label: string }[]
-            ).map((opt, idx) => {
-              const active = genderFilter === opt.value;
-              return (
-                <div key={opt.value || "all"} className="flex-1 flex">
-                  {idx > 0 && <div className="w-px bg-surface-border" />}
-                  <button
-                    onClick={() => setGenderFilter(opt.value)}
-                    className={
-                      "flex-1 min-h-[38px] flex items-center justify-center text-ios-footnote font-medium transition-all duration-200 " +
-                      (active
-                        ? "bg-accent text-white"
-                        : "text-surface-muted hover:bg-surface-card")
-                    }
-                  >
-                    {opt.label}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Filter (sheet) */}
+        <button
+          onClick={() => setFilterOpen(true)}
+          className="w-full min-h-[44px] rounded-2xl border border-surface-border bg-surface-card px-3.5 flex items-center gap-2.5 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+        >
+          <span className="relative shrink-0 text-surface-muted">
+            <SlidersHorizontal size={16} />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </span>
+          <span className="flex-1 min-w-0 text-ios-footnote text-surface-muted truncate">
+            Filter: <span className="text-surface-text font-medium">{filterSummary}</span>
+          </span>
+        </button>
 
         {/* Content */}
         {isLoading &&
@@ -302,6 +275,61 @@ export default function MemberSchedulePage() {
         meeting={selected}
         onClose={() => setSelected(null)}
       />
+
+      {/* Filter Sheet */}
+      <BottomSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="Filter Jadwal"
+      >
+        <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
+          Kategori
+        </p>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-4">
+          <FilterChip
+            active={kategoriFilter === "all"}
+            label="Semua"
+            onClick={() => setKategoriFilter("all")}
+          />
+          {MEMBER_CATEGORIES.map((c) => (
+            <FilterChip
+              key={c}
+              active={kategoriFilter === c}
+              label={CATEGORY_LABEL[c]}
+              onClick={() => setKategoriFilter(c)}
+            />
+          ))}
+        </div>
+
+        <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
+          Jenis Kelamin
+        </p>
+        <Segmented<GenderFilter>
+          ariaLabel="Filter jenis kelamin"
+          size="sm"
+          value={genderFilter}
+          onChange={setGenderFilter}
+          options={[
+            { value: "", label: "Semua" },
+            { value: "L", label: "Laki-laki" },
+            { value: "P", label: "Perempuan" },
+          ]}
+        />
+
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={resetFilter}
+            disabled={activeFilterCount === 0}
+          >
+            Atur Ulang
+          </Button>
+          <Button fullWidth onClick={() => setFilterOpen(false)}>
+            Terapkan
+          </Button>
+        </div>
+      </BottomSheet>
     </AppLayout>
   );
 }

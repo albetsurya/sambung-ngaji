@@ -46,7 +46,7 @@ export function MemberCalendarView({
         events={events}
         eventClick={handleEventClick}
         height="auto"
-        dayMaxEvents={3}
+        dayMaxEvents={2}
         eventDisplay="block"
         fixedWeekCount={false}
       />

@@ -316,14 +316,3 @@ export interface FridaySchedule {
   updated_at?: string;
   reminder_sent_at?: string;
 }
-
-export interface FridayReminderStatus {
-  server_now: string;
-  server_weekday: string;
-  fonnte_enabled: boolean;
-  group_set: boolean;
-  last_cron_hit: string;
-  last_sent: string;
-  next_window: string;
-  upcoming: FridaySchedule[];
-}

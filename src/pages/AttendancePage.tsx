@@ -35,6 +35,7 @@ import {
   Select,
   Input,
   ConfirmDialog,
+  Segmented,
 } from "../components/common";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
@@ -1244,33 +1245,18 @@ function GenderSegmented({
   value: "" | "L" | "P";
   onChange: (v: "" | "L" | "P") => void;
 }) {
-  const options: { value: "" | "L" | "P"; label: string }[] = [
-    { value: "", label: "Semua" },
-    { value: "L", label: "Laki-laki" },
-    { value: "P", label: "Perempuan" },
-  ];
-
   return (
-    <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-      {options.map((opt, idx) => {
-        const active = value === opt.value;
-        return (
-          <div key={opt.value} className="flex-1 flex">
-            {idx > 0 && <div className="w-px bg-surface-border" />}
-            <button
-              onClick={() => onChange(opt.value)}
-              className={`flex-1 min-h-[36px] flex items-center justify-center text-ios-footnote font-medium transition-all duration-200 active:scale-[0.98] ${
-                active
-                  ? "bg-accent text-white"
-                  : "text-surface-muted hover:bg-surface-card"
-              }`}
-            >
-              {opt.label}
-            </button>
-          </div>
-        );
-      })}
-    </div>
+    <Segmented<"" | "L" | "P">
+      ariaLabel="Filter jenis kelamin"
+      size="sm"
+      value={value}
+      onChange={onChange}
+      options={[
+        { value: "", label: "Semua" },
+        { value: "L", label: "Laki-laki" },
+        { value: "P", label: "Perempuan" },
+      ]}
+    />
   );
 }
 
