@@ -25,6 +25,7 @@ import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
 import { queryKeys } from "../lib/queryClient";
+import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 /* -------------------------------------------------------------------------- */
 /*                                   Types                                    */
@@ -67,6 +68,8 @@ export default function MemberFormPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [compressing, setCompressing] = useState(false);
+  // Sembunyikan bottom bar saat keyboard terbuka agar tidak menutupi form.
+  const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
     groupApi
@@ -402,7 +405,11 @@ export default function MemberFormPage() {
         </FormSection>
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 z-30">
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-30 transition-transform duration-200 ${
+          keyboardOpen ? "translate-y-full" : ""
+        }`}
+      >
         <div className="pointer-events-none h-6 bg-gradient-to-t from-surface-bg to-transparent" />
 
         <div className="bg-surface-bg backdrop-blur-xl border-t border-surface-border pb-safe">

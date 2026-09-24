@@ -61,6 +61,11 @@ export default function MemberRequestsPage() {
       showToast("Permintaan disetujui.");
       setPendingAction(null);
       qc.invalidateQueries({ queryKey: queryKeys.memberRequests() });
+      // Approve membuat member (+user): list & dashboard harus refresh.
+      qc.invalidateQueries({ queryKey: queryKeys.members() });
+      qc.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      qc.invalidateQueries({ queryKey: queryKeys.users() });
     },
     onError: (e) =>
       showToast(

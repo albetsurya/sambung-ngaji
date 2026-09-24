@@ -58,7 +58,7 @@ import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../lib/queryClient";
+import { queryKeys, invalidateRecap } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
 import {
   GenderTargetPicker,
@@ -360,6 +360,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.attendancePage(meetingId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       setDeleteMeetingTarget(null);
@@ -390,6 +391,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.attendancePage(vars.meetingId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       showToast(
@@ -415,6 +417,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.meetings({ range: "recent" }),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       showToast(
@@ -457,6 +460,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
     } catch {
       setOptimistic((o) => {
         const next = { ...o };
@@ -481,6 +485,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
       showToast("Absensi dihapus");
     } catch {
       setOptimistic((o) => {
@@ -512,6 +517,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
       showToast(`${targets.length} jamaah ditandai hadir`);
     } catch (err) {
       setOptimistic((o) => {
@@ -641,6 +647,7 @@ export default function AttendancePage() {
       });
     }
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    invalidateRecap(queryClient);
 
     // Navigasi
     // ✅ FIX TS: cek `sheet.mode === "create"` dulu sebelum akses `sheet.from`
@@ -683,7 +690,7 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} />
+          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} label="Tambah Jadwal" />
         ) : undefined
       }
     >

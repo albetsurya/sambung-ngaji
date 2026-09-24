@@ -72,7 +72,7 @@ export default function AnnouncementsPage() {
     <AppLayout
       fab={
         isAdminLike ? (
-          <FloatingActionButton onClick={() => setCreateOpen(true)} />
+          <FloatingActionButton onClick={() => setCreateOpen(true)} label="Buat Pengumuman" />
         ) : undefined
       }
     >

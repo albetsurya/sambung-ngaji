@@ -263,7 +263,7 @@ export default function MembersListPage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => navigate("/jamaah/baru")} />
+          <FloatingActionButton onClick={() => navigate("/jamaah/baru")} label="Tambah Jamaah" />
         ) : undefined
       }
     >

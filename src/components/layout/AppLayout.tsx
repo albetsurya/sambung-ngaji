@@ -164,6 +164,8 @@ export function AppLayout({
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
       <div className={`flex flex-col flex-1 ${hideNav ? "" : "pb-32"}`}>
         {children}
+        {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
+        {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
       </div>
 
       {showFloating && (

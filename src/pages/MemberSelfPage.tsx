@@ -103,6 +103,10 @@ export default function MemberSelfPage() {
         qc.invalidateQueries({
           queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
         });
+        // Member baru: list & dashboard harus refresh.
+        qc.invalidateQueries({ queryKey: queryKeys.members() });
+        qc.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+        qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
         setTimeout(() => refetch(), 600);
       }
     },
