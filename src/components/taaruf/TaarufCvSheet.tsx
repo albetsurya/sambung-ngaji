@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Member } from "../../types";
-import { BottomSheet, Button, Input } from "../common";
+import { BottomSheet, Button, Input, Segmented } from "../common";
 import {
   ChevronDown,
   Download,
@@ -249,26 +249,18 @@ export function TaarufCvSheet({
                   <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
                     Posisi foto
                   </p>
-                  <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-surface-card2">
-                    {(["right", "left"] as const).map((side) => {
-                      const active = options.photoSide === side;
-                      return (
-                        <button
-                          key={side}
-                          onClick={() =>
-                            setOptions((o) => ({ ...o, photoSide: side }))
-                          }
-                          className={`h-9 rounded-lg text-ios-footnote font-medium transition-all active:scale-[0.98] ${
-                            active
-                              ? "bg-surface-card text-surface-text shadow-sm"
-                              : "text-surface-muted"
-                          }`}
-                        >
-                          {side === "right" ? "Kanan" : "Kiri"}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <Segmented
+                    ariaLabel="Posisi foto"
+                    size="sm"
+                    value={options.photoSide}
+                    onChange={(side) =>
+                      setOptions((o) => ({ ...o, photoSide: side }))
+                    }
+                    options={[
+                      { value: "right", label: "Kanan" },
+                      { value: "left", label: "Kiri" },
+                    ]}
+                  />
                 </div>
 
                 {/* Urutan bagian */}

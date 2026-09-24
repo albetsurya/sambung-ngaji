@@ -15,6 +15,7 @@ import {
   ErrorState,
   Badge,
   LoadingOverlay,
+  Segmented,
 } from "../components/common";
 import { DateInput } from "../components/common/DateInput";
 import { GroupedListSkeleton } from "../components/common/Skeleton";
@@ -28,9 +29,11 @@ import {
   CircleAlert,
   Plus,
   Loader2,
+  Download,
 } from "../components/common/FontAwesomeIcons";
 import { fridayApi } from "../services/domainApi";
-import type { FridaySchedule, FridayReminderStatus } from "../types";
+import { FridayPrintSheet } from "../components/friday/FridayPrintSheet";
+import type { FridaySchedule } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError, abortAllApiCalls } from "../services/api";
@@ -71,6 +74,7 @@ export default function FridaySchedulesPage() {
     null,
   );
   const [followUp, setFollowUp] = useState<FridaySchedule | null>(null);
+  const [printOpen, setPrintOpen] = useState(false);
 
   const {
     data: schedules = [],
@@ -81,14 +85,6 @@ export default function FridaySchedulesPage() {
     queryKey: queryKeys.fridaySchedules(),
     queryFn: () => fridayApi.list(),
     staleTime: 5 * 60_000,
-  });
-
-  // Status reminder WA (khusus yang boleh kelola).
-  const { data: reminderStatus } = useQuery({
-    queryKey: ["friday-reminder-status"],
-    queryFn: () => fridayApi.getReminderStatus(),
-    enabled: canEdit,
-    staleTime: 60_000,
   });
 
   const today = todayIso();
@@ -106,6 +102,7 @@ export default function FridaySchedulesPage() {
         .sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
     [schedules, today],
   );
+
   const shown = tab === "upcoming" ? upcoming : past;
   const incompleteCount = useMemo(
     () => upcoming.filter((s) => !isFridayComplete(s)).length,
@@ -164,7 +161,6 @@ export default function FridaySchedulesPage() {
     mutationFn: (tanggal: string) => fridayApi.markSent(tanggal),
     onSuccess: () => {
       invalidate();
-      queryClient.invalidateQueries({ queryKey: ["friday-reminder-status"] });
       showToast("Ditandai sudah terkirim");
       setFollowUp(null);
     },
@@ -242,6 +238,21 @@ export default function FridaySchedulesPage() {
         title="Petugas Jumat"
         onBack={() => history.back()}
         backLabel="Kembali"
+        right={
+          schedules.length > 0 ? (
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => setPrintOpen(true)}
+              aria-label="Cetak tabel"
+              title="Cetak tabel (PDF/Gambar)"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
+            >
+              <Download size={16} />
+            </Button>
+          ) : undefined
+        }
       />
 
       <div className="py-3 px-4 space-y-3">
@@ -271,32 +282,16 @@ export default function FridaySchedulesPage() {
           </div>
         )}
 
-        {/* Status reminder WA */}
-        {canEdit && reminderStatus && (
-          <ReminderStatusCard status={reminderStatus} />
-        )}
-
         {/* Tabs */}
-        <div className="grid grid-cols-2 gap-1 p-1 rounded-2xl bg-surface-card border border-surface-border">
-          {(
-            [
-              { key: "upcoming", label: `Mendatang (${upcoming.length})` },
-              { key: "history", label: `Riwayat (${past.length})` },
-            ] as { key: Tab; label: string }[]
-          ).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`py-2 rounded-xl text-ios-footnote font-semibold transition-all ${
-                tab === t.key
-                  ? "bg-accent text-white shadow"
-                  : "text-surface-muted"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          ariaLabel="Jenis jadwal"
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: "upcoming", label: `Mendatang (${upcoming.length})` },
+            { value: "history", label: `Riwayat (${past.length})` },
+          ]}
+        />
 
         {isLoading && <GroupedListSkeleton rows={4} />}
 
@@ -594,25 +589,20 @@ export default function FridaySchedulesPage() {
       <LoadingOverlay
         open={saveMutation.isPending}
         label="Menyimpan jadwal..." onCancel={() => abortAllApiCalls()} />
+
+      <FridayPrintSheet
+        open={printOpen}
+        onClose={() => setPrintOpen(false)}
+        upcoming={upcoming}
+        past={past}
+      />
     </AppLayout>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            STATUS REMINDER WA                              */
+/*                              FORMAT TANGGAL                              */
 /* -------------------------------------------------------------------------- */
-
-function timeAgo(iso?: string): string {
-  if (!iso) return "belum pernah";
-  const t = new Date(iso).getTime();
-  if (isNaN(t)) return "-";
-  const m = Math.max(0, Math.floor((Date.now() - t) / 60000));
-  if (m < 1) return "baru saja";
-  if (m < 60) return `${m} mnt lalu`;
-  const h = Math.floor(m / 60);
-  if (h < 48) return `${h} jam lalu`;
-  return `${Math.floor(h / 24)} hari lalu`;
-}
 
 function formatDateTime(iso?: string): string {
   if (!iso) return "-";
@@ -624,89 +614,4 @@ function formatDateTime(iso?: string): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(d);
-}
-
-/**
- * Indikator kesiapan kirim reminder WA:
- * cron aman (hit < 2 jam), Fonnte siap, jadwal kirim berikut, terakhir kirim.
- */
-function ReminderStatusCard({ status }: { status: FridayReminderStatus }) {
-  const ready = status.fonnte_enabled && status.group_set;
-  const cronAgeMin = status.last_cron_hit
-    ? (Date.now() - new Date(status.last_cron_hit).getTime()) / 60000
-    : Infinity;
-  const cronOk = cronAgeMin < 120;
-  const dot = !ready
-    ? "bg-danger"
-    : cronOk
-      ? "bg-success"
-      : "bg-warning";
-  const nextTarget = status.upcoming.find((u) => !u.reminder_sent_at);
-
-  const rows: { label: string; value: string; warn?: boolean }[] = [
-    {
-      label: "Cron",
-      value: status.last_cron_hit
-        ? cronOk
-          ? `Aman, terakhir ${timeAgo(status.last_cron_hit)}`
-          : `Terakhir ${timeAgo(status.last_cron_hit)}, cek cron-job.org`
-        : "Belum pernah hit",
-      warn: !!status.last_cron_hit && !cronOk,
-    },
-    {
-      label: "Fonnte",
-      value: ready
-        ? "Aktif, siap kirim"
-        : !status.fonnte_enabled
-          ? "Mati, cek token"
-          : "Grup belum diset",
-      warn: !ready,
-    },
-    {
-      label: "Kirim berikut",
-      value: nextTarget
-        ? `${formatDateLongText(nextTarget.tanggal)}, Kamis 12:00`
-        : "Tidak ada jadwal",
-    },
-    {
-      label: "Terakhir kirim",
-      value: status.last_sent
-        ? `${formatDateTime(status.last_sent)} (${timeAgo(status.last_sent)})`
-        : "Belum pernah",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
-      <div className="flex items-center gap-2.5 mb-3">
-        <span className="relative flex w-2.5 h-2.5">
-          <span
-            className={`absolute inline-flex w-full h-full rounded-full opacity-40 animate-ping ${dot}`}
-          />
-          <span
-            className={`relative inline-flex w-2.5 h-2.5 rounded-full ${dot}`}
-          />
-        </span>
-        <p className="text-ios-footnote font-semibold text-surface-text">
-          Status Reminder WA
-        </p>
-      </div>
-      <div className="space-y-2">
-        {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between gap-3">
-            <span className="text-ios-footnote text-surface-muted shrink-0">
-              {r.label}
-            </span>
-            <span
-              className={`text-ios-footnote font-medium text-right truncate ${
-                r.warn ? "text-warning" : "text-surface-text"
-              }`}
-            >
-              {r.value}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }

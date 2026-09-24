@@ -32,15 +32,21 @@ function safeFilename(name: string): string {
   return clean || "cv-taaruf";
 }
 
-export function taarufFilename(nama: string, ext: "png" | "pdf"): string {
+export function taarufFilename(
+  nama: string,
+  ext: "png" | "pdf",
+  prefix = "CV-Taaruf",
+): string {
   const date = new Date().toISOString().slice(0, 10);
-  return `CV-Taaruf-${safeFilename(nama)}-${date}.${ext}`;
+  const base = prefix ? `${prefix}-${safeFilename(nama)}` : safeFilename(nama);
+  return `${base}-${date}.${ext}`;
 }
 
 /** PNG siap bagikan (mis. WhatsApp). */
 export async function exportTaarufPng(
   node: HTMLElement,
   nama: string,
+  prefix = "CV-Taaruf",
 ): Promise<void> {
   const canvas = await capture(node);
   const blob = await new Promise<Blob | null>((res) =>
@@ -49,23 +55,32 @@ export async function exportTaarufPng(
   if (!blob) throw new Error("Gagal membuat gambar");
   const url = URL.createObjectURL(blob);
   try {
-    download(url, taarufFilename(nama, "png"));
+    download(url, taarufFilename(nama, "png", prefix));
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
 }
 
-/** PDF A4 portrait. Multi-halaman bila konten melebihi 1 halaman. */
+/**
+ * PDF A4 — portrait untuk dokumen tegak, landscape untuk dokumen lebar
+ * (mis. tabel). Multi-halaman bila konten melebihi 1 halaman.
+ */
 export async function exportTaarufPdf(
   node: HTMLElement,
   nama: string,
+  prefix = "CV-Taaruf",
 ): Promise<void> {
   const canvas = await capture(node);
   const imgData = canvas.toDataURL("image/png");
 
-  const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  const pageW = 210;
-  const pageH = 297;
+  const landscape = canvas.width > canvas.height;
+  const pdf = new jsPDF({
+    unit: "mm",
+    format: "a4",
+    orientation: landscape ? "landscape" : "portrait",
+  });
+  const pageW = landscape ? 297 : 210;
+  const pageH = landscape ? 210 : 297;
   const margin = 10;
   const contentW = pageW - margin * 2;
   const contentH = pageH - margin * 2;
@@ -114,5 +129,5 @@ export async function exportTaarufPdf(
     }
   }
 
-  pdf.save(taarufFilename(nama, "pdf"));
+  pdf.save(taarufFilename(nama, "pdf", prefix));
 }

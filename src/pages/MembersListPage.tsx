@@ -25,6 +25,7 @@ import {
   EmptyState,
   BottomSheet,
   Button,
+  Segmented,
 } from "../components/common";
 import { memberApi, type MemberFilters } from "../services/memberApi";
 import type { Member, MemberCategory } from "../types";
@@ -57,7 +58,14 @@ const FETCH_THRESHOLD_PX = 300;
 const ROW_HEIGHTS: Record<ViewMode, number> = {
   row: 64,
   list: 76,
-  grid: 140,
+  grid: 148,
+};
+
+/** Slot baris grid mengikuti tinggi kartu per jumlah kolom (+8 gap). */
+const GRID_ROW_HEIGHTS: Record<GridCols, number> = {
+  2: 164,
+  3: 138,
+  4: 126,
 };
 
 export default function MembersListPage() {
@@ -164,7 +172,10 @@ export default function MembersListPage() {
         : "grid-cols-2";
 
   const getScrollElement = useCallback(() => scrollRef.current, []);
-  const estimateSize = useCallback(() => ROW_HEIGHTS[view], [view]);
+  const estimateSize = useCallback(
+    () => (view === "grid" ? GRID_ROW_HEIGHTS[gridCols] : ROW_HEIGHTS[view]),
+    [view, gridCols],
+  );
 
   const virtualizer = useVirtualizer({
     count:
@@ -238,7 +249,7 @@ export default function MembersListPage() {
       const start = index * gridCols;
       const rowMembers = allMembers.slice(start, start + gridCols);
       return (
-        <div className={`grid ${gridColsClass} gap-2`}>
+        <div className={`grid ${gridColsClass} gap-2 pb-2`}>
           {rowMembers.map((m) => (
             <JamaahGridCard
               key={m.member_id}
@@ -422,7 +433,10 @@ export default function MembersListPage() {
                       top: 0,
                       left: 0,
                       width: "100%",
-                      height: view === "grid" ? 140 : ROW_HEIGHTS[view],
+                      height:
+                        view === "grid"
+                          ? GRID_ROW_HEIGHTS[gridCols]
+                          : ROW_HEIGHTS[view],
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                     className={
@@ -530,38 +544,16 @@ export default function MembersListPage() {
             <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
               Filter Jenis Kelamin
             </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setJenisKelamin("")}
-                className={`flex-1 min-h-[40px] rounded-xl border text-ios-subhead font-medium transition-all active:scale-[0.97] ${
-                  jenisKelamin === ""
-                    ? "bg-accent text-white border-accent"
-                    : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2"
-                }`}
-              >
-                Semua
-              </button>
-              <button
-                onClick={() => setJenisKelamin("L")}
-                className={`flex-1 min-h-[40px] rounded-xl border text-ios-subhead font-medium transition-all active:scale-[0.97] ${
-                  jenisKelamin === "L"
-                    ? "bg-accent text-white border-accent"
-                    : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2"
-                }`}
-              >
-                Laki-laki
-              </button>
-              <button
-                onClick={() => setJenisKelamin("P")}
-                className={`flex-1 min-h-[40px] rounded-xl border text-ios-subhead font-medium transition-all active:scale-[0.97] ${
-                  jenisKelamin === "P"
-                    ? "bg-accent text-white border-accent"
-                    : "bg-surface-card text-surface-text border-surface-border hover:bg-surface-card2"
-                }`}
-              >
-                Perempuan
-              </button>
-            </div>
+            <Segmented<"" | "L" | "P">
+              ariaLabel="Filter jenis kelamin"
+              value={jenisKelamin as "" | "L" | "P"}
+              onChange={setJenisKelamin}
+              options={[
+                { value: "", label: "Semua" },
+                { value: "L", label: "Laki-laki" },
+                { value: "P", label: "Perempuan" },
+              ]}
+            />
           </div>
 
           <div>
@@ -753,7 +745,7 @@ const JamaahCard = memo(function JamaahCard({
   onPress: (id: string) => void;
 }) {
   return (
-    <div className="px-4">
+    <div className="px-4 pb-2">
       <Card
         onClick={() => onPress(member.member_id)}
         className="flex items-center gap-3 h-[68px]"

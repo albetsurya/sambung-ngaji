@@ -10,7 +10,7 @@ import {
   Heart,
   Sparkles,
   Pencil,
-  FileText,
+  Download,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -222,6 +222,21 @@ export default function MemberSelfPage() {
         onBack={handleBack}
         backLabel="Kembali"
         showSyncButton
+        right={
+          isTaarufEligible(profile) ? (
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => setTaarufOpen(true)}
+              aria-label="Cetak CV Taaruf"
+              title="Cetak CV Taaruf (PDF/Gambar)"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
+            >
+              <Download size={16} />
+            </Button>
+          ) : undefined
+        }
       />
 
       {/* Header profile */}
@@ -251,29 +266,6 @@ export default function MemberSelfPage() {
           <MemberStatusChips member={profile} />
         </div>
       </div>
-
-      {/* Tombol CV Taaruf — halaman ini selalu milik sendiri, khusus Pra Nikah */}
-      {isTaarufEligible(profile) && (
-      <div className="px-4 pt-1">
-        <button
-          onClick={() => setTaarufOpen(true)}
-          className="w-full rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
-        >
-          <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-            <FileText size={18} />
-          </span>
-          <span className="flex-1 min-w-0">
-            <span className="block text-ios-body font-medium text-surface-text">
-              CV Taaruf Saya
-            </span>
-            <span className="block text-ios-caption text-surface-muted truncate">
-              Pratinjau & unduh biodata taaruf
-            </span>
-          </span>
-          <ChevronRight size={16} className="text-surface-muted flex-shrink-0" />
-        </button>
-      </div>
-      )}
 
       {/* Sticky tab bar */}
       <div

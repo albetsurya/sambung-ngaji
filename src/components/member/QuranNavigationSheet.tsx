@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search, X, Bookmark } from "../common/FontAwesomeIcons";
+import { Segmented } from "../common/Segmented";
 import { fetchSurahList, type SurahSummary } from "../../data/quran";
 import { JUZ_LIST } from "../../data/quran-juz";
 import { useQuery } from "@tanstack/react-query";
@@ -85,27 +86,16 @@ export function QuranNavigationSheet({
 
         {/* Tab switcher */}
         <div className="px-4 pb-3 flex-shrink-0">
-          <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-            {(["surah", "juz"] as Tab[]).map((t, idx) => {
-              const active = tab === t;
-              return (
-                <div key={t} className="flex-1 flex">
-                  {idx > 0 && <div className="w-px bg-surface-border" />}
-                  <button
-                    onClick={() => setTab(t)}
-                    className={
-                      "flex-1 min-h-[40px] text-ios-footnote font-medium transition-all duration-200 " +
-                      (active
-                        ? "bg-accent text-white"
-                        : "text-surface-muted hover:bg-surface-card")
-                    }
-                  >
-                    {t === "surah" ? "Surah (114)" : "Juz (30)"}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+          <Segmented
+            ariaLabel="Navigasi"
+            size="sm"
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: "surah", label: "Surah (114)" },
+              { value: "juz", label: "Juz (30)" },
+            ]}
+          />
         </div>
 
         {/* Search */}

@@ -79,6 +79,7 @@ import {
   faLocationArrow,
   faUpload,
   faFileAlt,
+  faImage,
   faGripVertical,
   faUtensils,
   faToilet,
@@ -219,6 +220,7 @@ export const Navigation = createIcon(faLocationArrow);
 export const Upload = createIcon(faUpload);
 
 export const FileText = createIcon(faFileAlt);
+export const Image = createIcon(faImage);
 export const GripVertical = createIcon(faGripVertical);
 
 export const Utensils = createIcon(faUtensils);

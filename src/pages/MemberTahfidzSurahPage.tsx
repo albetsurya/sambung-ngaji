@@ -12,7 +12,7 @@ import {
   BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, ErrorState } from "../components/common";
+import { Button, ErrorState, Segmented } from "../components/common";
 import { AudioPlayerMini, type AudioTrack } from "../components/member/AudioPlayerMini";
 import {
   fetchSurahDetail,
@@ -269,37 +269,16 @@ export default function MemberTahfidzSurahPage() {
 
       {/* Mode toggle */}
       <div className="px-4 pt-3">
-        <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-          <div className="flex-1 flex">
-            <button
-              onClick={() => handleModeSwitch("baca")}
-              className={
-                "flex-1 min-h-[38px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-                (mode === "baca"
-                  ? "bg-accent text-white"
-                  : "text-surface-muted hover:bg-surface-card")
-              }
-            >
-              <Eye size={14} />
-              Baca
-            </button>
-          </div>
-          <div className="w-px bg-surface-border" />
-          <div className="flex-1 flex">
-            <button
-              onClick={() => handleModeSwitch("uji")}
-              className={
-                "flex-1 min-h-[38px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-                (mode === "uji"
-                  ? "bg-warning text-white"
-                  : "text-surface-muted hover:bg-surface-card")
-              }
-            >
-              <EyeOff size={14} />
-              Uji Hafalan
-            </button>
-          </div>
-        </div>
+        <Segmented
+          ariaLabel="Mode tahfidz"
+          size="sm"
+          value={mode}
+          onChange={handleModeSwitch}
+          options={[
+            { value: "baca", label: "Baca", icon: <Eye size={14} /> },
+            { value: "uji", label: "Uji Hafalan", icon: <EyeOff size={14} /> },
+          ]}
+        />
       </div>
 
       <div className="px-4 py-4 space-y-3 pb-32">

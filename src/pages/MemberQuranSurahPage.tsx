@@ -9,7 +9,7 @@ import {
   Bookmark,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, ErrorState } from "../components/common";
+import { Button, ErrorState, Segmented } from "../components/common";
 import { QuranAyatCard } from "../components/member/QuranAyatCard";
 import {
   AudioPlayerMini,
@@ -278,37 +278,16 @@ export default function MemberQuranSurahPage() {
 
       {data && (
         <div className="px-4 pt-3">
-          <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
-            <div className="flex-1 flex">
-              <button
-                onClick={() => handleModeSwitch("scroll")}
-                className={
-                  "flex-1 min-h-[36px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-                  (mode === "scroll"
-                    ? "bg-accent text-white"
-                    : "text-surface-muted hover:bg-surface-card")
-                }
-              >
-                <AlignLeft size={14} />
-                Scroll
-              </button>
-            </div>
-            <div className="w-px bg-surface-border" />
-            <div className="flex-1 flex">
-              <button
-                onClick={() => handleModeSwitch("ayat")}
-                className={
-                  "flex-1 min-h-[36px] flex items-center justify-center gap-1.5 text-ios-footnote font-medium transition-all duration-200 " +
-                  (mode === "ayat"
-                    ? "bg-accent text-white"
-                    : "text-surface-muted hover:bg-surface-card")
-                }
-              >
-                <Bookmark size={14} />
-                Per Ayat
-              </button>
-            </div>
-          </div>
+          <Segmented
+            ariaLabel="Mode baca"
+            size="sm"
+            value={mode}
+            onChange={handleModeSwitch}
+            options={[
+              { value: "scroll", label: "Scroll", icon: <AlignLeft size={14} /> },
+              { value: "ayat", label: "Per Ayat", icon: <Bookmark size={14} /> },
+            ]}
+          />
         </div>
       )}
 

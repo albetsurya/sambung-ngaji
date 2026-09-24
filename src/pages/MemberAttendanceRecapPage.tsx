@@ -226,26 +226,24 @@ export default function MemberAttendanceRecapPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Filter bulan — pola segmented seperti filter gender di Jadwal/Absensi */}
+        {/* Filter bulan */}
         <section>
-          <div className="flex rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
+          <div className="flex gap-1 p-1 rounded-2xl bg-surface-card border border-surface-border">
             <button
               onClick={prevMonth}
               aria-label="Bulan sebelumnya"
-              className="w-12 min-h-[40px] flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card hover:text-accent active:scale-95"
+              className="w-12 min-h-[40px] rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-95"
             >
               <ChevronLeft size={16} />
             </button>
-            <div className="w-px bg-surface-border" />
             <div className="flex-1 min-h-[40px] flex items-center justify-center text-ios-footnote font-medium text-surface-text tabular-nums">
               {currentMonthLabel}
             </div>
-            <div className="w-px bg-surface-border" />
             <button
               onClick={nextMonth}
               disabled={recapMonth >= getTodayIso().slice(0, 7)}
               aria-label="Bulan berikutnya"
-              className="w-12 min-h-[40px] flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card hover:text-accent active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+              className="w-12 min-h-[40px] rounded-xl flex items-center justify-center text-surface-muted transition-colors hover:bg-surface-card2 hover:text-accent active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronRight size={16} />
             </button>

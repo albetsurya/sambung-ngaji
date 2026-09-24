@@ -11,8 +11,8 @@ import {
   Pencil,
   RefreshCw,
   Sparkles,
-  FileText,
   Trash2,
+  Download,
 } from "../components/common/FontAwesomeIcons";
 import {
   Button,
@@ -244,7 +244,26 @@ export default function MemberDetailPage() {
         ) : undefined
       }
     >
-      <Header title={member.nama_lengkap} onBack={() => navigate(-1)} />
+      <Header
+        title={member.nama_lengkap}
+        onBack={() => navigate(-1)}
+        right={
+          isTaarufEligible(member) &&
+          canViewTaarufCv(role, user?.member_id, member.member_id) ? (
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => setTaarufOpen(true)}
+              aria-label="Cetak CV Taaruf"
+              title="Cetak CV Taaruf (PDF/Gambar)"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
+            >
+              <Download size={16} />
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Header profile */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
@@ -269,29 +288,6 @@ export default function MemberDetailPage() {
           <MemberStatusChips member={member} />
         </div>
       </div>
-
-      {/* Tombol CV Taaruf. Khusus Pra Nikah; admin, tim PNKB, pemilik */}
-      {isTaarufEligible(member) &&
-        canViewTaarufCv(role, user?.member_id, member.member_id) && (
-        <div className="px-4 pb-1">
-          <button
-            onClick={() => setTaarufOpen(true)}
-            className="w-full rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
-          >
-            <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-              <FileText size={18} />
-            </span>
-            <span className="flex-1 min-w-0">
-              <span className="block text-ios-body font-medium text-surface-text">
-                CV Taaruf
-              </span>
-              <span className="block text-ios-caption text-surface-muted truncate">
-                Pratinjau & unduh biodata taaruf
-              </span>
-            </span>
-          </button>
-        </div>
-      )}
 
       {/* Sticky Tab bar */}
       <div
