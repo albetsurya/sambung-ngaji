@@ -115,6 +115,9 @@ export const fridayApi = {
 
   getReminderStatus: () =>
     call<FridayReminderStatus>("getFridayReminderStatus", {}),
+
+  markSent: (tanggal: string) =>
+    call<{ marked: boolean }>("markFridayReminderSent", { tanggal }),
 };
 
 export const attendanceApi = {
