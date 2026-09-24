@@ -11,12 +11,15 @@ import {
   Pencil,
   RefreshCw,
   Sparkles,
+  FileText,
+  Trash2,
 } from "../components/common/FontAwesomeIcons";
 import {
   Button,
   Input,
   Select,
   BottomSheet,
+  ConfirmDialog,
   LoadingOverlay,
   MemberSelfSkeleton,
 } from "../components/common";
@@ -40,9 +43,13 @@ import {
   AttendanceTab,
   MoodTab,
   CategoryHeaderBadge,
+  MemberStatusChips,
   type AttendanceItem,
 } from "../components/member/MemberTabs";
 import { usePermission } from "../hooks/usePermission";
+import { useAuth } from "../contexts/AuthContext";
+import { canViewTaarufCv, isTaarufEligible } from "../lib/taarufAccess";
+import { TaarufCvSheet } from "../components/taaruf/TaarufCvSheet";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
@@ -88,10 +95,17 @@ type TabKey = (typeof TABS)[number]["key"];
 export default function MemberDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdminLike, role, canManageUsers } = usePermission();
+  const { isAdminLike, role, canManageUsers, isSuperAdmin } = usePermission();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const canEdit = role === "SUPER_ADMIN" || role === "ADMIN";
+  // Hapus member langsung: super admin + admin (backend menolak bila punya akun).
+  const canDeleteMember = canEdit;
   const [tab, setTab] = useState<TabKey>("Biodata");
   const [createUserOpen, setCreateUserOpen] = useState(false);
+  const [taarufOpen, setTaarufOpen] = useState(false);
+  const [confirmDeleteMember, setConfirmDeleteMember] = useState(false);
 
   /* ---------------------------- Queries ---------------------------- */
 
@@ -132,8 +146,28 @@ export default function MemberDetailPage() {
   const { data: userStatus, refetch: refetchUserStatus } = useQuery({
     queryKey: queryKeys.memberUserStatus(id || ""),
     queryFn: () => memberApi.getUserStatus(id!),
-    enabled: !!id && canManageUsers,
+    enabled: !!id && (canManageUsers || role === "ADMIN"),
     staleTime: 30_000,
+  });
+
+  const deleteMemberMutation = useMutation({
+    mutationFn: () => memberApi.delete(id!),
+    onSuccess: () => {
+      showToast("Member berhasil dihapus permanen");
+      queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+      setConfirmDeleteMember(false);
+      navigate("/jamaah", { replace: true });
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus member",
+        "error",
+      );
+      setConfirmDeleteMember(false);
+    },
   });
 
   const { data: moods = [] } = useQuery({
@@ -232,8 +266,32 @@ export default function MemberDetailPage() {
               </span>
             )}
           </div>
+          <MemberStatusChips member={member} />
         </div>
       </div>
+
+      {/* Tombol CV Taaruf. Khusus Pra Nikah; admin, tim PNKB, pemilik */}
+      {isTaarufEligible(member) &&
+        canViewTaarufCv(role, user?.member_id, member.member_id) && (
+        <div className="px-4 pb-1">
+          <button
+            onClick={() => setTaarufOpen(true)}
+            className="w-full rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+          >
+            <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
+              <FileText size={18} />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block text-ios-body font-medium text-surface-text">
+                CV Taaruf
+              </span>
+              <span className="block text-ios-caption text-surface-muted truncate">
+                Pratinjau & unduh biodata taaruf
+              </span>
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Sticky Tab bar */}
       <div
@@ -266,7 +324,7 @@ export default function MemberDetailPage() {
       <div className="px-4 py-4 animate-[fadeIn_0.2s_ease-out]" key={tab}>
         {tab === "Biodata" && <BiodataTab member={member} />}
         {tab === "Pendidikan" && (
-          <EducationTab education={member.pendidikan || []} />
+          <EducationTab education={member.pendidikan || []} member={member} />
         )}
         {tab === "Kehadiran" && <AttendanceTab items={attendanceItems} />}
         {tab === "Mood" && <MoodTab entries={moods} />}
@@ -305,6 +363,82 @@ export default function MemberDetailPage() {
           }}
         />
       )}
+
+      {/* Zona Berbahaya. Hapus member tanpa akun langsung di sini */}
+      {canDeleteMember && (
+        <div className="px-4 pb-6">
+          <div className="rounded-2xl border border-danger/30 bg-surface-card shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-danger/20 bg-danger-soft/50">
+              <p className="text-ios-caption text-danger font-semibold">
+                Zona Berbahaya
+              </p>
+            </div>
+            <div className="p-4">
+              {userStatus?.has_user ? (
+                isSuperAdmin ? (
+                  <button
+                    onClick={() => navigate("/lainnya/users")}
+                    className="w-full text-left rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 p-3.5 flex items-center gap-3 transition-all active:scale-[0.99]"
+                  >
+                    <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
+                      <UserPlus size={16} />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-ios-body font-medium text-surface-text">
+                        Kelola di Manajemen User
+                      </p>
+                      <p className="text-ios-caption text-surface-muted">
+                        Member ini punya akun. Hapus permanen lewat Kelola
+                        Akun.
+                      </p>
+                    </div>
+                    <ArrowUpRight size={16} className="text-surface-muted shrink-0" />
+                  </button>
+                ) : (
+                  <p className="text-ios-footnote text-surface-muted leading-relaxed">
+                    Member ini sudah punya akun user. Penghapusan permanen
+                    hanya bisa lewat Kelola Akun oleh super admin.
+                  </p>
+                )
+              ) : (
+                <button
+                  onClick={() => setConfirmDeleteMember(true)}
+                  className="w-full text-left rounded-xl border border-danger/30 bg-danger-soft hover:bg-danger-soft/80 p-3.5 flex items-center gap-3 transition-all active:scale-[0.99]"
+                >
+                  <span className="w-10 h-10 rounded-xl bg-danger text-white flex items-center justify-center flex-shrink-0">
+                    <Trash2 size={16} strokeWidth={2.2} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-ios-body font-medium text-danger">
+                      Hapus Member Permanen
+                    </p>
+                    <p className="text-ios-caption text-danger/80">
+                      Belum punya akun. Biodata dan riwayat ikut terhapus.
+                    </p>
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={confirmDeleteMember}
+        title={`Hapus ${member.nama_lengkap}?`}
+        description="Biodata, foto, riwayat absensi & pembinaan ikut terhapus permanen. Tidak bisa dibatalkan."
+        confirmLabel="Ya, Hapus"
+        danger
+        loading={deleteMemberMutation.isPending}
+        onCancel={() => setConfirmDeleteMember(false)}
+        onConfirm={() => deleteMemberMutation.mutate()}
+      />
+
+      <TaarufCvSheet
+        open={taarufOpen}
+        member={member}
+        onClose={() => setTaarufOpen(false)}
+      />
     </AppLayout>
   );
 }

@@ -11,7 +11,6 @@ import {
   ClipboardList,
   Sparkles,
   QrCode,
-  User,
   Calendar,
   CalendarCheck,
   Mosque,
@@ -19,6 +18,7 @@ import {
   FileText,
   UserPlus,
   Search,
+  ChevronRight,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -202,15 +202,6 @@ export default function OthersPage() {
       group: "akun",
     },
     {
-      key: "profil-saya",
-      label: "Biodata Saya",
-      description: "Lihat & edit biodata pribadi Anda",
-      Icon: User,
-      to: "/profil-saya",
-      show: true,
-      group: "akun",
-    },
-    {
       key: "change-password",
       label: "Ganti Password",
       description: "Ubah password akun Anda",
@@ -309,7 +300,11 @@ export default function OthersPage() {
 
       <div className="py-4">
         <GroupedList>
-          <ListRow insetDivider={false} className="py-3.5">
+          <ListRow
+            insetDivider={false}
+            className="py-3.5"
+            onClick={() => navigate("/profil-saya")}
+          >
             <div className="flex items-center gap-3">
               <Avatar
                 src={user?.foto_url}
@@ -328,6 +323,7 @@ export default function OthersPage() {
                   {roleLabel(user?.role)}
                 </span>
               </div>
+              <ChevronRight size={16} className="text-surface-muted shrink-0" />
             </div>
           </ListRow>
         </GroupedList>

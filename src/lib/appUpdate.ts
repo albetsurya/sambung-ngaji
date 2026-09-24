@@ -1,7 +1,7 @@
 import { registerSW } from "virtual:pwa-register";
 
 /**
- * Manager update aplikasi (PWA service worker) — mode auto-update.
+ * Manager update aplikasi (PWA service worker, mode auto-update).
  *
  * - Cek versi baru tiap 60 detik + saat tab kembali terlihat.
  * - Saat SW baru mengambil alih (controllerchange) → reload sekali otomatis.
@@ -112,7 +112,7 @@ export function initAppUpdate(): () => void {
   if (initialized) return () => undefined;
   initialized = true;
 
-  // Flag reload hanya berlaku untuk reload otomatis kami — bersihkan saat
+  // Flag reload hanya berlaku untuk reload otomatis kami. Bersihkan saat
   // halaman dimuat normal supaya update berikutnya bisa reload lagi.
   try {
     sessionStorage.removeItem(RELOAD_FLAG);

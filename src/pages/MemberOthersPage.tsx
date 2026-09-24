@@ -11,11 +11,11 @@ import {
   Download,
   Info,
   LogOut,
-  User,
   Home,
   Trophy,
   Search,
   Mosque,
+  ChevronRight,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { InstallAppCard } from "../components/member/InstallAppCard";
@@ -97,14 +97,6 @@ export default function MemberOthersPage() {
       description: "Rekap kehadiran pengajian",
       Icon: CalendarCheck,
       to: "/member/absensi",
-      group: "data",
-    },
-    {
-      key: "profil",
-      label: "Biodata Saya",
-      description: "Lihat & edit data pribadi",
-      Icon: User,
-      to: profilePath,
       group: "data",
     },
     {
@@ -308,6 +300,7 @@ export default function MemberOthersPage() {
                   {roleLabel(user?.role)}
                 </span>
               </div>
+              <ChevronRight size={16} className="text-surface-muted shrink-0" />
             </div>
           </ListRow>
         </GroupedList>

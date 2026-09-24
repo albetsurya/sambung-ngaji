@@ -45,6 +45,9 @@ export const memberApi = {
   deactivate: (member_id: string) =>
     call<Member>("deactivateMember", { member_id }),
 
+  delete: (member_id: string) =>
+    call<{ deleted: boolean }>("deleteMember", { member_id }),
+
   getUserStatus: (member_id: string) =>
     call<MemberUserStatus>("getMemberUserStatus", { member_id }),
 

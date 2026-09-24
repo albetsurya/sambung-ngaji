@@ -1,4 +1,4 @@
-import { X } from "./FontAwesomeIcons";
+import { X, Loader2 } from "./FontAwesomeIcons";
 import { Button } from "./Button";
 import type { ReactNode } from "react";
 
@@ -125,7 +125,14 @@ export function ConfirmDialog({
             disabled={loading}
             className="flex-1"
           >
-            {loading ? "Memproses..." : confirmLabel}
+            {loading ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 size={15} className="animate-spin" />
+                Memproses...
+              </span>
+            ) : (
+              confirmLabel
+            )}
           </Button>
         </div>
       </div>

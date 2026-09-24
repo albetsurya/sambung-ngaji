@@ -58,7 +58,7 @@ import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { AttendancePageSkeleton } from "../components/common/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../lib/queryClient";
+import { queryKeys, invalidateRecap } from "../lib/queryClient";
 import { DateInput } from "../components/common/DateInput";
 import {
   GenderTargetPicker,
@@ -360,6 +360,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.attendancePage(meetingId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       setDeleteMeetingTarget(null);
@@ -390,6 +391,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.attendancePage(vars.meetingId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       showToast(
@@ -415,6 +417,7 @@ export default function AttendancePage() {
         queryKey: queryKeys.meetings({ range: "recent" }),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      invalidateRecap(queryClient);
     },
     onError: (err) => {
       showToast(
@@ -433,7 +436,7 @@ export default function AttendancePage() {
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
     if (selectedMeeting.status === "LIBUR") {
-      showToast("Jadwal libur — absensi tidak dapat diubah", "warning");
+      showToast("Jadwal libur, absensi tidak dapat diubah", "warning");
       return;
     }
     const prev = records[memberId];
@@ -457,6 +460,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
     } catch {
       setOptimistic((o) => {
         const next = { ...o };
@@ -481,6 +485,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
       showToast("Absensi dihapus");
     } catch {
       setOptimistic((o) => {
@@ -512,6 +517,7 @@ export default function AttendancePage() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.attendancePage(selectedMeeting.meeting_id),
       });
+      invalidateRecap(queryClient);
       showToast(`${targets.length} jamaah ditandai hadir`);
     } catch (err) {
       setOptimistic((o) => {
@@ -641,6 +647,7 @@ export default function AttendancePage() {
       });
     }
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    invalidateRecap(queryClient);
 
     // Navigasi
     // ✅ FIX TS: cek `sheet.mode === "create"` dulu sebelum akses `sheet.from`
@@ -683,7 +690,7 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} />
+          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} label="Tambah Jadwal" />
         ) : undefined
       }
     >
@@ -713,7 +720,7 @@ export default function AttendancePage() {
         >
           <div className="px-4 py-2">
             <p className="text-ios-caption text-info leading-relaxed">
-              Anda masuk sebagai pengawas — hanya bisa melihat data absensi.
+              Anda masuk sebagai pengawas. Hanya bisa melihat data absensi.
             </p>
           </div>
         </div>
@@ -1321,7 +1328,7 @@ function CreatePickerContent({
             Buat 1 Jadwal
           </p>
           <p className="text-ios-caption text-surface-muted">
-            Untuk pengajian tunggal — isi tanggal & acara
+            Untuk pengajian tunggal, isi tanggal dan acara
           </p>
         </div>
         <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
@@ -1339,7 +1346,7 @@ function CreatePickerContent({
             Buat Massal
           </p>
           <p className="text-ios-caption text-accent/80">
-            1 bulan sekaligus — pilih bulan & hari rutin
+            1 bulan sekaligus. Pilih bulan dan hari rutin
           </p>
         </div>
         <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
@@ -1819,7 +1826,7 @@ function MeetingActionContent({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-medium text-surface-text truncate">
-            {meeting.hari} — {meeting.acara || "Pengajian"}
+                        {meeting.hari} · {meeting.acara || "Pengajian"}
             {isLibur && (
               <span className="ml-2 inline-block text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5 align-middle">
                 Libur

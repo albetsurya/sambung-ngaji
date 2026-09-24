@@ -10,6 +10,7 @@ import {
   Heart,
   Sparkles,
   Pencil,
+  FileText,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -39,7 +40,10 @@ import { goBack } from "../utils/navigation";
 import {
   BiodataTab,
   EducationTab,
+  MemberStatusChips,
 } from "../components/member/MemberTabs";
+import { TaarufCvSheet } from "../components/taaruf/TaarufCvSheet";
+import { isTaarufEligible } from "../lib/taarufAccess";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
 const TABS = [
@@ -65,6 +69,7 @@ export default function MemberSelfPage() {
   const [tab, setTab] = useState<TabKey>(
     isValidTab(tabFromUrl) ? tabFromUrl : "profil",
   );
+  const [taarufOpen, setTaarufOpen] = useState(false);
 
   useEffect(() => {
     if (isValidTab(tabFromUrl)) {
@@ -98,6 +103,10 @@ export default function MemberSelfPage() {
         qc.invalidateQueries({
           queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
         });
+        // Member baru: list & dashboard harus refresh.
+        qc.invalidateQueries({ queryKey: queryKeys.members() });
+        qc.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+        qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
         setTimeout(() => refetch(), 600);
       }
     },
@@ -239,8 +248,32 @@ export default function MemberSelfPage() {
               </span>
             )}
           </div>
+          <MemberStatusChips member={profile} />
         </div>
       </div>
+
+      {/* Tombol CV Taaruf — halaman ini selalu milik sendiri, khusus Pra Nikah */}
+      {isTaarufEligible(profile) && (
+      <div className="px-4 pt-1">
+        <button
+          onClick={() => setTaarufOpen(true)}
+          className="w-full rounded-2xl border border-surface-border bg-surface-card p-3.5 flex items-center gap-3 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
+        >
+          <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
+            <FileText size={18} />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-ios-body font-medium text-surface-text">
+              CV Taaruf Saya
+            </span>
+            <span className="block text-ios-caption text-surface-muted truncate">
+              Pratinjau & unduh biodata taaruf
+            </span>
+          </span>
+          <ChevronRight size={16} className="text-surface-muted flex-shrink-0" />
+        </button>
+      </div>
+      )}
 
       {/* Sticky tab bar */}
       <div
@@ -275,7 +308,7 @@ export default function MemberSelfPage() {
           <ProfileTab profile={profile} upcoming={upcoming} />
         )}
         {tab === "pendidikan" && (
-          <EducationTab education={profile.pendidikan || []} />
+          <EducationTab education={profile.pendidikan || []} member={profile} />
         )}
         {tab === "pembinaan" && (
           <MonitoringTab
@@ -287,6 +320,12 @@ export default function MemberSelfPage() {
           />
         )}
       </div>
+
+      <TaarufCvSheet
+        open={taarufOpen}
+        member={profile}
+        onClose={() => setTaarufOpen(false)}
+      />
     </AppLayout>
   );
 }

@@ -54,3 +54,9 @@ export const queryKeys = {
   memberSelfProfile: (userId: string) =>
     ["member-self-profile", userId] as const,
 };
+
+/** Rekap absensi memakai key mentah — invalidate keduanya sekaligus. */
+export function invalidateRecap(qc: QueryClient) {
+  qc.invalidateQueries({ queryKey: ["recap-meetings"] });
+  qc.invalidateQueries({ queryKey: ["recap-members"] });
+}

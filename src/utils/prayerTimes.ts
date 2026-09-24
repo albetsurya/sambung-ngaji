@@ -269,7 +269,7 @@ export function getSunnahTimes(
       arabic: "الشروق",
       time: syuruq.time,
       timeFormatted: formatTime(syuruq.time),
-      description: "Matahari terbit — batas akhir sholat Subuh",
+      description: "Matahari terbit. Batas akhir sholat Subuh",
     },
     dhuha: {
       key: "dhuha",
@@ -277,7 +277,7 @@ export function getSunnahTimes(
       arabic: "الضحى",
       time: dhuhaTime,
       timeFormatted: formatTime(dhuhaTime),
-      description: "±15 menit setelah terbit — awal sholat Dhuha",
+      description: "±15 menit setelah terbit. Awal sholat Dhuha",
     },
     nisfulLail: {
       key: "nisfulLail",
@@ -285,7 +285,7 @@ export function getSunnahTimes(
       arabic: "نصف الليل",
       time: nisfulLailTime,
       timeFormatted: formatTime(nisfulLailTime),
-      description: "Pertengahan malam — batas akhir sholat Isya",
+      description: "Pertengahan malam. Batas akhir sholat Isya",
     },
     sepertigaAkhir: {
       key: "sepertigaAkhir",

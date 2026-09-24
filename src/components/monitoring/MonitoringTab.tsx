@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle } from "../common/FontAwesomeIcons";
 import { Card, Badge, Button, Select, Textarea, BottomSheet } from "../common";
 import type { MonitoringEntry, MonitoringStatus } from "../../types";
@@ -7,6 +8,7 @@ import { MONITORING_STATUSES } from "../../constants";
 import { monitoringApi } from "../../services/domainApi";
 import { useToast } from "../../contexts/ToastContext";
 import { ApiError } from "../../services/api";
+import { queryKeys } from "../../lib/queryClient";
 import {
   analyzeAttendance,
   type AttendanceSnapshot,
@@ -39,6 +41,7 @@ export function MonitoringTab({
   const [tindakLanjut, setTindakLanjut] = useState("");
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
   /* ------------------- Analisis kehadiran (memoized) ------------------- */
   const analysis = useMemo(() => analyzeAttendance(attendance), [attendance]);
@@ -74,6 +77,13 @@ export function MonitoringTab({
       setOpen(false);
       setCatatan("");
       setTindakLanjut("");
+      // Daftar monitoring di tab ini + status di detail harus refresh.
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.monitoring(memberId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.memberDetail(memberId),
+      });
       onSaved();
     } catch (err) {
       showToast(

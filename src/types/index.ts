@@ -73,6 +73,7 @@ export interface Member {
   hobi?: string;
   pekerjaan?: string;
   foto_url?: string;
+  has_user?: boolean;
   status_pembinaan?: MonitoringStatus;
   status_aktif?: boolean;
   tanggal_masuk?: string;

@@ -147,7 +147,7 @@ export default function MemberTahfidzPage() {
           <section className="space-y-2.5">
             <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
               <RefreshCw size={14} className="text-warning" />
-              Muraja'ah — Perlu Diulang
+              Muraja'ah: Perlu Diulang
             </p>
 
             <div className="rounded-2xl border border-warning/20 bg-warning-soft/40 overflow-hidden">

@@ -18,6 +18,7 @@ import {
 import { groupApi } from "../services/domainApi";
 import type { Group } from "../types";
 import { useToast } from "../contexts/ToastContext";
+import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { GroupedListSkeleton } from "../components/common/Skeleton";
 import { queryKeys } from "../lib/queryClient";
@@ -27,6 +28,9 @@ export default function GroupsPage() {
   const [editing, setEditing] = useState<Group | null>(null);
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  // Simpan kelompok hanya ADMIN (backend). PENGAWAS read-only.
+  const { isAdminLike } = usePermission();
+  const canEdit = isAdminLike;
 
   const {
     data: groups = [],
@@ -44,6 +48,8 @@ export default function GroupsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.groups() });
       queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
       showToast("Kelompok disimpan");
       setOpen(false);
       setEditing(null);
@@ -60,12 +66,15 @@ export default function GroupsPage() {
     <AppLayout
       hideNav
       fab={
-        <FloatingActionButton
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
-        />
+        canEdit ? (
+          <FloatingActionButton
+            label="Tambah Kelompok"
+            onClick={() => {
+              setEditing(null);
+              setOpen(true);
+            }}
+          />
+        ) : undefined
       }
     >
       <Header
@@ -92,14 +101,16 @@ export default function GroupsPage() {
             title="Belum ada kelompok"
             description="Tambahkan kelompok pertama untuk memulai pengelolaan."
             action={
-              <Button
-                onClick={() => {
-                  setEditing(null);
-                  setOpen(true);
-                }}
-              >
-                Tambah Kelompok
-              </Button>
+              canEdit ? (
+                <Button
+                  onClick={() => {
+                    setEditing(null);
+                    setOpen(true);
+                  }}
+                >
+                  Tambah Kelompok
+                </Button>
+              ) : undefined
             }
           />
         )}
@@ -109,13 +120,29 @@ export default function GroupsPage() {
             {groups.map((g, i) => (
               <ListRow
                 key={g.group_id}
-                onClick={() => {
-                  setEditing(g);
-                  setOpen(true);
-                }}
+                onClick={
+                  canEdit
+                    ? () => {
+                        setEditing(g);
+                        setOpen(true);
+                      }
+                    : undefined
+                }
                 insetDivider={i !== groups.length - 1}
               >
-                <ChevronRow>
+                {canEdit ? (
+                  <ChevronRow>
+                    <div>
+                      <p className="text-ios-body font-medium text-surface-text truncate">
+                        {g.group_name}
+                      </p>
+                      <p className="text-ios-footnote text-surface-muted truncate">
+                        {g.pembina ? `Pembina: ${g.pembina}` : ""}{" "}
+                        {g.jadwal ? `· ${g.jadwal}` : ""}
+                      </p>
+                    </div>
+                  </ChevronRow>
+                ) : (
                   <div>
                     <p className="text-ios-body font-medium text-surface-text truncate">
                       {g.group_name}
@@ -125,7 +152,7 @@ export default function GroupsPage() {
                       {g.jadwal ? `· ${g.jadwal}` : ""}
                     </p>
                   </div>
-                </ChevronRow>
+                )}
               </ListRow>
             ))}
           </GroupedList>

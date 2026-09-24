@@ -54,6 +54,8 @@ export default function PendingMemberDetailPage() {
       queryKey: queryKeys.pendingDetail(submission_id || ""),
     });
     queryClient.invalidateQueries({ queryKey: ["members"] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
     queryClient.invalidateQueries({ queryKey: ["users"] });
   };
 

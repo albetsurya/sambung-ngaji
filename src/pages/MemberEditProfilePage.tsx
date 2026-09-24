@@ -7,6 +7,7 @@ import {
   Lock,
   Check,
   Trash2,
+  Loader2,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -26,6 +27,7 @@ import { useToast } from "../contexts/ToastContext";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { queryKeys } from "../lib/queryClient";
+import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 export default function MemberEditProfilePage() {
   const navigate = useNavigate();
@@ -41,6 +43,8 @@ export default function MemberEditProfilePage() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deletingPhoto, setDeletingPhoto] = useState(false);
   const [compressing, setCompressing] = useState(false);
+  // Sembunyikan bottom bar saat keyboard terbuka agar tidak menutupi form.
+  const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
     memberSelfApi
@@ -140,6 +144,7 @@ export default function MemberEditProfilePage() {
         berat_badan: form.berat_badan || "",
         is_kerja: !!form.is_kerja,
         is_nikah: !!form.is_nikah,
+        is_muballigh: !!form.is_muballigh,
         jenjang_pendidikan: form.jenjang_pendidikan || "",
         sekolah: form.sekolah || "",
         jurusan: form.jurusan || "",
@@ -168,8 +173,14 @@ export default function MemberEditProfilePage() {
           queryKey: queryKeys.memberSelfProfile(user.user_id),
         });
       }
+      if (user?.member_id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.memberDetail(user.member_id),
+        });
+      }
       queryClient.invalidateQueries({ queryKey: queryKeys.members() });
       queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
 
       showToast("Biodata diperbarui");
       const returnPath = user?.role === "MEMBER" ? "/member" : "/profil-saya";
@@ -433,6 +444,11 @@ export default function MemberEditProfilePage() {
               onChange={(v) => update("is_kerja", v)}
               label="Sedang bekerja"
             />
+            <ModernCheckbox
+              checked={!!form.is_muballigh}
+              onChange={(v) => update("is_muballigh", v)}
+              label="Muballigh"
+            />
             {!form.is_nikah && (
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <Input
@@ -457,7 +473,11 @@ export default function MemberEditProfilePage() {
         </section>
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 z-30">
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-30 transition-transform duration-200 ${
+          keyboardOpen ? "translate-y-full" : ""
+        }`}
+      >
         <div className="pointer-events-none h-6 bg-gradient-to-t from-surface-bg to-transparent" />
 
         <div className="bg-surface-bg backdrop-blur-xl border-t border-surface-border pb-safe">
@@ -468,11 +488,16 @@ export default function MemberEditProfilePage() {
               fullWidth
               disabled={submitting || compressing}
             >
-              {submitting
-                ? "Menyimpan..."
-                : compressing
-                  ? "Mengkompres..."
-                  : "Simpan Perubahan"}
+              {submitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin" />
+                  Menyimpan...
+                </span>
+              ) : compressing ? (
+                "Mengkompres..."
+              ) : (
+                "Simpan Perubahan"
+              )}
             </Button>
           </div>
         </div>

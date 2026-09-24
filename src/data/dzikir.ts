@@ -81,7 +81,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
     arti: "Tidak ada Tuhan selain Allah",
     target: 100,
     keutamaan:
-      "Dzikir paling afdhal — kalimat tauhid yang menjadi kunci surga.",
+      "Dzikir paling afdhal, kalimat tauhid yang menjadi kunci surga.",
   },
   {
     id: "hasbunallah",

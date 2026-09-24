@@ -6,6 +6,7 @@ import { ToastProvider, useToast } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { PersonalRoute } from "./components/layout/PersonalRoute";
+import { RoleRoute } from "./components/layout/RoleRoute";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
@@ -346,39 +347,163 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
-          <Route path="/jamaah" element={<MembersListPage />} />
-          <Route path="/jamaah/baru" element={<MemberFormPage />} />
-          <Route path="/jamaah/:id" element={<MemberDetailPage />} />
-          <Route path="/jamaah/:id/edit" element={<MemberFormPage />} />
-          <Route path="/absensi" element={<AttendancePage />} />
-          <Route path="/pengumuman" element={<AnnouncementsPage />} />
+          <Route
+            path="/jamaah"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+                <MembersListPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/jamaah/baru"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                <MemberFormPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/jamaah/:id"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+                <MemberDetailPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/jamaah/:id/edit"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                <MemberFormPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/absensi"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
+                <AttendancePage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/pengumuman"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
+                <AnnouncementsPage />
+              </RoleRoute>
+            }
+          />
           <Route
             path="/pengumuman/templates"
-            element={<AnnouncementTemplatesPage />}
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
+                <AnnouncementTemplatesPage />
+              </RoleRoute>
+            }
           />
           <Route path="/profil-saya" element={<MemberSelfPage />} />
           <Route path="/profil-saya/edit" element={<MemberEditProfilePage />} />
 
           <Route path="/lainnya">
             <Route index element={<OthersPage />} />
-            <Route path="kelompok" element={<GroupsPage />} />
-            <Route path="pendaftar" element={<PendingMembersPage />} />
+            <Route
+              path="kelompok"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
+                  <GroupsPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="pendaftar"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <PendingMembersPage />
+                </RoleRoute>
+              }
+            />
             <Route
               path="pendaftar/:submission_id"
-              element={<PendingMemberDetailPage />}
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <PendingMemberDetailPage />
+                </RoleRoute>
+              }
             />
             <Route
               path="permintaan-member"
-              element={<MemberRequestsPage />}
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <MemberRequestsPage />
+                </RoleRoute>
+              }
             />
-            <Route path="qr-code" element={<QrCodePage />} />
-            <Route path="ai-usage" element={<AiUsagePage />} />
-            <Route path="users" element={<UsersPage />} />
-            <Route path="audit-log" element={<AuditLogPage />} />
-            <Route path="jadwal" element={<JadwalPage />} />
-            <Route path="petugas-jumat" element={<FridaySchedulesPage />} />
-            <Route path="import-jamaah" element={<MemberImportPage />} />
-            <Route path="rekap-absensi" element={<MemberAttendanceRecapPage />} />
+            <Route
+              path="qr-code"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <QrCodePage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="ai-usage"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <AiUsagePage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN"]}>
+                  <UsersPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="audit-log"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN"]}>
+                  <AuditLogPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="jadwal"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI"]}>
+                  <JadwalPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="petugas-jumat"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
+                  <FridaySchedulesPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="import-jamaah"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                  <MemberImportPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="rekap-absensi"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
+                  <MemberAttendanceRecapPage />
+                </RoleRoute>
+              }
+            />
           </Route>
 
           <Route path="/ai-chat" element={<AiChatPage />} />

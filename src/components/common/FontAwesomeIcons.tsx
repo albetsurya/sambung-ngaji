@@ -17,6 +17,7 @@ import {
   faEllipsisVertical,
   faChevronLeft,
   faPlus,
+  faMinus,
   faSun,
   faMoon,
   faWandMagicSparkles,
@@ -78,6 +79,7 @@ import {
   faLocationArrow,
   faUpload,
   faFileAlt,
+  faGripVertical,
   faUtensils,
   faToilet,
   faCarSide,
@@ -86,6 +88,12 @@ import {
   faCloudRain,
   faSeedling,
   faSprout,
+  faCakeCandles,
+  faMars,
+  faVenus,
+  faRuler,
+  faPhone,
+  faHourglassHalf,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -135,6 +143,7 @@ export const MoreHorizontal = createIcon(faEllipsis);
 export const MoreVertical = createIcon(faEllipsisVertical);
 export const ChevronLeft = createIcon(faChevronLeft);
 export const Plus = createIcon(faPlus);
+export const Minus = createIcon(faMinus);
 export const Sun = createIcon(faSun);
 export const Moon = createIcon(faMoon);
 export const Sparkles = createIcon(faWandMagicSparkles);
@@ -210,6 +219,7 @@ export const Navigation = createIcon(faLocationArrow);
 export const Upload = createIcon(faUpload);
 
 export const FileText = createIcon(faFileAlt);
+export const GripVertical = createIcon(faGripVertical);
 
 export const Utensils = createIcon(faUtensils);
 export const Toilet = createIcon(faToilet);
@@ -219,3 +229,9 @@ export const Shirt = createIcon(faShirt);
 export const CloudRain = createIcon(faCloudRain);
 export const Seedling = createIcon(faSeedling);
 export const Sprout = createIcon(faSprout);
+export const Cake = createIcon(faCakeCandles);
+export const Mars = createIcon(faMars);
+export const Venus = createIcon(faVenus);
+export const Ruler = createIcon(faRuler);
+export const Phone = createIcon(faPhone);
+export const Hourglass = createIcon(faHourglassHalf);
