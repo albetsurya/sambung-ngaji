@@ -27,6 +27,7 @@ import {
   CheckCircle2,
   CircleAlert,
   Plus,
+  Loader2,
 } from "../components/common/FontAwesomeIcons";
 import { fridayApi } from "../services/domainApi";
 import type { FridaySchedule, FridayReminderStatus } from "../types";
@@ -154,6 +155,22 @@ export default function FridaySchedulesPage() {
     onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menghapus jadwal",
+        "error",
+      );
+    },
+  });
+
+  const markSentMutation = useMutation({
+    mutationFn: (tanggal: string) => fridayApi.markSent(tanggal),
+    onSuccess: () => {
+      invalidate();
+      queryClient.invalidateQueries({ queryKey: ["friday-reminder-status"] });
+      showToast("Ditandai sudah terkirim");
+      setFollowUp(null);
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menandai terkirim",
         "error",
       );
     },
@@ -529,6 +546,30 @@ export default function FridaySchedulesPage() {
                 Via WhatsApp
               </Button>
             </div>
+            {followUp.reminder_sent_at ? (
+              <p className="text-ios-caption text-surface-muted text-center flex items-center justify-center gap-1.5">
+                <CheckCircle2 size={13} className="text-success" />
+                Sudah ditandai terkirim {formatDateTime(followUp.reminder_sent_at)}
+              </p>
+            ) : canEdit ? (
+              <Button
+                fullWidth
+                variant="secondary"
+                disabled={markSentMutation.isPending}
+                onClick={() => markSentMutation.mutate(followUp.tanggal)}
+                leftIcon={
+                  markSentMutation.isPending ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <CheckCircle2 size={15} />
+                  )
+                }
+              >
+                {markSentMutation.isPending
+                  ? "Menandai..."
+                  : "Tandai Sudah Terkirim"}
+              </Button>
+            ) : null}
           </div>
         )}
       </BottomSheet>
