@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   List,
   Loader2,
+  KeyRound,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -730,6 +731,11 @@ const JamaahRow = memo(function JamaahRow({
           {member.kelompok || "Belum ada kelompok"}
         </p>
       </div>
+      {member.has_user && (
+        <span title="Punya akun user" aria-label="Punya akun user">
+          <KeyRound size={12} className="text-accent shrink-0" />
+        </span>
+      )}
       {member.kategori && (
         <span className="text-ios-footnote text-surface-muted flex-shrink-0">
           {CATEGORY_LABEL[member.kategori]}
@@ -765,6 +771,11 @@ const JamaahCard = memo(function JamaahCard({
             {member.kelompok || "Belum ada kelompok"}
           </p>
         </div>
+        {member.has_user && (
+          <span title="Punya akun user" aria-label="Punya akun user">
+            <KeyRound size={13} className="text-accent shrink-0" />
+          </span>
+        )}
         {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
       </Card>
     </div>
@@ -809,8 +820,14 @@ const JamaahGridCard = memo(function JamaahGridCard({
       </div>
       {member.kategori && (
         <span
-          className={`inline-flex items-center px-1.5 py-0.5 rounded-full ${badgeSize} font-semibold tracking-wide bg-accent-soft text-accent truncate max-w-full`}
+          className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full ${badgeSize} font-semibold tracking-wide bg-accent-soft text-accent truncate max-w-full`}
         >
+          {member.has_user && (
+            <KeyRound
+              size={9}
+              aria-label="Punya akun user"
+            />
+          )}
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}

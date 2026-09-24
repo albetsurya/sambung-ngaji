@@ -433,7 +433,7 @@ export default function AttendancePage() {
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
     if (selectedMeeting.status === "LIBUR") {
-      showToast("Jadwal libur — absensi tidak dapat diubah", "warning");
+      showToast("Jadwal libur, absensi tidak dapat diubah", "warning");
       return;
     }
     const prev = records[memberId];
@@ -713,7 +713,7 @@ export default function AttendancePage() {
         >
           <div className="px-4 py-2">
             <p className="text-ios-caption text-info leading-relaxed">
-              Anda masuk sebagai pengawas — hanya bisa melihat data absensi.
+              Anda masuk sebagai pengawas. Hanya bisa melihat data absensi.
             </p>
           </div>
         </div>
@@ -1321,7 +1321,7 @@ function CreatePickerContent({
             Buat 1 Jadwal
           </p>
           <p className="text-ios-caption text-surface-muted">
-            Untuk pengajian tunggal — isi tanggal & acara
+            Untuk pengajian tunggal, isi tanggal dan acara
           </p>
         </div>
         <ChevronDown size={16} className="text-surface-muted -rotate-90 flex-shrink-0" />
@@ -1339,7 +1339,7 @@ function CreatePickerContent({
             Buat Massal
           </p>
           <p className="text-ios-caption text-accent/80">
-            1 bulan sekaligus — pilih bulan & hari rutin
+            1 bulan sekaligus. Pilih bulan dan hari rutin
           </p>
         </div>
         <ChevronDown size={16} className="text-accent/70 -rotate-90 flex-shrink-0" />
@@ -1819,7 +1819,7 @@ function MeetingActionContent({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-medium text-surface-text truncate">
-            {meeting.hari} — {meeting.acara || "Pengajian"}
+                        {meeting.hari} · {meeting.acara || "Pengajian"}
             {isLibur && (
               <span className="ml-2 inline-block text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5 align-middle">
                 Libur

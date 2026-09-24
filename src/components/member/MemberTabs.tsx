@@ -4,6 +4,23 @@ import {
   X,
   AlertTriangle,
   ChevronDown,
+  GraduationCap,
+  User,
+  Mars,
+  Venus,
+  Cake,
+  Hourglass,
+  Ruler,
+  Building2,
+  Home,
+  Compass,
+  MapPin,
+  Phone,
+  Briefcase,
+  Star,
+  Heart,
+  Mosque,
+  CalendarCheck,
 } from "../common/FontAwesomeIcons";
 import { Card, Badge, GroupedList, ListRow } from "../common";
 import type { Member, Education, AttendanceStatus } from "../../types";
@@ -21,51 +38,113 @@ import type { MoodEntry } from "../../services/domainApi";
 /* -------------------------------------------------------------------------- */
 
 export function BiodataTab({ member }: { member: Member }) {
-  const rows: [string, string | undefined][] = [
-    ["Nama Panggilan", member.nama_panggilan],
-    [
-      "Jenis Kelamin",
-      member.jenis_kelamin === "L"
-        ? "Laki-laki"
-        : member.jenis_kelamin === "P"
-          ? "Perempuan"
-          : "-",
-    ],
-    [
-      "Tempat, Tgl Lahir",
-      [
-        member.tempat_lahir,
-        member.tanggal_lahir ? formatDateLongText(member.tanggal_lahir) : "",
-      ]
-        .filter(Boolean)
-        .join(", "),
-    ],
-    ["Usia", member.usia != null ? `${member.usia} tahun` : "-"],
-    ["Kelompok", member.kelompok],
-    ["Desa", member.desa],
-    ["Daerah", member.daerah],
-    ["Alamat", member.alamat_rumah],
-    ["No. WhatsApp", member.no_wa],
-    ["Pekerjaan", member.pekerjaan],
+  const GenderIcon = member.jenis_kelamin === "P" ? Venus : Mars;
+  const ttl = [member.tempat_lahir, member.tanggal_lahir ? formatDateLongText(member.tanggal_lahir) : ""]
+    .filter(Boolean)
+    .join(", ");
+  const fisik = [
+    member.tinggi_badan ? `${member.tinggi_badan} cm` : "",
+    member.berat_badan ? `${member.berat_badan} kg` : "",
+  ]
+    .filter(Boolean)
+    .join(" / ");
+
+  const sections: {
+    title: string;
+    rows: { Icon: typeof User; label: string; value?: string }[];
+  }[] = [
+    {
+      title: "Pribadi",
+      rows: [
+        { Icon: User, label: "Nama panggilan", value: member.nama_panggilan },
+        {
+          Icon: GenderIcon,
+          label: "Jenis kelamin",
+          value:
+            member.jenis_kelamin === "L"
+              ? "Laki-laki"
+              : member.jenis_kelamin === "P"
+                ? "Perempuan"
+                : undefined,
+        },
+        { Icon: Cake, label: "Tempat, tanggal lahir", value: ttl || undefined },
+        {
+          Icon: Hourglass,
+          label: "Usia",
+          value: member.usia != null ? `${member.usia} tahun` : undefined,
+        },
+        { Icon: Ruler, label: "Tinggi / berat badan", value: fisik || undefined },
+        {
+          Icon: CalendarCheck,
+          label: "Aktif sejak",
+          value: member.tanggal_masuk ? formatDateShort(member.tanggal_masuk) : undefined,
+        },
+      ],
+    },
+    {
+      title: "Domisili",
+      rows: [
+        { Icon: Building2, label: "Kelompok", value: member.kelompok },
+        { Icon: Home, label: "Desa", value: member.desa },
+        { Icon: Compass, label: "Daerah", value: member.daerah },
+        { Icon: MapPin, label: "Alamat rumah", value: member.alamat_rumah },
+      ],
+    },
+    {
+      title: "Kontak & Kesibukan",
+      rows: [
+        { Icon: Phone, label: "No. WhatsApp", value: member.no_wa },
+        { Icon: Briefcase, label: "Pekerjaan", value: member.pekerjaan },
+        { Icon: Star, label: "Hobi", value: member.hobi },
+      ],
+    },
   ];
+
+  const visibleSections = sections
+    .map((s) => ({ ...s, rows: s.rows.filter((r) => r.value) }))
+    .filter((s) => s.rows.length > 0);
 
   return (
     <div className="-mx-4">
-      <GroupedList>
-        {rows.map(([label, value], i) => (
-          <ListRow key={label} insetDivider={i !== rows.length - 1}>
-            <div className="flex justify-between gap-4">
-              <span className="text-ios-body text-surface-muted flex-shrink-0">
-                {label}
-              </span>
-              <span className="text-ios-body text-surface-text text-right truncate">
-                {value || "-"}
-              </span>
-            </div>
-          </ListRow>
-        ))}
-      </GroupedList>
-      <p className="text-ios-caption text-surface-muted px-5 mt-1">
+      {visibleSections.map((s, si) => {
+        const rows = s.rows;
+        return (
+          <section key={s.title}>
+            <p
+              className={`px-4 mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted ${
+                si === 0 ? "mt-1" : "mt-5"
+              }`}
+            >
+              {s.title}
+            </p>
+            <GroupedList>
+              {rows.map((r, i) => {
+                const Icon = r.Icon;
+                return (
+                  <ListRow
+                    key={r.label}
+                    insetDivider={i !== rows.length - 1}
+                    leading={
+                      <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                        <Icon size={15} />
+                      </span>
+                    }
+                  >
+                    <p className="text-ios-caption text-surface-muted">
+                      {r.label}
+                    </p>
+                    <p className="text-ios-body font-medium text-surface-text leading-snug break-words">
+                      {r.value}
+                    </p>
+                  </ListRow>
+                );
+              })}
+            </GroupedList>
+          </section>
+        );
+      })}
+
+      <p className="text-ios-caption text-surface-muted px-5 mt-3">
         Data diperbarui:{" "}
         {member.updated_at ? formatDateShort(member.updated_at) : "-"}
       </p>
@@ -77,39 +156,179 @@ export function BiodataTab({ member }: { member: Member }) {
 /*                              EDUCATION TAB                                 */
 /* -------------------------------------------------------------------------- */
 
-export function EducationTab({ education }: { education: Education[] }) {
-  if (!education.length) {
+export function EducationTab({
+  education,
+  member,
+}: {
+  education: Education[];
+  /**
+   * Fallback biodata flat (jenjang/sekolah/jurusan). Backend belum punya
+   * tabel riwayat pendidikan — `pendidikan[]` selalu kosong, jadi tab
+   * dibangun dari kolom biodata bila array kosong.
+   */
+  member?: Member;
+}) {
+  const items =
+    education.length > 0 ? education : fallbackEducation(member);
+  if (!items.length) {
     return (
       <Card>
-        <p className="text-ios-subhead text-surface-muted text-center py-4">
-          Belum ada riwayat pendidikan.
-        </p>
+        <div className="flex flex-col items-center text-center py-6">
+          <span className="w-14 h-14 rounded-2xl bg-accent-soft flex items-center justify-center text-accent mb-3">
+            <GraduationCap size={26} />
+          </span>
+          <p className="text-ios-subhead font-medium text-surface-text">
+            Belum ada riwayat pendidikan
+          </p>
+          <p className="text-ios-caption text-surface-muted mt-1 max-w-[240px] leading-relaxed">
+            Lengkapi data pendidikan melalui Edit Biodata.
+          </p>
+        </div>
       </Card>
     );
   }
+
+  const latest = items[0];
+  const yearRange = formatYearRange(latest.tahun_mulai, latest.tahun_selesai);
+  const duration = studyDuration(latest.tahun_mulai, latest.tahun_selesai);
+
   return (
-    <div className="space-y-2">
-      {education.map((e) => (
-        <Card
-          key={e.education_id}
-          className="flex items-center justify-between"
-        >
-          <div className="min-w-0">
-            <p className="font-medium text-ios-subhead text-surface-text truncate">
-              {e.jenjang} {e.kelas ? `- Kelas ${e.kelas}` : ""}
+    <div className="space-y-3">
+      {/* Hero: pendidikan terakhir */}
+      <div className="rounded-2xl border border-surface-border bg-surface-card shadow-sm overflow-hidden">
+        <div className="p-4 flex items-center gap-3">
+          <span className="w-12 h-12 rounded-2xl bg-accent text-white flex items-center justify-center shrink-0 shadow-sm shadow-accent/30">
+            <GraduationCap size={22} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-accent">
+              Pendidikan terakhir
             </p>
-            <p className="text-ios-footnote text-surface-muted truncate">
-              {e.sekolah}
-              {e.jurusan ? ` · ${e.jurusan}` : ""}
+            <p className="text-[17px] font-semibold text-surface-text truncate tracking-[-0.01em]">
+              {latest.jenjang}
+              {latest.kelas ? ` · Kelas ${latest.kelas}` : ""}
             </p>
+            {(latest.sekolah || latest.jurusan) && (
+              <p className="text-ios-footnote text-surface-muted truncate">
+                {[latest.sekolah, latest.jurusan].filter(Boolean).join(" · ")}
+              </p>
+            )}
           </div>
-          <Badge color={e.status === "AKTIF" ? "emerald" : "ink"}>
-            {e.status}
-          </Badge>
-        </Card>
-      ))}
+        </div>
+        {(yearRange || duration || latest.status) && (
+          <div className="px-4 pb-3.5 flex items-center gap-2 flex-wrap">
+            {yearRange && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold tabular-nums bg-accent-soft text-accent">
+                {yearRange}
+              </span>
+            )}
+            {duration && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-surface-card2 text-surface-muted">
+                {duration}
+              </span>
+            )}
+            {latest.status && (
+              <Badge color={latest.status === "AKTIF" ? "emerald" : "ink"}>
+                {latest.status}
+              </Badge>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Timeline riwayat */}
+      <div className="relative pl-5">
+        <div className="absolute left-[7px] top-2 bottom-2 w-px bg-surface-border" />
+        <div className="space-y-2.5">
+          {items.map((e, idx) => {
+            const range = formatYearRange(e.tahun_mulai, e.tahun_selesai);
+            return (
+              <div key={e.education_id} className="relative">
+                <div
+                  className={`absolute -left-5 top-4 w-3.5 h-3.5 rounded-full bg-surface-card border-2 ${
+                    idx === 0 ? "border-accent" : "border-surface-muted/40"
+                  }`}
+                />
+                <Card
+                  className={idx === 0 ? "!border-accent/25" : ""}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-ios-subhead text-surface-text truncate">
+                        {e.jenjang}
+                        {e.kelas ? ` · Kelas ${e.kelas}` : ""}
+                      </p>
+                      {(e.sekolah || e.jurusan) && (
+                        <p className="text-ios-footnote text-surface-muted truncate mt-0.5">
+                          {[e.sekolah, e.jurusan].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                    {range && (
+                      <span className="text-[11px] font-bold tabular-nums text-surface-muted shrink-0">
+                        {range}
+                      </span>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <p className="text-ios-caption text-surface-muted px-1">
+        {items.length} riwayat pendidikan
+        {member?.updated_at
+          ? ` · diperbarui ${formatDateShort(member.updated_at)}`
+          : ""}
+      </p>
     </div>
   );
+}
+
+/** "2019–2023", "2021–sekarang", atau "" bila tak ada tahun. */
+function formatYearRange(
+  mulai?: string | number,
+  selesai?: string | number,
+): string {
+  const m = mulai !== undefined && mulai !== "" ? String(mulai) : "";
+  const s = selesai !== undefined && selesai !== "" ? String(selesai) : "";
+  if (m && s) return `${m}–${s}`;
+  if (m) return `${m}–sekarang`;
+  if (s) return `s.d. ${s}`;
+  return "";
+}
+
+/** "4 tahun" bila kedua tahun numerik, selebihnya "". */
+function studyDuration(
+  mulai?: string | number,
+  selesai?: string | number,
+): string {
+  const m = Number(mulai);
+  const s = Number(selesai);
+  if (!mulai || !selesai || !Number.isFinite(m) || !Number.isFinite(s)) return "";
+  const d = s - m;
+  if (d <= 0) return "";
+  return `${d} tahun`;
+}
+
+/** Bangun 1 entri dari kolom flat bila array riwayat kosong. */
+function fallbackEducation(member?: Member): Education[] {
+  if (!member) return [];
+  const { jenjang_pendidikan, sekolah, jurusan } = member;
+  if (!jenjang_pendidikan && !sekolah && !jurusan) return [];
+  return [
+    {
+      education_id: "biodata",
+      member_id: member.member_id,
+      jenjang: jenjang_pendidikan || "Pendidikan",
+      sekolah,
+      jurusan,
+      tahun_mulai: member.tahun_mulai_pendidikan,
+      tahun_selesai: member.tahun_selesai_pendidikan,
+    },
+  ];
 }
 
 /* -------------------------------------------------------------------------- */
@@ -548,6 +767,34 @@ function StatBox({
 export function CategoryHeaderBadge({ member }: { member: Member }) {
   if (!member.kategori) return null;
   return <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>;
+}
+
+/**
+ * Chip status identitas (Muballigh/Bekerja/Menikah) — dipasang di header
+ * profil tepat di bawah kategori–kelompok, bukan di dalam tab.
+ */
+export function MemberStatusChips({ member }: { member: Member }) {
+  const chips: { Icon: typeof Heart; label: string }[] = [];
+  if (member.is_muballigh) chips.push({ Icon: Mosque, label: "Muballigh" });
+  if (member.is_kerja) chips.push({ Icon: Briefcase, label: "Bekerja" });
+  if (member.is_nikah) chips.push({ Icon: Heart, label: "Menikah" });
+  if (chips.length === 0) return null;
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+      {chips.map((c) => {
+        const Icon = c.Icon;
+        return (
+          <span
+            key={c.label}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-accent-soft text-accent"
+          >
+            <Icon size={10} />
+            {c.label}
+          </span>
+        );
+      })}
+    </div>
+  );
 }
 
 /* -------------------------------------------------------------------------- */

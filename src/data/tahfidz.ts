@@ -21,7 +21,7 @@ export const TAHFIDZ_KATEGORI: TahfidzKategoriInfo[] = [
   {
     key: "juz30",
     label: "Juz 30",
-    deskripsi: "Juz 'Amma — 37 surah pendek",
+    deskripsi: "Juz 'Amma, 37 surah pendek",
     emoji: "🌱",
   },
   {

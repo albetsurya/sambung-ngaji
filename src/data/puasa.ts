@@ -96,7 +96,7 @@ export const PUASA_ARAFAH: PuasaInfo = {
   nama: "Puasa Arafah",
   deskripsi: "Puasa 9 Dzulhijjah",
   keutamaan:
-    "Menghapus dosa setahun yang lalu dan setahun yang akan datang — khusus bagi yang tidak berhaji.",
+    "Menghapus dosa setahun yang lalu dan setahun yang akan datang, khusus bagi yang tidak berhaji.",
   dalil: "HR. Muslim 1162",
   tone: "warning",
 };

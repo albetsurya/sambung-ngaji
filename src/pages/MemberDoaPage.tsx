@@ -304,7 +304,7 @@ export default function MemberDoaPage() {
               {kategori.arabLabel}
             </p>
             <p className="text-ios-footnote text-surface-muted mt-1">
-              {visibleEntries.length} doa — klik untuk membuka
+              {visibleEntries.length} doa. Klik untuk membuka
             </p>
           </div>
         )}

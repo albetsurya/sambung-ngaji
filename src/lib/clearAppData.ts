@@ -3,7 +3,7 @@ import { queryClient } from "./queryClient";
 import { createIDBPersister } from "./queryPersist";
 
 /**
- * Flush data lokal supaya aplikasi kembali fresh — tanpa logout.
+ * Flush data lokal supaya aplikasi kembali fresh, tanpa logout.
  *
  * Yang dibersihkan:
  * - React Query cache (memory) + persist IDB ("pengajian-query-cache")
@@ -67,7 +67,7 @@ export async function flushAppData(
     // ignore
   }
 
-  // 4. Cache Storage (Workbox precache/runtime) — SW tetap terdaftar.
+  // 4. Cache Storage (Workbox precache/runtime). SW tetap terdaftar.
   try {
     if ("caches" in window) {
       const names = await caches.keys();

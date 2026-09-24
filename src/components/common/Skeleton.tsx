@@ -368,7 +368,7 @@ export function AnnouncementListSkeleton({ rows = 5 }: { rows?: number }) {
  * Skeleton untuk MemberSelfPage — mirror layout asli:
  * - Profile header (avatar 64px + nama + badge + kelompok)
  * - Tab bar (3 tab: Profil, Absensi, Pembinaan)
- * - Card "Biodata" dengan 8 baris field
+ * - Chip status + 2 section Biodata (ikon + label/value stacked)
  * - Section "Jadwal Pengajian Mendatang" dengan 2 card jadwal
  */
 export function MemberSelfSkeleton() {
@@ -395,25 +395,40 @@ export function MemberSelfSkeleton() {
         </div>
       </div>
 
-      {/* Content — mirror tab "Profil" */}
+      {/* Content — mirror tab "Profil" (Biodata sectioned) */}
       <div className="px-4 py-4 space-y-4">
-        {/* Card Biodata */}
-        <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4">
-          <div className="mb-3 px-0.5">
-            <Skeleton width={60} height={14} />
-          </div>
-          <div className="space-y-2.5">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex justify-between gap-3 py-2 border-b border-surface-border last:border-b-0"
-              >
-                <Skeleton width="30%" height={16} />
-                <Skeleton width="50%" height={16} />
-              </div>
-            ))}
-          </div>
+        {/* Chip status */}
+        <div className="flex gap-2">
+          <Skeleton width={92} height={24} className="rounded-full" />
+          <Skeleton width={76} height={24} className="rounded-full" />
         </div>
+
+        {/* 2 section Biodata: label + card ikon stacked */}
+        {[4, 3].map((rowCount, s) => (
+          <div key={s}>
+            <div className="px-4 mb-2 mt-1">
+              <Skeleton width={88} height={12} />
+            </div>
+            <div className="mx-4 bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
+              {Array.from({ length: rowCount }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center gap-3 px-4 py-3 ${
+                    i !== rowCount - 1
+                      ? "border-b border-surface-border"
+                      : ""
+                  }`}
+                >
+                  <Skeleton variant="rect" width={36} height={36} className="rounded-xl shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <Skeleton width="35%" height={11} />
+                    <Skeleton width="70%" height={15} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
 
         {/* Section Jadwal Pengajian Mendatang */}
         <div className="space-y-2">

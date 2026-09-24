@@ -22,7 +22,7 @@ export function BadgeCollection({ badges }: { badges: BadgeState[] }) {
           <div
             key={b.id}
             className={`flex flex-col items-center gap-1 rounded-xl p-2 ${TIER_COLOR[b.tier]}`}
-            title={`${b.name} — ${b.minStreak} hari`}
+            title={`${b.name}: ${b.minStreak} hari`}
           >
             <Star size={16} />
             <span className="text-[9px] font-medium text-center leading-tight">
@@ -34,7 +34,7 @@ export function BadgeCollection({ badges }: { badges: BadgeState[] }) {
           <div
             key={b.id}
             className="flex flex-col items-center gap-1 rounded-xl bg-surface-card2 p-2 opacity-50"
-            title={`${b.name} — ${b.minStreak} hari`}
+            title={`${b.name}: ${b.minStreak} hari`}
           >
             <Lock size={16} className="text-surface-muted" />
             <span className="text-[9px] font-medium text-center leading-tight text-surface-muted">

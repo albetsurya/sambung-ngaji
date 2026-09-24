@@ -167,7 +167,7 @@ export function ResetPasswordSheet({
     <BottomSheet
       open={open}
       onClose={handleClose}
-      title={`Reset Password — ${userName}`}
+      title={`Reset Password: ${userName}`}
     >
       <div className="rounded-xl bg-warning-soft border border-warning/20 p-3 mb-4">
         <p className="text-ios-footnote text-warning leading-relaxed">

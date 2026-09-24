@@ -257,7 +257,7 @@ function EmptyChat({ onSuggest }: { onSuggest: (text: string) => void }) {
         Assalamu'alaikum
       </h3>
       <p className="text-ios-footnote text-surface-muted max-w-xs leading-relaxed mb-6">
-        Saya siap membantu menjawab pertanyaan tentang data pribadi Anda —
+        Saya siap membantu menjawab pertanyaan tentang data pribadi Anda:
         biodata, absensi, pembinaan, dan jadwal pengajian.
       </p>
       <div className="w-full max-w-sm space-y-2">

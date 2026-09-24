@@ -32,7 +32,7 @@ export default function MemberGuidePage() {
           number={1}
           title="Lihat Profil Anda"
           Icon={User}
-          description="Tab Profil menampilkan biodata lengkap Anda — nama, usia, kelompok, alamat, kontak, dan pendidikan."
+          description="Tab Profil menampilkan biodata lengkap Anda: nama, usia, kelompok, alamat, kontak, dan pendidikan."
           steps={[
             "Buka tab Profil di halaman utama",
             "Scroll untuk melihat semua data",

@@ -207,6 +207,9 @@ export default function UsersPage() {
         onDeleted={() => {
           queryClient.invalidateQueries({ queryKey: queryKeys.users() });
           queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+          queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+          queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+          queryClient.invalidateQueries({ queryKey: ["member"] });
           setDeleteTarget(null);
         }}
       />
@@ -295,7 +298,7 @@ function CreateUserSheet({
           {members.map((m) => (
             <option key={m.member_id} value={m.member_id}>
               {m.nama_lengkap}
-              {m.kelompok ? ` — ${m.kelompok}` : ""}
+              {m.kelompok ? ` · ${m.kelompok}` : ""}
             </option>
           ))}
         </Select>
