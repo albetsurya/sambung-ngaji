@@ -9,6 +9,7 @@ import {
 import type { User } from "../types";
 import { authApi } from "../services/authApi";
 import { getToken, clearToken, ApiError } from "../services/api";
+import { migrateAnonDataToUser } from "../lib/scopedStorage";
 import { useQueryClient } from "@tanstack/react-query";
 
 /* -------------------------------------------------------------------------- */
@@ -66,6 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (cancelled) return;
 
+        // Gabungkan progres tamu (anon) ke akun bila ada.
+        migrateAnonDataToUser(u?.user_id);
         setUser(u);
       } catch (error) {
         if (cancelled) return;
@@ -93,6 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function login(username: string, password: string) {
     console.log("🔐 AuthProvider.login called");
     const u = await authApi.login(username, password);
+    // Gabungkan progres tamu (anon) ke akun bila ada.
+    migrateAnonDataToUser(u?.user_id);
     setUser(u);
   }
 

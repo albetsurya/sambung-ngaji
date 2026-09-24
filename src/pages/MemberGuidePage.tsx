@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import {
   User,
   Calendar,
@@ -12,12 +14,18 @@ import {
 
 export default function MemberGuidePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   return (
     <AppLayout hideNav>
       <Header
         title="Panduan Penggunaan"
-        onBack={() => goBack(navigate, "/member/lainnya")}
+        onBack={() => goBack(navigate, user ? "/member/lainnya" : "/")}
         backLabel="Kembali"
+        right={
+          !user ? (
+              <MasukButton />
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-4">

@@ -8,7 +8,9 @@ import {
   Heart,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button } from "../components/common";
+import { useAuth } from "../contexts/AuthContext";
 import {
   MOOD_LIST,
   getMood,
@@ -53,6 +55,7 @@ function pickDalil(mood: Mood): Dalil | null {
 
 export default function MemberMoodPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const moodParam = searchParams.get("mood") as MoodKey | null;
   const selected = moodParam ? getMood(moodParam) : null;
@@ -68,10 +71,15 @@ export default function MemberMoodPage() {
         }
         onBack={() => {
           if (selected) setSearchParams({}, { replace: true });
-          else goBack(navigate, "/member");
+          else goBack(navigate, user ? "/member" : "/");
         }}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+              <MasukButton />
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
@@ -91,6 +99,7 @@ export default function MemberMoodPage() {
 
 function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
   const [selected, setSelected] = useState<MoodKey | null>(null);
+  const { user } = useAuth();
 
   return (
     <>
@@ -135,7 +144,8 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       <Button
         onClick={() => {
           if (selected) {
-            moodApi.save(selected).catch(() => {});
+            // Tamu: konten tetap tampil, riwayat hanya tersimpan bila masuk.
+            if (user) moodApi.save(selected).catch(() => {});
             onSelect(selected);
           }
         }}
@@ -147,6 +157,11 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       >
         {selected ? "Tampilkan untuk saya" : "Pilih mood dulu"}
       </Button>
+      {!user && (
+        <p className="text-ios-caption text-surface-muted text-center">
+          Masuk agar riwayat mood tersimpan di akun Anda.
+        </p>
+      )}
     </>
   );
 }

@@ -62,3 +62,44 @@ export function clearUserData(userId: string | null | undefined): number {
   }
   return removed;
 }
+
+/**
+ * Migrasi data tamu (anon) ke akun saat login.
+ * Tiap `sng:anon:{base}` dipindah ke `sng:{userId}:{base}` HANYA bila
+ * target kosong (tidak menimpa data akun). Key anon yang dipindah dihapus.
+ * @returns jumlah key yang dipindahkan.
+ */
+export function migrateAnonDataToUser(
+  userId: string | null | undefined,
+): number {
+  if (!userId) return 0;
+  const anonPrefix = PREFIX + ":anon:";
+  const userPrefix = PREFIX + ":" + userId + ":";
+  if (anonPrefix === userPrefix) return 0;
+  let moved = 0;
+  try {
+    const bases: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(anonPrefix)) bases.push(k.slice(anonPrefix.length));
+    }
+    for (const base of bases) {
+      const from = anonPrefix + base;
+      const to = userPrefix + base;
+      const value = localStorage.getItem(from);
+      if (value === null) continue;
+      if (localStorage.getItem(to) !== null) continue;
+      try {
+        localStorage.setItem(to, value);
+        localStorage.removeItem(from);
+        moved++;
+      } catch {
+        // quota penuh — hentikan, sisanya tetap anon
+        break;
+      }
+    }
+  } catch {
+    // ignore (private mode)
+  }
+  return moved;
+}

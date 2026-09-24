@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Mosque } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import {
   EmptyState,
   ErrorState,
@@ -14,6 +15,7 @@ import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { formatDateLongText } from "../utils/format";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   FRIDAY_ROLES,
   missingRoles,
@@ -23,6 +25,7 @@ import {
 
 export default function MemberFridayPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const {
     data: schedules = [],
@@ -48,9 +51,14 @@ export default function MemberFridayPage() {
     <AppLayout hideNav showAiChat={false}>
       <Header
         title="Petugas Jumat"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+              <MasukButton />
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-3 pb-8">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Compass,
   Navigation,
@@ -10,6 +11,7 @@ import {
   Check,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button } from "../components/common";
 import { useQiblaDirection } from "../hooks/useQiblaDirection";
 
@@ -17,6 +19,7 @@ const LATUKAN = { lat: -6.9879, lng: 112.3729 };
 
 export default function MemberKiblatPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     qiblaBearing,
     deviceHeading,
@@ -63,11 +66,13 @@ export default function MemberKiblatPage() {
               ? "Lokasi Anda saat ini"
               : "Mencari lokasi..."
         }
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          <Button
+          <>
+            {!user && <MasukButton />}
+            <Button
             variant="ghost"
             size="xs"
             iconOnly
@@ -81,6 +86,7 @@ export default function MemberKiblatPage() {
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </Button>
+          </>
         }
       />
 

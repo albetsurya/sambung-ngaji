@@ -1,42 +1,48 @@
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import { RefreshCw } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button } from "../components/common";
 import { DZIKIR_PRESETS } from "../data/dzikir";
 import { useDzikirCounters } from "../hooks/useDzikirCounters";
 
 export default function MemberDzikirPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { getCount, resetAll, counts } = useDzikirCounters();
 
   const totalDzikir = Object.values(counts).reduce((a, b) => a + b, 0);
   const adaProgress = totalDzikir > 0;
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Dzikir"
         subtitle="Tasbih digital"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          adaProgress ? (
-            <Button
-              variant="ghost"
-              size="xs"
-              iconOnly
-              onClick={() => {
-                if (confirm("Reset semua dzikir hari ini?")) resetAll();
-              }}
-              aria-label="Reset semua"
-              title="Reset semua"
-              className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
-            >
-              <RefreshCw size={16} />
-            </Button>
-          ) : undefined
+          <>
+            {!user && <MasukButton />}
+            {adaProgress ? (
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={() => {
+                  if (confirm("Reset semua dzikir hari ini?")) resetAll();
+                }}
+                aria-label="Reset semua"
+                title="Reset semua"
+                className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
+              >
+                <RefreshCw size={16} />
+              </Button>
+            ) : undefined}
+          </>
         }
       />
 

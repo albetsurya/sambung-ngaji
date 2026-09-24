@@ -13,7 +13,9 @@ import {
   Type as TypeIcon,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button, ErrorState } from "../components/common";
+import { useAuth } from "../contexts/AuthContext";
 import { MushafPageSkeleton } from "../components/common/Skeleton";
 import { MushafPageView } from "../components/member/MushafPageView";
 import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
@@ -30,6 +32,7 @@ const TOTAL_PAGES = 604;
 
 export default function MemberQuranMushafPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
 
@@ -198,6 +201,7 @@ export default function MemberQuranMushafPage() {
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
+            {!user && <MasukButton />}
             <Button
               onClick={cycleScale}
               aria-label="Ubah ukuran"

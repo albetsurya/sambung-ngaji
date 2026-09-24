@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { BottomSheet, Button, Card, ErrorState, Badge, Segmented } from "../components/common";
 import { MemberCalendarView } from "../components/member/MemberCalendarView";
 import { MemberScheduleListView } from "../components/member/MemberScheduleListView";
@@ -91,7 +92,7 @@ export default function MemberSchedulePage() {
   const [selected, setSelected] = useState<Meeting | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const backPath = "/member";
+  const backPath = user ? "/member" : "/";
   const handleBack = () => goBack(navigate, backPath);
 
   /* ---------------------- Fetch user's kategori ---------------------- */
@@ -199,6 +200,11 @@ export default function MemberSchedulePage() {
         onBack={handleBack}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+              <MasukButton />
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-3 pb-8">

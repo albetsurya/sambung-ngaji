@@ -9,7 +9,9 @@ import {
   Bookmark,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button, ErrorState, Segmented } from "../components/common";
+import { useAuth } from "../contexts/AuthContext";
 import { QuranAyatCard } from "../components/member/QuranAyatCard";
 import {
   AudioPlayerMini,
@@ -57,6 +59,7 @@ function persistMode(m: BacaMode) {
 
 export default function MemberQuranSurahPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { nomor } = useParams<{ nomor: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const nomorNum = Number(nomor);
@@ -251,6 +254,7 @@ export default function MemberQuranSurahPage() {
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
+            {!user && <MasukButton />}
             <Button
               onClick={() => setNavSheetOpen(true)}
               aria-label="Lompat ke surah / juz"

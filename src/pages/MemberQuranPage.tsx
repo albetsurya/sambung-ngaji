@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -11,6 +12,7 @@ import {
   BookOpen,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { MasukButton } from "../components/common";
 import { Button, ErrorState } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
@@ -33,6 +35,7 @@ function toArabicNumber(n: number): string {
 
 export default function MemberQuranPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
 
@@ -64,15 +67,16 @@ export default function MemberQuranPage() {
   const hasSearch = search.trim().length > 0;
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Al-Quran"
         subtitle="114 surah"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
+            {!user && <MasukButton />}
             <Button
               onClick={() => navigate("/member/quran/mushaf")}
               aria-label="Baca mushaf"
@@ -85,7 +89,9 @@ export default function MemberQuranPage() {
             </Button>
             {bookmarkCount > 0 && (
               <Button
-                onClick={() => navigate("/member/quran/bookmark")}
+                onClick={() =>
+                  navigate(user ? "/member/quran/bookmark" : "/login")
+                }
                 aria-label="Bookmark"
                 title="Ayat yang di-bookmark"
                 variant="secondary"

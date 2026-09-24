@@ -272,6 +272,14 @@ export default function LoginPage() {
             Daftar sekarang
             <ArrowRight size={14} />
           </Link>
+          <div className="mt-3">
+            <Link
+              to="/"
+              className="text-ios-footnote text-surface-muted underline underline-offset-4"
+            >
+              Jelajahi tanpa masuk
+            </Link>
+          </div>
         </div>
 
         <p className="text-center text-ios-caption text-surface-muted/70 mt-6">
