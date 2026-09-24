@@ -6,9 +6,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // "prompt": user diberi tahu + tombol muat ulang saat versi baru ada.
-      // Jangan autoUpdate: user perlu sadar kapan UI berubah.
-      registerType: "prompt",
+      // "autoUpdate": SW baru langsung skipWaiting + claim, halaman reload
+      // otomatis via PwaUpdatePrompt. User tetap dapat versi terbaru
+      // tanpa harus klik banner manual.
+      registerType: "autoUpdate",
       manifest: false,
       includeAssets: [
         "favicon.ico",
@@ -33,6 +34,9 @@ export default defineConfig({
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/],
         cleanupOutdatedCaches: true,
+        // Auto-update: SW baru langsung aktif + kuasai halaman terbuka.
+        clientsClaim: true,
+        skipWaiting: true,
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       devOptions: {

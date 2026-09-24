@@ -30,6 +30,7 @@ import {
   ChangePasswordSheet,
 } from "../components/common";
 import { useAuth } from "../contexts/AuthContext";
+import { AppMaintenanceSection } from "../components/common/AppMaintenanceSection";
 import { usePermission } from "../hooks/usePermission";
 import { normalizeGender } from "../utils/format";
 import { pendingApi } from "../services/pendingApi";
@@ -348,6 +349,8 @@ export default function OthersPage() {
         </div>
 
         {GROUP_ORDER.map((g) => renderMenuGroup(g))}
+
+        <AppMaintenanceSection />
 
         {visibleMenu.length === 0 && (
           <div className="px-4 mt-5">
