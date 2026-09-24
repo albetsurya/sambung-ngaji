@@ -12,6 +12,7 @@ import type {
   DashboardAbsensi,
   Member,
   FridaySchedule,
+  FridayReminderStatus,
 } from "../types";
 export const educationApi = {
   list: (member_id: string) => call<Education[]>("getEducation", { member_id }),
@@ -111,6 +112,9 @@ export const fridayApi = {
     call<{ tanggal: string; deleted: boolean }>("deleteFridaySchedule", {
       tanggal,
     }),
+
+  getReminderStatus: () =>
+    call<FridayReminderStatus>("getFridayReminderStatus", {}),
 };
 
 export const attendanceApi = {
