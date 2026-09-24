@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Calendar,
   MapPin,
@@ -33,6 +34,7 @@ import {
 
 export default function MemberPrayerPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [now, setNow] = useState<Date>(() => new Date());
   const [copied, setCopied] = useState(false);
@@ -78,13 +80,23 @@ export default function MemberPrayerPage() {
   }
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Waktu Sholat"
         subtitle={LATUKAN_LABEL}
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+            <button
+              onClick={() => navigate("/login")}
+              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
+            >
+              Masuk
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">

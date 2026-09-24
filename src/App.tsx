@@ -6,7 +6,10 @@ import { ToastProvider, useToast } from "./contexts/ToastContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { PersonalRoute } from "./components/layout/PersonalRoute";
+import { MemberRoute } from "./components/layout/MemberRoute";
 import { RoleRoute } from "./components/layout/RoleRoute";
+import { useAuth } from "./contexts/AuthContext";
+import { LoadingScreen } from "./components/common";
 import { useBackgroundSync } from "./hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
@@ -111,6 +114,9 @@ const MemberAttendancePage = lazy(() => import("./pages/MemberAttendancePage"));
 const MemberAttendanceRecapPage = lazy(() => import("./pages/MemberAttendanceRecapPage"));
 const AiUsagePage = lazy(() => import("./pages/AiUsagePage"));
 const QrCodePage = lazy(() => import("./pages/QrCodePage"));
+const PublicLandingPage = lazy(
+  () => import("./pages/PublicLandingPage"),
+);
 
 function PageFallback() {
   return (
@@ -126,6 +132,15 @@ function PageFallback() {
   );
 }
 
+/** Beranda: tamu lihat landing publik, member ke /member, admin ke dashboard. */
+function HomeRoute() {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen label="Memuat..." />;
+  if (!user) return <PublicLandingPage />;
+  if (user.role === "MEMBER") return <Navigate to="/member" replace />;
+  return <DashboardPage />;
+}
+
 function AppRoutes() {
   useBackgroundSync();
 
@@ -135,6 +150,7 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/daftar" element={<PublicRegistrationPage />} />
         <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
+        <Route path="/" element={<HomeRoute />} />
 
         <Route
           path="/member"
@@ -147,25 +163,25 @@ function AppRoutes() {
         <Route
           path="/member/prayer"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberPrayerPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/doa"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberDoaPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/kiblat"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberKiblatPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -179,17 +195,17 @@ function AppRoutes() {
         <Route
           path="/member/jadwal"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberSchedulePage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/petugas-jumat"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberFridayPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -203,9 +219,9 @@ function AppRoutes() {
         <Route
           path="/member/puasa"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberPuasaPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -227,17 +243,17 @@ function AppRoutes() {
         <Route
           path="/member/quran"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberQuranPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/quran/mushaf"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberQuranMushafPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -251,25 +267,25 @@ function AppRoutes() {
         <Route
           path="/member/quran/:nomor"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberQuranSurahPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/dzikir"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberDzikirPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/dzikir/:id"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberDzikirCounterPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -283,9 +299,9 @@ function AppRoutes() {
         <Route
           path="/member/panduan"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberGuidePage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -346,7 +362,6 @@ function AppRoutes() {
         />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<DashboardPage />} />
           <Route
             path="/jamaah"
             element={

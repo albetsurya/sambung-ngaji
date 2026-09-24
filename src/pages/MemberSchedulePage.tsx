@@ -91,7 +91,7 @@ export default function MemberSchedulePage() {
   const [selected, setSelected] = useState<Meeting | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const backPath = "/member";
+  const backPath = user ? "/member" : "/";
   const handleBack = () => goBack(navigate, backPath);
 
   /* ---------------------- Fetch user's kategori ---------------------- */
@@ -199,6 +199,16 @@ export default function MemberSchedulePage() {
         onBack={handleBack}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+            <button
+              onClick={() => navigate("/login")}
+              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
+            >
+              Masuk
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-3 pb-8">

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import { RefreshCw } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { Button } from "../components/common";
@@ -8,35 +9,46 @@ import { useDzikirCounters } from "../hooks/useDzikirCounters";
 
 export default function MemberDzikirPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { getCount, resetAll, counts } = useDzikirCounters();
 
   const totalDzikir = Object.values(counts).reduce((a, b) => a + b, 0);
   const adaProgress = totalDzikir > 0;
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Dzikir"
         subtitle="Tasbih digital"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          adaProgress ? (
-            <Button
-              variant="ghost"
-              size="xs"
-              iconOnly
-              onClick={() => {
-                if (confirm("Reset semua dzikir hari ini?")) resetAll();
-              }}
-              aria-label="Reset semua"
-              title="Reset semua"
-              className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
-            >
-              <RefreshCw size={16} />
-            </Button>
-          ) : undefined
+          <>
+            {!user && (
+              <button
+                onClick={() => navigate("/login")}
+                className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97] mr-1.5"
+              >
+                Masuk
+              </button>
+            )}
+            {adaProgress ? (
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={() => {
+                  if (confirm("Reset semua dzikir hari ini?")) resetAll();
+                }}
+                aria-label="Reset semua"
+                title="Reset semua"
+                className="border border-surface-border hover:!bg-danger-soft hover:!text-danger hover:!border-danger/30"
+              >
+                <RefreshCw size={16} />
+              </Button>
+            ) : undefined}
+          </>
         }
       />
 

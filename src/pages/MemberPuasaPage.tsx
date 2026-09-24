@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Calendar,
   Sparkles,
@@ -41,6 +42,7 @@ const TONE_STYLE: Record<
 
 export default function MemberPuasaPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { puasaDays, today, nextPuasa, nextPuasaDays } = usePuasaSchedule(60);
   const [showAll, setShowAll] = useState(false);
 
@@ -51,9 +53,19 @@ export default function MemberPuasaPage() {
       <Header
         title="Puasa Sunnah"
         subtitle="Jadwal 60 hari ke depan"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+            <button
+              onClick={() => navigate("/login")}
+              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
+            >
+              Masuk
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">

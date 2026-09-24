@@ -14,6 +14,7 @@ import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { formatDateLongText } from "../utils/format";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   FRIDAY_ROLES,
   missingRoles,
@@ -23,6 +24,7 @@ import {
 
 export default function MemberFridayPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const {
     data: schedules = [],
@@ -48,9 +50,19 @@ export default function MemberFridayPage() {
     <AppLayout hideNav showAiChat={false}>
       <Header
         title="Petugas Jumat"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
+        right={
+          !user ? (
+            <button
+              onClick={() => navigate("/login")}
+              className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97]"
+            >
+              Masuk
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="px-4 py-4 space-y-3 pb-8">

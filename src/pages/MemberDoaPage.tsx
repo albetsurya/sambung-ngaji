@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Sun,
   Moon,
@@ -43,6 +44,7 @@ const HARIAN_ICON: Record<string, typeof Moon> = {
 
 export default function MemberDoaPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [fontSheetOpen, setFontSheetOpen] = useState(false);
   const [filter, setFilter] = useState<FilterMode>("all");
@@ -109,28 +111,38 @@ export default function MemberDoaPage() {
       <Header
         title={headerTitle}
         subtitle={headerSubtitle}
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
-          <Button
-            onClick={() => setFontSheetOpen(true)}
-            aria-label="Ubah ukuran teks"
-            title="Ubah ukuran teks"
-            variant="secondary"
-            size="sm"
-          >
-            <span
-              className="text-[11px] font-bold"
-              style={{
-                fontFamily:
-                  '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
-                fontSize: 16,
-              }}
+          <>
+            {!user && (
+              <button
+                onClick={() => navigate("/login")}
+                className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97] mr-1.5"
+              >
+                Masuk
+              </button>
+            )}
+            <Button
+              onClick={() => setFontSheetOpen(true)}
+              aria-label="Ubah ukuran teks"
+              title="Ubah ukuran teks"
+              variant="secondary"
+              size="sm"
             >
-              Aa
-            </span>
-          </Button>
+              <span
+                className="text-[11px] font-bold"
+                style={{
+                  fontFamily:
+                    '"Noto Naskh Arabic", "Amiri", "Scheherazade New", serif',
+                  fontSize: 16,
+                }}
+              >
+                Aa
+              </span>
+            </Button>
+          </>
         }
       />
 

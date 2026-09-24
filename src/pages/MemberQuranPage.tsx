@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
+import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -33,6 +34,7 @@ function toArabicNumber(n: number): string {
 
 export default function MemberQuranPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
 
@@ -64,15 +66,23 @@ export default function MemberQuranPage() {
   const hasSearch = search.trim().length > 0;
 
   return (
-    <AppLayout showAiChat={false}>
+    <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Al-Quran"
         subtitle="114 surah"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">
+            {!user && (
+              <button
+                onClick={() => navigate("/login")}
+                className="h-9 px-3.5 rounded-xl bg-accent text-white text-ios-footnote font-semibold transition-all active:scale-[0.97] mr-1"
+              >
+                Masuk
+              </button>
+            )}
             <Button
               onClick={() => navigate("/member/quran/mushaf")}
               aria-label="Baca mushaf"
@@ -85,7 +95,9 @@ export default function MemberQuranPage() {
             </Button>
             {bookmarkCount > 0 && (
               <Button
-                onClick={() => navigate("/member/quran/bookmark")}
+                onClick={() =>
+                  navigate(user ? "/member/quran/bookmark" : "/login")
+                }
                 aria-label="Bookmark"
                 title="Ayat yang di-bookmark"
                 variant="secondary"
