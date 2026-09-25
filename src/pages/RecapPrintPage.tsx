@@ -27,6 +27,7 @@ import {
   buildRecapMatrix,
   exportRecapPDF,
   exportRecapExcel,
+  type RecapMatrixRow,
 } from "../lib/monthlyAttendanceExport";
 
 /**
@@ -90,6 +91,18 @@ export default function RecapPrintPage() {
 
   const matrix = dataQuery.data ?? null;
 
+  /* Lembaran ala PDF: baris dipecah per halaman mengikuti tata file
+     PDF (A4 portrait), agar terlihat tiap lembar isi berapa baris. */
+  const ROWS_PER_SHEET = 35;
+  const sheets: RecapMatrixRow[][] = useMemo(() => {
+    if (!matrix) return [];
+    const out: RecapMatrixRow[][] = [];
+    for (let i = 0; i < matrix.rows.length; i += ROWS_PER_SHEET) {
+      out.push(matrix.rows.slice(i, i + ROWS_PER_SHEET));
+    }
+    return out;
+  }, [matrix]);
+
   async function handleExport(kind: "pdf" | "excel") {
     if (!matrix || exporting) return;
     setExporting(kind);
@@ -134,7 +147,8 @@ export default function RecapPrintPage() {
               : "memuat..."}
           </p>
           <p className="text-ios-caption text-surface-muted mt-1 leading-relaxed">
-            Tabel di bawah sama dengan isi file yang akan diunduh.
+            Tiap lembar di bawah menggambarkan halaman file PDF yang akan
+            diunduh — termasuk pembagian baris per lembar.
           </p>
         </section>
 
@@ -163,107 +177,133 @@ export default function RecapPrintPage() {
             description="Tidak ada jamaah pada kategori dan gender yang dipilih."
           />
         ) : (
-          <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-ios-caption border-separate border-spacing-0">
-                <thead>
-                  <tr className="bg-surface-card2">
-                    <th className="px-1 py-2 font-semibold text-surface-text text-center w-8 border-b border-surface-border">
-                      No
-                    </th>
-                    <th className="px-2 py-2 font-semibold text-surface-text text-left min-w-[88px] border-b border-surface-border">
-                      Nama
-                    </th>
-                    {matrix.meetings.map((m: Meeting) => (
-                      <th
-                        key={m.meeting_id}
-                        className="px-2 py-2 font-semibold text-surface-text text-center min-w-[56px] whitespace-nowrap border-b border-surface-border"
-                      >
-                        <div className="text-[11px] tabular-nums">
-                          {formatDayMonth(m.tanggal)}
-                        </div>
-                        <div className="text-[9px] font-normal text-surface-muted truncate max-w-[64px] mx-auto">
-                          {m.acara || "Pengajian"}
-                        </div>
-                      </th>
-                    ))}
-                    <th className="px-2 py-2 font-semibold text-surface-text text-center w-12 border-b border-surface-border">
-                      Hadir
-                    </th>
-                    <th className="px-2 py-2 font-semibold text-surface-text text-center w-16 border-b border-surface-border">
-                      Tdk Hadir
-                    </th>
-                    <th className="px-2 py-2 font-semibold text-surface-text text-center w-12 border-b border-surface-border">
-                      %
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {matrix.rows.map((row, idx) => {
-                    const rateColor =
-                      row.rate >= 80
-                        ? "text-emerald-600"
-                        : row.rate >= 60
-                          ? "text-amber-600"
-                          : row.rate >= 40
-                            ? "text-orange-600"
-                            : "text-red-600";
-                    return (
-                      <tr
-                        key={row.member.member_id}
-                        className="hover:bg-surface-card2/50"
-                      >
-                        <td className="px-1 py-1.5 text-center text-surface-muted tabular-nums border-b border-surface-border">
-                          {idx + 1}
-                        </td>
-                        <td className="px-2 py-1.5 font-medium text-surface-text border-b border-surface-border">
-                          <span className="block truncate max-w-[88px]">
-                            {row.member.nama_lengkap}
-                          </span>
-                        </td>
-                        {matrix.meetings.map((m: Meeting) => {
-                          const status = row.cells[m.meeting_id];
-                          const initial = status
-                            ? { HADIR: "H", IZIN: "I", SAKIT: "S", ALPA: "A" }[
-                                status
-                              ]
-                            : "-";
-                          const statusColor =
-                            status === "HADIR"
-                              ? "text-emerald-600"
-                              : status === "IZIN"
-                                ? "text-amber-600"
-                                : status === "SAKIT"
-                                  ? "text-blue-600"
-                                  : status === "ALPA"
-                                    ? "text-red-600"
-                                    : "text-surface-muted";
-                          return (
-                            <td
-                              key={m.meeting_id}
-                              className={`px-2 py-1.5 text-center font-semibold tabular-nums border-b border-surface-border ${statusColor}`}
-                            >
-                              {initial}
-                            </td>
-                          );
-                        })}
-                        <td className="px-2 py-1.5 text-center font-semibold text-emerald-600 tabular-nums border-b border-surface-border">
-                          {row.hadir}
-                        </td>
-                        <td className="px-2 py-1.5 text-center font-semibold text-red-600 tabular-nums border-b border-surface-border">
-                          {row.nonHadir}
-                        </td>
-                        <td
-                          className={`px-2 py-1.5 text-center font-bold tabular-nums border-b border-surface-border ${rateColor}`}
-                        >
-                          {row.rate}%
-                        </td>
+          <div className="space-y-4">
+            {sheets.map((sheetRows, sheetIdx) => (
+              <section
+                key={sheetIdx}
+                className="rounded-2xl border border-slate-200 bg-white text-slate-900 overflow-hidden"
+              >
+                <div className="px-4 pt-4 pb-3 border-b border-slate-200">
+                  <h2 className="text-[16px] font-bold leading-tight">
+                    Rekap Kehadiran Bulanan
+                  </h2>
+                  <p className="text-[11px] text-slate-600 mt-0.5">
+                    Bulan: {bulan} | Kategori: {kategori || "semua"}
+                  </p>
+                  <p className="text-[11px] text-slate-600">
+                    Dicetak:{" "}
+                    {new Date().toLocaleString("id-ID")} · Lembar{" "}
+                    {sheetIdx + 1} dari {sheets.length}
+                  </p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-[11px] border-separate border-spacing-0">
+                    <thead>
+                      <tr className="bg-slate-800">
+                        <th className="px-1 py-2 font-bold text-white text-center w-8 border-b border-slate-700">
+                          No
+                        </th>
+                        <th className="px-2 py-2 font-bold text-white text-left min-w-[88px] border-b border-slate-700">
+                          Nama
+                        </th>
+                        {matrix.meetings.map((m: Meeting) => (
+                          <th
+                            key={m.meeting_id}
+                            className="px-2 py-2 font-bold text-white text-center min-w-[56px] whitespace-nowrap border-b border-slate-700"
+                          >
+                            <div className="tabular-nums">
+                              {formatDayMonth(m.tanggal)}
+                            </div>
+                            <div className="font-normal text-slate-300 truncate max-w-[64px] mx-auto">
+                              {m.acara || "Pengajian"}
+                            </div>
+                          </th>
+                        ))}
+                        <th className="px-2 py-2 font-bold text-white text-center w-12 border-b border-slate-700">
+                          Hadir
+                        </th>
+                        <th className="px-2 py-2 font-bold text-white text-center w-16 border-b border-slate-700">
+                          Tdk Hadir
+                        </th>
+                        <th className="px-2 py-2 font-bold text-white text-center w-12 border-b border-slate-700">
+                          %
+                        </th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {sheetRows.map((row, idx) => {
+                        const no = sheetIdx * ROWS_PER_SHEET + idx + 1;
+                        const rateBg =
+                          row.rate >= 80
+                            ? "bg-emerald-100"
+                            : row.rate >= 60
+                              ? "bg-yellow-100"
+                              : row.rate >= 40
+                                ? "bg-orange-100"
+                                : "bg-red-100";
+                        const rateColor =
+                          row.rate >= 80
+                            ? "text-emerald-800"
+                            : row.rate >= 60
+                              ? "text-amber-800"
+                              : row.rate >= 40
+                                ? "text-orange-800"
+                                : "text-red-800";
+                        return (
+                          <tr key={row.member.member_id}>
+                            <td className="px-1 py-1.5 text-center text-slate-500 tabular-nums border-b border-slate-100">
+                              {no}
+                            </td>
+                            <td className="px-2 py-1.5 font-medium border-b border-slate-100">
+                              <span className="block truncate max-w-[88px]">
+                                {row.member.nama_lengkap}
+                              </span>
+                            </td>
+                            {matrix.meetings.map((m: Meeting) => {
+                              const status = row.cells[m.meeting_id];
+                              const initial = status
+                                ? { HADIR: "H", IZIN: "I", SAKIT: "S", ALPA: "A" }[
+                                    status
+                                  ]
+                                : "-";
+                              const statusColor =
+                                status === "HADIR"
+                                  ? "text-emerald-700"
+                                  : status === "IZIN"
+                                    ? "text-amber-700"
+                                    : status === "SAKIT"
+                                      ? "text-blue-700"
+                                      : status === "ALPA"
+                                        ? "text-red-700"
+                                        : "text-slate-400";
+                              return (
+                                <td
+                                  key={m.meeting_id}
+                                  className={`px-2 py-1.5 text-center font-semibold tabular-nums border-b border-slate-100 ${statusColor}`}
+                                >
+                                  {initial}
+                                </td>
+                              );
+                            })}
+                            <td className="px-2 py-1.5 text-center font-semibold text-emerald-700 tabular-nums border-b border-slate-100">
+                              {row.hadir}
+                            </td>
+                            <td className="px-2 py-1.5 text-center font-semibold text-red-700 tabular-nums border-b border-slate-100">
+                              {row.nonHadir}
+                            </td>
+                            <td
+                              className={`px-2 py-1.5 text-center font-bold tabular-nums border-b border-slate-100 ${rateColor} ${rateBg}`}
+                            >
+                              {row.rate}%
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ))}
           </div>
         )}
 
