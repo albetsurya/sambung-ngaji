@@ -54,7 +54,7 @@ export default function MemberAttendanceRecapPage() {
   const isReadonly = role === "PENGAWAS";
 
   const [recapMonth, setRecapMonth] = useState(defaultMonth);
-  const [recapKategori, setRecapKategori] = useState<MemberCategory | "">("");
+  const [recapKategori, setRecapKategori] = useState<MemberCategory[]>([]);
   const [recapGender, setRecapGender] = useState<"" | "L" | "P">("");
 
   /* Jadwal + absensi per meeting dalam bulan — bounded, diambil sekali */
@@ -90,14 +90,13 @@ export default function MemberAttendanceRecapPage() {
     staleTime: 2 * 60_000,
   });
 
-  /* Jamaah — paginasi 20/halaman, pola MembersListPage */
+  /* Jamaah — paginasi 20/halaman, ambil semua (filter kategori di frontend) */
   const membersQuery = useInfiniteQuery({
     queryKey: ["recap-members", recapKategori, recapGender],
     queryFn: ({ pageParam }) =>
       memberApi.listPaged({
         limit: PAGE_SIZE,
         offset: pageParam,
-        kategori: recapKategori || undefined,
         jenis_kelamin: recapGender || undefined,
       }),
     initialPageParam: 0,
@@ -106,10 +105,11 @@ export default function MemberAttendanceRecapPage() {
     staleTime: 5 * 60_000,
   });
 
-  const allMembers = useMemo(
-    () => membersQuery.data?.pages.flatMap((p) => p.items) ?? [],
-    [membersQuery.data],
-  );
+  const allMembers = useMemo(() => {
+    const items = membersQuery.data?.pages.flatMap((p) => p.items) ?? [];
+    if (recapKategori.length === 0) return items;
+    return items.filter((m) => recapKategori.includes(m.kategori as MemberCategory));
+  }, [membersQuery.data, recapKategori]);
   const totalMembers = membersQuery.data?.pages[0]?.total ?? 0;
 
   const recapMatrix: RecapMatrix | null = useMemo(() => {
@@ -221,29 +221,32 @@ export default function MemberAttendanceRecapPage() {
           </div>
         </section>
 
-        {/* Filter kategori — pola chip seperti halaman Jadwal/Absensi */}
+        {/* Filter kategori — multi-select chip */}
         <section>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             <FilterChip
-              active={recapKategori === ""}
+              active={recapKategori.length === 0}
               label="Semua"
-              onClick={() => setRecapKategori("")}
+              onClick={() => setRecapKategori([])}
             />
             {MEMBER_CATEGORIES.map((c: MemberCategory) => (
               <FilterChip
                 key={c}
-                active={recapKategori === c}
+                active={recapKategori.includes(c)}
                 label={CATEGORY_LABEL[c]}
-                onClick={() => setRecapKategori(c)}
+                onClick={() => {
+                  setRecapKategori((prev) =>
+                    prev.includes(c)
+                      ? prev.filter((k) => k !== c)
+                      : [...prev, c],
+                  );
+                }}
               />
             ))}
           </div>
         </section>
         {/* Filter gender — pola segmented seperti halaman Absensi */}
         <section>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
-            Gender
-          </p>
           <GenderSegmented value={recapGender} onChange={setRecapGender} />
         </section>
 
@@ -284,14 +287,14 @@ export default function MemberAttendanceRecapPage() {
             <div className="flex items-center justify-between gap-2 pl-3 pr-2 py-1.5 border-b border-surface-border">
               <p className="text-ios-caption text-surface-muted tabular-nums truncate">
                 {recapMatrix.rows.length} jamaah · {recapMatrix.meetings.length}{" "}
-                pertemuan
+                pertemuan{recapKategori.length > 0 ? " · " + recapKategori.map((k) => CATEGORY_LABEL[k as MemberCategory]).join(", ") : ""}
               </p>
               {hasData && !isReadonly && (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Button
                     onClick={() =>
                       navigate(
-                        `/lainnya/rekap-absensi/cetak?bulan=${recapMonth}&kategori=${recapKategori}&gender=${recapGender}`,
+                        `/lainnya/rekap-absensi/cetak?bulan=${recapMonth}&kategori=${recapKategori.join(",")}&gender=${recapGender}`,
                       )
                     }
                     aria-label="Pratinjau cetakan"

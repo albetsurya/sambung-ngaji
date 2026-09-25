@@ -32,7 +32,7 @@ export default function MemberGuidePage() {
         <div className="rounded-2xl bg-accent-soft/60 p-4">
           <p className="text-ios-body text-surface-text leading-relaxed">
             Panduan ini membantu Anda memahami cara menggunakan aplikasi
-            Manajemen Pengajian sebagai jamaah.
+            Sambung Ngaji sebagai jamaah.
           </p>
         </div>
 
