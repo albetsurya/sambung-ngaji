@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AppLayout,
@@ -32,7 +33,6 @@ import {
   Download,
 } from "../components/common/FontAwesomeIcons";
 import { fridayApi } from "../services/domainApi";
-import { FridayPrintSheet } from "../components/friday/FridayPrintSheet";
 import type { FridaySchedule } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
@@ -61,6 +61,7 @@ const EMPTY_FORM = {
 };
 
 export default function FridaySchedulesPage() {
+  const navigate = useNavigate();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const { role, isAdminLike } = usePermission();
@@ -74,7 +75,6 @@ export default function FridaySchedulesPage() {
     null,
   );
   const [followUp, setFollowUp] = useState<FridaySchedule | null>(null);
-  const [printOpen, setPrintOpen] = useState(false);
 
   const {
     data: schedules = [],
@@ -240,13 +240,13 @@ export default function FridaySchedulesPage() {
         backLabel="Kembali"
         right={
           schedules.length > 0 ? (
-            <Button
-              variant="ghost"
-              size="xs"
-              iconOnly
-              onClick={() => setPrintOpen(true)}
-              aria-label="Cetak tabel"
-              title="Cetak tabel (PDF/Gambar)"
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={() => navigate("/lainnya/petugas-jumat/cetak")}
+                aria-label="Pratinjau cetakan"
+                title="Pratinjau cetakan (PDF/Gambar)"
               className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
             >
               <Download size={16} />
@@ -589,13 +589,6 @@ export default function FridaySchedulesPage() {
       <LoadingOverlay
         open={saveMutation.isPending}
         label="Menyimpan jadwal..." onCancel={() => abortAllApiCalls()} />
-
-      <FridayPrintSheet
-        open={printOpen}
-        onClose={() => setPrintOpen(false)}
-        upcoming={upcoming}
-        past={past}
-      />
     </AppLayout>
   );
 }

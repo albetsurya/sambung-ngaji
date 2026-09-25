@@ -53,7 +53,6 @@ import {
 import { usePermission } from "../hooks/usePermission";
 import { useAuth } from "../contexts/AuthContext";
 import { canViewTaarufCv, isTaarufEligible } from "../lib/taarufAccess";
-import { TaarufCvSheet } from "../components/taaruf/TaarufCvSheet";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
@@ -114,7 +113,6 @@ export default function MemberDetailPage() {
     : TABS.filter((t) => t.key !== "Akun");
   const [tab, setTab] = useState<TabKey>("Biodata");
   const [createUserOpen, setCreateUserOpen] = useState(false);
-  const [taarufOpen, setTaarufOpen] = useState(false);
   const [confirmDeleteMember, setConfirmDeleteMember] = useState(false);
 
   /* ---------------------------- Queries ---------------------------- */
@@ -264,7 +262,7 @@ export default function MemberDetailPage() {
               variant="ghost"
               size="xs"
               iconOnly
-              onClick={() => setTaarufOpen(true)}
+              onClick={() => navigate(`/jamaah/${member.member_id}/cv-taaruf`)}
               aria-label="Cetak CV Taaruf"
               title="Cetak CV Taaruf (PDF/Gambar)"
               className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
@@ -437,12 +435,6 @@ export default function MemberDetailPage() {
         loading={deleteMemberMutation.isPending}
         onCancel={() => setConfirmDeleteMember(false)}
         onConfirm={() => deleteMemberMutation.mutate()}
-      />
-
-      <TaarufCvSheet
-        open={taarufOpen}
-        member={member}
-        onClose={() => setTaarufOpen(false)}
       />
     </AppLayout>
   );

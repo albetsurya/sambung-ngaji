@@ -4,6 +4,7 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   Calendar,
   Download,
+  Eye,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -317,6 +318,20 @@ export default function MemberAttendanceRecapPage() {
               </p>
               {hasData && !isReadonly && (
                 <div className="flex items-center gap-1 flex-shrink-0">
+                  <Button
+                    onClick={() =>
+                      navigate(
+                        `/lainnya/rekap-absensi/cetak?bulan=${recapMonth}&kategori=${recapKategori}&gender=${recapGender}`,
+                      )
+                    }
+                    aria-label="Pratinjau cetakan"
+                    title="Pratinjau cetakan"
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
+                  >
+                    <Eye size={14} />
+                  </Button>
                   <Button
                     onClick={() => exportFull("pdf")}
                     disabled={exporting !== null}
