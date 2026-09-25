@@ -22,6 +22,7 @@ import {
   ConfirmDialog,
   LoadingOverlay,
   MemberSelfSkeleton,
+  RoleBadge,
 } from "../components/common";
 import { userApi, meetingApi, moodApi } from "../services/domainApi";
 import type { Role } from "../types";
@@ -279,6 +280,7 @@ export default function MemberDetailPage() {
           </p>
           <div className="flex items-center gap-2 mt-1">
             <CategoryHeaderBadge member={member} />
+            {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
             {member.kelompok && (
               <span className="text-ios-footnote text-surface-muted truncate">
                 {member.kelompok}
@@ -483,9 +485,7 @@ function UserAccountSection({
             </div>
             <div className="flex justify-between gap-3 py-1.5 border-b border-surface-border">
               <span className="text-ios-footnote text-surface-muted">Role</span>
-              <span className="text-ios-body text-surface-text">
-                {ROLE_LABEL[userStatus.user.role]}
-              </span>
+              <RoleBadge role={userStatus.user.role} />
             </div>
             <Button
               variant="secondary"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -8,6 +8,8 @@ import {
   Shield,
   ArrowUpRight,
   Trash2,
+  Search,
+  X,
 } from "../components/common/FontAwesomeIcons";
 import {
   AppLayout,
@@ -15,7 +17,7 @@ import {
   FloatingActionButton,
 } from "../components/layout/AppLayout";
 import {
-  Badge,
+  RoleBadge,
   Button,
   Input,
   Select,
@@ -26,11 +28,14 @@ import {
   ErrorState,
   EmptyState,
   ConfirmDialog,
+  Segmented,
 } from "../components/common";
 import { ResetPasswordSheet } from "../components/common/ChangePasswordSheet";
 import { userApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
-import type { Member, Role, User } from "../types";
+import type { Member, MemberCategory, Role, User } from "../types";
+import { CATEGORY_LABEL } from "../utils/format";
+import { MEMBER_CATEGORIES } from "../constants";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
@@ -76,6 +81,33 @@ export default function UsersPage() {
 
   const memberById = new Map(members.map((m) => [m.member_id, m]));
 
+  /* ------------------------- Filter (search/gender/kategori) ------------------------- */
+  const [fSearch, setFSearch] = useState("");
+  const [fGender, setFGender] = useState<"" | "L" | "P">("");
+  const [fKategori, setFKategori] = useState<MemberCategory | "">("");
+
+  const filteredUsers = useMemo(() => {
+    const q = fSearch.trim().toLowerCase();
+    return users.filter((u) => {
+      const member = u.member_id ? memberById.get(u.member_id) : undefined;
+      if (q) {
+        const hay = `${u.nama} ${u.username} ${member?.nama_lengkap ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (fGender && member?.jenis_kelamin !== fGender) return false;
+      if (fKategori && member?.kategori !== fKategori) return false;
+      return true;
+    });
+  }, [users, memberById, fSearch, fGender, fKategori]);
+
+  const hasActiveFilter = fSearch.trim() !== "" || fGender !== "" || fKategori !== "";
+
+  const resetFilter = () => {
+    setFSearch("");
+    setFGender("");
+    setFKategori("");
+  };
+
   return (
     <AppLayout
       hideNav
@@ -89,10 +121,72 @@ export default function UsersPage() {
     >
       <Header
         title="Manajemen User"
-        subtitle={`${users.length} user`}
+        subtitle={`${filteredUsers.length} dari ${users.length} user`}
         onBack={() => history.back()}
         backLabel="Kembali"
       />
+
+      <div className="px-4 pt-3 space-y-2">
+        <div className="relative">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+          />
+          <input
+            value={fSearch}
+            onChange={(e) => setFSearch(e.target.value)}
+            placeholder="Cari nama / username"
+            className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+          />
+          {fSearch.length > 0 && (
+            <button
+              onClick={() => setFSearch("")}
+              aria-label="Hapus pencarian"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <div className="flex-1 min-w-0">
+            <Segmented
+              ariaLabel="Filter jenis kelamin"
+              size="sm"
+              value={fGender}
+              onChange={setFGender}
+              options={[
+                { value: "", label: "Semua" },
+                { value: "L", label: "Laki-laki" },
+                { value: "P", label: "Perempuan" },
+              ]}
+            />
+          </div>
+          <select
+            value={fKategori}
+            onChange={(e) => setFKategori(e.target.value as MemberCategory | "")}
+            aria-label="Filter kategori"
+            className="min-h-[36px] rounded-xl border border-surface-border bg-surface-card px-2 text-ios-footnote text-surface-text shadow-sm focus:outline-none focus:border-accent"
+          >
+            <option value="">Semua kategori</option>
+            {MEMBER_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {CATEGORY_LABEL[c]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {hasActiveFilter && (
+          <button
+            onClick={resetFilter}
+            className="text-ios-caption text-danger font-medium px-1"
+          >
+            Reset filter
+          </button>
+        )}
+      </div>
 
       <div className="py-3">
         {isLoading && <UsersSkeleton rows={4} />}
@@ -121,14 +215,26 @@ export default function UsersPage() {
           />
         )}
 
-        {!isLoading && !error && users.length > 0 && (
+        {!isLoading && !error && users.length > 0 && filteredUsers.length === 0 && (
+          <EmptyState
+            title="Tidak ditemukan"
+            description="Tidak ada user yang cocok dengan filter. Ubah kata kunci atau reset filter."
+            action={
+              <Button onClick={resetFilter} variant="secondary">
+                Reset Filter
+              </Button>
+            }
+          />
+        )}
+
+        {!isLoading && !error && filteredUsers.length > 0 && (
           <GroupedList>
-            {users.map((u, i) => {
+            {filteredUsers.map((u, i) => {
               const member = u.member_id ? memberById.get(u.member_id) : null;
               return (
                 <ListRow
                   key={u.user_id}
-                  insetDivider={i !== users.length - 1}
+                  insetDivider={i !== filteredUsers.length - 1}
                   onClick={() => setEditTarget(u)}
                   leading={
                     <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
@@ -147,7 +253,7 @@ export default function UsersPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Badge>{ROLE_LABEL[u.role]}</Badge>
+                      <RoleBadge role={u.role} />
                       <Button
                         variant="ghost"
                         size="xs"

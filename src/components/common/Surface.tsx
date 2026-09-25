@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ChevronRight } from "./FontAwesomeIcons";
+import type { Role } from "../../types";
+import { ROLE_LABEL } from "../../hooks/usePermission";
 
 export function Card({
   children,
@@ -246,6 +248,20 @@ export function Badge({
       {children}
     </span>
   );
+}
+
+/* Badge role dengan warna per role. Satu-satunya tempat mapping ini. */
+export const ROLE_BADGE_COLOR: Record<Role, keyof typeof BADGE_COLORS> = {
+  SUPER_ADMIN: "red",
+  ADMIN: "emerald",
+  TIM_PNKB: "amber",
+  TIM_ABSENSI: "amber",
+  PENGAWAS: "ink",
+  MEMBER: "ink",
+};
+
+export function RoleBadge({ role }: { role: Role }) {
+  return <Badge color={ROLE_BADGE_COLOR[role]}>{ROLE_LABEL[role]}</Badge>;
 }
 
 export function ChevronRow({

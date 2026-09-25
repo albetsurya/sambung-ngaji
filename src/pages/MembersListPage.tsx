@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Search,
@@ -21,6 +21,7 @@ import {
   Card,
   Avatar,
   Badge,
+  RoleBadge,
   ErrorState,
   EmptyState,
   BottomSheet,
@@ -28,7 +29,8 @@ import {
   Segmented,
 } from "../components/common";
 import { memberApi, type MemberFilters } from "../services/memberApi";
-import type { Member, MemberCategory } from "../types";
+import { userApi } from "../services/domainApi";
+import type { Member, MemberCategory, Role } from "../types";
 import {
   CATEGORY_LABEL,
   getDisplayName,
@@ -155,6 +157,21 @@ export default function MembersListPage() {
 
   const total = query.data?.pages[0]?.total ?? 0;
 
+  /* Role akun tertaut per member (untuk badge role). */
+  const { data: users = [] } = useQuery({
+    queryKey: queryKeys.users(),
+    queryFn: () => userApi.list(),
+    staleTime: 2 * 60_000,
+  });
+
+  const roleByMemberId = useMemo(() => {
+    const m = new Map<string, Role>();
+    users.forEach((u) => {
+      if (u.member_id) m.set(u.member_id, u.role);
+    });
+    return m;
+  }, [users]);
+
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
   const activeFilterCount = useMemo(
@@ -239,12 +256,24 @@ export default function MembersListPage() {
       if (view === "row") {
         const m = allMembers[index];
         if (!m) return null;
-        return <JamaahRow member={m} onPress={handlePress} />;
+        return (
+          <JamaahRow
+            member={m}
+            role={roleByMemberId.get(m.member_id)}
+            onPress={handlePress}
+          />
+        );
       }
       if (view === "list") {
         const m = allMembers[index];
         if (!m) return null;
-        return <JamaahCard member={m} onPress={handlePress} />;
+        return (
+          <JamaahCard
+            member={m}
+            role={roleByMemberId.get(m.member_id)}
+            onPress={handlePress}
+          />
+        );
       }
       const start = index * gridCols;
       const rowMembers = allMembers.slice(start, start + gridCols);
@@ -254,6 +283,7 @@ export default function MembersListPage() {
             <JamaahGridCard
               key={m.member_id}
               member={m}
+              role={roleByMemberId.get(m.member_id)}
               cols={gridCols}
               onPress={handlePress}
             />
@@ -261,7 +291,7 @@ export default function MembersListPage() {
         </div>
       );
     },
-    [allMembers, view, gridCols, gridColsClass, handlePress],
+    [allMembers, view, gridCols, gridColsClass, handlePress, roleByMemberId],
   );
 
   const showSkeleton = query.isLoading;
@@ -700,9 +730,11 @@ function GridIcon({ cols }: { cols: GridCols }) {
 
 const JamaahRow = memo(function JamaahRow({
   member,
+  role,
   onPress,
 }: {
   member: Member;
+  role?: Role;
   onPress: (id: string) => void;
 }) {
   return (
@@ -723,10 +755,14 @@ const JamaahRow = memo(function JamaahRow({
           {member.kelompok || "Belum ada kelompok"}
         </p>
       </div>
-      {member.has_user && (
-        <span title="Punya akun user" aria-label="Punya akun user">
-          <KeyRound size={12} className="text-accent shrink-0" />
-        </span>
+      {role ? (
+        <RoleBadge role={role} />
+      ) : (
+        member.has_user && (
+          <span title="Punya akun user" aria-label="Punya akun user">
+            <KeyRound size={12} className="text-accent shrink-0" />
+          </span>
+        )
       )}
       {member.kategori && (
         <span className="text-ios-footnote text-surface-muted flex-shrink-0">
@@ -739,9 +775,11 @@ const JamaahRow = memo(function JamaahRow({
 
 const JamaahCard = memo(function JamaahCard({
   member,
+  role,
   onPress,
 }: {
   member: Member;
+  role?: Role;
   onPress: (id: string) => void;
 }) {
   return (
@@ -763,10 +801,14 @@ const JamaahCard = memo(function JamaahCard({
             {member.kelompok || "Belum ada kelompok"}
           </p>
         </div>
-        {member.has_user && (
-          <span title="Punya akun user" aria-label="Punya akun user">
-            <KeyRound size={13} className="text-accent shrink-0" />
-          </span>
+        {role ? (
+          <RoleBadge role={role} />
+        ) : (
+          member.has_user && (
+            <span title="Punya akun user" aria-label="Punya akun user">
+              <KeyRound size={13} className="text-accent shrink-0" />
+            </span>
+          )
         )}
         {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
       </Card>
@@ -776,10 +818,12 @@ const JamaahCard = memo(function JamaahCard({
 
 const JamaahGridCard = memo(function JamaahGridCard({
   member,
+  role,
   cols,
   onPress,
 }: {
   member: Member;
+  role?: Role;
   cols: GridCols;
   onPress: (id: string) => void;
 }) {
@@ -814,7 +858,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
         <span
           className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full ${badgeSize} font-semibold tracking-wide bg-accent-soft text-accent truncate max-w-full`}
         >
-          {member.has_user && (
+          {member.has_user && !role && (
             <KeyRound
               size={9}
               aria-label="Punya akun user"
@@ -823,6 +867,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
+      {role && <RoleBadge role={role} />}
     </Card>
   );
 });
