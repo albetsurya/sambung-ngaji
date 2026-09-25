@@ -29,6 +29,7 @@ import {
   EmptyState,
   ConfirmDialog,
   Segmented,
+  FilterChip,
 } from "../components/common";
 import { ResetPasswordSheet } from "../components/common/ChangePasswordSheet";
 import { userApi } from "../services/domainApi";
@@ -163,19 +164,21 @@ export default function UsersPage() {
               ]}
             />
           </div>
-          <select
-            value={fKategori}
-            onChange={(e) => setFKategori(e.target.value as MemberCategory | "")}
-            aria-label="Filter kategori"
-            className="min-h-[36px] rounded-xl border border-surface-border bg-surface-card px-2 text-ios-footnote text-surface-text shadow-sm focus:outline-none focus:border-accent"
-          >
-            <option value="">Semua kategori</option>
+          <div className="flex gap-1.5 flex-1 flex-wrap">
+            <FilterChip
+              active={fKategori === ""}
+              label="Semua"
+              onClick={() => setFKategori("")}
+            />
             {MEMBER_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABEL[c]}
-              </option>
+              <FilterChip
+                key={c}
+                active={fKategori === c}
+                label={CATEGORY_LABEL[c]}
+                onClick={() => setFKategori(c)}
+              />
             ))}
-          </select>
+          </div>
         </div>
 
         {hasActiveFilter && (
