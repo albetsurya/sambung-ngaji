@@ -25,6 +25,7 @@ import {
   LoadingOverlay,
   MemberSelfSkeleton,
   RoleBadge,
+  AccountBadge,
 } from "../components/common";
 import { userApi, meetingApi, moodApi } from "../services/domainApi";
 import type { Role } from "../types";
@@ -295,15 +296,7 @@ export default function MemberDetailPage() {
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
             <CategoryHeaderBadge member={member} />
             {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
-            <span
-              title={member.has_user ? "Punya akun user" : "Belum ada akun"}
-              aria-label={member.has_user ? "Punya akun user" : "Belum ada akun"}
-            >
-              <KeyRound
-                size={13}
-                className={member.has_user ? "text-accent" : "text-surface-muted/40"}
-              />
-            </span>
+            <AccountBadge hasAccount={member.has_user} />
             <MemberStatusChips member={member} inline />
           </div>
         </div>

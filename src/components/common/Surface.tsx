@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ChevronRight } from "./FontAwesomeIcons";
+import { ChevronRight, KeyRound } from "./FontAwesomeIcons";
 import type { Role } from "../../types";
 import { ROLE_LABEL } from "../../hooks/usePermission";
 
@@ -262,6 +262,30 @@ export const ROLE_BADGE_COLOR: Record<Role, keyof typeof BADGE_COLORS> = {
 
 export function RoleBadge({ role }: { role: Role }) {
   return <Badge color={ROLE_BADGE_COLOR[role]}>{ROLE_LABEL[role]}</Badge>;
+}
+
+/* Badge status akun: hijau bila punya akun, abu bila belum.
+   compact = ikon saja (untuk baris list yang sempit). */
+export function AccountBadge({
+  hasAccount,
+  compact = false,
+}: {
+  hasAccount?: boolean;
+  compact?: boolean;
+}) {
+  const active = !!hasAccount;
+  return (
+    <span
+      title={active ? "Punya akun user" : "Belum ada akun"}
+      aria-label={active ? "Punya akun user" : "Belum ada akun"}
+      className={`inline-flex items-center gap-1 rounded-full font-semibold tracking-wide ${
+        compact ? "px-1.5 py-1" : "px-2 py-0.5 text-[10px]"
+      } ${active ? "bg-accent-soft text-accent" : "bg-surface-card2 text-surface-muted"}`}
+    >
+      <KeyRound size={compact ? 11 : 10} />
+      {!compact && (active ? "Punya Akun" : "Belum Ada Akun")}
+    </span>
+  );
 }
 
 export function ChevronRow({
