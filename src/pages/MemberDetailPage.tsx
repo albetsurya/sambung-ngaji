@@ -292,9 +292,9 @@ export default function MemberDetailPage() {
             </p>
           )}
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            <CategoryHeaderBadge member={member} />
-            {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
             <AccountBadge hasAccount={member.has_user} />
+            {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
+            <CategoryHeaderBadge member={member} />
             <MemberStatusChips member={member} inline />
           </div>
         </div>
