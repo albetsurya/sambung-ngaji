@@ -65,9 +65,9 @@ const ROW_HEIGHTS: Record<ViewMode, number> = {
 
 /** Slot baris grid mengikuti tinggi kartu per jumlah kolom (+8 gap). */
 const GRID_ROW_HEIGHTS: Record<GridCols, number> = {
-  2: 164,
-  3: 138,
-  4: 126,
+  2: 196,
+  3: 170,
+  4: 158,
 };
 
 export default function MembersListPage() {
@@ -755,15 +755,12 @@ const JamaahRow = memo(function JamaahRow({
           {member.kelompok || "Belum ada kelompok"}
         </p>
       </div>
-      {role ? (
-        <RoleBadge role={role} />
-      ) : (
-        member.has_user && (
-          <span title="Punya akun user" aria-label="Punya akun user">
-            <KeyRound size={12} className="text-accent shrink-0" />
-          </span>
-        )
+      {member.has_user && (
+        <span title="Punya akun user" aria-label="Punya akun user">
+          <KeyRound size={12} className="text-accent shrink-0" />
+        </span>
       )}
+      {role && <RoleBadge role={role} />}
       {member.kategori && (
         <span className="text-ios-footnote text-surface-muted flex-shrink-0">
           {CATEGORY_LABEL[member.kategori]}
@@ -801,15 +798,12 @@ const JamaahCard = memo(function JamaahCard({
             {member.kelompok || "Belum ada kelompok"}
           </p>
         </div>
-        {role ? (
-          <RoleBadge role={role} />
-        ) : (
-          member.has_user && (
-            <span title="Punya akun user" aria-label="Punya akun user">
-              <KeyRound size={13} className="text-accent shrink-0" />
-            </span>
-          )
+        {member.has_user && (
+          <span title="Punya akun user" aria-label="Punya akun user">
+            <KeyRound size={13} className="text-accent shrink-0" />
+          </span>
         )}
+        {role && <RoleBadge role={role} />}
         {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
       </Card>
     </div>
@@ -858,7 +852,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
         <span
           className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full ${badgeSize} font-semibold tracking-wide bg-accent-soft text-accent truncate max-w-full`}
         >
-          {member.has_user && !role && (
+          {member.has_user && (
             <KeyRound
               size={9}
               aria-label="Punya akun user"
@@ -867,7 +861,10 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
-      {role && <RoleBadge role={role} />}
+      {/* Slot tetap setinggi badge agar semua kartu grid sama tinggi. */}
+      <div className="min-h-[26px] flex items-center justify-center">
+        {role && <RoleBadge role={role} />}
+      </div>
     </Card>
   );
 });
