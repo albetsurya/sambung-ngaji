@@ -49,12 +49,17 @@ const PROVIDERS = [
   {
     key: "gemini",
     label: "Gemini",
-    description: "Gemini 2.5 Flash (cepat & gratis)",
+    description: "Gemini 3.8 Flash (cepat & gratis)",
   },
   {
     key: "groq",
     label: "Groq",
     description: "GPT-OSS 120B (cepat & gratis)",
+  },
+  {
+    key: "nvidia",
+    label: "Nvidia",
+    description: "GPT-OSS 20B (gratis)",
   },
 ] as const;
 

@@ -24,6 +24,7 @@ import { queryKeys } from "../lib/queryClient";
 const PROVIDER_LABEL: Record<string, string> = {
   gemini: "Gemini",
   groq: "Groq",
+  nvidia: "Nvidia",
 };
 
 const ROLE_LABEL: Record<string, string> = {
