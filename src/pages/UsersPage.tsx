@@ -150,6 +150,24 @@ export default function UsersPage() {
           )}
         </div>
 
+        {/* Category chips — sama seperti halaman Attendance */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          <FilterChip
+            active={fKategori === ""}
+            label="Semua"
+            onClick={() => setFKategori("")}
+          />
+          {MEMBER_CATEGORIES.map((c) => (
+            <FilterChip
+              key={c}
+              active={fKategori === c}
+              label={CATEGORY_LABEL[c]}
+              onClick={() => setFKategori(c)}
+            />
+          ))}
+        </div>
+
+        {/* Gender segmented */}
         <div className="flex gap-2">
           <div className="flex-1 min-w-0">
             <Segmented
@@ -163,21 +181,6 @@ export default function UsersPage() {
                 { value: "P", label: "Perempuan" },
               ]}
             />
-          </div>
-          <div className="flex gap-1.5 flex-1 flex-wrap">
-            <FilterChip
-              active={fKategori === ""}
-              label="Semua"
-              onClick={() => setFKategori("")}
-            />
-            {MEMBER_CATEGORIES.map((c) => (
-              <FilterChip
-                key={c}
-                active={fKategori === c}
-                label={CATEGORY_LABEL[c]}
-                onClick={() => setFKategori(c)}
-              />
-            ))}
           </div>
         </div>
 
