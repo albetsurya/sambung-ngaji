@@ -22,29 +22,33 @@ const NAV_BY_ROLE: Record<Role, string[]> = {
 export function usePermission() {
   const { user } = useAuth();
   const role = user?.role as Role | undefined;
+  const groupId = user?.group_id ?? null;
 
   function canSeeNav(key: string) {
     if (!role) return false;
     return NAV_BY_ROLE[role]?.includes(key) || false;
   }
 
-  const isAdminLike = role === "SUPER_ADMIN" || role === "ADMIN";
   const isSuperAdmin = role === "SUPER_ADMIN";
+  const isAdminLike = role === "SUPER_ADMIN" || role === "ADMIN";
   const isPengawas = role === "PENGAWAS";
   const isMember = role === "MEMBER";
 
-  const canViewAllMembers =
-    role === "SUPER_ADMIN" || role === "ADMIN" || role === "PENGAWAS";
-  const canEditMembers = role === "SUPER_ADMIN" || role === "ADMIN";
+  // SUPER_ADMIN = global, role lain = per kelompok
+  const assignedGroup = isSuperAdmin ? null : groupId;
+  const isGlobal = isSuperAdmin;
+
+  const canViewAllMembers = isGlobal || role === "ADMIN" || role === "PENGAWAS";
+  const canEditMembers = isGlobal || role === "ADMIN";
   const canWriteMonitoring =
-    role === "SUPER_ADMIN" ||
-    role === "ADMIN" ||
-    role === "TIM_PNKB" ||
-    role === "PENGAWAS";
-  const canManageUsers = role === "SUPER_ADMIN";
+    isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
+  const canManageUsers = isGlobal;
 
   return {
     role,
+    groupId,
+    assignedGroup,
+    isGlobal,
     canSeeNav,
     isSuperAdmin,
     isAdminLike,
