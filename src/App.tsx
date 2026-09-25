@@ -112,6 +112,9 @@ const MemberAiChatPage = lazy(() => import("./pages/MemberAiChatPage"));
 const MemberProgressPage = lazy(() => import("./pages/MemberProgressPage"));
 const MemberAttendancePage = lazy(() => import("./pages/MemberAttendancePage"));
 const MemberAttendanceRecapPage = lazy(() => import("./pages/MemberAttendanceRecapPage"));
+const RecapPrintPage = lazy(() => import("./pages/RecapPrintPage"));
+const FridayPrintPage = lazy(() => import("./pages/FridayPrintPage"));
+const TaarufCvPrintPage = lazy(() => import("./pages/TaarufCvPrintPage"));
 const AiUsagePage = lazy(() => import("./pages/AiUsagePage"));
 const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
@@ -387,6 +390,14 @@ function AppRoutes() {
             }
           />
           <Route
+            path="/jamaah/:id/cv-taaruf"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+                <TaarufCvPrintPage />
+              </RoleRoute>
+            }
+          />
+          <Route
             path="/jamaah/:id/edit"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
@@ -504,6 +515,14 @@ function AppRoutes() {
               }
             />
             <Route
+              path="petugas-jumat/cetak"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
+                  <FridayPrintPage />
+                </RoleRoute>
+              }
+            />
+            <Route
               path="import-jamaah"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
@@ -516,6 +535,14 @@ function AppRoutes() {
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <MemberAttendanceRecapPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="rekap-absensi/cetak"
+              element={
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
+                  <RecapPrintPage />
                 </RoleRoute>
               }
             />

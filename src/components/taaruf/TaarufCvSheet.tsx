@@ -42,6 +42,25 @@ export function TaarufCvSheet({
   onClose: () => void;
   member: Member | null;
 }) {
+  if (!open) return null;
+  return (
+    <BottomSheet open={open} onClose={onClose} title="CV Taaruf">
+      <TaarufCvEditor member={member} resetKey={open} />
+    </BottomSheet>
+  );
+}
+
+/**
+ * Isi editor CV Taaruf (pratinjau + sesuaikan + unduh).
+ * Dipakai di sheet maupun halaman cetak tersendiri.
+ */
+export function TaarufCvEditor({
+  member,
+  resetKey,
+}: {
+  member: Member | null;
+  resetKey?: unknown;
+}) {
   const [editing, setEditing] = useState(false);
   const [selection, setSelection] = useState<TaarufRegionKey | null>(null);
   const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
@@ -51,17 +70,13 @@ export function TaarufCvSheet({
   const exportRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
 
-  // Reset tiap sheet dibuka.
+  // Reset tiap dibuka / ganti member.
   useEffect(() => {
-    if (open) {
-      setEditing(false);
-      setSelection(null);
-      setBusy(null);
-      setOptions(DEFAULT_PRINT_OPTIONS);
-    }
-  }, [open, member?.member_id]);
-
-  if (!open) return null;
+    setEditing(false);
+    setSelection(null);
+    setBusy(null);
+    setOptions(DEFAULT_PRINT_OPTIONS);
+  }, [resetKey, member?.member_id]);
 
   async function handleExport(kind: "pdf" | "png") {
     const node = exportRef.current;
@@ -129,11 +144,17 @@ export function TaarufCvSheet({
     });
   }
 
+  if (!member) {
+    return (
+      <p className="text-ios-body text-surface-muted text-center py-6">
+        Data tidak tersedia.
+      </p>
+    );
+  }
+
   return (
-    <BottomSheet open={open} onClose={onClose} title="CV Taaruf">
-      {member ? (
-        <div className="pb-2">
-          <TaarufCvPreview
+    <div className="pb-2">
+      <TaarufCvPreview
             member={member}
             options={options}
             selection={selection}
@@ -486,11 +507,5 @@ export function TaarufCvSheet({
             </div>
           </div>
         </div>
-      ) : (
-        <p className="text-ios-body text-surface-muted text-center py-6">
-          Data tidak tersedia.
-        </p>
-      )}
-    </BottomSheet>
   );
 }
