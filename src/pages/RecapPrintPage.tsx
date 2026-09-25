@@ -9,7 +9,7 @@ import {
   X,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, EmptyState } from "../components/common";
+import { Button, EmptyState, Segmented } from "../components/common";
 import { RecapTableSkeleton } from "../components/common/Skeleton";
 import { meetingApi, attendanceApi } from "../services/domainApi";
 import { memberApi } from "../services/memberApi";
@@ -43,6 +43,7 @@ export default function RecapPrintPage() {
   const isReadonly = role === "PENGAWAS";
   const { showToast } = useToast();
   const [exporting, setExporting] = useState<null | "pdf" | "excel">(null);
+  const [fontSize, setFontSize] = useState<"7" | "9" | "11">("7");
 
   const bulan = searchParams.get("bulan") || "";
   const kategoriParam = searchParams.get("kategori") || "";
@@ -93,25 +94,35 @@ export default function RecapPrintPage() {
 
   /* Lembaran ala PDF: baris dipecah per halaman mengikuti tata file
      PDF (A4 portrait), agar terlihat tiap lembar isi berapa baris.
-     38 = hasil ukur aktual file PDF (font 7, padding 1.5, startY 38).
+     Angka baris = hasil ukur aktual file PDF per ukuran font.
      Kalau konfigurasi exportRecapPDF berubah, samakan angka ini. */
-  const ROWS_PER_SHEET = 38;
+  const ROWS_PER_SHEET: Record<typeof fontSize, number> = {
+    "7": 38,
+    "9": 29,
+    "11": 24,
+  };
+  const SHEET_ZOOM: Record<typeof fontSize, number> = {
+    "7": 1,
+    "9": 1.2,
+    "11": 1.4,
+  };
   const sheets: RecapMatrixRow[][] = useMemo(() => {
     if (!matrix) return [];
+    const per = ROWS_PER_SHEET[fontSize];
     const out: RecapMatrixRow[][] = [];
-    for (let i = 0; i < matrix.rows.length; i += ROWS_PER_SHEET) {
-      out.push(matrix.rows.slice(i, i + ROWS_PER_SHEET));
+    for (let i = 0; i < matrix.rows.length; i += per) {
+      out.push(matrix.rows.slice(i, i + per));
     }
     return out;
-  }, [matrix]);
+  }, [matrix, fontSize]);
 
   async function handleExport(kind: "pdf" | "excel") {
     if (!matrix || exporting) return;
     setExporting(kind);
     try {
       const label = kategori || "semua";
-      if (kind === "pdf") await exportRecapPDF(matrix, bulan, label);
-      else await exportRecapExcel(matrix, bulan, label);
+      if (kind === "pdf") await exportRecapPDF(matrix, monthLabel, label, Number(fontSize));
+      else await exportRecapExcel(matrix, monthLabel, label);
     } catch (err) {
       showToast(
         err instanceof ApiError ? err.message : "Gagal export rekap",
@@ -154,6 +165,23 @@ export default function RecapPrintPage() {
           </p>
         </section>
 
+        <section>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
+            Ukuran font cetakan
+          </p>
+          <Segmented
+            ariaLabel="Ukuran font cetakan"
+            size="sm"
+            value={fontSize}
+            onChange={setFontSize}
+            options={[
+              { value: "7", label: "Kecil" },
+              { value: "9", label: "Sedang" },
+              { value: "11", label: "Besar" },
+            ]}
+          />
+        </section>
+
         {dataQuery.isLoading ? (
           <RecapTableSkeleton rows={8} />
         ) : dataQuery.error ? (
@@ -190,7 +218,7 @@ export default function RecapPrintPage() {
                     Rekap Kehadiran Bulanan
                   </h2>
                   <p className="text-[11px] text-slate-600 mt-0.5">
-                    Bulan: {bulan} | Kategori: {kategori || "semua"}
+                    Bulan: {monthLabel} | Kategori: {kategori || "semua"}
                   </p>
                   <p className="text-[11px] text-slate-600">
                     Dicetak:{" "}
@@ -198,7 +226,10 @@ export default function RecapPrintPage() {
                     {sheetIdx + 1} dari {sheets.length}
                   </p>
                 </div>
-                <div className="overflow-x-auto">
+                <div
+                  className="overflow-x-auto"
+                  style={{ zoom: SHEET_ZOOM[fontSize] }}
+                >
                   <table className="w-full text-left text-[11px] border-separate border-spacing-0">
                     <thead>
                       <tr className="bg-slate-800">
@@ -234,7 +265,7 @@ export default function RecapPrintPage() {
                     </thead>
                     <tbody>
                       {sheetRows.map((row, idx) => {
-                        const no = sheetIdx * ROWS_PER_SHEET + idx + 1;
+                        const no = sheetIdx * ROWS_PER_SHEET[fontSize] + idx + 1;
                         const rateBg =
                           row.rate >= 80
                             ? "bg-emerald-100"
