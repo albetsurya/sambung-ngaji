@@ -30,7 +30,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
           <Landmark size={40} className="text-white" />
         </div>
         <h3 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
-          Manajemen Pengajian
+          Sambung Ngaji
         </h3>
         <p className="text-ios-footnote text-surface-muted">Versi 1.0.0</p>
       </div>

@@ -3,6 +3,24 @@ import type { ApiResponse } from "../types";
 import { API_BASE_URL } from "../constants";
 
 const TOKEN_KEY = "pengajian_token";
+const GROUP_ID_KEY = "pengajian_group_id";
+let _groupId = "";
+
+export function setGroupId(id: string | null) {
+  _groupId = id ?? "";
+  if (_groupId) {
+    document.cookie = `pengajian_group_id=${encodeURIComponent(_groupId)}; path=/; SameSite=Strict`;
+  } else {
+    document.cookie = "pengajian_group_id=; path=/; SameSite=Strict; Max-Age=-1";
+  }
+}
+
+function getGroupId(): string {
+  if (_groupId) return _groupId;
+  const match = document.cookie.match(/(?:^|;\s*)pengajian_group_id=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
 const REQUEST_TIMEOUT_MS = 45_000;
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [2000, 5000, 10000];
@@ -252,6 +270,11 @@ async function callOnce<T>(
       action,
       ...params,
     };
+    // Auto-attach group_id untuk filter per kelompok
+    const gid = getGroupId();
+    if (gid) {
+      payload.group_id = gid;
+    }
     const body = JSON.stringify(payload);
 
     const headers: Record<string, string> = {

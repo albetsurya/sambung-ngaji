@@ -70,6 +70,33 @@ function rgbToArgb(rgb: [number, number, number]): string {
       .join("")
   );
 }
+/* ---- Geometri PDF (satu sumber kebenaran dengan exportRecapPDF) ---- */
+export const PDF_PAGE_MM = {
+  portrait: { w: 210, h: 297 },
+  landscape: { w: 297, h: 210 },
+} as const;
+export const PDF_TABLE_START_Y = 38;
+export const PDF_TABLE_MARGIN_X = 14;
+export const PDF_CELL_PADDING = 1.5;
+const PDF_MARGIN_BOTTOM = 37; // dikalibrasi: portrait font 7 terukur 38 baris
+const PT_TO_MM = 0.3528;
+const JSPDF_LINE_HEIGHT = 1.15;
+
+/**
+ * Baris per halaman dihitung dari geometri aktual, bukan tebakan.
+ * Kalibrasi: portrait font 7 = 38 baris terukur.
+ */
+export function rowsPerSheet(
+  orientation: "portrait" | "landscape",
+  fontSize: number,
+): number {
+  const pageH = PDF_PAGE_MM[orientation].h;
+  const rowH = fontSize * PT_TO_MM * JSPDF_LINE_HEIGHT + 2 * PDF_CELL_PADDING;
+  return Math.max(
+    1,
+    Math.floor((pageH - PDF_TABLE_START_Y - PDF_MARGIN_BOTTOM) / rowH + 1e-9),
+  );
+}
 function getRateColor(rate: number): { bg: [number, number, number]; text: [number, number, number] } {
   if (rate >= 80) return { bg: hexToRgb("dcfce7"), text: hexToRgb("166534") }; // hijau
   if (rate >= 60) return { bg: hexToRgb("fef9c3"), text: hexToRgb("854d0e") }; // kuning

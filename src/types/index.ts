@@ -44,6 +44,7 @@ export interface User {
   username: string;
   nama: string;
   role: Role;
+  group_id?: string;
   member_id?: string;
   jenis_kelamin?: string;
   foto_url?: string;

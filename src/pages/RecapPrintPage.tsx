@@ -29,6 +29,8 @@ import {
   buildRecapMatrix,
   exportRecapPDF,
   exportRecapExcel,
+  rowsPerSheet,
+  PDF_PAGE_MM,
   type RecapMatrixRow,
 } from "../lib/monthlyAttendanceExport";
 
@@ -48,6 +50,7 @@ export default function RecapPrintPage() {
   const [fontSize, setFontSize] = useState<"7" | "9" | "11">("7");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [sheetIdx, setSheetIdx] = useState(0);
+  const [zoom, setZoom] = useState(0.5);
 
   const bulan = searchParams.get("bulan") || "";
   const kategoriParam = searchParams.get("kategori") || "";
@@ -96,31 +99,21 @@ export default function RecapPrintPage() {
 
   const matrix = dataQuery.data ?? null;
 
-  /* Lembaran ala PDF: baris dipecah per halaman mengikuti tata file
-     PDF, agar terlihat tiap lembar isi berapa baris.
-     Angka baris = hasil ukur aktual file PDF per orientasi + ukuran font.
-     Kalau konfigurasi exportRecapPDF berubah, samakan angka ini. */
-  const ROWS_PER_SHEET: Record<string, number> =
-    orientation === "portrait"
-      ? { "7": 38, "9": 29, "11": 24 }
-      : { "7": 24, "9": 19, "11": 15 };
-  const SHEET_ZOOM: Record<typeof fontSize, number> = {
-    "7": 1,
-    "9": 1.2,
-    "11": 1.4,
-  };
+  /* Zoom = skala tampilan preview saja, tidak mengubah ukuran lembar.
+     Lebar lembar = ukuran kertas A4 aktual (sesuai PDF). */
+  const perSheet = rowsPerSheet(orientation, Number(fontSize));
+  const sheetWidthMm = PDF_PAGE_MM[orientation].w;
+  const displayScale = zoom;
   const sheets: RecapMatrixRow[][] = useMemo(() => {
     if (!matrix) return [];
-    const per = ROWS_PER_SHEET[fontSize];
     const out: RecapMatrixRow[][] = [];
-    for (let i = 0; i < matrix.rows.length; i += per) {
-      out.push(matrix.rows.slice(i, i + per));
+    for (let i = 0; i < matrix.rows.length; i += perSheet) {
+      out.push(matrix.rows.slice(i, i + perSheet));
     }
     return out;
-  }, [matrix, fontSize, orientation]);
+  }, [matrix, perSheet]);
 
   const safeIdx = Math.min(sheetIdx, Math.max(sheets.length - 1, 0));
-  const perSheet = ROWS_PER_SHEET[fontSize];
   const sheetRows = sheets[safeIdx] ?? [];
 
   async function handleExport(kind: "pdf" | "excel") {
@@ -154,27 +147,9 @@ export default function RecapPrintPage() {
         showSyncButton={false}
       />
 
-      <div className="px-4 py-4 space-y-4 pb-8">
-        <section className="rounded-2xl border border-surface-border bg-surface-card p-4">
-          <p className="text-ios-footnote text-surface-muted leading-relaxed">
-            Bulan <strong className="text-surface-text">{monthLabel}</strong>
-            {" · "}Kategori{" "}
-            <strong className="text-surface-text">
-              {kategori ? CATEGORY_LABEL[kategori] : "Semua"}
-            </strong>
-            {" · "}
-            {matrix
-              ? `${matrix.rows.length} jamaah · ${matrix.meetings.length} pertemuan`
-              : "memuat..."}
-          </p>
-          <p className="text-ios-caption text-surface-muted mt-1 leading-relaxed">
-            Tiap lembar di bawah menggambarkan halaman file PDF yang akan
-            diunduh, termasuk pembagian baris per lembar.
-          </p>
-        </section>
-
+      <div className="px-4 py-4 space-y-3 pb-8">
         <section className="rounded-2xl border border-surface-border bg-surface-card p-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted mb-1 px-0.5">
                 Font
@@ -183,7 +158,10 @@ export default function RecapPrintPage() {
                 ariaLabel="Ukuran font cetakan"
                 size="sm"
                 value={fontSize}
-                onChange={setFontSize}
+                onChange={(v) => {
+                  setFontSize(v);
+                  setSheetIdx(0);
+                }}
                 options={[
                   { value: "7", label: "Kecil" },
                   { value: "9", label: "Sedang" },
@@ -193,7 +171,7 @@ export default function RecapPrintPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted mb-1 px-0.5">
-                Kertas
+                Orientasi
               </p>
               <Segmented
                 ariaLabel="Orientasi kertas"
@@ -204,14 +182,14 @@ export default function RecapPrintPage() {
                   setSheetIdx(0);
                 }}
                 options={[
-                  { value: "portrait", label: "Potrait" },
+                  { value: "portrait", label: "Potret" },
                   { value: "landscape", label: "Lanskap" },
                 ]}
               />
             </div>
           </div>
           {!isReadonly && (
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-2">
             <Button
               variant="secondary"
               fullWidth
@@ -246,6 +224,38 @@ export default function RecapPrintPage() {
             </Button>
           </div>
           )}
+          <div className="flex items-center gap-2 mt-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted px-0.5">
+              Zoom
+            </p>
+            <div className="flex items-center gap-1 flex-1">
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                disabled={zoom <= 0.3}
+                onClick={() => setZoom((z) => Math.max(0.3, +(z - 0.1).toFixed(2)))}
+                aria-label="Perkecil"
+                className="border border-surface-border bg-surface-card"
+              >
+                <span className="text-[14px] font-bold leading-none px-0.5">−</span>
+              </Button>
+              <p className="text-ios-footnote font-medium text-surface-text tabular-nums w-11 text-center">
+                {Math.round(zoom * 100)}%
+              </p>
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                disabled={zoom >= 1.5}
+                onClick={() => setZoom((z) => Math.min(1.5, +(z + 0.1).toFixed(2)))}
+                aria-label="Perbesar"
+                className="border border-surface-border bg-surface-card"
+              >
+                <span className="text-[14px] font-bold leading-none px-0.5">+</span>
+              </Button>
+            </div>
+          </div>
         </section>
 
         {dataQuery.isLoading ? (
@@ -302,64 +312,61 @@ export default function RecapPrintPage() {
               </Button>
             </div>
             {sheetRows.length > 0 && (
+            <div className="overflow-x-auto -mx-4 px-4 pb-1">
               <section
                 key={safeIdx}
-                className="rounded-2xl border border-slate-200 bg-white text-slate-900 overflow-hidden"
+                className="rounded-xl border border-slate-300 bg-white text-slate-900 overflow-hidden mx-auto shadow-sm"
+                style={{ width: `${sheetWidthMm}mm`, minWidth: `${sheetWidthMm}mm`, transform: `scale(${displayScale})`, transformOrigin: 'top left' }}
               >
-                <div className="px-4 pt-4 pb-3 border-b border-slate-200">
-                  <h2 className="text-[16px] font-bold leading-tight">
+                <div className="px-3 pt-3 pb-2 border-b border-slate-300">
+                  <h2 className="text-[15px] font-bold leading-tight">
                     Rekap Kehadiran Bulanan
                   </h2>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
+                  <p className="text-[10px] text-slate-600 mt-0.5">
                     Bulan: {monthLabel} | Kategori: {kategori || "semua"}
                   </p>
-                  <p className="text-[11px] text-slate-600">
-                    Dicetak:{" "}
-                    {new Date().toLocaleString("id-ID")} · Lembar{" "}
+                  <p className="text-[10px] text-slate-600">
+                    Dicetak: {new Date().toLocaleString("id-ID")} · Lembar{" "}
                     {safeIdx + 1} dari {sheets.length} ·{" "}
-                    {orientation === "landscape" ? "Lanskap" : "Potrait"}
+                    {orientation === "landscape" ? "Lanskap" : "Potret"}
                   </p>
                 </div>
-                <div
-                  className="overflow-x-auto"
-                  style={{ zoom: SHEET_ZOOM[fontSize] }}
-                >
+                <div className="overflow-x-auto">
                   <table
-                    className="w-full text-left text-[11px] border-separate border-spacing-0"
-                    style={
-                      orientation === "landscape"
-                        ? { minWidth: 860 }
-                        : undefined
-                    }
+                    className="w-full table-fixed text-left text-[10px] border-separate border-spacing-0"
                   >
+                    <colgroup>
+                      <col style={{ width: "8mm" }} />
+                      <col style={{ width: "32mm" }} />
+                    </colgroup>
                     <thead>
-                      <tr className="bg-slate-800">
-                        <th className="px-1 py-2 font-bold text-white text-center w-8 border-b border-slate-700">
+                      <tr className="bg-slate-700">
+                        <th className="px-1 py-1.5 font-bold text-white text-center border-b border-slate-600">
                           No
                         </th>
-                        <th className="px-2 py-2 font-bold text-white text-left min-w-[88px] border-b border-slate-700">
+                        <th className="px-2 py-1.5 font-bold text-white text-left border-b border-slate-600">
                           Nama
                         </th>
                         {matrix.meetings.map((m: Meeting) => (
                           <th
                             key={m.meeting_id}
-                            className="px-2 py-2 font-bold text-white text-center min-w-[56px] whitespace-nowrap border-b border-slate-700"
+                            className="px-1 py-1.5 font-bold text-white text-center border-b border-slate-600"
                           >
                             <div className="tabular-nums">
                               {formatDayMonth(m.tanggal)}
                             </div>
-                            <div className="font-normal text-slate-300 break-words max-w-[64px] mx-auto">
+                            <div className="font-normal text-slate-300 break-words">
                               {m.acara || "Pengajian"}
                             </div>
                           </th>
                         ))}
-                        <th className="px-2 py-2 font-bold text-white text-center w-12 border-b border-slate-700">
+                        <th className="px-1 py-1.5 font-bold text-white text-center w-10 border-b border-slate-600">
                           Hadir
                         </th>
-                        <th className="px-2 py-2 font-bold text-white text-center w-16 border-b border-slate-700">
-                          Tdk Hadir
+                        <th className="px-1 py-1.5 font-bold text-white text-center w-14 border-b border-slate-600">
+                          Tdk
                         </th>
-                        <th className="px-2 py-2 font-bold text-white text-center w-12 border-b border-slate-700">
+                        <th className="px-1 py-1.5 font-bold text-white text-center w-10 border-b border-slate-600">
                           %
                         </th>
                       </tr>
@@ -385,11 +392,11 @@ export default function RecapPrintPage() {
                                 : "text-red-800";
                         return (
                           <tr key={row.member.member_id}>
-                            <td className="px-1 py-1.5 text-center text-slate-500 tabular-nums border-b border-slate-100">
+                            <td className="px-1 py-1 text-center text-slate-500 tabular-nums border-b border-slate-100">
                               {no}
                             </td>
-                            <td className="px-2 py-1.5 font-medium border-b border-slate-100">
-                              <span className="block break-words max-w-[88px]">
+                            <td className="px-2 py-1 font-medium border-b border-slate-100">
+                              <span className="block break-words">
                                 {row.member.nama_lengkap}
                               </span>
                             </td>
@@ -413,20 +420,20 @@ export default function RecapPrintPage() {
                               return (
                                 <td
                                   key={m.meeting_id}
-                                  className={`px-2 py-1.5 text-center font-semibold tabular-nums border-b border-slate-100 ${statusColor}`}
+                                  className={`px-1 py-1 text-center font-semibold tabular-nums border-b border-slate-100 ${statusColor}`}
                                 >
                                   {initial}
                                 </td>
                               );
                             })}
-                            <td className="px-2 py-1.5 text-center font-semibold text-emerald-700 tabular-nums border-b border-slate-100">
+                            <td className="px-2 py-1 text-center font-semibold text-emerald-700 tabular-nums border-b border-slate-100">
                               {row.hadir}
                             </td>
-                            <td className="px-2 py-1.5 text-center font-semibold text-red-700 tabular-nums border-b border-slate-100">
+                            <td className="px-2 py-1 text-center font-semibold text-red-700 tabular-nums border-b border-slate-100">
                               {row.nonHadir}
                             </td>
                             <td
-                              className={`px-2 py-1.5 text-center font-bold tabular-nums border-b border-slate-100 ${rateColor} ${rateBg}`}
+                              className={`px-2 py-1 text-center font-bold tabular-nums border-b border-slate-100 ${rateColor} ${rateBg}`}
                             >
                               {row.rate}%
                             </td>
@@ -437,9 +444,10 @@ export default function RecapPrintPage() {
                   </table>
                 </div>
               </section>
+            </div>
             )}
           </div>
-        )}
+          )}
 
         {matrix && matrix.rows.length > 0 && !isReadonly && (
           <p className="text-ios-caption text-surface-muted text-center">

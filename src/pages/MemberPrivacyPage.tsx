@@ -24,7 +24,7 @@ export default function MemberPrivacyPage() {
           <Shield size={20} className="text-accent flex-shrink-0 mt-0.5" />
           <p className="text-ios-body text-surface-text leading-relaxed">
             Kami berkomitmen melindungi privasi Anda. Kebijakan ini menjelaskan
-            bagaimana data Anda dikelola di aplikasi Manajemen Pengajian.
+            bagaimana data Anda dikelola di aplikasi Sambung Ngaji.
           </p>
         </div>
 

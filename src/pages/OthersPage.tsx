@@ -374,7 +374,7 @@ export default function OthersPage() {
 
         <div className="text-center pt-5 pb-3">
           <p className="text-ios-caption text-surface-muted">
-            Manajemen Pengajian · v1.0.0
+            Sambung Ngaji · v1.0.0
           </p>
         </div>
       </div>

@@ -8,7 +8,7 @@ import {
 } from "react";
 import type { User } from "../types";
 import { authApi } from "../services/authApi";
-import { getToken, clearToken, ApiError } from "../services/api";
+import { getToken, clearToken, ApiError, setGroupId } from "../services/api";
 import { migrateAnonDataToUser } from "../lib/scopedStorage";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -43,6 +43,7 @@ function getValidateSessionPromise(): Promise<User> {
 
 interface AuthContextValue {
   user: User | null;
+  groupId: string | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Gabungkan progres tamu (anon) ke akun bila ada.
         migrateAnonDataToUser(u?.user_id);
+        setGroupId(u?.group_id ?? null);
         setUser(u);
       } catch (error) {
         if (cancelled) return;
@@ -98,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const u = await authApi.login(username, password);
     // Gabungkan progres tamu (anon) ke akun bila ada.
     migrateAnonDataToUser(u?.user_id);
+    setGroupId(u?.group_id ?? null);
     setUser(u);
   }
 
@@ -107,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 1. Clear query cache + state + token DULU — biar UI instant redirect
     queryClient.clear();
     clearToken();
+    setGroupId(null);
     setUser(null);
 
     // 2. API call di background — tidak blocking, error di-ignore
@@ -126,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, groupId: user?.group_id ?? null, loading, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
