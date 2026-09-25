@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import type { Member } from "../types";
 import type { Meeting } from "../types";
 import type { AttendanceRecord } from "../types";
@@ -57,11 +57,24 @@ export function buildRecapMatrix(
   return { rows, meetings };
 }
 
-function getRateColor(rate: number): { bg: string; text: string } {
-  if (rate >= 80) return { bg: "dcfce7", text: "166534" }; // hijau
-  if (rate >= 60) return { bg: "fef9c3", text: "854d0e" }; // kuning
-  if (rate >= 40) return { bg: "ffedd5", text: "9a3412" }; // oranye
-  return { bg: "fee2e2", text: "991b1b" }; // merah
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function rgbToArgb(rgb: [number, number, number]): string {
+  return (
+    "FF" +
+    rgb
+      .map((v) => v.toString(16).padStart(2, "0").toUpperCase())
+      .join("")
+  );
+}
+function getRateColor(rate: number): { bg: [number, number, number]; text: [number, number, number] } {
+  if (rate >= 80) return { bg: hexToRgb("dcfce7"), text: hexToRgb("166534") }; // hijau
+  if (rate >= 60) return { bg: hexToRgb("fef9c3"), text: hexToRgb("854d0e") }; // kuning
+  if (rate >= 40) return { bg: hexToRgb("ffedd5"), text: hexToRgb("9a3412") }; // oranye
+  return { bg: hexToRgb("fee2e2"), text: hexToRgb("991b1b") }; // merah
 }
 
 export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string) {
@@ -86,7 +99,7 @@ export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, ka
     `${row.rate}%`,
   ]);
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: 38,
     head: [headers],
     body,
@@ -101,8 +114,8 @@ export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, ka
         const rowIdx = hook.row.index;
         const rate = matrix.rows[rowIdx].rate;
         const color = getRateColor(rate);
-        hook.cell.styles.fillColor = parseInt(color.bg, 16);
-        hook.cell.styles.textColor = parseInt(color.text, 16);
+        hook.cell.styles.fillColor = color.bg;
+        hook.cell.styles.textColor = color.text;
         hook.cell.styles.fontStyle = "bold";
       }
     },
@@ -139,8 +152,8 @@ export async function exportRecapExcel(matrix: RecapMatrix, monthLabel: string, 
 
     const rateCell = r.getCell(headerRow.length);
     const color = getRateColor(row.rate);
-    rateCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: color.bg } };
-    rateCell.font = { bold: true, color: { argb: color.text } };
+    rateCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: rgbToArgb(color.bg) } };
+    rateCell.font = { bold: true, color: { argb: rgbToArgb(color.text) } };
     rateCell.alignment = { horizontal: "center", vertical: "middle" };
   });
 

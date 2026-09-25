@@ -168,7 +168,7 @@ export default function MembersListPage() {
   const roleByMemberId = useMemo(() => {
     const m = new Map<string, Role>();
     users.forEach((u) => {
-      if (u.member_id) m.set(u.member_id, u.role);
+      if (u.member_id && u.status_aktif !== false) m.set(u.member_id, u.role);
     });
     return m;
   }, [users]);

@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   Calendar,
-  Download,
   Eye,
-  FileText,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -28,13 +26,10 @@ import {
 } from "../utils/format";
 import { CATEGORY_LABEL } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
-import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import {
   buildRecapMatrix,
-  exportRecapPDF,
-  exportRecapExcel,
   type RecapMatrix,
 } from "../lib/monthlyAttendanceExport";
 
@@ -57,12 +52,10 @@ export default function MemberAttendanceRecapPage() {
   const navigate = useNavigate();
   const { role } = usePermission();
   const isReadonly = role === "PENGAWAS";
-  const { showToast } = useToast();
 
   const [recapMonth, setRecapMonth] = useState(defaultMonth);
   const [recapKategori, setRecapKategori] = useState<MemberCategory | "">("");
   const [recapGender, setRecapGender] = useState<"" | "L" | "P">("");
-  const [exporting, setExporting] = useState<null | "pdf" | "excel">(null);
 
   /* Jadwal + absensi per meeting dalam bulan — bounded, diambil sekali */
   const meetingsQuery = useQuery({
@@ -149,30 +142,7 @@ export default function MemberAttendanceRecapPage() {
     return () => window.removeEventListener("scroll", maybeFetchNext);
   }, [maybeFetchNext]);
 
-  /* Export selalu data penuh, bukan cuma halaman yang termuat */
-  async function exportFull(kind: "pdf" | "excel") {
-    const m = meetingsQuery.data;
-    if (!m || m.meetings.length === 0) return;
-    setExporting(kind);
-    try {
-      const members = await memberApi.list({
-        kategori: recapKategori || undefined,
-        jenis_kelamin: recapGender || undefined,
-      });
-      const full = buildRecapMatrix(members, m.meetings, m.attendanceByMeeting);
-      const label = recapKategori || "semua";
-      if (kind === "pdf") await exportRecapPDF(full, recapMonth, label);
-      else await exportRecapExcel(full, recapMonth, label);
-    } catch (err) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal export rekap",
-        "error",
-      );
-    } finally {
-      setExporting(null);
-    }
-  }
-
+  /* Export PDF/Excel hanya dari halaman pratinjau. */
   function retryAll() {
     meetingsQuery.refetch();
     membersQuery.refetch();
@@ -331,36 +301,6 @@ export default function MemberAttendanceRecapPage() {
                     iconOnly
                   >
                     <Eye size={14} />
-                  </Button>
-                  <Button
-                    onClick={() => exportFull("pdf")}
-                    disabled={exporting !== null}
-                    aria-label="Export PDF"
-                    title="Export PDF"
-                    variant="ghost"
-                    size="xs"
-                    iconOnly
-                  >
-                    {exporting === "pdf" ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <FileText size={14} />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => exportFull("excel")}
-                    disabled={exporting !== null}
-                    aria-label="Export Excel"
-                    title="Export Excel"
-                    variant="ghost"
-                    size="xs"
-                    iconOnly
-                  >
-                    {exporting === "excel" ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <Download size={14} />
-                    )}
                   </Button>
                 </div>
               )}
