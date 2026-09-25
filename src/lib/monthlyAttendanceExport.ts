@@ -77,8 +77,8 @@ function getRateColor(rate: number): { bg: [number, number, number]; text: [numb
   return { bg: hexToRgb("fee2e2"), text: hexToRgb("991b1b") }; // merah
 }
 
-export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string, fontSize = 7) {
-  const doc = new jsPDF();
+export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string, fontSize = 7, orientation: "portrait" | "landscape" = "portrait") {
+  const doc = new jsPDF({ orientation });
   const pageW = doc.internal.pageSize.getWidth();
 
   doc.setFontSize(14);

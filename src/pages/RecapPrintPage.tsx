@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   Download,
   FileText,
   Loader2,
@@ -44,6 +46,8 @@ export default function RecapPrintPage() {
   const { showToast } = useToast();
   const [exporting, setExporting] = useState<null | "pdf" | "excel">(null);
   const [fontSize, setFontSize] = useState<"7" | "9" | "11">("7");
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
+  const [sheetIdx, setSheetIdx] = useState(0);
 
   const bulan = searchParams.get("bulan") || "";
   const kategoriParam = searchParams.get("kategori") || "";
@@ -93,14 +97,13 @@ export default function RecapPrintPage() {
   const matrix = dataQuery.data ?? null;
 
   /* Lembaran ala PDF: baris dipecah per halaman mengikuti tata file
-     PDF (A4 portrait), agar terlihat tiap lembar isi berapa baris.
-     Angka baris = hasil ukur aktual file PDF per ukuran font.
+     PDF, agar terlihat tiap lembar isi berapa baris.
+     Angka baris = hasil ukur aktual file PDF per orientasi + ukuran font.
      Kalau konfigurasi exportRecapPDF berubah, samakan angka ini. */
-  const ROWS_PER_SHEET: Record<typeof fontSize, number> = {
-    "7": 38,
-    "9": 29,
-    "11": 24,
-  };
+  const ROWS_PER_SHEET: Record<string, number> =
+    orientation === "portrait"
+      ? { "7": 38, "9": 29, "11": 24 }
+      : { "7": 24, "9": 19, "11": 15 };
   const SHEET_ZOOM: Record<typeof fontSize, number> = {
     "7": 1,
     "9": 1.2,
@@ -114,14 +117,19 @@ export default function RecapPrintPage() {
       out.push(matrix.rows.slice(i, i + per));
     }
     return out;
-  }, [matrix, fontSize]);
+  }, [matrix, fontSize, orientation]);
+
+  const safeIdx = Math.min(sheetIdx, Math.max(sheets.length - 1, 0));
+  const perSheet = ROWS_PER_SHEET[fontSize];
+  const sheetRows = sheets[safeIdx] ?? [];
 
   async function handleExport(kind: "pdf" | "excel") {
     if (!matrix || exporting) return;
     setExporting(kind);
     try {
       const label = kategori || "semua";
-      if (kind === "pdf") await exportRecapPDF(matrix, monthLabel, label, Number(fontSize));
+      if (kind === "pdf")
+        await exportRecapPDF(matrix, monthLabel, label, Number(fontSize), orientation);
       else await exportRecapExcel(matrix, monthLabel, label);
     } catch (err) {
       showToast(
@@ -182,6 +190,25 @@ export default function RecapPrintPage() {
           />
         </section>
 
+        <section>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
+            Orientasi kertas
+          </p>
+          <Segmented
+            ariaLabel="Orientasi kertas"
+            size="sm"
+            value={orientation}
+            onChange={(v) => {
+              setOrientation(v);
+              setSheetIdx(0);
+            }}
+            options={[
+              { value: "portrait", label: "Potrait" },
+              { value: "landscape", label: "Lanskap" },
+            ]}
+          />
+        </section>
+
         {dataQuery.isLoading ? (
           <RecapTableSkeleton rows={8} />
         ) : dataQuery.error ? (
@@ -207,10 +234,37 @@ export default function RecapPrintPage() {
             description="Tidak ada jamaah pada kategori dan gender yang dipilih."
           />
         ) : (
-          <div className="space-y-4">
-            {sheets.map((sheetRows, sheetIdx) => (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                disabled={safeIdx <= 0}
+                onClick={() => setSheetIdx(safeIdx - 1)}
+                aria-label="Lembar sebelumnya"
+                className="border border-surface-border bg-surface-card"
+              >
+                <ChevronLeft size={16} />
+              </Button>
+              <p className="text-ios-footnote font-medium text-surface-text tabular-nums">
+                Lembar {safeIdx + 1} dari {sheets.length}
+              </p>
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                disabled={safeIdx >= sheets.length - 1}
+                onClick={() => setSheetIdx(safeIdx + 1)}
+                aria-label="Lembar berikutnya"
+                className="border border-surface-border bg-surface-card"
+              >
+                <ChevronRight size={16} />
+              </Button>
+            </div>
+            {sheetRows.length > 0 && (
               <section
-                key={sheetIdx}
+                key={safeIdx}
                 className="rounded-2xl border border-slate-200 bg-white text-slate-900 overflow-hidden"
               >
                 <div className="px-4 pt-4 pb-3 border-b border-slate-200">
@@ -223,7 +277,7 @@ export default function RecapPrintPage() {
                   <p className="text-[11px] text-slate-600">
                     Dicetak:{" "}
                     {new Date().toLocaleString("id-ID")} · Lembar{" "}
-                    {sheetIdx + 1} dari {sheets.length}
+                    {safeIdx + 1} dari {sheets.length}
                   </p>
                 </div>
                 <div
@@ -247,7 +301,7 @@ export default function RecapPrintPage() {
                             <div className="tabular-nums">
                               {formatDayMonth(m.tanggal)}
                             </div>
-                            <div className="font-normal text-slate-300 truncate max-w-[64px] mx-auto">
+                            <div className="font-normal text-slate-300 break-words max-w-[64px] mx-auto">
                               {m.acara || "Pengajian"}
                             </div>
                           </th>
@@ -265,7 +319,7 @@ export default function RecapPrintPage() {
                     </thead>
                     <tbody>
                       {sheetRows.map((row, idx) => {
-                        const no = sheetIdx * ROWS_PER_SHEET[fontSize] + idx + 1;
+                        const no = safeIdx * perSheet + idx + 1;
                         const rateBg =
                           row.rate >= 80
                             ? "bg-emerald-100"
@@ -288,7 +342,7 @@ export default function RecapPrintPage() {
                               {no}
                             </td>
                             <td className="px-2 py-1.5 font-medium border-b border-slate-100">
-                              <span className="block truncate max-w-[88px]">
+                              <span className="block break-words max-w-[88px]">
                                 {row.member.nama_lengkap}
                               </span>
                             </td>
@@ -336,7 +390,7 @@ export default function RecapPrintPage() {
                   </table>
                 </div>
               </section>
-            ))}
+            )}
           </div>
         )}
 
