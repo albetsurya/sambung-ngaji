@@ -289,18 +289,13 @@ export default function MemberDetailPage() {
             <CategoryHeaderBadge member={member} />
             {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide ${
-                member.has_user
-                  ? "bg-accent-soft text-accent"
-                  : "bg-surface-card2 text-surface-muted"
-              }`}
+              title={member.has_user ? "Punya akun user" : "Belum ada akun"}
+              aria-label={member.has_user ? "Punya akun user" : "Belum ada akun"}
             >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  member.has_user ? "bg-accent" : "bg-surface-muted"
-                }`}
+              <KeyRound
+                size={13}
+                className={member.has_user ? "text-accent" : "text-surface-muted/40"}
               />
-              {member.has_user ? "Punya Akun" : "Belum Ada Akun"}
             </span>
             {member.kelompok && (
               <span className="text-ios-footnote text-surface-muted truncate">
