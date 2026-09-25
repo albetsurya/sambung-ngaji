@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import {
   Send,
   Sparkles,
+  Star,
   Loader2,
   ChevronLeft,
   ChevronDown,
   Zap,
+  Chip,
   Copy,
   Check,
   Share2,
@@ -45,61 +47,78 @@ const PROVIDERS = [
     key: "auto",
     label: "Otomatis",
     description: "Pilih provider terbaik otomatis",
+    icon: Sparkles,
+    color: "",
   },
   {
     key: "gemini",
     label: "Gemini",
     description: "Gemini 3.8 Flash (cepat & gratis)",
+    icon: Star,
+    color: "#1a73e8",
   },
   {
     key: "groq",
     label: "Groq",
     description: "GPT-OSS 120B (cepat & gratis)",
+    icon: Zap,
+    color: "#F55036",
   },
   {
     key: "nvidia",
     label: "Nvidia",
     description: "GPT-OSS 20B (gratis)",
+    icon: Chip,
+    color: "#76B900",
   },
 ] as const;
 
 type ProviderKey = (typeof PROVIDERS)[number]["key"];
 
+function providerOf(key: string): (typeof PROVIDERS)[number] {
+  return (
+    PROVIDERS.find((p) => p.key === key) ??
+    PROVIDERS.find((p) => p.key === "auto")!
+  );
+}
+
+/* Icon tile per provider: bintang Gemini, petir Groq, chip Nvidia. */
+function ProviderIcon({
+  iconKey,
+  size = 40,
+  circle = false,
+}: {
+  iconKey: ProviderKey;
+  size?: number;
+  circle?: boolean;
+}) {
+  const p = providerOf(iconKey);
+  const Icon = p.icon;
+  const glyph = Math.round(size * 0.45);
+  return (
+    <div
+      className={`flex items-center justify-center flex-shrink-0 ${
+        circle ? "rounded-full shadow-lg shadow-accent/20" : "rounded-xl"
+      }`}
+      style={{
+        width: size,
+        height: size,
+        background: p.color
+          ? p.color
+          : "linear-gradient(135deg, rgb(var(--c-accent)) 0%, rgb(var(--c-accent-dark)) 100%)",
+      }}
+    >
+      <Icon size={glyph} className="text-white" />
+    </div>
+  );
+}
+
 /* -------------------------------------------------------------------------- */
 /*                          Avatar Icon (Custom)                              */
 /* -------------------------------------------------------------------------- */
 
-function AiAvatar({ size = 32 }: { size?: number }) {
-  return (
-    <div
-      className="rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-accent/20"
-      style={{
-        width: size,
-        height: size,
-        background:
-          "linear-gradient(135deg, rgb(var(--c-accent)) 0%, rgb(var(--c-accent-dark)) 100%)",
-      }}
-    >
-      <svg
-        width={size * 0.5}
-        height={size * 0.5}
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 2 L13.5 9 L20.5 10.5 L13.5 12 L12 19 L10.5 12 L3.5 10.5 L10.5 9 Z"
-          fill="white"
-        />
-        <path
-          d="M19 17 L19.7 19.3 L22 20 L19.7 20.7 L19 23 L18.3 20.7 L16 20 L18.3 19.3 Z"
-          fill="white"
-          opacity="0.8"
-        />
-      </svg>
-    </div>
-  );
+function AiAvatar({ size = 32, iconKey = "auto" as ProviderKey }: { size?: number; iconKey?: ProviderKey }) {
+  return <ProviderIcon iconKey={iconKey} size={size} circle />;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -271,6 +290,18 @@ export default function AiChatPage() {
   const currentProviderLabel =
     PROVIDERS.find((p) => p.key === provider)?.label || provider;
 
+  /* Provider efektif: yang benar-benar dipakai server kalau sudah tahu,
+     kalau belum ya pilihan user. Header + avatar ikut ini. */
+  const effectiveKey: ProviderKey = (PROVIDERS.some((p) => p.key === activeProvider)
+    ? activeProvider
+    : provider) as ProviderKey;
+  const effective = providerOf(effectiveKey);
+  const EffectiveGlyph = effective.icon;
+  const showActiveSuffix =
+    activeProvider !== "" &&
+    activeProvider !== provider &&
+    PROVIDERS.some((p) => p.key === activeProvider);
+
   return (
     <AppLayout hideNav>
       {/* -------------------- Custom Header (compact) -------------------- */}
@@ -300,6 +331,7 @@ export default function AiChatPage() {
             </div>
             <p className="text-[11px] text-surface-muted truncate leading-tight mt-0.5">
               Model: {currentProviderLabel}
+              {showActiveSuffix && ` • Aktif: ${providerOf(activeProvider).label}`}
             </p>
           </div>
 
@@ -312,7 +344,11 @@ export default function AiChatPage() {
               size="sm"
               iconOnly
             >
-              <Zap size={16} strokeWidth={2.3} />
+              <EffectiveGlyph
+                size={16}
+                strokeWidth={2.3}
+                style={effective.color ? { color: effective.color } : undefined}
+              />
             </Button>
 
             {messages.length > 0 && (
@@ -341,7 +377,7 @@ export default function AiChatPage() {
           )}
 
           {hydrated && messages.length === 0 && !loading && (
-            <EmptyChat onSuggest={handleSend} />
+            <EmptyChat onSuggest={handleSend} iconKey={effectiveKey} />
           )}
 
           {hydrated &&
@@ -420,15 +456,7 @@ export default function AiChatPage() {
                     : "border-surface-border bg-surface-card hover:bg-surface-card2"
                 }`}
               >
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isActive
-                      ? "bg-accent text-white"
-                      : "bg-surface-card2 text-surface-muted"
-                  }`}
-                >
-                  <Sparkles size={18} />
-                </div>
+                <ProviderIcon iconKey={p.key} size={40} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-ios-body font-medium text-surface-text truncate">
@@ -512,11 +540,11 @@ export default function AiChatPage() {
 /*                              Empty Chat                                    */
 /* -------------------------------------------------------------------------- */
 
-function EmptyChat({ onSuggest }: { onSuggest: (text: string) => void }) {
+function EmptyChat({ onSuggest, iconKey }: { onSuggest: (text: string) => void; iconKey?: ProviderKey }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="mb-4">
-        <AiAvatar size={64} />
+        <AiAvatar size={64} iconKey={iconKey} />
       </div>
       <h3 className="text-ios-nav font-semibold text-surface-text mb-1.5">
         Assalamu'alaikum

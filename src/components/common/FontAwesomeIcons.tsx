@@ -95,6 +95,7 @@ import {
   faRuler,
   faPhone,
   faHourglassHalf,
+  faMicrochip,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -237,3 +238,4 @@ export const Venus = createIcon(faVenus);
 export const Ruler = createIcon(faRuler);
 export const Phone = createIcon(faPhone);
 export const Hourglass = createIcon(faHourglassHalf);
+export const Chip = createIcon(faMicrochip);
