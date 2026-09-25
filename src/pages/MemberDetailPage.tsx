@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   User,
+  Users,
   GraduationCap,
   Calendar,
   Heart,
@@ -285,7 +286,13 @@ export default function MemberDetailPage() {
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
             {member.nama_lengkap}
           </p>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
+          {member.kelompok && (
+            <p className="text-ios-footnote text-surface-muted truncate mt-0.5 flex items-center gap-1">
+              <Users size={11} className="shrink-0" />
+              {member.kelompok}
+            </p>
+          )}
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
             <CategoryHeaderBadge member={member} />
             {userStatus?.user && <RoleBadge role={userStatus.user.role} />}
             <span
@@ -297,13 +304,8 @@ export default function MemberDetailPage() {
                 className={member.has_user ? "text-accent" : "text-surface-muted/40"}
               />
             </span>
-            {member.kelompok && (
-              <span className="text-ios-footnote text-surface-muted truncate">
-                {member.kelompok}
-              </span>
-            )}
+            <MemberStatusChips member={member} inline />
           </div>
-          <MemberStatusChips member={member} />
         </div>
       </div>
 

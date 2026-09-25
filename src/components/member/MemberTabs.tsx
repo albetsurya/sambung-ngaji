@@ -773,26 +773,34 @@ export function CategoryHeaderBadge({ member }: { member: Member }) {
  * Chip status identitas (Muballigh/Bekerja/Menikah) — dipasang di header
  * profil tepat di bawah kategori–kelompok, bukan di dalam tab.
  */
-export function MemberStatusChips({ member }: { member: Member }) {
+export function MemberStatusChips({
+  member,
+  inline = false,
+}: {
+  member: Member;
+  inline?: boolean;
+}) {
   const chips: { Icon: typeof Heart; label: string }[] = [];
   if (member.is_muballigh) chips.push({ Icon: Mosque, label: "Muballigh" });
   if (member.is_kerja) chips.push({ Icon: Briefcase, label: "Bekerja" });
   if (member.is_nikah) chips.push({ Icon: Heart, label: "Menikah" });
   if (chips.length === 0) return null;
+  const items = chips.map((c) => {
+    const Icon = c.Icon;
+    return (
+      <span
+        key={c.label}
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-accent-soft text-accent"
+      >
+        <Icon size={10} />
+        {c.label}
+      </span>
+    );
+  });
+  if (inline) return <>{items}</>;
   return (
     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-      {chips.map((c) => {
-        const Icon = c.Icon;
-        return (
-          <span
-            key={c.label}
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide bg-accent-soft text-accent"
-          >
-            <Icon size={10} />
-            {c.label}
-          </span>
-        );
-      })}
+      {items}
     </div>
   );
 }
