@@ -914,7 +914,7 @@ export default function AttendancePage() {
 
               {/* Legend status absensi — compact */}
               {!isReadonly && (
-                <div className="flex gap-3 px-4 py-2 border-t border-surface-border bg-surface-card/50">
+                <div className="flex gap-3 px-4 py-2 border-t border-surface-border bg-surface-card/50 justify-end">
                   {ATTENDANCE_STATUSES.map((s) => {
                     const cfg = STATUS_CONFIG[s];
                     const Icon = cfg.Icon;
