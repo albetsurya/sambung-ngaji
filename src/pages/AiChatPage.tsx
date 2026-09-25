@@ -47,19 +47,14 @@ const PROVIDERS = [
     description: "Pilih provider terbaik otomatis",
   },
   {
+    key: "gemini",
+    label: "Gemini",
+    description: "Gemini 2.5 Flash (cepat & gratis)",
+  },
+  {
     key: "groq",
     label: "Groq",
     description: "GPT-OSS 120B (cepat & gratis)",
-  },
-  {
-    key: "cerebras",
-    label: "Cerebras",
-    description: "GPT-OSS 120B (tercepat & gratis)",
-  },
-  {
-    key: "openrouter",
-    label: "OpenRouter",
-    description: "Model gratis pilihan (free)",
   },
 ] as const;
 
