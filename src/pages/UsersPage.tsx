@@ -216,23 +216,21 @@ export default function UsersPage() {
         )}
 
         {!isLoading && !error && filteredUsers.length > 0 && (
-          <GroupedList>
-            {filteredUsers.map((u, i) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filteredUsers.map((u) => {
               const member = u.member_id ? memberById.get(u.member_id) : null;
               return (
-                <ListRow
+                <div
                   key={u.user_id}
-                  insetDivider={i !== filteredUsers.length - 1}
                   onClick={() => setEditTarget(u)}
-                  leading={
-                    <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
-                      <UserIcon size={16} />
-                    </span>
-                  }
+                  className="bg-surface-card rounded-2xl border border-surface-border p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-accent/40 hover:shadow-sm transition-all"
                 >
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-semibold">
+                      {u.nama ? u.nama.charAt(0).toUpperCase() : <UserIcon size={18} />}
+                    </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-ios-body font-medium text-surface-text truncate">
+                      <p className="text-ios-body font-semibold text-surface-text truncate">
                         {u.nama}
                       </p>
                       <p className="text-ios-footnote text-surface-muted truncate">
@@ -240,31 +238,31 @@ export default function UsersPage() {
                         {member ? ` · ${member.nama_lengkap}` : ""}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <RoleBadge role={u.role} />
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        iconOnly
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setResetTarget({
-                            userId: u.user_id,
-                            userName: u.nama || u.username,
-                          });
-                        }}
-                        aria-label={`Reset password ${u.nama}`}
-                        title="Reset password"
-                        className="hover:bg-accent-soft hover:text-accent"
-                      >
-                        <KeyRound size={14} />
-                      </Button>
-                    </div>
                   </div>
-                </ListRow>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <RoleBadge role={u.role} />
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      iconOnly
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setResetTarget({
+                          userId: u.user_id,
+                          userName: u.nama || u.username,
+                        });
+                      }}
+                      aria-label={`Reset password ${u.nama}`}
+                      title="Reset password"
+                      className="hover:bg-accent-soft hover:text-accent"
+                    >
+                      <KeyRound size={14} />
+                    </Button>
+                  </div>
+                </div>
               );
             })}
-          </GroupedList>
+          </div>
         )}
       </div>
 
