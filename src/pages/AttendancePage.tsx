@@ -968,17 +968,19 @@ export default function AttendancePage() {
                   />
                 )}
 
-                {filteredMembers.map((m, i) => (
-                  <CompactAttendanceRow
-                    key={m.member_id}
-                    member={m}
-                    status={records[m.member_id]}
-                    onStatus={handleStatusChange}
-                    onRequestDelete={handleRequestDelete}
-                    divider={i !== filteredMembers.length - 1}
-                    readonly={isReadonly || selectedMeeting.status === "LIBUR"}
-                  />
-                ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 border-t border-surface-border">
+                  {filteredMembers.map((m, i) => (
+                    <CompactAttendanceRow
+                      key={m.member_id}
+                      member={m}
+                      status={records[m.member_id]}
+                      onStatus={handleStatusChange}
+                      onRequestDelete={handleRequestDelete}
+                      divider={i !== filteredMembers.length - 1}
+                      readonly={isReadonly || selectedMeeting.status === "LIBUR"}
+                    />
+                  ))}
+                </div>
               </div>
             </>
           )}

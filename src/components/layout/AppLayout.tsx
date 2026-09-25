@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "../common/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
+import { DesktopSidebar } from "./DesktopSidebar";
 import { Button } from "../common/Button";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
@@ -161,15 +162,23 @@ export function AppLayout({
   }, [hideNav, fab, showAiChatFab]);
 
   return (
-    <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
-      <div className={`flex flex-col flex-1 ${hideNav ? "" : "pb-32"}`}>
-        {children}
-        {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
-        {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
+    <div className="min-h-screen bg-surface-bg flex flex-col md:flex-row">
+      {/* Sidebar Desktop (Vercel Style) */}
+      <DesktopSidebar />
+
+      {/* Main Content Workspace */}
+      <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0">
+        <div className="app-shell flex flex-col flex-1">
+          <div className={`flex flex-col flex-1 ${hideNav ? "" : "pb-24 md:pb-8"}`}>
+            {children}
+            {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
+            {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
+          </div>
+        </div>
       </div>
 
       {showFloating && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe pointer-events-none">
+        <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
           <div
             className={`app-shell px-3 ${containerPadding} flex flex-col items-end gap-2.5`}
           >
@@ -185,7 +194,7 @@ export function AppLayout({
             )}
             {fab && <div className="pointer-events-auto">{fab}</div>}
             {!hideNav && (
-              <div className="pointer-events-auto w-full">
+              <div className="pointer-events-auto w-full md:hidden">
                 <BottomNav />
               </div>
             )}

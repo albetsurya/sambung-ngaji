@@ -162,24 +162,21 @@ textarea:focus-visible {
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
 }
 
-/* ── Desktop shell: phone-frame centered ── */
-@media (min-width: 640px) {
+/* ── Desktop shell: Vercel-style wide workspace ── */
+@media (min-width: 768px) {
   body {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  }
-  .dark body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background-color: rgb(var(--c-bg));
   }
 
   .app-shell {
-    box-shadow:
-      0 0 0 1px rgb(var(--c-border)),
-      0 8px 32px rgb(0 0 0 / 0.08),
-      0 2px 8px rgb(0 0 0 / 0.04);
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: none;
     min-height: 100vh;
-    border-radius: 0;
   }
 }
 

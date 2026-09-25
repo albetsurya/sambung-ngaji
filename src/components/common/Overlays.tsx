@@ -12,17 +12,17 @@ interface SheetProps {
 export function BottomSheet({ open, onClose, title, children }: SheetProps) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4">
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
         onClick={onClose}
       />
-      <div className="app-shell sheet relative w-full bg-surface-card rounded-t-[28px] border-t border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
-        <div className="flex items-center justify-center pt-2.5 pb-2">
+      <div className="app-shell sheet relative w-full bg-surface-card rounded-t-[28px] md:rounded-[24px] border-t md:border border-surface-border shadow-2xl max-h-[85vh] md:max-w-lg flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
+        <div className="flex items-center justify-center pt-2.5 pb-2 md:hidden">
           <div className="w-9 h-[5px] rounded-full bg-surface-muted/25" />
         </div>
         {title && (
-          <div className="px-5 pb-3 flex items-center justify-between">
+          <div className="px-5 pb-3 md:pt-5 flex items-center justify-between">
             <h3 className="text-ios-nav font-semibold text-surface-text">
               {title}
             </h3>
@@ -34,7 +34,7 @@ export function BottomSheet({ open, onClose, title, children }: SheetProps) {
             </button>
           </div>
         )}
-        <div className="px-5 pb-[calc(1.25rem+var(--safe-bottom))] overflow-y-auto">
+        <div className="px-5 pb-[calc(1.25rem+var(--safe-bottom))] md:pb-5 overflow-y-auto">
           {children}
         </div>
       </div>

@@ -501,7 +501,7 @@ function GeneralDashboard({
             Belum ada data jamaah
           </p>
         ) : (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {Object.entries(data.per_kategori).map(([k, v]) => (
               <button
                 key={k}
