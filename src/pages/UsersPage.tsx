@@ -103,12 +103,6 @@ export default function UsersPage() {
 
   const hasActiveFilter = fSearch.trim() !== "" || fGender !== "" || fKategori !== "";
 
-  const resetFilter = () => {
-    setFSearch("");
-    setFGender("");
-    setFKategori("");
-  };
-
   return (
     <AppLayout
       hideNav
@@ -184,14 +178,7 @@ export default function UsersPage() {
           </div>
         </div>
 
-        {hasActiveFilter && (
-          <button
-            onClick={resetFilter}
-            className="text-ios-caption text-danger font-medium px-1"
-          >
-            Reset filter
-          </button>
-        )}
+
       </div>
 
       <div className="py-3">
@@ -224,12 +211,7 @@ export default function UsersPage() {
         {!isLoading && !error && users.length > 0 && filteredUsers.length === 0 && (
           <EmptyState
             title="Tidak ditemukan"
-            description="Tidak ada user yang cocok dengan filter. Ubah kata kunci atau reset filter."
-            action={
-              <Button onClick={resetFilter} variant="secondary">
-                Reset Filter
-              </Button>
-            }
+            description="Tidak ada user yang cocok dengan filter. Ubah kata kunci."
           />
         )}
 
