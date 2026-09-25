@@ -169,44 +169,83 @@ export default function RecapPrintPage() {
           </p>
           <p className="text-ios-caption text-surface-muted mt-1 leading-relaxed">
             Tiap lembar di bawah menggambarkan halaman file PDF yang akan
-            diunduh — termasuk pembagian baris per lembar.
+            diunduh, termasuk pembagian baris per lembar.
           </p>
         </section>
 
-        <section>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
-            Ukuran font cetakan
-          </p>
-          <Segmented
-            ariaLabel="Ukuran font cetakan"
-            size="sm"
-            value={fontSize}
-            onChange={setFontSize}
-            options={[
-              { value: "7", label: "Kecil" },
-              { value: "9", label: "Sedang" },
-              { value: "11", label: "Besar" },
-            ]}
-          />
-        </section>
-
-        <section>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2 px-1">
-            Orientasi kertas
-          </p>
-          <Segmented
-            ariaLabel="Orientasi kertas"
-            size="sm"
-            value={orientation}
-            onChange={(v) => {
-              setOrientation(v);
-              setSheetIdx(0);
-            }}
-            options={[
-              { value: "portrait", label: "Potrait" },
-              { value: "landscape", label: "Lanskap" },
-            ]}
-          />
+        <section className="rounded-2xl border border-surface-border bg-surface-card p-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted mb-1 px-0.5">
+                Font
+              </p>
+              <Segmented
+                ariaLabel="Ukuran font cetakan"
+                size="sm"
+                value={fontSize}
+                onChange={setFontSize}
+                options={[
+                  { value: "7", label: "Kecil" },
+                  { value: "9", label: "Sedang" },
+                  { value: "11", label: "Besar" },
+                ]}
+              />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted mb-1 px-0.5">
+                Kertas
+              </p>
+              <Segmented
+                ariaLabel="Orientasi kertas"
+                size="sm"
+                value={orientation}
+                onChange={(v) => {
+                  setOrientation(v);
+                  setSheetIdx(0);
+                }}
+                options={[
+                  { value: "portrait", label: "Potrait" },
+                  { value: "landscape", label: "Lanskap" },
+                ]}
+              />
+            </div>
+          </div>
+          {!isReadonly && (
+          <div className="flex gap-2 mt-3">
+            <Button
+              variant="secondary"
+              fullWidth
+              size="sm"
+              disabled={exporting !== null || !matrix || matrix.rows.length === 0}
+              onClick={() => handleExport("pdf")}
+              leftIcon={
+                exporting === "pdf" ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <FileText size={14} />
+                )
+              }
+            >
+              {exporting === "pdf" ? "Membuat..." : "PDF"}
+            </Button>
+            <Button
+              variant="secondary"
+              fullWidth
+              size="sm"
+              disabled={exporting !== null || !matrix || matrix.rows.length === 0}
+              onClick={() => handleExport("excel")}
+              leftIcon={
+                exporting === "excel" ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Download size={14} />
+                )
+              }
+            >
+              {exporting === "excel" ? "Membuat..." : "Excel"}
+            </Button>
+          </div>
+          )}
         </section>
 
         {dataQuery.isLoading ? (
@@ -277,14 +316,22 @@ export default function RecapPrintPage() {
                   <p className="text-[11px] text-slate-600">
                     Dicetak:{" "}
                     {new Date().toLocaleString("id-ID")} · Lembar{" "}
-                    {safeIdx + 1} dari {sheets.length}
+                    {safeIdx + 1} dari {sheets.length} ·{" "}
+                    {orientation === "landscape" ? "Lanskap" : "Potrait"}
                   </p>
                 </div>
                 <div
                   className="overflow-x-auto"
                   style={{ zoom: SHEET_ZOOM[fontSize] }}
                 >
-                  <table className="w-full text-left text-[11px] border-separate border-spacing-0">
+                  <table
+                    className="w-full text-left text-[11px] border-separate border-spacing-0"
+                    style={
+                      orientation === "landscape"
+                        ? { minWidth: 860 }
+                        : undefined
+                    }
+                  >
                     <thead>
                       <tr className="bg-slate-800">
                         <th className="px-1 py-2 font-bold text-white text-center w-8 border-b border-slate-700">
@@ -395,38 +442,9 @@ export default function RecapPrintPage() {
         )}
 
         {matrix && matrix.rows.length > 0 && !isReadonly && (
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              fullWidth
-              disabled={exporting !== null}
-              onClick={() => handleExport("pdf")}
-              leftIcon={
-                exporting === "pdf" ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <FileText size={15} />
-                )
-              }
-            >
-              {exporting === "pdf" ? "Membuat..." : "Unduh PDF"}
-            </Button>
-            <Button
-              variant="secondary"
-              fullWidth
-              disabled={exporting !== null}
-              onClick={() => handleExport("excel")}
-              leftIcon={
-                exporting === "excel" ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Download size={15} />
-                )
-              }
-            >
-              {exporting === "excel" ? "Membuat..." : "Unduh Excel"}
-            </Button>
-          </div>
+          <p className="text-ios-caption text-surface-muted text-center">
+            Hasil unduhan sama dengan lembar yang tampil.
+          </p>
         )}
       </div>
     </AppLayout>
