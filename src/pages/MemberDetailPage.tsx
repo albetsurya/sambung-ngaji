@@ -365,24 +365,10 @@ export default function MemberDetailPage() {
                 <div className="p-4">
                   {userStatus?.has_user ? (
                     isSuperAdmin ? (
-                      <button
-                        onClick={() => navigate("/lainnya/users")}
-                        className="w-full text-left rounded-xl border border-surface-border bg-surface-card hover:bg-surface-card2 p-3.5 flex items-center gap-3 transition-all active:scale-[0.99]"
-                      >
-                        <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
-                          <UserPlus size={16} />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-ios-body font-medium text-surface-text">
-                            Kelola di Manajemen User
+                      <p className="text-ios-footnote text-surface-muted leading-relaxed">
+                            Member ini punya akun user. Hapus permanen
+                            hanya bisa lewat Manajemen User (super admin).
                           </p>
-                          <p className="text-ios-caption text-surface-muted">
-                            Member ini punya akun. Hapus permanen lewat Kelola
-                            Akun.
-                          </p>
-                        </div>
-                        <ArrowUpRight size={16} className="text-surface-muted shrink-0" />
-                      </button>
                     ) : (
                       <p className="text-ios-footnote text-surface-muted leading-relaxed">
                         Member ini sudah punya akun user. Penghapusan permanen
@@ -421,6 +407,7 @@ export default function MemberDetailPage() {
           onClose={() => setCreateUserOpen(false)}
           onCreated={() => {
             refetchUserStatus();
+            refetch();
             setCreateUserOpen(false);
           }}
         />

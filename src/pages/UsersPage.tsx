@@ -29,6 +29,7 @@ import {
   EmptyState,
   ConfirmDialog,
   Segmented,
+  FilterChip,
 } from "../components/common";
 import { ResetPasswordSheet } from "../components/common/ChangePasswordSheet";
 import { userApi } from "../services/domainApi";
@@ -102,12 +103,6 @@ export default function UsersPage() {
 
   const hasActiveFilter = fSearch.trim() !== "" || fGender !== "" || fKategori !== "";
 
-  const resetFilter = () => {
-    setFSearch("");
-    setFGender("");
-    setFKategori("");
-  };
-
   return (
     <AppLayout
       hideNav
@@ -149,6 +144,24 @@ export default function UsersPage() {
           )}
         </div>
 
+        {/* Category chips — sama seperti halaman Attendance */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          <FilterChip
+            active={fKategori === ""}
+            label="Semua"
+            onClick={() => setFKategori("")}
+          />
+          {MEMBER_CATEGORIES.map((c) => (
+            <FilterChip
+              key={c}
+              active={fKategori === c}
+              label={CATEGORY_LABEL[c]}
+              onClick={() => setFKategori(c)}
+            />
+          ))}
+        </div>
+
+        {/* Gender segmented */}
         <div className="flex gap-2">
           <div className="flex-1 min-w-0">
             <Segmented
@@ -163,29 +176,9 @@ export default function UsersPage() {
               ]}
             />
           </div>
-          <select
-            value={fKategori}
-            onChange={(e) => setFKategori(e.target.value as MemberCategory | "")}
-            aria-label="Filter kategori"
-            className="min-h-[36px] rounded-xl border border-surface-border bg-surface-card px-2 text-ios-footnote text-surface-text shadow-sm focus:outline-none focus:border-accent"
-          >
-            <option value="">Semua kategori</option>
-            {MEMBER_CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABEL[c]}
-              </option>
-            ))}
-          </select>
         </div>
 
-        {hasActiveFilter && (
-          <button
-            onClick={resetFilter}
-            className="text-ios-caption text-danger font-medium px-1"
-          >
-            Reset filter
-          </button>
-        )}
+
       </div>
 
       <div className="py-3">
@@ -218,12 +211,7 @@ export default function UsersPage() {
         {!isLoading && !error && users.length > 0 && filteredUsers.length === 0 && (
           <EmptyState
             title="Tidak ditemukan"
-            description="Tidak ada user yang cocok dengan filter. Ubah kata kunci atau reset filter."
-            action={
-              <Button onClick={resetFilter} variant="secondary">
-                Reset Filter
-              </Button>
-            }
+            description="Tidak ada user yang cocok dengan filter. Ubah kata kunci."
           />
         )}
 

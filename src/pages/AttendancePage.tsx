@@ -75,38 +75,48 @@ const STATUS_CONFIG: Record<
   AttendanceStatus,
   {
     label: string;
-    Icon: typeof Check;
+    shortLabel: string;
+    Icon: React.FC<{ size?: number; style?: React.CSSProperties; strokeWidth?: number; className?: string }>;
     activeClass: string;
     inactiveClass: string;
+    dotClass: string;
   }
 > = {
   HADIR: {
     label: "Hadir",
+    shortLabel: "H",
     Icon: Check,
     activeClass: "bg-accent text-white shadow-sm shadow-accent/30",
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-accent-soft hover:text-accent",
+    dotClass: "text-accent",
   },
   IZIN: {
     label: "Izin",
+    shortLabel: "I",
     Icon: X,
     activeClass: "bg-warning text-white shadow-sm shadow-warning/30",
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-warning-soft hover:text-warning",
+    dotClass: "text-warning",
   },
   SAKIT: {
     label: "Sakit",
+    shortLabel: "S",
     Icon: Thermometer,
     activeClass: "bg-info text-white shadow-sm shadow-info/30",
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-info-soft hover:text-info",
+    dotClass: "text-info",
   },
   ALPA: {
     label: "Alpa",
+    shortLabel: "A",
     Icon: CircleAlert,
     activeClass: "bg-danger text-white shadow-sm shadow-danger/30",
     inactiveClass:
       "bg-surface-card2 text-surface-muted hover:bg-danger-soft hover:text-danger",
+    dotClass: "text-danger",
   },
 };
 
@@ -901,6 +911,25 @@ export default function AttendancePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Legend status absensi — compact */}
+              {!isReadonly && (
+                <div className="flex gap-3 px-4 py-2 border-t border-surface-border bg-surface-card/50 justify-end">
+                  {ATTENDANCE_STATUSES.map((s) => {
+                    const cfg = STATUS_CONFIG[s];
+                    const Icon = cfg.Icon;
+                    return (
+                      <span
+                        key={s}
+                        className="flex items-center gap-1 text-ios-caption text-surface-muted"
+                      >
+                        <Icon size={13} strokeWidth={2.2} className={cfg.dotClass} />
+                        <span>{cfg.shortLabel}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
 
               <div className="bg-surface-card">
                 {selectedMeeting.status === "LIBUR" && (
