@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   Calendar,
-  Eye,
+  Printer,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -300,7 +300,7 @@ export default function MemberAttendanceRecapPage() {
                     size="xs"
                     iconOnly
                   >
-                    <Eye size={14} />
+                    <Printer size={14} />
                   </Button>
                 </div>
               )}

@@ -77,7 +77,7 @@ function getRateColor(rate: number): { bg: [number, number, number]; text: [numb
   return { bg: hexToRgb("fee2e2"), text: hexToRgb("991b1b") }; // merah
 }
 
-export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string) {
+export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string, fontSize = 7) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -103,7 +103,7 @@ export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, ka
     startY: 38,
     head: [headers],
     body,
-    styles: { fontSize: 7, cellPadding: 1.5 },
+    styles: { fontSize, cellPadding: 1.5 },
     headStyles: { fillColor: [30, 58, 95], textColor: 255, fontStyle: "bold", halign: "center" },
     columnStyles: {
       0: { cellWidth: 10, halign: "center" },
