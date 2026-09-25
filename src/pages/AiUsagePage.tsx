@@ -22,9 +22,9 @@ import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 
 const PROVIDER_LABEL: Record<string, string> = {
-  omniroute: "OmniRoute",
   groq: "Groq",
-  gemini: "Gemini",
+  cerebras: "Cerebras",
+  openrouter: "OpenRouter",
 };
 
 const ROLE_LABEL: Record<string, string> = {

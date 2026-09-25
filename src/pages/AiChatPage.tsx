@@ -47,19 +47,19 @@ const PROVIDERS = [
     description: "Pilih provider terbaik otomatis",
   },
   {
-    key: "omniroute",
-    label: "OmniRoute",
-    description: "Provider utama, respons cepat",
-  },
-  {
-    key: "gemini",
-    label: "Gemini",
-    description: "Google Gemini 2.0 Flash",
-  },
-  {
     key: "groq",
     label: "Groq",
     description: "Llama 3.3 70B (cepat & gratis)",
+  },
+  {
+    key: "cerebras",
+    label: "Cerebras",
+    description: "GPT-OSS 120B (tercepat & gratis)",
+  },
+  {
+    key: "openrouter",
+    label: "OpenRouter",
+    description: "Model gratis pilihan (free)",
   },
 ] as const;
 
@@ -290,7 +290,7 @@ export default function AiChatPage() {
           <div className="flex-1 min-w-0 flex flex-col justify-center px-1">
             <div className="flex items-center gap-1.5 min-w-0">
               <h1 className="text-ios-nav font-semibold text-surface-text truncate min-w-0">
-                Asisten Pengajian
+                Asisten Sambung Ngaji
               </h1>
               {isDevelopment && (
                 <span className="inline-flex items-center px-1 py-[1px] rounded text-[8px] font-bold uppercase tracking-wide bg-warning-soft text-warning border border-warning/20 flex-shrink-0 leading-none">
