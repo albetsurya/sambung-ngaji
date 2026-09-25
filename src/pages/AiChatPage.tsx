@@ -49,7 +49,7 @@ const PROVIDERS = [
   {
     key: "groq",
     label: "Groq",
-    description: "Llama 3.3 70B (cepat & gratis)",
+    description: "GPT-OSS 120B (cepat & gratis)",
   },
   {
     key: "cerebras",
