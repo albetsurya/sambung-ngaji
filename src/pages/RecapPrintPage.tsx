@@ -92,8 +92,10 @@ export default function RecapPrintPage() {
   const matrix = dataQuery.data ?? null;
 
   /* Lembaran ala PDF: baris dipecah per halaman mengikuti tata file
-     PDF (A4 portrait), agar terlihat tiap lembar isi berapa baris. */
-  const ROWS_PER_SHEET = 35;
+     PDF (A4 portrait), agar terlihat tiap lembar isi berapa baris.
+     38 = hasil ukur aktual file PDF (font 7, padding 1.5, startY 38).
+     Kalau konfigurasi exportRecapPDF berubah, samakan angka ini. */
+  const ROWS_PER_SHEET = 38;
   const sheets: RecapMatrixRow[][] = useMemo(() => {
     if (!matrix) return [];
     const out: RecapMatrixRow[][] = [];
