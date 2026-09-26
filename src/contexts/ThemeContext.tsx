@@ -8,6 +8,8 @@ import {
 import { withThemeTransition } from "../utils/transition";
 
 type Theme = "light" | "dark";
+export type ThemeMode = "light" | "dark" | "system";
+export type PresetGroup = "aplikasi" | "alam" | "dasar";
 export type ThemePreset =
   | "default"
   | "whatsapp"
@@ -18,102 +20,159 @@ export type ThemePreset =
   | "masjid"
   | "ocean"
   | "sunset"
+  | "hutan"
   | "midnight"
-  | "glass";
+  | "glass"
+  | "kertas";
 
 const STORAGE_KEY = "pengajian_theme";
 const PRESET_KEY = "pengajian_preset";
+
+export const PRESET_GROUPS: {
+  key: PresetGroup;
+  label: string;
+  description: string;
+}[] = [
+  {
+    key: "aplikasi",
+    label: "Aplikasi",
+    description: "Sensasi familiar dari aplikasi yang dipakai setiap hari.",
+  },
+  {
+    key: "alam",
+    label: "Alam",
+    description: "Warna tenang yang diambil dari alam: laut, hutan, dan senja.",
+  },
+  {
+    key: "dasar",
+    label: "Dasar",
+    description: "Warna netral yang aman dipakai kapan saja.",
+  },
+];
 
 export const THEME_PRESETS: {
   key: ThemePreset;
   label: string;
   description: string;
+  group: PresetGroup;
   swatch: string[];
 }[] = [
   {
     key: "default",
     label: "Default",
     description: "Biru navy profesional",
+    group: "dasar",
     swatch: ["#1E3A8A", "#3B82F6", "#EFF6FF"],
   },
   {
     key: "whatsapp",
     label: "WhatsApp",
     description: "Hijau familiar",
+    group: "aplikasi",
     swatch: ["#25D366", "#128C7E", "#DCF8C6"],
   },
   {
     key: "instagram",
     label: "Instagram",
     description: "Pink gradient trendy",
+    group: "aplikasi",
     swatch: ["#E1306C", "#F77737", "#FCE7F3"],
   },
   {
     key: "tiktok",
     label: "TikTok",
     description: "Cyan neon bold",
+    group: "aplikasi",
     swatch: ["#25F4EE", "#FE2C55", "#000000"],
   },
   {
     key: "spotify",
     label: "Spotify",
     description: "Hijau neon premium",
+    group: "aplikasi",
     swatch: ["#1DB954", "#121212", "#191414"],
   },
   {
     key: "discord",
     label: "Discord",
     description: "Blurple komunitas",
+    group: "aplikasi",
     swatch: ["#5865F2", "#4752C4", "#E0E7FF"],
   },
   {
     key: "masjid",
     label: "Masjid",
     description: "Emerald islami",
+    group: "alam",
     swatch: ["#059669", "#10B981", "#D1FAE5"],
   },
   {
     key: "ocean",
     label: "Ocean",
     description: "Biru laut tenang",
+    group: "alam",
     swatch: ["#06B6D4", "#0891B2", "#CFFAFE"],
   },
   {
     key: "sunset",
     label: "Sunset",
     description: "Oranye hangat",
+    group: "alam",
     swatch: ["#F97316", "#EA580C", "#FFEDD5"],
+  },
+  {
+    key: "hutan",
+    label: "Hutan",
+    description: "Hijau pinus natural",
+    group: "alam",
+    swatch: ["#15803D", "#92400E", "#DCFCE7"],
   },
   {
     key: "midnight",
     label: "Midnight",
     description: "Hitam neon sleek",
+    group: "dasar",
     swatch: ["#8B5CF6", "#000000", "#A78BFA"],
   },
   {
     key: "glass",
     label: "Glass",
     description: "Kaca frosted modern",
+    group: "dasar",
     swatch: ["#E2E8F0", "#FFFFFF", "#0F172A"],
+  },
+  {
+    key: "kertas",
+    label: "Kertas",
+    description: "Krem hangat paper-like",
+    group: "dasar",
+    swatch: ["#B45309", "#FDF6E3", "#1C1917"],
   },
 ];
 
 interface ThemeContextValue {
   theme: Theme;
+  mode: ThemeMode;
   preset: ThemePreset;
   toggleTheme: () => void;
   setTheme: (t: Theme) => void;
+  setMode: (m: ThemeMode) => void;
   setPreset: (p: ThemePreset) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-function getInitialTheme(): Theme {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+function systemTheme(): Theme {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
+}
+
+function getInitialMode(): ThemeMode {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === "light" || stored === "dark" || stored === "system")
+    return stored;
+  return "system";
 }
 
 function getInitialPreset(): ThemePreset {
@@ -128,22 +187,40 @@ function getInitialPreset(): ThemePreset {
     "masjid",
     "ocean",
     "sunset",
+    "hutan",
     "midnight",
     "glass",
+    "kertas",
   ];
   if (stored && valid.includes(stored)) return stored;
   return "default";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+  const [mode, setModeState] = useState<ThemeMode>(getInitialMode);
   const [preset, setPresetState] = useState<ThemePreset>(getInitialPreset);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const m = getInitialMode();
+    return m === "system" ? systemTheme() : m;
+  });
+
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+    const sync = () => {
+      if (localStorage.getItem(STORAGE_KEY) !== "system") return;
+      withThemeTransition(() =>
+        setThemeState(mq.matches ? "dark" : "light"),
+      );
+    };
+    mq?.addEventListener("change", sync);
+    return () => mq?.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
     root.setAttribute("data-preset", preset);
-    localStorage.setItem(STORAGE_KEY, theme);
+    localStorage.setItem(STORAGE_KEY, mode);
     localStorage.setItem(PRESET_KEY, preset);
 
     const host = window.location.hostname || "";
@@ -183,13 +260,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, preset]);
 
   function setTheme(t: Theme) {
-    withThemeTransition(() => setThemeState(t));
+    withThemeTransition(() => {
+      setModeState(t);
+      setThemeState(t);
+    });
   }
 
   function toggleTheme() {
     withThemeTransition(() =>
-      setThemeState((t) => (t === "dark" ? "light" : "dark")),
+      setThemeState((t) => {
+        const next = t === "dark" ? "light" : "dark";
+        setModeState(next);
+        return next;
+      }),
     );
+  }
+
+  function setMode(m: ThemeMode) {
+    withThemeTransition(() => {
+      setModeState(m);
+      setThemeState(m === "system" ? systemTheme() : m);
+    });
   }
 
   function setPreset(p: ThemePreset) {
@@ -198,7 +289,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext.Provider
-      value={{ theme, preset, toggleTheme, setTheme, setPreset }}
+      value={{ theme, mode, preset, toggleTheme, setTheme, setMode, setPreset }}
     >
       {children}
     </ThemeContext.Provider>

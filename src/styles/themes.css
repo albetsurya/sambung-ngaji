@@ -138,6 +138,28 @@
   --c-text: 255 245 235;
 }
 
+[data-preset="hutan"] {
+  --c-accent: 21 128 61;
+  --c-accent-dark: 22 101 52;
+  --c-accent-light: 220 252 231;
+  --c-accent-2: 146 64 14;
+  --c-accent-2-dark: 120 53 15;
+  --c-accent-2-light: 254 243 199;
+}
+[data-preset="hutan"].dark {
+  --c-bg: 10 18 12;
+  --c-card: 18 30 22;
+  --c-card2: 13 22 16;
+  --c-border: 35 55 42;
+  --c-accent: 74 222 128;
+  --c-accent-dark: 110 231 160;
+  --c-accent-light: 10 50 28;
+  --c-accent-2: 217 150 60;
+  --c-accent-2-dark: 230 175 90;
+  --c-accent-2-light: 55 35 12;
+  --c-text: 240 248 242;
+}
+
 [data-preset="discord"] {
   --c-accent: 88 101 242;
   --c-accent-dark: 71 82 196;
@@ -168,6 +190,35 @@
   --c-accent-dark: 196 181 253;
   --c-accent-light: 30 15 50;
   --c-text: 250 250 255;
+}
+
+[data-preset="kertas"] {
+  --c-bg: 253 246 227;
+  --c-card: 255 252 244;
+  --c-card2: 247 236 208;
+  --c-border: 224 205 165;
+  --c-muted: 120 100 75;
+  --c-text: 60 45 25;
+  --c-accent: 180 83 9;
+  --c-accent-dark: 146 64 14;
+  --c-accent-light: 254 240 210;
+  --c-accent-2: 180 83 9;
+  --c-accent-2-dark: 146 64 14;
+  --c-accent-2-light: 254 240 210;
+}
+[data-preset="kertas"].dark {
+  --c-bg: 28 25 23;
+  --c-card: 38 34 30;
+  --c-card2: 32 28 25;
+  --c-border: 65 58 48;
+  --c-muted: 190 170 140;
+  --c-text: 245 235 220;
+  --c-accent: 245 170 60;
+  --c-accent-dark: 250 195 110;
+  --c-accent-light: 80 50 20;
+  --c-accent-2: 245 170 60;
+  --c-accent-2-dark: 250 195 110;
+  --c-accent-2-light: 80 50 20;
 }
 
 /* ========================================================================
