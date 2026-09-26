@@ -193,6 +193,7 @@ export default function MemberAttendanceRecapPage() {
           else navigate("/absensi", { replace: true });
         }}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
       />
 

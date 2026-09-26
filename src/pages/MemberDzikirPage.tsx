@@ -23,6 +23,7 @@ export default function MemberDzikirPage() {
         subtitle="Tasbih digital"
         onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
         right={
           <>

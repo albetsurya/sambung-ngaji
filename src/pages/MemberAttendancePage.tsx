@@ -67,6 +67,7 @@ export default function MemberAttendancePage() {
           else navigate("/member", { replace: true });
         }}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
       />
 

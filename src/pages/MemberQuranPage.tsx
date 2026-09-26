@@ -73,6 +73,7 @@ export default function MemberQuranPage() {
         subtitle="114 surah"
         onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
         right={
           <div className="flex items-center gap-1">

@@ -273,7 +273,7 @@ export default function MemberQuranMushafPage() {
       </div>
 
       {/* Bottom controls */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pb-safe bg-surface-bg/95 backdrop-blur border-t border-surface-border">
+      <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe bg-surface-bg/95 backdrop-blur border-t border-surface-border">
         <div className="app-shell px-3 py-2.5 flex items-center gap-2">
           <Button
             onClick={nextPage}

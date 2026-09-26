@@ -87,6 +87,7 @@ export default function MemberPrayerPage() {
         subtitle={LATUKAN_LABEL}
         onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
         right={
           !user ? (

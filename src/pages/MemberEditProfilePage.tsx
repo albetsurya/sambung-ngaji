@@ -474,7 +474,7 @@ export default function MemberEditProfilePage() {
       </form>
 
       <div
-        className={`fixed bottom-0 left-0 right-0 z-30 transition-transform duration-200 ${
+        className={`fixed bottom-0 left-0 right-0 md:left-64 z-30 transition-transform duration-200 ${
           keyboardOpen ? "translate-y-full" : ""
         }`}
       >

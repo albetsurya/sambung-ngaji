@@ -213,7 +213,7 @@ export default function PendingMemberDetailPage() {
       </div>
 
       {canProcess && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 md:left-64 z-30 pb-safe">
           <div className="app-shell px-4 pt-3 pb-4 bg-surface-bg/80 backdrop-blur-xl border-t border-surface-border">
             <div className="flex gap-3">
               <Button

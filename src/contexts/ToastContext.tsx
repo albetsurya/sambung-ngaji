@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
 
       <div
-        className="fixed left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"
+        className="fixed left-0 right-0 md:left-64 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"
         style={{
           bottom:
             "calc(1rem + var(--toast-offset, 0px) + var(--safe-bottom, 0px))",

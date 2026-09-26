@@ -58,11 +58,11 @@ export function QuranNavigationSheet({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40"
+      className="fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/40 md:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md h-[85vh] rounded-t-3xl bg-surface-bg border-t border-surface-border flex flex-col animate-[slideUp_0.2s_ease-out]"
+        className="w-full max-w-md md:max-w-lg h-[85vh] md:h-auto md:max-h-[80vh] rounded-t-3xl md:rounded-3xl bg-surface-bg border-t md:border border-surface-border flex flex-col animate-[slideUp_0.2s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}

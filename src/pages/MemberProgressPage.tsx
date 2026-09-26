@@ -151,6 +151,7 @@ export default function MemberProgressPage() {
           else navigate("/member", { replace: true });
         }}
         backLabel="Kembali"
+        hideBackOnDesktop
         showSyncButton={false}
       />
 

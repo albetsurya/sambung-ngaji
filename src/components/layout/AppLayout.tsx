@@ -25,6 +25,8 @@ interface HeaderProps {
   right?: ReactNode;
   showThemeToggle?: boolean;
   showSyncButton?: boolean;
+  /** Sembunyikan tombol back di desktop (halaman level-1 yg sudah ada di sidebar). Mobile tetap tampil. */
+  hideBackOnDesktop?: boolean;
 }
 
 export function Header({
@@ -35,6 +37,7 @@ export function Header({
   right,
   showThemeToggle,
   showSyncButton = true,
+  hideBackOnDesktop = false,
 }: HeaderProps) {
   const navigate = useNavigate();
   const { isDevelopment } = useEnvironment();
@@ -130,7 +133,7 @@ export function Header({
       <div className="hidden md:flex items-center justify-between gap-4 h-16 px-6 lg:px-8">
         {/* Left: Title + Subtitle + Back */}
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          {onBack && (
+          {onBack && !hideBackOnDesktop && (
             <button
               onClick={() => (onBack ? onBack() : navigate(-1))}
               className="flex items-center gap-1 pl-1.5 pr-3 h-9 rounded-xl text-surface-muted hover:text-surface-text hover:bg-surface-card2 text-ios-footnote font-medium transition-colors shrink-0 border border-surface-border/60 whitespace-nowrap"
@@ -234,7 +237,7 @@ export function AppLayout({
       {showFloating && (
         <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
           <div
-            className={`app-shell px-3 ${containerPadding} flex flex-col items-end gap-2.5`}
+            className={`app-shell px-3 md:px-8 ${containerPadding} md:pb-6 flex flex-col items-end md:justify-end gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
           >
             {showAiChatFab && (
               <div className="pointer-events-auto">

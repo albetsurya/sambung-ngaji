@@ -138,7 +138,7 @@ export function AudioPlayerMini({
     <>
       <audio ref={audioRef} preload="metadata" />
 
-      <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe pointer-events-none">
+      <div className="fixed bottom-0 left-0 right-0 md:left-64 z-50 pb-safe pointer-events-none">
         <div className="app-shell px-3 pb-3">
           <div className="pointer-events-auto rounded-2xl bg-surface-card border border-surface-border shadow-lg shadow-black/10 backdrop-blur-xl overflow-hidden">
             {/* Progress bar */}

@@ -395,11 +395,11 @@ export default function MemberQuranSurahPage() {
 
       {qariSheetOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40"
+          className="fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/40 md:p-4"
           onClick={() => setQariSheetOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-t-3xl bg-surface-bg border-t border-surface-border p-4 pb-safe"
+            className="w-full max-w-md md:max-w-lg rounded-t-3xl md:rounded-3xl bg-surface-bg border-t md:border border-surface-border p-4 pb-safe"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-10 h-1 rounded-full bg-surface-card2 mx-auto mb-3" />
