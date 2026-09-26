@@ -338,7 +338,7 @@ export default function PublicRegistrationPage() {
         
         <form
           onSubmit={handleSubmit}
-          className="relative flex-1 flex flex-col px-5 py-4 pb-36"
+          className="relative flex-1 flex flex-col px-4 py-4 pb-36 space-y-4"
         >
           {step === 1 && (
             <div className="anim-fade">

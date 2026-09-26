@@ -22,6 +22,7 @@ import {
   normalizePhoneNumber,
 } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
+import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
 import { queryKeys } from "../lib/queryClient";
@@ -63,11 +64,22 @@ export default function MemberFormPage() {
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [compressing, setCompressing] = useState(false);
   const keyboardOpen = useKeyboardVisible();
+  const { isSuperAdmin, assignedGroup } = usePermission();
 
   useEffect(() => {
     groupApi
       .list()
-      .then(setGroups)
+      .then((res) => {
+        setGroups(res);
+        if (!isEdit && !isSuperAdmin && assignedGroup) {
+          const matched = res.find(
+            (g) => g.group_id === assignedGroup || g.group_name === assignedGroup
+          );
+          if (matched) {
+            setForm((f) => ({ ...f, kelompok: matched.group_name }));
+          }
+        }
+      })
       .catch(() => {});
     if (isEdit && id) {
       memberApi
@@ -295,7 +307,9 @@ export default function MemberFormPage() {
           <Select
             label="Kelompok"
             value={form.kelompok || ""}
+            disabled={!isSuperAdmin && !isEdit && !!assignedGroup}
             onChange={(e) => update("kelompok", e.target.value)}
+            hint={!isSuperAdmin && !isEdit && !!assignedGroup ? "Otomatis diisi sesuai kelompok Anda" : undefined}
           >
             <option value="">Pilih kelompok</option>
             {groups.map((g) => (
