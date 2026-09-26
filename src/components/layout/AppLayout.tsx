@@ -200,9 +200,9 @@ export function AppLayout({
 
   const showAiChatFab = showAiChat && !hideNav;
   const showFloating = showAiChatFab || !!fab || !hideNav;
-  /* pb-[68px] hanya untuk mobile (ruang jempol di atas tepi layar).
-     Di desktop dock menempel pojok, jadi samakan dengan halaman biasa. */
-  const containerPadding = hideNav ? "pb-[68px] md:pb-2" : "pb-2";
+  /* pb besar hanya untuk mobile (ruang jempol di atas tepi layar).
+     Di desktop dock hampir mepet bawah: sisa 12px dari pb-safe saja. */
+  const containerPadding = hideNav ? "pb-[68px] md:pb-0" : "pb-2 md:pb-0";
 
   useEffect(() => {
     let offset = 16;
@@ -239,7 +239,7 @@ export function AppLayout({
       {showFloating && (
         <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
           <div
-            className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} md:pb-2 flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
+            className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} md:pb-0 flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
           >
             {showAiChatFab && (
               <div className="pointer-events-auto">
