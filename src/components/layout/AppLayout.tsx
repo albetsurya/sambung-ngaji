@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -165,18 +166,20 @@ export function Header({
         {/* Right: Actions */}
         <div className="flex items-center gap-2.5 shrink-0">
           {showSyncButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSync}
-              disabled={syncing}
-              aria-label="Sync data"
-              title="Sync data"
-              className="border border-surface-border bg-surface-card hover:bg-surface-card2 gap-2"
-            >
-              <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
-              <span className="text-ios-footnote font-medium hidden lg:inline">Refresh</span>
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSync}
+            disabled={syncing}
+            aria-label="Sync data"
+            title="Sync data"
+            className="border border-surface-border bg-surface-card hover:bg-surface-card2 gap-2"
+          >
+            <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
+            <span className="text-ios-footnote font-medium hidden lg:inline ml-1">
+              Refresh
+            </span>
+          </Button>
           )}
           {right}
         </div>
@@ -201,7 +204,7 @@ export function AppLayout({
   const showAiChatFab = showAiChat && !hideNav;
   const showFloating = showAiChatFab || !!fab || !hideNav;
   /* pb besar hanya untuk mobile (ruang jempol di atas tepi layar).
-     Di desktop dock hampir mepet bawah: sisa 12px dari pb-safe saja. */
+     Di desktop dock mepet tepi bawah: md:pb-0. */
   const containerPadding = hideNav ? "pb-[68px] md:pb-0" : "pb-2 md:pb-0";
 
   useEffect(() => {
@@ -228,7 +231,9 @@ export function AppLayout({
       {/* Main Content Workspace */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
         <div className="app-shell flex flex-col flex-1 w-full max-w-7xl px-4 md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
-          <div className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}>
+          <div
+            className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}
+          >
             {children}
             {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
             {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
@@ -236,41 +241,50 @@ export function AppLayout({
         </div>
       </div>
 
-      {showFloating && (
-        <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
-          <div
-            className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} md:pb-0 flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
-          >
-            {showAiChatFab && (
-              <div className="pointer-events-auto">
-                {/* Mobile: lingkaran FAB. Desktop: pil berlabel di pojok viewport. */}
-                <span className="md:hidden">
-                  <FloatingActionButton
+      {/* FAB & BottomNav — di-render lewat Portal ke document.body
+          agar `position: fixed` selalu relatif ke viewport. */}
+      {showFloating &&
+        createPortal(
+          <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
+            {/*
+              `floating-dock` punya min-height:0 di CSS (media md),
+              jadi min-height:100vh dari .app-shell tidak bocor ke dock
+              dan FAB tidak nyangkut di tengah layar.
+            */}
+            <div
+              className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
+            >
+              {showAiChatFab && (
+                <div className="pointer-events-auto">
+                  {/* Mobile: lingkaran FAB. Desktop: pil berlabel di pojok viewport. */}
+                  <span className="md:hidden">
+                    <FloatingActionButton
+                      onClick={() => navigate("/ai-chat")}
+                      label="Tanya AI"
+                      variant="secondary"
+                      icon={<Sparkles size={18} strokeWidth={2.2} />}
+                    />
+                  </span>
+                  <button
                     onClick={() => navigate("/ai-chat")}
-                    label="Tanya AI"
-                    variant="secondary"
-                    icon={<Sparkles size={18} strokeWidth={2.2} />}
-                  />
-                </span>
-                <button
-                  onClick={() => navigate("/ai-chat")}
-                  aria-label="Tanya AI"
-                  className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary text-ios-footnote font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95"
-                >
-                  <Sparkles size={18} strokeWidth={2.2} />
-                  Tanya AI
-                </button>
-              </div>
-            )}
-            {fab && <div className="pointer-events-auto">{fab}</div>}
-            {!hideNav && (
-              <div className="pointer-events-auto w-full md:hidden">
-                <BottomNav />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                    aria-label="Tanya AI"
+                    className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary text-ios-footnote font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95"
+                  >
+                    <Sparkles size={18} strokeWidth={2.2} />
+                    Tanya AI
+                  </button>
+                </div>
+              )}
+              {fab && <div className="pointer-events-auto">{fab}</div>}
+              {!hideNav && (
+                <div className="pointer-events-auto w-full md:hidden">
+                  <BottomNav />
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

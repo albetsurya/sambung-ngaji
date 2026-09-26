@@ -189,9 +189,13 @@ textarea:focus-visible {
   .modal-narrow {
     max-width: 42rem;
   }
-  /* Dock FAB: lepas dari batas 1280px agar menempel pojok viewport. */
+
+  /* Dock FAB: lepas dari batas 1280px agar menempel pojok viewport.
+     min-height:0 WAJIB agar min-height:100vh dari .app-shell tidak
+     bocor ke dock (kalau bocor, FAB akan muncul di tengah layar). */
   .floating-dock {
     max-width: none;
+    min-height: 0;
   }
 }
 
