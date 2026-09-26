@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { usePermission } from "../../hooks/usePermission";
 import { useEnvironment } from "../../hooks/useEnvironment";
+import { tapFeedback } from "../../lib/haptics";
 import {
   Home,
   Users,
@@ -81,7 +82,8 @@ export function BottomNav() {
               key={item.key}
               to={item.to}
               end={item.to === "/" || item.to === "/member"}
-              className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200"
+              className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200 active:scale-90"
+              onClick={() => tapFeedback()}
             >
               {({ isActive }) => (
                 <>

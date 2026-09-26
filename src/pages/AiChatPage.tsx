@@ -611,7 +611,7 @@ function ChatBubble({
     return (
       <div className="flex justify-end">
         <div
-          className="max-w-[82%] bg-accent text-white px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
+          className="selectable max-w-[82%] bg-accent text-white px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
           style={{
             borderRadius: "16px 0 16px 16px",
           }}
@@ -627,7 +627,7 @@ function ChatBubble({
     <div className="flex justify-start">
       <div className="max-w-[82%]">
         <div
-          className="bg-surface-card border border-surface-border text-surface-text px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
+          className="selectable bg-surface-card border border-surface-border text-surface-text px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
           style={{
             borderRadius: "0 16px 16px 16px",
           }}

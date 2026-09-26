@@ -316,7 +316,7 @@ function ChatBubble({
       )}
 
       <div
-        className={`max-w-[78%] flex flex-col gap-1 ${
+        className={`selectable max-w-[78%] flex flex-col gap-1 ${
           isUser ? "items-end" : "items-start"
         }`}
       >

@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { ChevronRight, KeyRound } from "./FontAwesomeIcons";
 import type { Role } from "../../types";
 import { ROLE_LABEL } from "../../hooks/usePermission";
+import { tapFeedback } from "../../lib/haptics";
 
 export function Card({
   children,
@@ -64,7 +65,14 @@ export function ListRow({
 }) {
   return (
     <div
-      onClick={onClick}
+      onClick={
+        onClick
+          ? () => {
+              tapFeedback();
+              onClick();
+            }
+          : undefined
+      }
       className={`flex items-center gap-3 min-h-[52px] px-4 py-3 ${
         insetDivider ? "ios-list-divider" : ""
       } ${

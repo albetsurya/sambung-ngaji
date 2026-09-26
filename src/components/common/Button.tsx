@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { tapFeedback } from "../../lib/haptics";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger" | "soft" | "softDanger";
@@ -73,11 +74,17 @@ export function Button({
   iconOnly,
   className = "",
   children,
+  onClick,
   ...rest
 }: Props) {
   const s = SIZES[size];
   // Class stabil untuk override per-preset tema (lihat styles/themes.css).
   const stable = `btn btn-${variant} btn-${size}`;
+  // Getar halus tiap tap (Android; iOS mengabaikan).
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    tapFeedback();
+    onClick?.(e);
+  };
 
   if (iconOnly) {
     const width =
@@ -91,6 +98,7 @@ export function Button({
     return (
       <button
         className={`inline-flex items-center justify-center ${s.height} ${width} rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${className}`}
+        onClick={handleClick}
         {...rest}
       >
         <span className={`flex items-center justify-center ${s.iconSize}`}>
@@ -103,8 +111,9 @@ export function Button({
   return (
     <button
       className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${fullWidth ? "w-full" : ""} ${className}`}
-      {...rest}
-    >
+        onClick={handleClick}
+        {...rest}
+      >
       {leftIcon && (
         <span
           className={`inline-flex items-center justify-center flex-shrink-0 ${s.iconSize}`}

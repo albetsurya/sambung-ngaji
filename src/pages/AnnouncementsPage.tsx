@@ -255,7 +255,7 @@ function PreviewModal({
       </div>
 
       <div className="rounded-2xl border border-surface-border p-4 mb-4 max-h-[45vh] overflow-y-auto bg-accent-soft/40">
-        <pre className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-surface-text font-sans">
+        <pre className="selectable whitespace-pre-wrap text-[14.5px] leading-relaxed text-surface-text font-sans">
           {announcement.generated_text}
         </pre>
       </div>

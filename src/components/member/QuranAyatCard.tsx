@@ -78,7 +78,7 @@ export function QuranAyatCard({
       </div>
 
       {/* Body: Arab + Latin + Indonesia */}
-      <div className="px-4 py-4 space-y-3">
+      <div className="selectable px-4 py-4 space-y-3">
         <div
           className="text-surface-text"
           style={{

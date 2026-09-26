@@ -17,6 +17,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useEnvironment } from "../../hooks/useEnvironment";
 import { invalidateRouteQueries } from "../../lib/routeQueries";
+import { tapFeedback } from "../../lib/haptics";
 
 interface HeaderProps {
   title: string;
@@ -265,9 +266,12 @@ export function AppLayout({
                       icon={<Sparkles size={18} strokeWidth={2.2} />}
                     />
                   </span>
-                  <button
-                    onClick={() => navigate("/ai-chat")}
-                    aria-label="Tanya AI"
+                <button
+                  onClick={() => {
+                    tapFeedback();
+                    navigate("/ai-chat");
+                  }}
+                  aria-label="Tanya AI"
                     className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary text-ios-footnote font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95"
                   >
                     <Sparkles size={18} strokeWidth={2.2} />
@@ -331,7 +335,10 @@ export function FloatingActionButton({
 
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        tapFeedback();
+        onClick();
+      }}
       aria-label={label}
       className={`relative ${sizeClass} rounded-2xl flex items-center justify-center transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95 active:translate-y-0 ${variantClass} ${className}`}
     >

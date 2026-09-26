@@ -128,7 +128,7 @@ export function DoaCard({
       </div>
 
       {open && (
-        <div className="px-4 pb-4 pt-1 border-t border-surface-border space-y-3">
+        <div className="selectable px-4 pb-4 pt-1 border-t border-surface-border space-y-3">
           <div
             className="border-r-2 border-accent/30 pr-4 py-2 text-surface-text"
             style={{

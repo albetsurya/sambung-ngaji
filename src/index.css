@@ -124,6 +124,39 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* ── App-feel: seperti aplikasi native di layar sentuh.
+   - Teks UI tidak terseleksi saat tap/sentuh (tetap bisa di input & zona .selectable).
+   - Tanpa menu long-press iOS & tanpa jeda/zoom double-tap (touch-action).
+   - Tanpa efek karet/pull-to-refresh browser (overscroll). ── */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+img {
+  -webkit-user-drag: none;
+}
+/* Zona yang tetap bisa diseleksi/dicopy (chat, artikel, ayat). */
+.selectable,
+.selectable * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
+
 .ios-active {
   transition:
     transform 200ms ease-out,
