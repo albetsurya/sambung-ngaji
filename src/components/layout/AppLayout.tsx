@@ -57,7 +57,8 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
+      {/* ── Mobile Header (iOS Style) ── */}
+      <div className="md:hidden grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
         <div className="flex items-center justify-start min-w-0">
           {onBack && (
             <button
@@ -124,6 +125,59 @@ export function Header({
           {right}
         </div>
       </div>
+
+      {/* ── Desktop Header (Vercel Style) ── */}
+      <div className="hidden md:flex items-center justify-between gap-4 h-16 px-6 lg:px-8">
+        {/* Left: Title + Subtitle + Back */}
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {onBack && (
+            <button
+              onClick={() => (onBack ? onBack() : navigate(-1))}
+              className="flex items-center gap-1 pl-1.5 pr-3 h-9 rounded-xl text-surface-muted hover:text-surface-text hover:bg-surface-card2 text-ios-footnote font-medium transition-colors shrink-0 border border-surface-border/60 whitespace-nowrap"
+            >
+              <ChevronLeft size={18} strokeWidth={2.2} className="-ml-0.5" />
+              {backLabel || "Kembali"}
+            </button>
+          )}
+
+          <div className="flex flex-col justify-center min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <h1 className="text-xl font-bold text-surface-text truncate tracking-tight leading-tight">
+                {title}
+              </h1>
+              {isDevelopment && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide shrink-0 bg-warning-soft text-warning border border-warning/20">
+                  DEV
+                </span>
+              )}
+            </div>
+            {subtitle && (
+              <p className="text-ios-footnote text-surface-muted truncate mt-0.5">
+                {subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {showSyncButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSync}
+              disabled={syncing}
+              aria-label="Sync data"
+              title="Sync data"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2"
+            >
+              <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
+              <span className="text-ios-footnote font-medium hidden lg:inline">Refresh</span>
+            </Button>
+          )}
+          {right}
+        </div>
+      </div>
     </header>
   );
 }
@@ -167,9 +221,9 @@ export function AppLayout({
       <DesktopSidebar />
 
       {/* Main Content Workspace */}
-      <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0">
-        <div className="app-shell flex flex-col flex-1">
-          <div className={`flex flex-col flex-1 ${hideNav ? "" : "pb-24 md:pb-8"}`}>
+      <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
+        <div className="app-shell flex flex-col flex-1 w-full max-w-7xl px-4 md:px-8 py-2 md:py-6">
+          <div className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}>
             {children}
             {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
             {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
