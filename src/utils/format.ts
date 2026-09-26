@@ -299,15 +299,15 @@ export function normalizeGender(value?: string | null): "L" | "P" | undefined {
 }
 
 /**
- * Display name dengan sapaan Bapak/Ibu untuk usia >= 35.
+ * Display name dengan sapaan Pak/Bu untuk usia >= 40.
  * Backend tetap pakai nama_lengkap — ini murni untuk tampilan.
  */
 export function getDisplayName(member: Member): string {
   const usia = getMemberAge(member.tanggal_lahir);
-  if (usia === null || usia < 35) return member.nama_lengkap;
+  if (usia === null || usia < 40) return member.nama_lengkap;
 
   const jk = (member.jenis_kelamin || "").toUpperCase();
-  if (jk === "L") return `Bapak ${member.nama_lengkap}`;
-  if (jk === "P") return `Ibu ${member.nama_lengkap}`;
+  if (jk === "L") return `Pak ${member.nama_lengkap}`;
+  if (jk === "P") return `Bu ${member.nama_lengkap}`;
   return member.nama_lengkap;
 }

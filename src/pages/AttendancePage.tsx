@@ -50,8 +50,7 @@ import {
   formatDateLong,
   formatDateLongText,
   getHariFromDate,
-  getTodayIso,
-} from "../utils/format";
+  getTodayIso, getDisplayName} from "../utils/format";
 import { ATTENDANCE_STATUSES, MEMBER_CATEGORIES } from "../constants";
 import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
@@ -1173,7 +1172,7 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
       >
         <div className="flex-1 min-w-0 py-2">
           <p className="text-ios-body font-medium text-surface-text truncate">
-            {member.nama_lengkap}
+            {getDisplayName(member)}
           </p>
           {member.kelompok && (
             <p className="text-ios-caption text-surface-muted truncate">
@@ -1214,7 +1213,7 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
     >
       <div className="flex-1 min-w-0 py-2">
         <p className="text-ios-body font-medium text-surface-text truncate">
-          {member.nama_lengkap}
+          {getDisplayName(member)}
         </p>
         {member.kelompok && (
           <p className="text-ios-caption text-surface-muted truncate">

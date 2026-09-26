@@ -40,7 +40,7 @@ import { Avatar, ErrorState } from "../components/common";
 import { memberApi } from "../services/memberApi";
 import { attendanceApi, monitoringApi } from "../services/domainApi";
 import type { Member } from "../types";
-import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
+import { CATEGORY_LABEL, normalizeGender, getDisplayName } from "../utils/format";
 import {
   BiodataTab,
   EducationTab,
@@ -253,7 +253,7 @@ export default function MemberDetailPage() {
       }
     >
       <Header
-        title={member.nama_lengkap}
+        title={getDisplayName(member)}
         onBack={() => navigate(-1)}
         right={
           isTaarufEligible(member) &&
@@ -283,7 +283,7 @@ export default function MemberDetailPage() {
         />
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
-            {member.nama_lengkap}
+            {getDisplayName(member)}
           </p>
           {member.kelompok && (
             <p className="text-ios-footnote text-surface-muted truncate mt-0.5 flex items-center gap-1">
