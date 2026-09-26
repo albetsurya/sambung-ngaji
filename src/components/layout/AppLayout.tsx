@@ -230,7 +230,7 @@ export function AppLayout({
 
       {/* Main Content Workspace */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
-        <div className="app-shell flex flex-col flex-1 w-full max-w-7xl px-4 md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
+        <div className="app-shell flex flex-col flex-1 w-full max-w-7xl md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
           <div
             className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}
           >
