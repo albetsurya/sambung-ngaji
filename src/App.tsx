@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider, useToast } from "./contexts/ToastContext";
@@ -144,10 +144,12 @@ function HomeRoute() {
 
 function AppRoutes() {
   useBackgroundSync();
+  const location = useLocation();
 
   return (
     <Suspense fallback={<PageFallback />}>
-      <Routes>
+      <div key={location.pathname} className="page-enter">
+      <Routes location={location}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/daftar" element={<PublicRegistrationPage />} />
         <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
@@ -551,6 +553,7 @@ function AppRoutes() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </div>
     </Suspense>
   );
 }

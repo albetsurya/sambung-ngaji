@@ -14,10 +14,10 @@ export function BottomSheet({ open, onClose, title, children }: SheetProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4">
       <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm anim-fade"
         onClick={onClose}
       />
-      <div className="app-shell sheet sheet-narrow relative w-full bg-surface-card rounded-t-[28px] md:rounded-[24px] border-t md:border border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[sheetIn_0.32s_cubic-bezier(0.32,0.72,0,1)]">
+      <div className="app-shell sheet sheet-narrow relative w-full bg-surface-card surface-shift rounded-t-[28px] md:rounded-[24px] border-t md:border border-surface-border shadow-2xl max-h-[85vh] flex flex-col anim-sheet">
         <div className="flex items-center justify-center pt-2.5 pb-2 md:hidden">
           <div className="w-9 h-[5px] rounded-full bg-surface-muted/25" />
         </div>
@@ -47,10 +47,10 @@ export function Modal({ open, onClose, title, children }: SheetProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm anim-fade"
         onClick={onClose}
       />
-      <div className="app-shell modal-narrow relative w-full bg-surface-card rounded-[28px] border border-surface-border shadow-2xl max-h-[85vh] flex flex-col animate-[popIn_0.2s_ease-out]">
+      <div className="app-shell modal-narrow relative w-full bg-surface-card surface-shift rounded-[28px] border border-surface-border shadow-2xl max-h-[85vh] flex flex-col anim-pop">
         {title && (
           <div className="px-5 pt-5 pb-2 flex items-center justify-between">
             <h3 className="text-ios-nav font-semibold text-surface-text">
@@ -96,10 +96,10 @@ export function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-10">
       <div
-        className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-[fadeIn_0.15s_ease-out]"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm anim-fade-fast"
         onClick={loading ? undefined : onCancel}
       />
-      <div className="relative w-full max-w-[300px] sm:max-w-sm bg-surface-card rounded-[24px] border border-surface-border overflow-hidden shadow-2xl animate-[popIn_0.2s_ease-out]">
+      <div className="relative w-full max-w-[300px] sm:max-w-sm bg-surface-card surface-shift rounded-[24px] border border-surface-border overflow-hidden shadow-2xl anim-pop">
         <div className="px-5 pt-5 pb-4 text-center">
           <h3 className="text-[17px] font-semibold text-surface-text tracking-[-0.01em]">
             {title}

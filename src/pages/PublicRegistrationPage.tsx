@@ -341,7 +341,7 @@ export default function PublicRegistrationPage() {
           className="relative flex-1 flex flex-col px-5 py-4 pb-36"
         >
           {step === 1 && (
-            <div className="animate-[fadeIn_0.2s_ease-out]">
+            <div className="anim-fade">
               <div className="mb-5">
                 <h2 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
                   Data Diri
@@ -393,7 +393,7 @@ export default function PublicRegistrationPage() {
           )}
 
           {step === 2 && (
-            <div className="animate-[fadeIn_0.2s_ease-out]">
+            <div className="anim-fade">
               <div className="mb-5">
                 <h2 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
                   Kontak & Alamat
@@ -436,7 +436,7 @@ export default function PublicRegistrationPage() {
           )}
 
           {step === 3 && (
-            <div className="animate-[fadeIn_0.2s_ease-out]">
+            <div className="anim-fade">
               <div className="mb-5">
                 <h2 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
                   Pendidikan & Akun

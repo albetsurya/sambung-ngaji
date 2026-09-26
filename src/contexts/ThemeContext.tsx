@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { withThemeTransition } from "../utils/transition";
 
 type Theme = "light" | "dark";
 export type ThemePreset =
@@ -182,15 +183,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, preset]);
 
   function setTheme(t: Theme) {
-    setThemeState(t);
+    withThemeTransition(() => setThemeState(t));
   }
 
   function toggleTheme() {
-    setThemeState((t) => (t === "dark" ? "light" : "dark"));
+    withThemeTransition(() =>
+      setThemeState((t) => (t === "dark" ? "light" : "dark")),
+    );
   }
 
   function setPreset(p: ThemePreset) {
-    setPresetState(p);
+    withThemeTransition(() => setPresetState(p));
   }
 
   return (

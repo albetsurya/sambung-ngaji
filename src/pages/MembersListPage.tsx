@@ -439,7 +439,7 @@ export default function MembersListPage() {
           >
             <div
               key={`${view}-${gridCols}`}
-              className="animate-[fadeIn_0.15s_ease-out]"
+              className="anim-fade-fast"
               style={{
                 height: virtualizer.getTotalSize(),
                 width: "100%",

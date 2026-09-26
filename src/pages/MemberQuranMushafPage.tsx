@@ -236,7 +236,7 @@ export default function MemberQuranMushafPage() {
         {!isLoading && !error && pageData && (
           <div
             key={currentPage}
-            className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl animate-[fadeIn_0.15s_ease-out] pb-[140px]"
+            className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl anim-fade-fast pb-[140px]"
           >
             <MushafPageView
               page={pageData}

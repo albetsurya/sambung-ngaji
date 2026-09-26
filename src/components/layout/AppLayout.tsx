@@ -60,7 +60,7 @@ export function Header({
   }
 
   return (
-    <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
+    <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70 surface-shift">
       
       <div className="md:hidden grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
         <div className="flex items-center justify-start min-w-0">
@@ -222,7 +222,7 @@ export function AppLayout({
   }, [hideNav, fab, showAiChatFab]);
 
   return (
-    <div className="min-h-screen bg-surface-bg flex flex-col md:flex-row">
+    <div className="min-h-screen bg-surface-bg surface-shift flex flex-col md:flex-row">
       
       <DesktopSidebar />
 

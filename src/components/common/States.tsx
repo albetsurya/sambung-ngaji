@@ -36,7 +36,7 @@ export function LoadingScreen({ label = "Memuat..." }: { label?: string }) {
       aria-busy="true"
       aria-live="polite"
     >
-      <div className="bg-surface-card border border-surface-border shadow-2xl rounded-2xl px-6 py-5 min-w-[200px] max-w-[280px] flex flex-col items-center gap-3 animate-[popIn_0.2s_ease-out]">
+      <div className="bg-surface-card surface-shift border border-surface-border shadow-2xl rounded-2xl px-6 py-5 min-w-[200px] max-w-[280px] flex flex-col items-center gap-3 anim-pop">
         <div className="w-8 h-8 border-[3px] border-surface-card2 border-t-accent rounded-full animate-spin" />
         <span className="text-ios-subhead text-surface-text font-medium text-center">
           {label}
@@ -58,7 +58,7 @@ export function LoadingOverlay({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center pt-safe pb-safe animate-[fadeIn_0.2s_ease-out] ${
+      className={`fixed inset-0 z-50 flex items-center justify-center pt-safe pb-safe anim-fade ${
         blockInteraction ? "pointer-events-auto" : "pointer-events-none"
       }`}
       role="alert"
@@ -67,7 +67,7 @@ export function LoadingOverlay({
     >
       <div className="absolute inset-0 bg-surface-bg/60 backdrop-blur-md" />
 
-      <div className="relative bg-surface-card border border-surface-border shadow-2xl rounded-2xl px-6 py-5 min-w-[200px] max-w-[280px] flex flex-col items-center gap-3 animate-[popIn_0.2s_ease-out]">
+      <div className="relative bg-surface-card surface-shift border border-surface-border shadow-2xl rounded-2xl px-6 py-5 min-w-[200px] max-w-[280px] flex flex-col items-center gap-3 anim-pop">
         <div className="w-8 h-8 border-[3px] border-surface-card2 border-t-accent rounded-full animate-spin" />
 
         {label && (

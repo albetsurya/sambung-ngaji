@@ -62,7 +62,7 @@ export function QuranNavigationSheet({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md md:max-w-lg h-[85vh] md:h-auto md:max-h-[80vh] rounded-t-3xl md:rounded-3xl bg-surface-bg border-t md:border border-surface-border flex flex-col animate-[slideUp_0.2s_ease-out]"
+        className="w-full max-w-md md:max-w-lg h-[85vh] md:h-auto md:max-h-[80vh] rounded-t-3xl md:rounded-3xl bg-surface-bg surface-shift border-t md:border border-surface-border flex flex-col anim-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         

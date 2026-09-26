@@ -317,7 +317,7 @@ export default function MemberDetailPage() {
       </div>
 
       
-      <div className="px-4 py-4 animate-[fadeIn_0.2s_ease-out]" key={tab}>
+      <div className="px-4 py-4 anim-fade" key={tab}>
         {tab === "Biodata" && <BiodataTab member={member} />}
         {tab === "Pendidikan" && (
           <EducationTab education={member.pendidikan || []} member={member} />
