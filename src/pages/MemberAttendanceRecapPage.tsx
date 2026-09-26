@@ -33,9 +33,6 @@ import {
   type RecapMatrix,
 } from "../lib/monthlyAttendanceExport";
 
-/* -------------------------------------------------------------------------- */
-/*                              Config                                        */
-/* -------------------------------------------------------------------------- */
 
 function defaultMonth(): string {
   return getTodayIso().slice(0, 7);
@@ -44,9 +41,6 @@ function defaultMonth(): string {
 const PAGE_SIZE = 20;
 const FETCH_THRESHOLD_PX = 600;
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberAttendanceRecapPage() {
   const navigate = useNavigate();
@@ -57,7 +51,6 @@ export default function MemberAttendanceRecapPage() {
   const [recapKategori, setRecapKategori] = useState<MemberCategory[]>([]);
   const [recapGender, setRecapGender] = useState<"" | "L" | "P">("");
 
-  /* Jadwal + absensi per meeting dalam bulan — bounded, diambil sekali */
   const meetingsQuery = useQuery({
     queryKey: ["recap-meetings", recapMonth],
     queryFn: async () => {
@@ -90,7 +83,6 @@ export default function MemberAttendanceRecapPage() {
     staleTime: 2 * 60_000,
   });
 
-  /* Jamaah — paginasi 20/halaman, ambil semua (filter kategori di frontend) */
   const membersQuery = useInfiniteQuery({
     queryKey: ["recap-members", recapKategori, recapGender],
     queryFn: ({ pageParam }) =>
@@ -121,7 +113,6 @@ export default function MemberAttendanceRecapPage() {
   const tableVisible =
     recapMatrix !== null && recapMatrix.meetings.length > 0;
 
-  /* Auto-fetch halaman berikut saat scroll mendekati bawah */
   const maybeFetchNext = useCallback(() => {
     if (!membersQuery.hasNextPage || membersQuery.isFetchingNextPage) return;
     if (!tableVisible) return;
@@ -142,7 +133,6 @@ export default function MemberAttendanceRecapPage() {
     return () => window.removeEventListener("scroll", maybeFetchNext);
   }, [maybeFetchNext]);
 
-  /* Export PDF/Excel hanya dari halaman pratinjau. */
   function retryAll() {
     meetingsQuery.refetch();
     membersQuery.refetch();
@@ -198,7 +188,7 @@ export default function MemberAttendanceRecapPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Filter bulan */}
+        
         <section>
           <div className="flex gap-1 p-1 rounded-2xl bg-surface-card border border-surface-border">
             <button
@@ -222,7 +212,7 @@ export default function MemberAttendanceRecapPage() {
           </div>
         </section>
 
-        {/* Filter kategori — multi-select chip */}
+        
         <section>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             <FilterChip
@@ -246,12 +236,12 @@ export default function MemberAttendanceRecapPage() {
             ))}
           </div>
         </section>
-        {/* Filter gender — pola segmented seperti halaman Absensi */}
+        
         <section>
           <GenderSegmented value={recapGender} onChange={setRecapGender} />
         </section>
 
-        {/* Content */}
+        
         {isLoadingInitial ? (
           <RecapTableSkeleton rows={8} />
         ) : loadError ? (
@@ -284,7 +274,7 @@ export default function MemberAttendanceRecapPage() {
           />
         ) : (
           <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
-            {/* Toolbar tabel: ringkasan + export */}
+            
             <div className="flex items-center justify-between gap-2 pl-3 pr-2 py-1.5 border-b border-surface-border">
               <p className="text-ios-caption text-surface-muted tabular-nums truncate">
                 {recapMatrix.rows.length} jamaah · {recapMatrix.meetings.length}{" "}
@@ -421,7 +411,7 @@ export default function MemberAttendanceRecapPage() {
           </div>
         )}
 
-        {/* Paginasi — pola MembersListPage: auto saat scroll + tombol */}
+        
         {tableVisible && membersQuery.hasNextPage && (
           <div className="flex justify-center pt-1">
             <Button
@@ -452,9 +442,6 @@ export default function MemberAttendanceRecapPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Gender Segmented                              */
-/* -------------------------------------------------------------------------- */
 
 function GenderSegmented({
   value,
@@ -493,9 +480,6 @@ function GenderSegmented({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Filter Chip                                   */
-/* -------------------------------------------------------------------------- */
 
 function FilterChip({
   active,

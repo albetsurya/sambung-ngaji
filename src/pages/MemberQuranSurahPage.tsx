@@ -44,7 +44,6 @@ function loadMode(): BacaMode {
     const v = localStorage.getItem(MODE_KEY);
     if (v === "ayat" || v === "scroll") return v;
   } catch {
-    // ignore
   }
   return "scroll";
 }
@@ -53,7 +52,6 @@ function persistMode(m: BacaMode) {
   try {
     localStorage.setItem(MODE_KEY, m);
   } catch {
-    // ignore
   }
 }
 
@@ -119,7 +117,6 @@ export default function MemberQuranSurahPage() {
     try {
       localStorage.setItem("quran-qari", qariKey);
     } catch {
-      // ignore
     }
   }, [qariKey]);
 

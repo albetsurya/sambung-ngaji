@@ -6,11 +6,6 @@ import { useToast } from "../../contexts/ToastContext";
 import { useAppUpdate } from "../../hooks/useAppUpdate";
 import { flushAndReload } from "../../lib/clearAppData";
 
-/**
- * Section "Aplikasi" untuk halaman Lainnya (admin & member):
- * - Periksa Pembaruan: cek SW baru + terapkan otomatis (reload).
- * - Bersihkan Data: flush cache lokal (tanpa logout) + reload fresh.
- */
 export function AppMaintenanceSection() {
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -22,7 +17,6 @@ export function AppMaintenanceSection() {
     try {
       const updated = await checkForUpdate();
       if (!updated) showToast("Sudah memakai versi terbaru");
-      // Bila updated → halaman reload otomatis via controllerchange.
     } catch {
       showToast("Gagal memeriksa pembaruan", "error");
     }

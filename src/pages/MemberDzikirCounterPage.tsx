@@ -50,7 +50,6 @@ export default function MemberDzikirCounterPage() {
     showToast("Hitungan direset");
   }
 
-  // Circle progress — SVG
   const circleSize = 260;
   const strokeWidth = 10;
   const radius = (circleSize - strokeWidth) / 2;
@@ -59,7 +58,7 @@ export default function MemberDzikirCounterPage() {
 
   return (
     <AppLayout hideNav showAiChat={false}>
-      {/* Header custom */}
+      
       <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80">
         <div className="grid grid-cols-[auto_1fr_auto] items-center h-[52px] px-3 gap-2">
           <Button
@@ -95,7 +94,7 @@ export default function MemberDzikirCounterPage() {
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-6 min-h-[calc(100vh-52px)]">
-        {/* Teks dzikir */}
+        
         <div className="w-full max-w-md mb-8 text-center">
           <p
             className="text-surface-text mb-3"
@@ -118,14 +117,14 @@ export default function MemberDzikirCounterPage() {
           </p>
         </div>
 
-        {/* Tap area — circle + count */}
+        
         <button
           onClick={handleTap}
           aria-label="Tambah hitungan"
           className="relative w-[260px] h-[260px] flex items-center justify-center select-none transition-transform duration-100 active:scale-[0.96]"
           style={{ transform: pressed ? "scale(0.96)" : undefined }}
         >
-          {/* SVG progress ring */}
+          
           <svg
             width={circleSize}
             height={circleSize}
@@ -154,7 +153,7 @@ export default function MemberDzikirCounterPage() {
             />
           </svg>
 
-          {/* Inner circle — background */}
+          
           <div
             className={
               "absolute inset-6 rounded-full flex flex-col items-center justify-center transition-colors duration-300 " +
@@ -182,7 +181,7 @@ export default function MemberDzikirCounterPage() {
           </div>
         </button>
 
-        {/* Keutamaan */}
+        
         {preset.keutamaan && (
           <div className="mt-8 max-w-md w-full rounded-2xl bg-success-soft border border-success/20 px-4 py-3">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-success mb-1">

@@ -35,7 +35,6 @@ export default function MemberKiblatPage() {
 
   const [usingDefault, setUsingDefault] = useState(false);
 
-  // Auto pakai default Latukan kalau user tidak mau kasih location
   useEffect(() => {
     if (locationError && !coords) {
       setUsingDefault(true);
@@ -91,7 +90,7 @@ export default function MemberKiblatPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Info lokasi */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card px-4 py-3">
           <div className="flex items-start gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
@@ -121,13 +120,13 @@ export default function MemberKiblatPage() {
           </div>
         </div>
 
-        {/* Kompas */}
+        
         <div className="flex flex-col items-center py-4">
           <div className="relative w-[280px] h-[280px]">
-            {/* Compass dial — static, selalu utara di atas */}
+            
             <CompassDial />
 
-            {/* Needle kiblat — rotate sesuai bearing atau relative */}
+            
             <div
               className="absolute inset-0 flex items-start justify-center transition-transform duration-300 ease-out"
               style={{
@@ -142,13 +141,13 @@ export default function MemberKiblatPage() {
               </div>
             </div>
 
-            {/* Center dot */}
+            
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-3 h-3 rounded-full bg-accent shadow-md" />
             </div>
           </div>
 
-          {/* Bearing info */}
+          
           {effectiveBearing !== null && (
             <div className="mt-6 text-center">
               <p className="text-ios-caption text-surface-muted mb-1">
@@ -198,7 +197,7 @@ export default function MemberKiblatPage() {
           )}
         </div>
 
-        {/* Hint / panduan */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5">
           <p className="text-ios-footnote font-medium text-surface-text mb-2 flex items-center gap-1.5">
             <Navigation size={14} className="text-accent" />
@@ -248,25 +247,22 @@ export default function MemberKiblatPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Compass Dial                                  */
-/* -------------------------------------------------------------------------- */
 
 function CompassDial() {
-  const tickAngles = Array.from({ length: 72 }, (_, i) => i * 5); // tiap 5°
+  const tickAngles = Array.from({ length: 72 }, (_, i) => i * 5);
   const cardinals = [
-    { label: "U", angle: 0, primary: true },        // Utara
-    { label: "T", angle: 90, primary: false },      // Timur
-    { label: "S", angle: 180, primary: false },     // Selatan
-    { label: "B", angle: 270, primary: false },     // Barat
+    { label: "U", angle: 0, primary: true },
+    { label: "T", angle: 90, primary: false },
+    { label: "S", angle: 180, primary: false },
+    { label: "B", angle: 270, primary: false },
   ];
 
   return (
     <div className="absolute inset-0 rounded-full border-2 border-surface-border bg-surface-card shadow-sm overflow-hidden">
-      {/* Inner circle */}
+      
       <div className="absolute inset-4 rounded-full border border-surface-border/60" />
 
-      {/* Ticks */}
+      
       {tickAngles.map((a) => {
         const major = a % 15 === 0;
         return (
@@ -289,7 +285,7 @@ function CompassDial() {
         );
       })}
 
-      {/* Cardinal labels */}
+      
       {cardinals.map((c) => {
         const radius = 110;
         const rad = (c.angle - 90) * (Math.PI / 180);
@@ -319,9 +315,6 @@ function CompassDial() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Bearing helper                                */
-/* -------------------------------------------------------------------------- */
 
 function calcBearing(lat: number, lng: number): number {
   const KAABA_LAT = 21.4224779;

@@ -5,10 +5,6 @@ import idLocale from "@fullcalendar/core/locales/id";
 import type { EventClickArg } from "@fullcalendar/core/index.js";
 import type { Meeting } from "../../types";
 
-/**
- * Read-only calendar view untuk member.
- * Tidak ada dateClick / eventCreate — murni lihat.
- */
 export function MemberCalendarView({
   meetings,
   onSelect,

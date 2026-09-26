@@ -12,23 +12,9 @@ import {
 import { resolveTaarufValues, TAARUF_FIELDS } from "./taarufFields";
 import { TAARUF_THEMES, type TaarufThemeKey } from "./taarufThemes";
 
-/* -------------------------------------------------------------------------- */
-/*                          CV Taaruf: Minimalis Modern                      */
-/* -------------------------------------------------------------------------- */
-/**
- * Dokumen CV satu halaman. Selalu terang (putih/slate) agar konsisten saat
- * di-export PDF/gambar, tidak mengikuti dark mode aplikasi.
- * - forwardRef: nanti ditempel html2canvas/jsPDF → hasil cetak = preview.
- * - Semua penyesuaian (hidden/overrides/foto/tema/layout/font) khusus
- *   cetakan, tidak mengubah data tersimpan.
- * - Edit langsung di preview: beri callback onSelect/onPhotoChange/
- *   onSectionOrderChange/dst. Kosongkan semua saat export agar statis.
- */
 
 export interface TaarufPhotoState {
-  /** 1 = pas bingkai, maks 2.5 */
   scale: number;
-  /** Geser px (sebelum zoom) */
   x: number;
   y: number;
 }
@@ -71,7 +57,6 @@ function px(base: number, size: TaarufFontSize): string {
   return `${Math.max(9, Math.round(base * FONT_MULT[size]))}px`;
 }
 
-/** Batas geser agar foto tidak keluar bingkai 88x104. */
 export function clampPhoto(p: TaarufPhotoState): TaarufPhotoState {
   const scale = Math.min(2.5, Math.max(1, p.scale));
   const maxX = (88 * (scale - 1)) / 2;
@@ -138,7 +123,7 @@ function Field({
   );
 }
 
-/* ------------------------- Toolbar kecil di preview ------------------------ */function MiniBtn({
+function MiniBtn({
   label,
   title,
   active,
@@ -171,7 +156,6 @@ function Field({
   );
 }
 
-/** Toolbar inline untuk section/kop yang sedang dipilih. */
 function InlineToolbar({
   size,
   onSize,
@@ -243,9 +227,6 @@ function InlineToolbar({
   );
 }
 
-/* --------------------- Placeholder section tersembunyi ------------------- */
-/** Penanda di preview agar section/foto yang di-hide bisa ditampilkan lagi
-    tanpa scroll. Hanya muncul saat mode edit, tidak ikut tercetak. */
 function HiddenPlaceholder({
   label,
   onShow,
@@ -271,8 +252,6 @@ function HiddenPlaceholder({
 }
 
 function HiddenPhotoPlaceholder({ onShow }: { onShow: () => void }) {
-  // Strip ramping di bawah kop (bukan kotak 88px) agar teks kop melebar
-  // penuh. Handler show tidak berubah. Tetap satu ketukan di preview.
   return (
     <div
       onClick={(e) => {
@@ -290,9 +269,7 @@ function HiddenPhotoPlaceholder({ onShow }: { onShow: () => void }) {
   );
 }
 
-/* ------------------------------ Bingkai foto ------------------------------ */
 
-/** Bingkai foto 88x104: klik untuk edit, seret untuk crop. */
 function PhotoFrame({
   src,
   name,
@@ -323,8 +300,6 @@ function PhotoFrame({
     null,
   );
   const editable = !!onPhotoChange;
-  // Link Drive menolak hotlink bila ada Referer (403). Samakan dengan
-  // Avatar: tanpa referrer. Bila tetap gagal, tampilkan inisial.
   const [imgError, setImgError] = useState(false);
   useEffect(() => setImgError(false), [src]);
   const showPhoto = !!src && !imgError;
@@ -434,14 +409,12 @@ function PhotoFrame({
   );
 }
 
-/* --------------------------------- Dokumen --------------------------------- */
 
 export const TaarufCvPreview = forwardRef<
   HTMLDivElement,
   {
     member: Member;
     options?: TaarufPrintOptions;
-    /** Seleksi aktif (dikelola sheet). Isi untuk mode edit, kosongkan saat export. */
     selection?: TaarufRegionKey | null;
     onSelect?: (r: TaarufRegionKey | null) => void;
     onPhotoChange?: (p: TaarufPhotoState) => void;
@@ -451,10 +424,8 @@ export const TaarufCvPreview = forwardRef<
     onToggleSection?: (key: TaarufSectionKey) => void;
     onTogglePhotoSide?: () => void;
     onHidePhoto?: () => void;
-    /** Kembalikan section/foto yang disembunyikan (dipakai placeholder). */
     onRestoreSection?: (key: TaarufSectionKey) => void;
     onRestorePhoto?: () => void;
-    /** true saat render untuk cetak: sembunyikan catatan rahasia. */
     hideConfidential?: boolean;
   }
 >(function TaarufCvPreview(
@@ -499,7 +470,6 @@ export const TaarufCvPreview = forwardRef<
           .join(" · ")
       : "";
 
-  /* ---- Drag & drop urutan section langsung di preview ---- */
   const secRefs = useRef<
     Partial<Record<TaarufSectionKey, HTMLDivElement | null>>
   >({});
@@ -631,7 +601,6 @@ export const TaarufCvPreview = forwardRef<
         {visibleFields.map((f, i) => (
           <div
             key={f.key}
-            // Isian panjang (TTL, alamat) atau sisa ganjil → selebar penuh.
             className={
               f.wide || (visibleFields.length % 2 === 1 && i === visibleFields.length - 1)
                 ? "col-span-2"
@@ -725,11 +694,11 @@ export const TaarufCvPreview = forwardRef<
       ref={ref}
       className="bg-white text-slate-900 rounded-2xl border border-slate-200 overflow-hidden max-w-[560px] mx-auto"
     >
-      {/* Aksen atas */}
+      
       <div className={`h-1.5 ${theme.bar}`} />
 
       <div className="p-6">
-        {/* Kop, klik untuk atur ukuran font */}
+        
         <div
           className={editable ? "cursor-pointer" : undefined}
           onClick={() => {
@@ -741,7 +710,7 @@ export const TaarufCvPreview = forwardRef<
               opts.photoSide === "left" ? "flex-row-reverse" : ""
             } ${selection === "kop" ? "ring-2 ring-slate-900/30" : ""}`}
           >
-            {/* flex-1: saat foto di-hide, teks melebar memenuhi baris */}
+            
             <div className="min-w-0 flex-1">
               <p
                 className={`font-bold uppercase tracking-[0.22em] ${theme.accentText}`}
@@ -826,7 +795,7 @@ export const TaarufCvPreview = forwardRef<
           ) : null,
         )}
 
-        {/* Footer, catatan rahasia hanya tampil di preview */}
+        
         <div className="mt-6 pt-4 border-t border-slate-200">
           {!hideConfidential && (
             <p className="text-[11px] leading-relaxed text-slate-400">

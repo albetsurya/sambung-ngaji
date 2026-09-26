@@ -14,10 +14,6 @@ import {
 } from "../lib/taarufAccess";
 import { TaarufCvEditor } from "../components/taaruf/TaarufCvSheet";
 
-/**
- * Halaman cetak CV Taaruf tersendiri (pengganti sheet).
- * Pratinjau WYSIWYG + sesuaikan + unduh PDF/Gambar.
- */
 export default function TaarufCvPrintPage() {
   const { id } = useParams();
   const navigate = useNavigate();

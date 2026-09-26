@@ -30,7 +30,6 @@ export function MonitoringTab({
 }: {
   memberId: string;
   entries: MonitoringEntry[];
-  /** Opsional: untuk auto-isi catatan berdasarkan analisis kehadiran */
   attendance?: AttendanceSnapshot[];
   canWrite: boolean;
   onSaved: () => void;
@@ -43,15 +42,11 @@ export function MonitoringTab({
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
-  /* ------------------- Analisis kehadiran (memoized) ------------------- */
   const analysis = useMemo(() => analyzeAttendance(attendance), [attendance]);
 
-  /* ------------------------ Buka sheet + auto-fill ------------------------ */
   function handleOpenSheet() {
-    // Auto-isi catatan dengan saran (kalau ada)
     setCatatan(analysis.suggestedCatatan);
 
-    // Auto-set status kalau ada indikasi perlu perhatian
     if (analysis.alpaStreak >= 3 || analysis.sakitStreak >= 3) {
       setStatus("PERLU_PERHATIAN");
     } else if (analysis.last30Rate < 50 && analysis.last30Total >= 3) {
@@ -77,7 +72,6 @@ export function MonitoringTab({
       setOpen(false);
       setCatatan("");
       setTindakLanjut("");
-      // Daftar monitoring di tab ini + status di detail harus refresh.
       queryClient.invalidateQueries({
         queryKey: queryKeys.monitoring(memberId),
       });
@@ -97,7 +91,7 @@ export function MonitoringTab({
 
   return (
     <div className="space-y-2">
-      {/* --------------------- Smart Insight Card --------------------- */}
+      
       {analysis.hasWarning && (
         <div className="rounded-2xl border border-warning/30 bg-warning-soft/50 p-3.5">
           <div className="flex items-start gap-2.5">
@@ -125,14 +119,14 @@ export function MonitoringTab({
         </div>
       )}
 
-      {/* --------------------- Tombol Tambah --------------------- */}
+      
       {canWrite && (
         <Button variant="secondary" fullWidth onClick={handleOpenSheet}>
           + Catatan Monitoring Baru
         </Button>
       )}
 
-      {/* --------------------- List Entries --------------------- */}
+      
       {entries.length === 0 && (
         <Card>
           <p className="text-ios-subhead text-surface-muted text-center py-4">
@@ -163,13 +157,13 @@ export function MonitoringTab({
         </Card>
       ))}
 
-      {/* --------------------- Sheet Form --------------------- */}
+      
       <BottomSheet
         open={open}
         onClose={() => setOpen(false)}
         title="Catatan Monitoring"
       >
-        {/* Info banner kalau catatan auto-generated */}
+        
         {analysis.hasWarning && (
           <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
             <p className="text-ios-caption text-accent/90 leading-relaxed">

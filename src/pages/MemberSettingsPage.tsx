@@ -61,7 +61,7 @@ export default function MemberSettingsPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Card Profil Ringkas */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
           <div className="flex items-center gap-3">
             <Avatar
@@ -90,7 +90,7 @@ export default function MemberSettingsPage() {
           </div>
         </div>
 
-        {/* Akun */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Akun
@@ -130,7 +130,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Tampilan */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Tampilan
@@ -193,7 +193,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Data */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Data
@@ -217,7 +217,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Info */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Info
@@ -273,7 +273,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Logout */}
+        
         <GroupedList>
           <ListRow
             onClick={() => setConfirmLogoutOpen(true)}
@@ -294,7 +294,7 @@ export default function MemberSettingsPage() {
         </div>
       </div>
 
-      {/* Sheets & Modals */}
+      
       <ChangePasswordSheet
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}

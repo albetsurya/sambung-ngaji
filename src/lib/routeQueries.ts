@@ -2,18 +2,11 @@ import { queryKeys } from "./queryClient";
 
 type QueryKey = readonly unknown[];
 
-/**
- * Mapping route → daftar query keys yang relevan.
- * Digunakan oleh useBackgroundSync dan tombol Sync di Header.
- */
 export function getQueryKeysForRoute(pathname: string): QueryKey[] {
-  // Dashboard
   if (pathname === "/" || pathname === "/dashboard") {
-    // Prefix key — akan match ["member-self-dashboard", *] untuk semua user
     return [queryKeys.dashboard(), ["member-self-dashboard"]];
   }
 
-  // Member detail (prioritas — cek dulu sebelum /jamaah)
   if (pathname.startsWith("/jamaah/") && pathname !== "/jamaah/baru") {
     const parts = pathname.split("/");
     const memberId = parts[2];
@@ -27,7 +20,6 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     }
   }
 
-  // Member list
   if (pathname === "/jamaah" || pathname.startsWith("/jamaah")) {
     return [
       queryKeys.members(),
@@ -36,7 +28,6 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     ];
   }
 
-  // Absensi
   if (pathname.startsWith("/absensi")) {
     return [
       queryKeys.meetings(),
@@ -45,17 +36,14 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     ];
   }
 
-  // Pengumuman
   if (pathname.startsWith("/pengumuman")) {
     return [queryKeys.announcements()];
   }
 
-  // Profil saya
   if (pathname.startsWith("/profil-saya")) {
     return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
-  // Member self (mode member)
   if (pathname.startsWith("/member")) {
     if (pathname.startsWith("/member/petugas-jumat")) {
       return [
@@ -67,7 +55,6 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
-  // Lainnya — sub-routes
   if (pathname.startsWith("/lainnya/kelompok")) {
     return [queryKeys.groups()];
   }
@@ -87,18 +74,13 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     return [queryKeys.fridaySchedules()];
   }
 
-  // Fallback — halaman "Lainnya" index
   if (pathname === "/lainnya") {
     return [];
   }
 
-  // Route tidak dikenal — invalidate minimal
   return [];
 }
 
-/**
- * Invalidate semua query untuk route tertentu.
- */
 export function invalidateRouteQueries(
   queryClient: {
     invalidateQueries: (opts: { queryKey: QueryKey }) => Promise<void> | void;

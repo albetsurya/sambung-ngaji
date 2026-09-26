@@ -1,11 +1,6 @@
 import type { Member } from "../../types";
 import { formatDateLongText } from "../../utils/format";
 
-/**
- * Definisi isian CV Taaruf, murni dari biodata utama saat pendaftaran.
- * Nilai bisa di-override khusus cetakan (in-memory, tidak mengubah data).
- * `wide` = isian panjang (TTL, alamat) → selebar penuh di grid.
- */
 
 export interface TaarufFieldDef {
   key: string;
@@ -78,7 +73,6 @@ export const TAARUF_FIELDS: TaarufFieldDef[] = [
   },
 ];
 
-/** Gabungkan nilai asli + override khusus cetakan. */
 export function resolveTaarufValues(
   member: Member,
   overrides: Record<string, string>,

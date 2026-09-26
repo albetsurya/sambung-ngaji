@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import "./styles/themes.css"; // ← TAMBAH INI
+import "./styles/themes.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { queryClient } from "./lib/queryClient";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";

@@ -43,7 +43,6 @@ export default function MemberEditProfilePage() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deletingPhoto, setDeletingPhoto] = useState(false);
   const [compressing, setCompressing] = useState(false);
-  // Sembunyikan bottom bar saat keyboard terbuka agar tidak menutupi form.
   const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
@@ -164,7 +163,6 @@ export default function MemberEditProfilePage() {
         );
       }
 
-      // Invalidate cache supaya dashboard & detail refresh
       if (user?.user_id) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.memberSelfDashboard(user.user_id),

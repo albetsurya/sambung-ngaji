@@ -24,7 +24,6 @@ interface LoadingOverlayProps {
   label?: string;
   blockInteraction?: boolean;
   children?: ReactNode;
-  /** Tampilkan tombol Batal (panggil abortAllApiCalls dari pemanggil). */
   onCancel?: () => void;
   cancelLabel?: string;
 }

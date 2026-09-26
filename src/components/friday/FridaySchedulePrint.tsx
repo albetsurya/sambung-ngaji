@@ -3,14 +3,6 @@ import type { FridaySchedule } from "../../types";
 import { FRIDAY_ROLES } from "../../utils/friday";
 import { formatDateLongText } from "../../utils/format";
 
-/* -------------------------------------------------------------------------- */
-/*                     Tabel cetak Petugas Jumat — elegan                     */
-/* -------------------------------------------------------------------------- */
-/**
- * Dokumen tabel satu lebar (landscape), selalu terang agar konsisten
- * saat di-export PDF/gambar. Tanpa ikon/SVG (html2canvas) — murni teks CSS.
- * forwardRef: ditempel html2canvas/jsPDF untuk export.
- */
 
 function shortDay(tanggal: string): string {
   const d = new Date(tanggal + "T00:00:00");
@@ -40,7 +32,7 @@ export const FridaySchedulePrint = forwardRef<
       className="bg-white text-slate-900 rounded-2xl border border-slate-200 overflow-hidden mx-auto"
       style={{ width: 900 }}
     >
-      {/* Kepala */}
+      
       <div className="bg-emerald-800 px-8 pt-7 pb-6">
         <p
           className="text-[11px] font-bold uppercase text-emerald-200"
@@ -59,7 +51,7 @@ export const FridaySchedulePrint = forwardRef<
       </div>
       <div className="h-1 bg-amber-400" />
 
-      {/* Tabel */}
+      
       <div className="p-6">
         <table className="w-full border-collapse text-left">
           <thead>
@@ -117,7 +109,7 @@ export const FridaySchedulePrint = forwardRef<
           </tbody>
         </table>
 
-        {/* Kaki */}
+        
         <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
           <p className="text-[11px] text-slate-400">
             {schedules.length} jadwal petugas

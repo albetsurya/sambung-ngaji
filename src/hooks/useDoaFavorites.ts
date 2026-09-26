@@ -20,7 +20,6 @@ function persist(key: string, ids: Set<string>) {
   try {
     localStorage.setItem(key, JSON.stringify([...ids]));
   } catch {
-    // ignore
   }
 }
 
@@ -33,7 +32,6 @@ export function useDoaFavorites() {
     load(storageKey),
   );
 
-  // Reload saat user berubah + migrasi key lama (kalau ada)
   useEffect(() => {
     if (userId) {
       migrateKey(BASE_KEY, storageKey);
@@ -41,7 +39,6 @@ export function useDoaFavorites() {
     setFavorites(load(storageKey));
   }, [storageKey, userId]);
 
-  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
       if (e.key === storageKey) setFavorites(load(storageKey));

@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 
-/**
- * Deteksi keyboard virtual sedang terbuka via visualViewport.
- * Dipakai untuk menyembunyikan bottom action bar yang fixed, supaya tidak
- * terangkat menutupi form saat mengetik.
- */
 export function useKeyboardVisible(threshold = 150): boolean {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) {
-      // Fallback: browser sangat lama tanpa visualViewport.
       const onFocusIn = (e: FocusEvent) => {
         const t = e.target as HTMLElement | null;
         if (

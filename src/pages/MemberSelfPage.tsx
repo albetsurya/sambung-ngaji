@@ -78,8 +78,6 @@ export default function MemberSelfPage() {
   }, [tabFromUrl]);
 
   const basePath = isMember ? "/member" : "/profil-saya";
-  // Fallback berbasis route aktif, bukan role — supaya admin yang sedang
-  // di mode jamaah (/member/profil) tidak terlempar ke /lainnya admin.
   const backFallback = pathname.startsWith("/member")
     ? "/member/lainnya"
     : "/lainnya";
@@ -97,13 +95,10 @@ export default function MemberSelfPage() {
     onSuccess: async (res) => {
       setRequestMsg(res.message);
       if (res.auto_created) {
-        // Refresh AuthContext supaya user.member_id ter-update
-        // (menu "Tampilan Jamaah" di /lainnya cek field ini)
         await refreshUser();
         qc.invalidateQueries({
           queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
         });
-        // Member baru: list & dashboard harus refresh.
         qc.invalidateQueries({ queryKey: queryKeys.members() });
         qc.invalidateQueries({ queryKey: queryKeys.membersPaged() });
         qc.invalidateQueries({ queryKey: queryKeys.dashboard() });
@@ -187,8 +182,6 @@ export default function MemberSelfPage() {
 
   const { profile, attendance, monitoring, upcoming } = data;
 
-  /* Snapshot kehadiran — hanya untuk analisis grafik pembinaan.
-     Tampilan riwayat penuh pindah ke halaman /member/absensi. */
   const attendanceHistory = attendance
     .filter((a) => a.tanggal && a.status_meeting !== "LIBUR")
     .map((a) => ({ date: a.tanggal, status: a.status }))
@@ -239,7 +232,7 @@ export default function MemberSelfPage() {
         }
       />
 
-      {/* Header profile */}
+      
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
           src={profile.foto_url}
@@ -267,7 +260,7 @@ export default function MemberSelfPage() {
         </div>
       </div>
 
-      {/* Sticky tab bar */}
+      
       <div
         className="sticky sticky-below-header z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
       >
@@ -293,7 +286,7 @@ export default function MemberSelfPage() {
         </div>
       </div>
 
-      {/* Tab content */}
+      
       <div className="px-4 py-4" key={tab}>
         {tab === "profil" && (
           <ProfileTab profile={profile} upcoming={upcoming} />
@@ -321,9 +314,6 @@ export default function MemberSelfPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              PROFILE TAB                                   */
-/* -------------------------------------------------------------------------- */
 
 function ProfileTab({
   profile,
@@ -334,12 +324,12 @@ function ProfileTab({
 }) {
   return (
     <div className="-mx-4 space-y-4">
-      {/* Biodata section — pakai shared component di dalam padding */}
+      
       <div className="px-4">
         <BiodataTab member={profile} />
       </div>
 
-      {/* Jadwal Mendatang */}
+      
       <div className="px-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Jadwal Pengajian Mendatang
@@ -379,7 +369,7 @@ function ProfileTab({
         )}
       </div>
 
-      {/* Link ke riwayat absensi penuh */}
+      
       <div className="px-4">
         <AttendanceHistoryLink />
       </div>

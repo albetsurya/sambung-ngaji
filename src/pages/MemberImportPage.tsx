@@ -36,9 +36,6 @@ interface SaveResult {
   error?: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Sample Template                               */
-/* -------------------------------------------------------------------------- */
 
 const SAMPLE = `📋 *BIODATA GENERUS*
 
@@ -55,9 +52,6 @@ const SAMPLE = `📋 *BIODATA GENERUS*
 🏫 Sekolah : Universitas Negeri Surabaya
 📚 Jurusan : Teknik Informatika`;
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberImportPage() {
   const navigate = useNavigate();
@@ -74,7 +68,6 @@ export default function MemberImportPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showSample, setShowSample] = useState(false);
 
-  /* ---------------------------- Parse Handler ---------------------------- */
 
   function handleParse() {
     const trimmed = text.trim();
@@ -92,7 +85,6 @@ export default function MemberImportPage() {
     setPhase("preview");
   }
 
-  /* ---------------------------- Save Handler ----------------------------- */
 
   async function handleSave() {
     setConfirmOpen(false);
@@ -147,13 +139,11 @@ export default function MemberImportPage() {
       showToast(`${success} berhasil, ${failed} gagal`, "error");
     }
 
-    // Invalidate cache
     queryClient.invalidateQueries({ queryKey: queryKeys.members() });
     queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
   }
 
-  /* ---------------------------- Reset Handler ---------------------------- */
 
   function handleReset() {
     setText("");
@@ -163,7 +153,6 @@ export default function MemberImportPage() {
     setPhase("input");
   }
 
-  /* ---------------------------- Render Phases ---------------------------- */
 
   return (
     <AppLayout hideNav showAiChat={false}>
@@ -222,9 +211,6 @@ export default function MemberImportPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              INPUT PHASE                                   */
-/* -------------------------------------------------------------------------- */
 
 function InputPhase({
   text,
@@ -253,7 +239,7 @@ function InputPhase({
         </p>
       </div>
 
-      {/* Textarea */}
+      
       <div>
         <div className="flex items-center justify-between mb-2 px-1">
           <label className="text-ios-footnote font-medium text-surface-text">
@@ -272,7 +258,7 @@ function InputPhase({
         />
       </div>
 
-      {/* Sample toggle */}
+      
       <button
         onClick={onToggleSample}
         className="w-full flex items-center justify-between gap-2 rounded-2xl border border-surface-border bg-surface-card px-4 py-3 transition-all hover:bg-surface-card2 active:scale-[0.99]"
@@ -323,9 +309,6 @@ function InputPhase({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              PREVIEW PHASE                                 */
-/* -------------------------------------------------------------------------- */
 
 function PreviewPhase({
   parsed,
@@ -390,7 +373,7 @@ function PreviewPhase({
         </div>
       )}
 
-      {/* List preview */}
+      
       <div className="space-y-2.5">
         {parsed.map((m, i) => (
           <MemberPreviewCard key={i} index={i} member={m} />
@@ -520,9 +503,6 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              SAVING PHASE                                  */
-/* -------------------------------------------------------------------------- */
 
 function SavingPhase({ total }: { total: number }) {
   return (
@@ -540,9 +520,6 @@ function SavingPhase({ total }: { total: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              DONE PHASE                                    */
-/* -------------------------------------------------------------------------- */
 
 function DonePhase({
   results,

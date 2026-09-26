@@ -33,9 +33,6 @@ import {
 import { getMood } from "../../data/mood";
 import type { MoodEntry } from "../../services/domainApi";
 
-/* -------------------------------------------------------------------------- */
-/*                              BIODATA TAB                                   */
-/* -------------------------------------------------------------------------- */
 
 export function BiodataTab({ member }: { member: Member }) {
   const GenderIcon = member.jenis_kelamin === "P" ? Venus : Mars;
@@ -152,20 +149,12 @@ export function BiodataTab({ member }: { member: Member }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              EDUCATION TAB                                 */
-/* -------------------------------------------------------------------------- */
 
 export function EducationTab({
   education,
   member,
 }: {
   education: Education[];
-  /**
-   * Fallback biodata flat (jenjang/sekolah/jurusan). Backend belum punya
-   * tabel riwayat pendidikan — `pendidikan[]` selalu kosong, jadi tab
-   * dibangun dari kolom biodata bila array kosong.
-   */
   member?: Member;
 }) {
   const items =
@@ -194,7 +183,7 @@ export function EducationTab({
 
   return (
     <div className="space-y-3">
-      {/* Hero: pendidikan terakhir */}
+      
       <div className="rounded-2xl border border-surface-border bg-surface-card shadow-sm overflow-hidden">
         <div className="p-4 flex items-center gap-3">
           <span className="w-12 h-12 rounded-2xl bg-accent text-white flex items-center justify-center shrink-0 shadow-sm shadow-accent/30">
@@ -236,7 +225,7 @@ export function EducationTab({
         )}
       </div>
 
-      {/* Timeline riwayat */}
+      
       <div className="relative pl-5">
         <div className="absolute left-[7px] top-2 bottom-2 w-px bg-surface-border" />
         <div className="space-y-2.5">
@@ -287,7 +276,6 @@ export function EducationTab({
   );
 }
 
-/** "2019–2023", "2021–sekarang", atau "" bila tak ada tahun. */
 function formatYearRange(
   mulai?: string | number,
   selesai?: string | number,
@@ -300,7 +288,6 @@ function formatYearRange(
   return "";
 }
 
-/** "4 tahun" bila kedua tahun numerik, selebihnya "". */
 function studyDuration(
   mulai?: string | number,
   selesai?: string | number,
@@ -313,7 +300,6 @@ function studyDuration(
   return `${d} tahun`;
 }
 
-/** Bangun 1 entri dari kolom flat bila array riwayat kosong. */
 function fallbackEducation(member?: Member): Education[] {
   if (!member) return [];
   const { jenjang_pendidikan, sekolah, jurusan } = member;
@@ -331,9 +317,6 @@ function fallbackEducation(member?: Member): Education[] {
   ];
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              TIMELINE TAB                                  */
-/* -------------------------------------------------------------------------- */
 
 interface TimelineEvent {
   date: string;
@@ -398,16 +381,6 @@ export function TimelineTab({ events }: { events: TimelineEvent[] }) {
 
 export type { TimelineEvent };
 
-/* -------------------------------------------------------------------------- */
-/*                              ATTENDANCE TAB                                */
-/* -------------------------------------------------------------------------- */
-/*
- * Layout:
- *  1. Stats grid (total)
- *  2. Percentage bar (total)
- *  3. Rekap bulanan (per YYYY-MM)
- *  4. Riwayat absensi (hybrid: 5 awal + tombol "Lihat Semua")
- */
 
 export interface AttendanceItem {
   id: string;
@@ -415,7 +388,6 @@ export interface AttendanceItem {
   label: string;
   sublabel?: string;
   status: AttendanceStatus;
-  /** true jika meeting berstatus LIBUR — tidak dihitung dalam rate/rekap */
   libur?: boolean;
 }
 
@@ -429,7 +401,6 @@ const ATT_STATUS_CONFIG: Record<
   ALPA: { label: "Alpa", color: "red" },
 };
 
-/* ----------------------------- Month helpers ----------------------------- */
 
 const BULAN_NAMA = [
   "Januari",
@@ -448,7 +419,7 @@ const BULAN_NAMA = [
 
 function getMonthKey(date?: string): string | null {
   if (!date || date.length < 7) return null;
-  return date.slice(0, 7); // YYYY-MM
+  return date.slice(0, 7);
 }
 
 function formatMonthLabel(monthKey: string): string {
@@ -496,11 +467,9 @@ function buildMonthlyRecap(items: AttendanceItem[]): MonthlyRecap[] {
     m.rate = m.total ? Math.round((m.hadir / m.total) * 100) : 0;
   });
 
-  // Sort: newest month first
   return list.sort((a, b) => b.monthKey.localeCompare(a.monthKey));
 }
 
-/* ----------------------------- Main component ----------------------------- */
 
 export function AttendanceTab({
   items,
@@ -513,10 +482,8 @@ export function AttendanceTab({
 }) {
   const [showAll, setShowAll] = useState(false);
 
-  /* -------- Item yang dihitung statistik: kecualikan meeting LIBUR -------- */
   const statsItems = items.filter((it) => !it.libur);
 
-  /* ---------------------------- Compute stats ---------------------------- */
   const counts = {
     HADIR: 0,
     IZIN: 0,
@@ -537,7 +504,7 @@ export function AttendanceTab({
 
   return (
     <div className="space-y-4">
-      {/* ------------------------------ Stats Grid ------------------------------ */}
+      
       <div className="grid grid-cols-4 gap-2">
         <StatBox label="Hadir" value={counts.HADIR} color="emerald" />
         <StatBox label="Izin" value={counts.IZIN} color="amber" />
@@ -545,7 +512,7 @@ export function AttendanceTab({
         <StatBox label="Alpa" value={counts.ALPA} color="red" />
       </div>
 
-      {/* ---------------------------- Percentage Bar ---------------------------- */}
+      
       <Card>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
@@ -568,7 +535,7 @@ export function AttendanceTab({
         </div>
       </Card>
 
-      {/* ---------------------------- Rekap Bulanan ---------------------------- */}
+      
       {monthlyRecap.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-2 px-0.5">
@@ -587,7 +554,7 @@ export function AttendanceTab({
         </div>
       )}
 
-      {/* ---------------------------- Riwayat Absensi ---------------------------- */}
+      
       <div>
         <div className="flex items-center justify-between mb-2 px-0.5">
           <p className="text-ios-footnote font-medium text-surface-muted">
@@ -663,18 +630,13 @@ export function AttendanceTab({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          MONTHLY RECAP CARD                                */
-/* -------------------------------------------------------------------------- */
 
 function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
   const { monthKey, total, hadir, ijin, sakit, alpa, rate } = recap;
 
-  // Warna bar berdasarkan rate
   const barColor =
     rate >= 80 ? "bg-accent" : rate >= 50 ? "bg-warning" : "bg-danger";
 
-  // Build detail chips (skip yang 0)
   const chips: { label: string; value: number; color: string }[] = [];
   if (hadir > 0)
     chips.push({ label: "hadir", value: hadir, color: "text-accent" });
@@ -687,7 +649,7 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
 
   return (
     <Card>
-      {/* Header: bulan + persentase */}
+      
       <div className="flex items-center justify-between gap-3 mb-1.5">
         <p className="text-ios-subhead font-medium text-surface-text truncate">
           {formatMonthLabel(monthKey)}
@@ -705,7 +667,7 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
         </span>
       </div>
 
-      {/* Detail chips */}
+      
       <p className="text-ios-caption text-surface-muted mb-2">
         {chips.map((c, i) => (
           <span key={c.label}>
@@ -716,7 +678,7 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
         <span className="text-surface-muted"> dari {total} pertemuan</span>
       </p>
 
-      {/* Progress bar */}
+      
       <div className="h-1.5 rounded-full bg-surface-card2 overflow-hidden">
         <div
           className={`h-full transition-all duration-500 ${barColor}`}
@@ -727,9 +689,6 @@ function MonthlyRecapCard({ recap }: { recap: MonthlyRecap }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              STAT BOX                                      */
-/* -------------------------------------------------------------------------- */
 
 function StatBox({
   label,
@@ -760,19 +719,12 @@ function StatBox({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          CATEGORY HEADER BADGE                             */
-/* -------------------------------------------------------------------------- */
 
 export function CategoryHeaderBadge({ member }: { member: Member }) {
   if (!member.kategori) return null;
   return <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>;
 }
 
-/**
- * Chip status identitas (Muballigh/Bekerja/Menikah) — dipasang di header
- * profil tepat di bawah kategori–kelompok, bukan di dalam tab.
- */
 export function MemberStatusChips({
   member,
   inline = false,
@@ -805,9 +757,6 @@ export function MemberStatusChips({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          MOOD TAB                                          */
-/* -------------------------------------------------------------------------- */
 
 function moodMeta(key: string): { emoji: string; label: string } {
   const m = getMood(key as Parameters<typeof getMood>[0]);

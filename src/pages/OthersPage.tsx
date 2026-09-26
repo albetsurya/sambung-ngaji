@@ -73,7 +73,6 @@ export default function OthersPage() {
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
   const menu = ([
-    // Tampilan
     {
       key: "theme",
       label: "Tampilan & Tema",
@@ -84,7 +83,6 @@ export default function OthersPage() {
       group: "tampilan",
     },
 
-    // Jamaah & Pendaftaran
     {
       key: "pendaftar",
       label: "Pendaftar",
@@ -133,7 +131,6 @@ export default function OthersPage() {
       group: "jamaah",
     },
 
-    // Jadwal & Absensi
     {
       key: "jadwal",
       label: "Kelola Jadwal",
@@ -162,7 +159,6 @@ export default function OthersPage() {
       group: "jadwal",
     },
 
-    // Sistem
     {
       key: "users",
       label: "Manajemen User",
@@ -191,7 +187,6 @@ export default function OthersPage() {
       group: "sistem",
     },
 
-    // Akun
     {
       key: "tampilan-jamaah",
       label: "Tampilan Jamaah",

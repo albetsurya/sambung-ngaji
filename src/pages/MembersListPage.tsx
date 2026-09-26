@@ -64,7 +64,6 @@ const ROW_HEIGHTS: Record<ViewMode, number> = {
   grid: 148,
 };
 
-/** Slot baris grid mengikuti tinggi kartu per jumlah kolom (+8 gap). */
 const GRID_ROW_HEIGHTS: Record<GridCols, number> = {
   2: 196,
   3: 170,
@@ -158,7 +157,6 @@ export default function MembersListPage() {
 
   const total = query.data?.pages[0]?.total ?? 0;
 
-  /* Role akun tertaut per member (untuk badge role). */
   const { data: users = [] } = useQuery({
     queryKey: queryKeys.users(),
     queryFn: () => userApi.list(),
@@ -847,7 +845,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
-      {/* Slot tetap setinggi badge agar semua kartu grid sama tinggi. */}
+      
       <div className="min-h-[26px] flex items-center justify-center gap-1">
         <AccountBadge hasAccount={member.has_user} compact />
         {role && <RoleBadge role={role} />}

@@ -82,7 +82,6 @@ export default function UsersPage() {
 
   const memberById = new Map(members.map((m) => [m.member_id, m]));
 
-  /* ------------------------- Filter (search/gender/kategori) ------------------------- */
   const [fSearch, setFSearch] = useState("");
   const [fGender, setFGender] = useState<"" | "L" | "P">("");
   const [fKategori, setFKategori] = useState<MemberCategory | "">("");
@@ -144,7 +143,7 @@ export default function UsersPage() {
           )}
         </div>
 
-        {/* Category chips — sama seperti halaman Attendance */}
+        
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           <FilterChip
             active={fKategori === ""}
@@ -161,7 +160,7 @@ export default function UsersPage() {
           ))}
         </div>
 
-        {/* Gender segmented */}
+        
         <div className="flex gap-2">
           <div className="flex-1 min-w-0">
             <Segmented
@@ -658,9 +657,6 @@ function EditUserSheet({
 }
 
 
-/* -------------------------------------------------------------------------- */
-/*                    DELETE USER CONFIRM MODAL                               */
-/* -------------------------------------------------------------------------- */
 
 function DeleteUserConfirmModal({
   user,

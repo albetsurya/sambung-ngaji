@@ -13,9 +13,6 @@ const BASE_KEY = "sholat-journal-v1";
 export type JournalEntry = Partial<Record<WaktuSholat, StatusSholat>>;
 export type JournalData = Record<string, JournalEntry>;
 
-/* -------------------------------------------------------------------------- */
-/*                              Persist                                       */
-/* -------------------------------------------------------------------------- */
 
 function load(key: string): JournalData {
   try {
@@ -33,13 +30,9 @@ function persist(key: string, data: JournalData) {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch {
-    // ignore
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Stats helpers                                 */
-/* -------------------------------------------------------------------------- */
 
 const WAKTU_ORDER: WaktuSholat[] = ["subuh", "dzuhur", "ashar", "maghrib", "isya"];
 
@@ -89,9 +82,6 @@ export function calculateStreak(data: JournalData): number {
   return started ? streak : 0;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Hook                                          */
-/* -------------------------------------------------------------------------- */
 
 export function useSholatJournal() {
   const { user } = useAuth();
@@ -100,7 +90,6 @@ export function useSholatJournal() {
 
   const [data, setData] = useState<JournalData>(() => load(storageKey));
 
-  // Reload saat user berubah + migrasi key lama
   useEffect(() => {
     if (userId) {
       migrateKey(BASE_KEY, storageKey);
@@ -108,7 +97,6 @@ export function useSholatJournal() {
     setData(load(storageKey));
   }, [storageKey, userId]);
 
-  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
       if (e.key === storageKey) setData(load(storageKey));

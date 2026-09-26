@@ -78,9 +78,7 @@ export function Button({
   ...rest
 }: Props) {
   const s = SIZES[size];
-  // Class stabil untuk override per-preset tema (lihat styles/themes.css).
   const stable = `btn btn-${variant} btn-${size}`;
-  // Getar halus tiap tap (Android; iOS mengabaikan).
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     tapFeedback();
     onClick?.(e);

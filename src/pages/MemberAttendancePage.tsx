@@ -14,9 +14,6 @@ import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { formatDateShort } from "../utils/format";
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberAttendancePage() {
   const navigate = useNavigate();

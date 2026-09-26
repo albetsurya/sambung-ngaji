@@ -62,7 +62,6 @@ export function ChangeUsernameSheet({
       );
       reset();
       onClose();
-      // Force logout setelah 1.2s biar toast sempat terbaca
       setTimeout(() => {
         logout();
       }, 1200);

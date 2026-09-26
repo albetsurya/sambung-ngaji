@@ -8,10 +8,6 @@ const BENEFITS = [
   "Ringan, hemat kuota",
 ];
 
-/**
- * Modal konfirmasi sebelum trigger native PWA install prompt.
- * Muncul saat user klik tombol "Install" di InstallAppCard.
- */
 export function InstallConfirmModal({
   open,
   onClose,

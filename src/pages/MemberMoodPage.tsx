@@ -22,9 +22,6 @@ import {
 } from "../data/mood";
 import { moodApi } from "../services/domainApi";
 
-/* -------------------------------------------------------------------------- */
-/*                                  Helpers                                   */
-/* -------------------------------------------------------------------------- */
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -34,10 +31,6 @@ type Dalil =
   | { kind: "ayat"; data: MoodAyat }
   | { kind: "hadits"; data: MoodHadits };
 
-/**
- * Pilih 1 dalil acak: bisa ayat, bisa hadits.
- * Kalau salah satu kosong, otomatis pakai yang tersedia.
- */
 function pickDalil(mood: Mood): Dalil | null {
   const hasAyat = mood.ayat.length > 0;
   const hasHadits = mood.hadits.length > 0;
@@ -49,9 +42,6 @@ function pickDalil(mood: Mood): Dalil | null {
     : { kind: "hadits", data: pickRandom(mood.hadits) };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                  Page                                      */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberMoodPage() {
   const navigate = useNavigate();
@@ -86,16 +76,13 @@ export default function MemberMoodPage() {
         {!selected && (
           <MoodPicker onSelect={(k) => setSearchParams({ mood: k })} />
         )}
-        {/* key={selected.key} → remount & re-random tiap kali pilih mood */}
+        
         {selected && <MoodResult key={selected.key} mood={selected} />}
       </div>
     </AppLayout>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                Mood Picker                                 */
-/* -------------------------------------------------------------------------- */
 
 function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
   const [selected, setSelected] = useState<MoodKey | null>(null);
@@ -144,7 +131,6 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
       <Button
         onClick={() => {
           if (selected) {
-            // Tamu: konten tetap tampil, riwayat hanya tersimpan bila masuk.
             if (user) moodApi.save(selected).catch(() => {});
             onSelect(selected);
           }
@@ -166,14 +152,10 @@ function MoodPicker({ onSelect }: { onSelect: (k: MoodKey) => void }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                Mood Result                                 */
-/* -------------------------------------------------------------------------- */
 
 function MoodResult({ mood }: { mood: Mood }) {
   const navigate = useNavigate();
 
-  // Random dipilih SEKALI per mount (per buka halaman / per ganti mood).
   const [dalil] = useState<Dalil | null>(() => pickDalil(mood));
   const [doa] = useState<MoodDoa | null>(() =>
     mood.doa.length > 0 ? pickRandom(mood.doa) : null,
@@ -181,7 +163,7 @@ function MoodResult({ mood }: { mood: Mood }) {
 
   return (
     <>
-      {/* Hero */}
+      
       <div className="rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 px-5 py-6 text-center">
         <span className="text-[56px] leading-none block mb-3">
           {mood.emoji}
@@ -194,7 +176,7 @@ function MoodResult({ mood }: { mood: Mood }) {
         </p>
       </div>
 
-      {/* Dalil: ayat atau hadits */}
+      
       {dalil && (
         <Section
           title={dalil.kind === "ayat" ? "Ayat untukmu" : "Hadits untukmu"}
@@ -217,7 +199,7 @@ function MoodResult({ mood }: { mood: Mood }) {
         </Section>
       )}
 
-      {/* Doa (1 saja) */}
+      
       {doa && (
         <Section
           title="Doa untukmu"
@@ -227,7 +209,7 @@ function MoodResult({ mood }: { mood: Mood }) {
         </Section>
       )}
 
-      {/* Nasehat & Hikmah */}
+      
       <Section
         title="Nasehat & Hikmah"
         icon={<Heart size={14} className="text-success" />}
@@ -239,7 +221,7 @@ function MoodResult({ mood }: { mood: Mood }) {
         </div>
       </Section>
 
-      {/* Aksi */}
+      
       <div className="flex flex-col gap-2 pt-2">
         <Button
           onClick={() => navigate("/member/dzikir")}
@@ -268,9 +250,6 @@ function MoodResult({ mood }: { mood: Mood }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                               Sub-components                               */
-/* -------------------------------------------------------------------------- */
 
 function Section({
   title,

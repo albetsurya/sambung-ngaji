@@ -31,7 +31,6 @@ import {
 
 type Tab = TahfidzKategori;
 
-/* Ikon tab kategori tahfidz — FontAwesome, konsisten dengan tab lain. */
 const KATEGORI_ICON: Record<TahfidzKategori, typeof Star> = {
   juz30: Seedling,
   juz1: Sprout,
@@ -97,7 +96,7 @@ export default function MemberTahfidzPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Hero stats */}
+        
         <div className="relative overflow-hidden rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 px-5 py-5">
           <div
             className="absolute -right-12 -top-12 w-40 h-40 rounded-full pointer-events-none"
@@ -142,7 +141,7 @@ export default function MemberTahfidzPage() {
           </div>
         </div>
 
-        {/* Review Queue */}
+        
         {reviewQueue.length > 0 && (
           <section className="space-y-2.5">
             <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
@@ -194,7 +193,7 @@ export default function MemberTahfidzPage() {
           </section>
         )}
 
-        {/* Tab kategori */}
+        
         <div className="flex rounded-2xl bg-surface-card2 border border-surface-border overflow-hidden">
           {TAHFIDZ_KATEGORI.map((k, idx) => {
             const active = tab === k.key;
@@ -219,7 +218,7 @@ export default function MemberTahfidzPage() {
           })}
         </div>
 
-        {/* List surah */}
+        
         <section className="space-y-2.5">
           {targets.map((t) => {
             const p = getSurahProgress(data, t);
@@ -323,9 +322,6 @@ export default function MemberTahfidzPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helper                                        */
-/* -------------------------------------------------------------------------- */
 
 function formatAge(ts?: number): string {
   if (!ts) return "belum pernah";
@@ -341,5 +337,4 @@ function formatAge(ts?: number): string {
   return months + " bulan";
 }
 
-/* Suppress unused */
 void TAHFIDZ_TARGETS;

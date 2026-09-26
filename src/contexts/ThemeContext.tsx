@@ -145,7 +145,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, theme);
     localStorage.setItem(PRESET_KEY, preset);
 
-    // Tentukan theme-color untuk meta tag berdasarkan environment + theme
     const host = window.location.hostname || "";
     const isDev =
       host === "localhost" || host === "127.0.0.1" || host.includes("-dev");
@@ -154,13 +153,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     let metaColor = "";
 
     if (isDev) {
-      // DEV: merah
       metaColor = theme === "dark" ? "#7F1D1D" : "#F87171";
     } else if (isStaging) {
-      // STAGING: oranye
       metaColor = theme === "dark" ? "#78350F" : "#FBBF24";
     } else {
-      // PRODUCTION: match --c-bg (putih / navy dark)
       const computed = getComputedStyle(root);
       const bg = computed.getPropertyValue("--c-bg").trim();
       const parts = bg.split(/\s+/).map(Number);
@@ -177,7 +173,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Delay sedikit biar CSS variable sudah ke-apply
     requestAnimationFrame(() => {
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta && metaColor) {

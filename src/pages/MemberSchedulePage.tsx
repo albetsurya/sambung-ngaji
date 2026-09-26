@@ -28,9 +28,6 @@ import {
 } from "../components/common/Skeleton";
 import type { Meeting, MemberCategory } from "../types";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                          */
-/* -------------------------------------------------------------------------- */
 
 type ViewMode = "calendar" | "list";
 type KategoriFilter = "all" | MemberCategory;
@@ -43,7 +40,6 @@ function loadView(): ViewMode {
     const v = localStorage.getItem(VIEW_KEY);
     if (v === "list" || v === "calendar") return v;
   } catch {
-    // ignore
   }
   return "calendar";
 }
@@ -52,7 +48,6 @@ function persistView(v: ViewMode) {
   try {
     localStorage.setItem(VIEW_KEY, v);
   } catch {
-    // ignore
   }
 }
 
@@ -77,9 +72,6 @@ function normalizeTargets(raw: unknown): MemberCategory[] {
   return [];
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                 */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberSchedulePage() {
   const navigate = useNavigate();
@@ -95,7 +87,6 @@ export default function MemberSchedulePage() {
   const backPath = user ? "/member" : "/";
   const handleBack = () => goBack(navigate, backPath);
 
-  /* ---------------------- Fetch user's kategori ---------------------- */
 
   const { data: selfDashboard } = useQuery({
     queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
@@ -108,8 +99,6 @@ export default function MemberSchedulePage() {
     | MemberCategory
     | undefined;
 
-  // Auto-aktifkan kategori user sekali saat data tersedia.
-  // Setelah itu, jangan override pilihan manual user.
   useEffect(() => {
     if (kategoriInitialized.current) return;
     if (userKategori) {
@@ -118,7 +107,6 @@ export default function MemberSchedulePage() {
     }
   }, [userKategori]);
 
-  /* ------------------------- Fetch meetings ------------------------- */
 
   const range = useMemo(() => {
     const now = new Date();
@@ -138,21 +126,17 @@ export default function MemberSchedulePage() {
     staleTime: 2 * 60_000,
   });
 
-  /* ---------------------------- Filtering ---------------------------- */
 
   const effectiveKategori: MemberCategory | "all" = kategoriFilter;
 
   const filtered = useMemo(() => {
     return meetings.filter((m) => {
-      // Kategori filter
       if (effectiveKategori !== "all") {
         const targets = normalizeTargets(m.kategori_target);
-        // Meeting tanpa target = tampil untuk semua
         if (targets.length > 0 && !targets.includes(effectiveKategori)) {
           return false;
         }
       }
-      // Gender filter
       if (genderFilter) {
         if (m.gender_target && m.gender_target !== genderFilter) return false;
       }
@@ -160,7 +144,6 @@ export default function MemberSchedulePage() {
     });
   }, [meetings, effectiveKategori, genderFilter]);
 
-  /* ---------------------------- Handlers ---------------------------- */
 
   function handleViewChange(v: ViewMode) {
     setView(v);
@@ -208,7 +191,7 @@ export default function MemberSchedulePage() {
       />
 
       <div className="px-4 py-4 space-y-3 pb-8">
-        {/* Tab Kalender / List */}
+        
         <Segmented
           ariaLabel="Tampilan jadwal"
           value={view}
@@ -219,7 +202,7 @@ export default function MemberSchedulePage() {
           ]}
         />
 
-        {/* Filter (sheet) */}
+        
         <button
           onClick={() => setFilterOpen(true)}
           className="w-full min-h-[44px] rounded-2xl border border-surface-border bg-surface-card px-3.5 flex items-center gap-2.5 text-left transition-all active:scale-[0.99] hover:bg-surface-card2"
@@ -237,7 +220,7 @@ export default function MemberSchedulePage() {
           </span>
         </button>
 
-        {/* Content */}
+        
         {isLoading &&
           (view === "calendar" ? (
             <CalendarSkeleton />
@@ -266,7 +249,7 @@ export default function MemberSchedulePage() {
           <MemberScheduleListView meetings={filtered} onSelect={setSelected} />
         )}
 
-        {/* Info footer */}
+        
         {!isLoading && !error && filtered.length > 0 && (
           <p className="text-center text-ios-caption text-surface-muted pt-2">
             Menampilkan {filtered.length} jadwal
@@ -276,13 +259,13 @@ export default function MemberSchedulePage() {
         )}
       </div>
 
-      {/* Detail Sheet */}
+      
       <MeetingDetailSheet
         meeting={selected}
         onClose={() => setSelected(null)}
       />
 
-      {/* Filter Sheet */}
+      
       <BottomSheet
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
@@ -340,9 +323,6 @@ export default function MemberSchedulePage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Filter Chip                                    */
-/* -------------------------------------------------------------------------- */
 
 function FilterChip({
   active,
@@ -368,9 +348,6 @@ function FilterChip({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Detail Sheet                                   */
-/* -------------------------------------------------------------------------- */
 
 function MeetingDetailSheet({
   meeting,

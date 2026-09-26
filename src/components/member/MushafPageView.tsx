@@ -15,7 +15,7 @@ interface MushafPageViewProps {
   page: MushafPage;
   surahList: SurahSummary[];
   fontSize?: DoaFontSize;
-  scale?: number; // 0.8 - 1.4 multiplier
+  scale?: number;
 }
 
 export function MushafPageView({
@@ -33,7 +33,6 @@ export function MushafPageView({
   const baseFontSize = fontSize === "small" ? 20 : fontSize === "large" ? 30 : 24;
   const arabicSize = baseFontSize * scale;
 
-  // Group ayat per surah untuk render judul di antara
   const grouped = useMemo(() => {
     const groups: { surah: number; verses: MushafVerse[] }[] = [];
     for (const v of page.verses) {
@@ -51,13 +50,13 @@ export function MushafPageView({
 
   return (
     <div className="min-h-full flex flex-col px-5 py-4">
-      {/* Header mushaf */}
+      
       <div className="flex items-center justify-between text-[11px] text-surface-muted pb-2 mb-3 border-b border-surface-border/60">
         <span>Juz {juz}</span>
         <span className="tabular-nums">Hal. {page.page}</span>
       </div>
 
-      {/* Body */}
+      
       <div
         className="flex-1 text-surface-text"
         style={{
@@ -79,7 +78,7 @@ export function MushafPageView({
 
           return (
             <div key={gi}>
-              {/* Judul surah + bismillah kalau ayat 1 */}
+              
               {isNewSurah && surahInfo && (
                 <>
                   <div className="text-center my-3 not-italic">
@@ -113,7 +112,7 @@ export function MushafPageView({
                 </>
               )}
 
-              {/* Ayat-ayat inline */}
+              
               {g.verses.map((v) => (
                 <span key={v.id}>
                   <span>{v.textUthmani}</span>
@@ -139,7 +138,7 @@ export function MushafPageView({
         })}
       </div>
 
-      {/* Footer mushaf */}
+      
       <div className="flex items-center justify-between text-[11px] text-surface-muted pt-3 mt-3 border-t border-surface-border/60">
         <span>{surahList[0]?.namaLatin ? "" : ""}</span>
         <span className="tabular-nums">{page.page}</span>

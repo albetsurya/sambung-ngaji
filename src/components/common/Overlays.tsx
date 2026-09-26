@@ -77,7 +77,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   danger?: boolean;
-  loading?: boolean; // ← TAMBAH
+  loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }

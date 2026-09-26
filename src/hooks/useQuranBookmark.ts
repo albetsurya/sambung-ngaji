@@ -20,7 +20,6 @@ export interface BookmarkEntry {
   timestamp: number;
 }
 
-/* ---------- Load / Save ---------- */
 
 function loadLastRead(key: string): LastRead | null {
   try {
@@ -44,7 +43,6 @@ function persistLastRead(key: string, v: LastRead | null) {
     if (v === null) localStorage.removeItem(key);
     else localStorage.setItem(key, JSON.stringify(v));
   } catch {
-    // ignore
   }
 }
 
@@ -70,11 +68,9 @@ function persistBookmarks(key: string, list: BookmarkEntry[]) {
   try {
     localStorage.setItem(key, JSON.stringify(list));
   } catch {
-    // ignore
   }
 }
 
-/* ---------- Hook ---------- */
 
 export function useQuranBookmark() {
   const { user } = useAuth();
@@ -90,7 +86,6 @@ export function useQuranBookmark() {
     loadBookmarks(bookmarkKey),
   );
 
-  // Reload saat user berubah + migrasi key lama
   useEffect(() => {
     if (userId) {
       migrateKey(LAST_READ_BASE, lastReadKey);
@@ -100,7 +95,6 @@ export function useQuranBookmark() {
     setBookmarks(loadBookmarks(bookmarkKey));
   }, [lastReadKey, bookmarkKey, userId]);
 
-  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
       if (e.key === lastReadKey) setLastReadState(loadLastRead(lastReadKey));

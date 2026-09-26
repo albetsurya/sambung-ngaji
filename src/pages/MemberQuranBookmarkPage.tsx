@@ -37,7 +37,6 @@ export default function MemberQuranBookmarkPage() {
     return m;
   }, [surahList]);
 
-  /* ---------------------------- Filter + group ---------------------------- */
 
   const filtered = useMemo(() => {
     if (!search.trim()) return bookmarks;
@@ -58,11 +57,9 @@ export default function MemberQuranBookmarkPage() {
       list.push(b);
       map.set(b.surahNomor, list);
     }
-    // Sort surah number ascending
     return Array.from(map.entries())
       .sort((a, b) => a[0] - b[0])
       .map(([surahNomor, items]) => {
-        // Sort ayat ascending
         const sorted = [...items].sort((a, b) => a.ayatNomor - b.ayatNomor);
         return { surahNomor, items: sorted };
       });
@@ -130,7 +127,7 @@ export default function MemberQuranBookmarkPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Search */}
+        
         {bookmarks.length > 0 && (
           <div className="relative">
             <Search
@@ -155,7 +152,7 @@ export default function MemberQuranBookmarkPage() {
           </div>
         )}
 
-        {/* Empty state */}
+        
         {bookmarks.length === 0 && (
           <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-8 text-center">
             <div className="w-14 h-14 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-4">
@@ -178,7 +175,7 @@ export default function MemberQuranBookmarkPage() {
           </div>
         )}
 
-        {/* Empty search */}
+        
         {bookmarks.length > 0 && filtered.length === 0 && (
           <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-6 text-center">
             <p className="text-ios-body font-medium text-surface-text mb-1">
@@ -190,7 +187,7 @@ export default function MemberQuranBookmarkPage() {
           </div>
         )}
 
-        {/* Grouped list */}
+        
         {grouped.map((g) => {
           const surahInfo = surahMap.get(g.surahNomor);
           return (

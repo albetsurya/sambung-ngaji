@@ -27,10 +27,6 @@ export function Card({
   );
 }
 
-/**
- * Grouped list modern: satu panel dengan border halus dan divider tipis,
- * bukan shadow bertumpuk. Lebih ringan dan bersih secara visual.
- */
 export function GroupedList({
   children,
   className = "",
@@ -38,7 +34,6 @@ export function GroupedList({
 }: {
   children: ReactNode;
   className?: string;
-  /** true = tanpa margin horizontal (untuk di dalam BottomSheet yang sudah px-5). */
   flush?: boolean;
 }) {
   return (
@@ -87,14 +82,7 @@ export function ListRow({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                            Avatar Fallback Icons                           */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Siluet wanita berhijab, tanpa wajah.
- * Digambar sebagai SVG inline agar tidak perlu dependency tambahan.
- */
 function FemaleHijabIcon({
   size,
   className,
@@ -111,15 +99,15 @@ function FemaleHijabIcon({
       className={className}
       aria-hidden="true"
     >
-      {/* Hijab luar */}
+      
       <path
         d="M12 2.5c-3.2 0-5.5 2.4-5.5 5.6 0 1.1.2 2 .5 2.8-.6.5-1 1.3-1 2.2 0 1.3.9 2.3 2 2.5.4 3.6 2.1 6.4 4 6.4s3.6-2.8 4-6.4c1.1-.2 2-1.2 2-2.5 0-.9-.4-1.7-1-2.2.3-.8.5-1.7.5-2.8 0-3.2-2.3-5.6-5.5-5.6Z"
         fill="currentColor"
         opacity="0.35"
       />
-      {/* Area wajah (polos) */}
+      
       <ellipse cx="12" cy="9.5" rx="2.6" ry="3.2" fill="currentColor" />
-      {/* Bahu */}
+      
       <path
         d="M6 22c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5"
         stroke="currentColor"
@@ -132,9 +120,6 @@ function FemaleHijabIcon({
   );
 }
 
-/**
- * Siluet pria sederhana (kepala + bahu), tanpa wajah.
- */
 function MaleIcon({ size, className }: { size: number; className?: string }) {
   return (
     <svg
@@ -145,9 +130,9 @@ function MaleIcon({ size, className }: { size: number; className?: string }) {
       className={className}
       aria-hidden="true"
     >
-      {/* Kepala */}
+      
       <circle cx="12" cy="9" r="4" fill="currentColor" />
-      {/* Bahu */}
+      
       <path
         d="M5 22c0-3.3 3.1-6 7-6s7 2.7 7 6"
         stroke="currentColor"
@@ -160,15 +145,7 @@ function MaleIcon({ size, className }: { size: number; className?: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                   Avatar                                   */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Optimasi URL foto avatar.
- * Google Drive thumbnail default `sz=w1000` (1000px) — untuk avatar 44-64px
- * cukup `w200` (retina 3x). Turunkan bandwidth ~5x tanpa kelihatan blur.
- */
 function optimizeAvatarUrl(url: string): string {
   if (!url) return url;
   if (url.includes("drive.google.com") && /sz=w\d+/.test(url)) {
@@ -181,16 +158,9 @@ interface AvatarProps {
   src?: string;
   name: string;
   size?: number;
-  /** Jenis kelamin untuk menentukan icon fallback. Default: 'L' (laki-laki) */
   gender?: "L" | "P";
 }
 
-/**
- * Avatar modern dengan fallback icon:
- * - Jika `src` ada dan berhasil dimuat → tampilkan foto
- * - Jika `src` kosong atau gagal dimuat → tampilkan icon dummy
- *   (hijab untuk perempuan, siluet biasa untuk laki-laki)
- */
 export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
   const showPhoto = src && !imgError;
@@ -230,9 +200,6 @@ export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                   Badge                                    */
-/* -------------------------------------------------------------------------- */
 
 const BADGE_COLORS: Record<string, string> = {
   emerald: "bg-accent-soft text-accent",
@@ -258,7 +225,6 @@ export function Badge({
   );
 }
 
-/* Badge role dengan warna per role. Satu-satunya tempat mapping ini. */
 export const ROLE_BADGE_COLOR: Record<Role, keyof typeof BADGE_COLORS> = {
   SUPER_ADMIN: "red",
   ADMIN: "emerald",
@@ -272,8 +238,6 @@ export function RoleBadge({ role }: { role: Role }) {
   return <Badge color={ROLE_BADGE_COLOR[role]}>{ROLE_LABEL[role]}</Badge>;
 }
 
-/* Badge status akun: hijau bila punya akun, abu bila belum.
-   compact = ikon saja (untuk baris list yang sempit). */
 export function AccountBadge({
   hasAccount,
   compact = false,

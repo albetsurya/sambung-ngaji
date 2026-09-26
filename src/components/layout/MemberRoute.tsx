@@ -4,11 +4,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { LoadingScreen } from "../common";
 import { PersonalRoute } from "./PersonalRoute";
 
-/**
- * MemberRoute — seperti PersonalRoute, tapi halaman yang ditandai
- * `allowGuest` bisa dibuka tanpa login (fitur ibadah umum).
- * Tanpa user: render langsung (komponen halaman toleran user null).
- */
 export function MemberRoute({
   allowGuest,
   children,

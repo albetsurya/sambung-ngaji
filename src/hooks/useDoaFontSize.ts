@@ -48,7 +48,6 @@ function load(): DoaFontSize {
       return raw;
     }
   } catch {
-    // ignore
   }
   return DEFAULT;
 }
@@ -57,7 +56,6 @@ function persist(size: DoaFontSize) {
   try {
     localStorage.setItem(STORAGE_KEY, size);
   } catch {
-    // ignore
   }
 }
 
@@ -65,7 +63,6 @@ export function useDoaFontSize() {
   const [size, setSizeState] = useState<DoaFontSize>(() => load());
 
   useEffect(() => {
-    // sinkron antar tab (kalau user buka 2 tab)
     function handler(e: StorageEvent) {
       if (e.key === STORAGE_KEY && e.newValue) {
         if (

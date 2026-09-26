@@ -30,9 +30,6 @@ import { queryKeys } from "../lib/queryClient";
 import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 type Tone = "accent" | "success" | "warning" | "info" | "danger";
 
@@ -44,9 +41,6 @@ interface QuickItem {
   tone: Tone;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Config                                        */
-/* -------------------------------------------------------------------------- */
 
 const QUICK_ITEMS: QuickItem[] = [
   { key: "quran",   label: "Al-Quran",   Icon: ScrollText,    to: "/member/quran",         tone: "accent" },
@@ -67,9 +61,6 @@ const TONE_BG: Record<Tone, string> = {
   danger:  "bg-danger-soft text-danger",
 };
 
-/* -------------------------------------------------------------------------- */
-/*                        SCHEDULE PREVIEW HELPERS                            */
-/* -------------------------------------------------------------------------- */
 
 function isoDate(d: Date): string {
   const y = d.getFullYear();
@@ -105,9 +96,6 @@ function formatScheduleDate(iso: string): string {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberHomePage() {
   const { user } = useAuth();
@@ -118,7 +106,6 @@ export default function MemberHomePage() {
   const displayName = user?.nama || "Jamaah";
   const isNonMember = !!user?.role && user.role !== "MEMBER";
 
-  // Fetch kategori user (untuk default filter jadwal)
   const { data: selfDashboard } = useQuery({
     queryKey: queryKeys.memberSelfDashboard(user?.user_id || ""),
     queryFn: () => memberSelfApi.getDashboard(),
@@ -169,16 +156,16 @@ export default function MemberHomePage() {
       />
 
       <div className="px-4 py-4 space-y-5 pb-8">
-        {/* Prayer card */}
+        
         <PrayerTimesCard />
 
-        {/* Jadwal Pengajian card */}
+        
         <SchedulePreviewCard
           userKategori={userKategori}
           onSeeAll={() => navigate("/member/jadwal")}
         />
 
-        {/* Perkembangan Saya */}
+        
         <section>
           <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
             Perkembangan Saya
@@ -219,7 +206,7 @@ export default function MemberHomePage() {
           </div>
         </section>
 
-        {/* Sering Dipakai */}
+        
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -260,7 +247,7 @@ export default function MemberHomePage() {
           </div>
         </section>
 
-        {/* Link ke halaman Lainnya */}
+        
         <button
           onClick={() => navigate("/member/lainnya")}
           className="w-full rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2"
@@ -292,9 +279,6 @@ export default function MemberHomePage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                        Schedule Preview Card                               */
-/* -------------------------------------------------------------------------- */
 
 function SchedulePreviewCard({
   userKategori,
@@ -316,7 +300,6 @@ function SchedulePreviewCard({
     staleTime: 2 * 60_000,
   });
 
-  // Filter sesuai kategori user + ambil yang paling dekat
   const nextMeeting = useMemo(() => {
     const today = isoDate(new Date());
     const filtered = meetings.filter((m: Meeting) => {
@@ -374,9 +357,6 @@ function SchedulePreviewCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helper                                        */
-/* -------------------------------------------------------------------------- */
 
 function getGreeting(): string {
   const h = new Date().getHours();

@@ -35,10 +35,6 @@ export interface CheckUsernameResult {
   reason?: "invalid" | "taken" | "pending";
 }
 
-/**
- * Ambil IP publik client via API gratis (ipify).
- * Dipakai untuk rate-limit di backend.
- */
 async function getClientIp(): Promise<string> {
   try {
     const res = await fetch("https://api.ipify.org?format=json");

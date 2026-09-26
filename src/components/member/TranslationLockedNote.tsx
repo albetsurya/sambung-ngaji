@@ -1,9 +1,5 @@
 import { Lock } from "../common/FontAwesomeIcons";
 
-/**
- * Pengganti teks terjemahan untuk non-mubaligh.
- * Tanpa emoji, konsisten dengan komponen lain.
- */
 export function TranslationLockedNote({
   className = "",
 }: {

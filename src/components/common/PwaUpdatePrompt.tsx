@@ -2,11 +2,6 @@ import { useEffect, useState } from "react";
 import { initAppUpdate, subscribeAppUpdate } from "../../lib/appUpdate";
 import { RefreshCw } from "./FontAwesomeIcons";
 
-/**
- * Auto-update PWA: saat SW baru terdeteksi, langsung diterapkan + reload.
- * Banner ini hanya indikator singkat "memperbarui…" (fallback bila reload
- * tertunda, mis. browser menahan controllerchange).
- */
 export function PwaUpdatePrompt() {
   const [needRefresh, setNeedRefresh] = useState(false);
 

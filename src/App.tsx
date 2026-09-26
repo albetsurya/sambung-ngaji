@@ -14,7 +14,6 @@ import { useBackgroundSync } from "./hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
 
-/** Teruskan notifikasi retry API menjadi toast (sekali per rantai retry). */
 function ApiRetryWire() {
   const { showToast } = useToast();
   useEffect(() => {
@@ -135,7 +134,6 @@ function PageFallback() {
   );
 }
 
-/** Beranda: tamu lihat landing publik, member ke /member, admin ke dashboard. */
 function HomeRoute() {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen label="Memuat..." />;

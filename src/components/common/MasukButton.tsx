@@ -1,9 +1,5 @@
 import { useNavigate } from "react-router-dom";
 
-/**
- * Tombol Masuk compact untuk header halaman publik.
- * Sengaja ramping (h-8) agar tidak menutupi judul di layar sempit.
- */
 export function MasukButton({
   variant = "primary",
 }: {

@@ -21,9 +21,6 @@ import {
   type BadgeTier,
 } from "../hooks/useBadges";
 
-/* -------------------------------------------------------------------------- */
-/*                              Config                                        */
-/* -------------------------------------------------------------------------- */
 
 const CATEGORY_LABEL: Record<BadgeCategory, string> = {
   sholat: "Sholat",
@@ -51,9 +48,6 @@ const TIER_BAR: Record<BadgeTier, string> = {
   gold: "bg-amber-400",
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 function formatProgress(badge: BadgeState): string {
   const value = Math.min(badge.minStreak, badge.minStreak);
@@ -97,9 +91,6 @@ function formatRemaining(badge: BadgeState, streaks: { sholat: number; dzikir: n
   return `${remaining} hari`;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberProgressPage() {
   const navigate = useNavigate();
@@ -156,7 +147,7 @@ export default function MemberProgressPage() {
       />
 
       <div className="px-4 py-4 space-y-5 pb-8">
-        {/* Ringkasan */}
+        
         <section>
           <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
             Ringkasan
@@ -179,7 +170,7 @@ export default function MemberProgressPage() {
           </div>
         </section>
 
-        {/* Badge */}
+        
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -197,7 +188,7 @@ export default function MemberProgressPage() {
           </div>
         </section>
 
-        {/* Berikutnya */}
+        
         {nextBadges.length > 0 && (
           <section>
             <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
@@ -235,9 +226,6 @@ export default function MemberProgressPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Badge Row                                     */
-/* -------------------------------------------------------------------------- */
 
 function BadgeRow({ badge, streaks }: { badge: BadgeState; streaks: { sholat: number; dzikir: number; quran: number; tahfidz: number } }) {
   const percent = formatProgressPercent(badge, streaks);

@@ -1,7 +1,7 @@
 import type { AttendanceStatus } from "../types";
 
 export interface AttendanceSnapshot {
-  date: string; // YYYY-MM-DD
+  date: string;
   status: AttendanceStatus;
 }
 
@@ -17,41 +17,21 @@ export interface AttendanceAnalysis {
   hasWarning: boolean;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              THRESHOLDS                                    */
-/* -------------------------------------------------------------------------- */
 
-const MIN_ATTENDANCE_FOR_RATE = 3; // minimal 3 absensi untuk hitung rate
-const RATE_THRESHOLD = 50; // < 50% dianggap kurang
+const MIN_ATTENDANCE_FOR_RATE = 3;
+const RATE_THRESHOLD = 50;
 const SAKIT_STREAK_THRESHOLD = 3;
 const ALPA_STREAK_THRESHOLD = 5;
 const IJIN_STREAK_THRESHOLD = 5;
 
-/* -------------------------------------------------------------------------- */
-/*                              MAIN FUNCTION                                 */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Analisis kehadiran jamaah dan generate saran catatan monitoring.
- *
- * Aturan:
- * - Alpa ≥ 5× berturut → pengingat
- * - Sakit ≥ 3× berturut → doa kesembuhan
- * - Izin ≥ 5× berturut → doa kelapangan
- * - Kehadiran 30 hari < 50% → perhatian khusus
- *
- * @param attendance - Daftar absensi (date + status)
- * @param now - Tanggal referensi (default: hari ini)
- */
 export function analyzeAttendance(
   attendance: AttendanceSnapshot[],
   now: Date = new Date(),
 ): AttendanceAnalysis {
-  /* -------- Filter data valid & sort newest first -------- */
   const valid = attendance.filter((a) => a.date && a.status);
   const sorted = [...valid].sort((a, b) => b.date.localeCompare(a.date));
 
-  /* -------- Hitung rate 30 hari terakhir -------- */
   const cutoff = new Date(now);
   cutoff.setDate(cutoff.getDate() - 30);
   const cutoffStr = cutoff.toISOString().slice(0, 10);
@@ -62,7 +42,6 @@ export function analyzeAttendance(
   const last30Rate =
     last30Total > 0 ? Math.round((last30Hadir / last30Total) * 100) : 0;
 
-  /* -------- Hitung current streak dari yang terbaru -------- */
   function currentStreak(status: AttendanceStatus): number {
     let count = 0;
     for (const item of sorted) {
@@ -76,7 +55,6 @@ export function analyzeAttendance(
   const alpaStreak = currentStreak("ALPA");
   const ijinStreak = currentStreak("IZIN");
 
-  /* -------- Build suggestions -------- */
   const suggestions: string[] = [];
 
   if (alpaStreak >= ALPA_STREAK_THRESHOLD) {

@@ -1,7 +1,3 @@
-/* ============================================================================
- * Data mood, ayat, doa, hadits, dan nasehat.
- * Sudah termasuk versi "ADDITIONS" yang di-merge & di-dedupe.
- * ========================================================================== */
 
 export type MoodKey =
   | "sedih"
@@ -50,9 +46,6 @@ export interface Mood {
 }
 
 export const MOOD_LIST: Mood[] = [
-  /* ========================================================================== */
-  /* SEDIH                                                                       */
-  /* ========================================================================== */
   {
     key: "sedih",
     label: "Sedih",
@@ -130,7 +123,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Janganlah kamu berputus asa dari rahmat Allah. Sesungguhnya Allah mengampuni dosa-dosa semuanya.",
       },
-      /* --- tambahan --- */
       {
         surah: 2,
         ayat: 155,
@@ -340,7 +332,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Tuhanku, sesungguhnya aku telah ditimpa penyakit dan Engkau adalah Tuhan Yang Maha Penyayang di antara semua penyayang.",
         sumber: "QS. Al-Anbiya: 83",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Ketika Ditimpa Musibah (lengkap)",
         arab: "مَا مِنْ عَبْدٍ تُصِيبُهُ مُصِيبَةٌ فَيَقُولُ إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ، اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا",
@@ -510,7 +501,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Sesungguhnya Allah beserta orang-orang yang sabar.",
         sumber: "QS. Al-Baqarah: 153",
       },
-      /* --- tambahan --- */
       {
         judul: "Kesedihan Menggugurkan Dosa",
         arab: "مَا يُصِيبُ الْمُسْلِمَ مِنْ نَصَبٍ وَلَا وَصَبٍ وَلَا هَمٍّ وَلَا حُزْنٍ وَلَا أَذًى وَلَا غَمٍّ، حَتَّى الشَّوْكَةِ يُشَاكُهَا، إِلَّا كَفَّرَ اللَّهُ بِهَا مِنْ خَطَايَاهُ",
@@ -573,9 +563,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* CEMAS                                                                       */
-  /* ========================================================================== */
   {
     key: "cemas",
     label: "Cemas",
@@ -654,7 +641,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Dan sungguh akan Kami berikan cobaan kepadamu, dengan sedikit ketakutan, kelaparan, kekurangan harta, jiwa dan buah-buahan. Dan berikanlah berita gembira kepada orang-orang yang sabar.",
       },
-      /* --- tambahan --- */
       {
         surah: 3,
         ayat: 160,
@@ -862,7 +848,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, aku berlindung kepada-Mu dari kecemasan dan kesedihan; aku berlindung kepada-Mu dari kelemahan dan kemalasan; aku berlindung kepada-Mu dari sifat pengecut dan kekikiran; dan aku berlindung kepada-Mu dari terlilit utang dan tekanan orang lain.",
         sumber: "HR. Abu Dawud, dishahihkan Al-Albani",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Keluar Rumah",
         arab: "بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
@@ -1015,7 +1000,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Aku sesuai dengan prasangka hamba-Ku kepada-Ku, dan Aku bersamanya apabila ia mengingat-Ku.",
         sumber: "HR. Bukhari dan Muslim",
       },
-      /* --- tambahan --- */
       {
         judul: "Kelapangan Setelah Kesempitan",
         arab: "وَاعْلَمْ أَنَّ النَّصْرَ مَعَ الصَّبْرِ، وَأَنَّ الْفَرَجَ مَعَ الْكَرْبِ، وَأَنَّ مَعَ الْعُسْرِ يُسْرًا",
@@ -1072,9 +1056,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* SYUKUR                                                                      */
-  /* ========================================================================== */
   {
     key: "syukur",
     label: "Bersyukur",
@@ -1155,7 +1136,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Maka makanlah yang halal lagi baik dari rezeki yang telah diberikan Allah kepadamu; dan syukurilah nikmat Allah, jika kamu hanya kepada-Nya saja menyembah.",
       },
-      /* --- tambahan --- */
       {
         surah: 16,
         ayat: 78,
@@ -1344,7 +1324,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, jadikanlah aku hamba yang bersyukur, jadikanlah aku hamba yang sabar, jadikanlah aku kecil di mataku sendiri dan besar di mata manusia.",
         sumber: "HR. IslamQA, hasan",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Setelah Makan",
         arab: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا، وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
@@ -1494,7 +1473,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Jika kamu kafir, maka sesungguhnya Allah tidak memerlukanmu, dan Dia tidak ridha kepada hamba-Nya yang kafir. Dan jika kamu bersyukur, Dia ridha kepadamu.",
         sumber: "QS. Az-Zumar: 7",
       },
-      /* --- tambahan --- */
       {
         judul: "Lihatlah yang Lebih Rendah agar Bersyukur",
         arab: "انْظُرُوا إِلَى مَنْ هُوَ أَسْفَلَ مِنْكُمْ وَلَا تَنْظُرُوا إِلَى مَنْ هُوَ فَوْقَكُمْ، فَإِنَّهُ أَجْدَرُ أَنْ لَا تَزْدَرُوا نِعْمَةَ اللَّهِ عَلَيْكُمْ",
@@ -1544,9 +1522,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* MARAH                                                                       */
-  /* ========================================================================== */
   {
     key: "marah",
     label: "Marah",
@@ -1627,7 +1602,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Dan bersegeralah kamu kepada ampunan dari Tuhanmu dan kepada surga yang luasnya seluas langit dan bumi yang disediakan untuk orang-orang yang bertakwa.",
       },
-      /* --- tambahan --- */
       {
         surah: 16,
         ayat: 126,
@@ -1827,7 +1801,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, aku memohon kepada-Mu jiwa yang merasa tenang kepada-Mu, yang yakin akan bertemu dengan-Mu, yang ridha dengan ketetapan-Mu, dan yang merasa cukup dengan pemberian-Mu.",
         sumber: "HR. Thabrani, hasan",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Ketika Ada yang Menyakiti Hati",
         arab: "اللَّهُمَّ اغْفِرْ لِقَوْمِي فَإِنَّهُمْ لَا يَعْلَمُونَ",
@@ -1979,7 +1952,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Apabila salah seorang dari kalian marah, hendaklah ia diam.",
         sumber: "HR. Ahmad dan Bukhari",
       },
-      /* --- tambahan --- */
       {
         judul: "Wasiat Nabi: Jangan Marah",
         arab: "أَوْصِنِي، قَالَ: لَا تَغْضَبْ، فَرَدَّدَ مِرَارًا، قَالَ: لَا تَغْضَبْ",
@@ -2038,9 +2010,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* LELAH                                                                       */
-  /* ========================================================================== */
   {
     key: "lelah",
     label: "Lelah",
@@ -2114,7 +2083,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Dan pada sebagian malam hari, bertahajudlah kamu sebagai suatu ibadah tambahan bagimu; mudah-mudahan Tuhanmu mengangkat kamu ke tempat yang terpuji.",
       },
-      /* --- tambahan --- */
       {
         surah: 30,
         ayat: 23,
@@ -2316,7 +2284,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, aku berlindung kepada-Mu dari kelemahan dan kemalasan, dari sifat pengecut dan pikun, dari kekikiran dan kelalaian, dari kerasnya hati, kehinaan, dan kemiskinan.",
         sumber: "HR. Abu Dawud 1546, hasan",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Sebelum Tidur",
         arab: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
@@ -2475,7 +2442,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ambillah amal sesuai kemampuanmu, karena demi Allah, Allah tidak akan bosan sampai kalian sendiri yang bosan.",
         sumber: "HR. Bukhari",
       },
-      /* --- tambahan --- */
       {
         judul: "Tidur Siang (Qailulah) Dianjurkan",
         arab: "قِيلُوا فَإِنَّ الشَّيَاطِينَ لَا تَقِيلُ",
@@ -2524,9 +2490,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* TAKUT                                                                       */
-  /* ========================================================================== */
   {
     key: "takut",
     label: "Takut",
@@ -2605,7 +2568,6 @@ export const MOOD_LIST: Mood[] = [
         teksIndonesia:
           "Dan apabila hamba-hamba-Ku bertanya kepadamu tentang Aku, maka (jawablah), bahwasanya Aku adalah dekat. Aku mengabulkan permohonan orang yang berdoa apabila ia memohon kepada-Ku.",
       },
-      /* --- tambahan --- */
       {
         surah: 2,
         ayat: 38,
@@ -2774,7 +2736,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, aku berlindung kepada-Mu dari akhlak yang buruk, amal yang buruk, hawa nafsu yang buruk, dan penyakit yang buruk.",
         sumber: "HR. Tirmidzi 3591, hasan",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Ketika Takut Suatu Kaum/Golongan",
         arab: "اللَّهُمَّ إِنَّا نَجْعَلُكَ فِي نُحُورِهِمْ، وَنَعُوذُ بِكَ مِنْ شُرُورِهِمْ",
@@ -2938,7 +2899,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Barangsiapa takut kepada penguasa yang zalim, hendaklah ia membaca: 'Ya Allah, Tuhan langit yang tujuh dan Tuhan Arsy yang agung, jadilah pelindungku dari si Fulan.'",
         sumber: "HR. Ahmad, hasan",
       },
-      /* --- tambahan --- */
       {
         judul: "Jibril Menjaga Nabi dari Ketakutan",
         arab: "لَا تَحْزَنْ إِنَّ ٱللَّهَ مَعَنَا",
@@ -2986,9 +2946,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* PUTUS ASA                                                                   */
-  /* ========================================================================== */
   {
     key: "putus-asa",
     label: "Putus Asa",
@@ -3066,7 +3023,6 @@ export const MOOD_LIST: Mood[] = [
         teksArab: "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
         teksIndonesia: "Maka sesungguhnya bersama kesulitan ada kemudahan.",
       },
-      /* --- tambahan --- */
       {
         surah: 15,
         ayat: 56,
@@ -3278,7 +3234,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Tuhan kami, janganlah Engkau jadikan hati kami condong kepada kesesatan sesudah Engkau beri petunjuk kepada kami, dan karuniakanlah kepada kami rahmat dari sisi-Mu; sesungguhnya Engkaulah Maha Pemberi karunia.",
         sumber: "QS. Ali 'Imran: 8",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Taubat Nasuha",
         arab: "رَبَّنَا ظَلَمْنَآ أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ ٱلْخَٰسِرِينَ",
@@ -3435,7 +3390,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Dan Kami lebih dekat kepadanya daripada urat lehernya.",
         sumber: "QS. Qaf: 16",
       },
-      /* --- tambahan --- */
       {
         judul: "Pintu Taubat Terbuka Hingga Matahari Terbit dari Barat",
         arab: "إِنَّ اللَّهَ يَبْسُطُ يَدَهُ بِاللَّيْلِ لِيَتُوبَ مُسِيءُ النَّهَارِ، وَيَبْسُطُ يَدَهُ بِالنَّهَارِ لِيَتُوبَ مُسِيءُ اللَّيْلِ، حَتَّى تَطْلُعَ الشَّمْسُ مِنْ مَغْرِبِهَا",
@@ -3478,9 +3432,6 @@ export const MOOD_LIST: Mood[] = [
     ],
   },
 
-  /* ========================================================================== */
-  /* TENANG                                                                      */
-  /* ========================================================================== */
   {
     key: "tenang",
     label: "Butuh Tenang",
@@ -3558,7 +3509,6 @@ export const MOOD_LIST: Mood[] = [
         teksArab: "يَا أَيَّتُهَا النَّفْسُ الْمُطْمَئِنَّةُ",
         teksIndonesia: "Hai jiwa yang tenang.",
       },
-      /* --- tambahan --- */
       {
         surah: 89,
         ayat: 28,
@@ -3772,7 +3722,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Ya Allah, jadikanlah cahaya di hatiku, cahaya di penglihatanku, cahaya di pendengaranku, cahaya di kananku, cahaya di kiriku, cahaya di depanku, cahaya di belakangku, cahaya di atasku, dan cahaya di bawahku.",
         sumber: "HR. Bukhari dan Muslim",
       },
-      /* --- tambahan --- */
       {
         judul: "Doa Memohon Hati yang Selalu Tenang",
         arab: "رَبِّ ٱشْرَحْ لِى صَدْرِى",
@@ -3922,7 +3871,6 @@ export const MOOD_LIST: Mood[] = [
         arti: "Tidaklah suatu kaum duduk berdzikir kepada Allah 'azza wa jalla melainkan para malaikat mengelilingi mereka, rahmat meliputi mereka, ketenangan turun kepada mereka, dan Allah menyebut mereka di hadapan makhluk yang ada di sisi-Nya.",
         sumber: "HR. Muslim 2700",
       },
-      /* --- tambahan --- */
       {
         judul: "Ketenangan Turun Bersama Al-Qur'an",
         arab: "مَا اجْتَمَعَ قَوْمٌ فِي بَيْتٍ مِنْ بُيُوتِ اللَّهِ يَتْلُونَ كِتَابَ اللَّهِ وَيَتَدَارَسُونَهُ بَيْنَهُمْ، إِلَّا نَزَلَتْ عَلَيْهِمُ السَّكِينَةُ",

@@ -15,9 +15,6 @@ import { Button } from "../components/common";
 import { ApiError } from "../services/api";
 import { useEnvironment } from "../hooks/useEnvironment";
 
-/* -------------------------------------------------------------------------- */
-/*                       App icon — checklist / database                      */
-/* -------------------------------------------------------------------------- */
 
 function AppIcon({ size = 44 }: { size?: number }) {
   return (
@@ -84,9 +81,6 @@ function AppIcon({ size = 44 }: { size?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function LoginPage() {
   const { login, user, loading } = useAuth();

@@ -23,9 +23,6 @@ import { ApiError, abortAllApiCalls } from "../services/api";
 import { DateInput } from "../components/common/DateInput";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
 
 interface FormData {
   nama_lengkap: string;
@@ -86,9 +83,6 @@ const MIN_PASSWORD_LENGTH = 6;
 
 type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function PublicRegistrationPage() {
   const navigate = useNavigate();
@@ -98,14 +92,12 @@ export default function PublicRegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
-  // Sembunyikan bottom bar saat keyboard terbuka agar tidak menutupi form.
   const keyboardOpen = useKeyboardVisible();
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  /* ---------------------- Cek ketersediaan username ---------------------- */
 
   useEffect(() => {
     const uname = form.username.trim().toLowerCase();
@@ -139,7 +131,6 @@ export default function PublicRegistrationPage() {
     };
   }, [form.username]);
 
-  /* ----------------------------- Validasi step --------------------------- */
 
   function canProceed(): { ok: boolean; message?: string } {
     if (step === 1) {
@@ -271,7 +262,7 @@ export default function PublicRegistrationPage() {
 
   return (
     <div className="min-h-screen bg-surface-bg relative overflow-x-hidden">
-      {/* Decorative circles */}
+      
       <div
         className="absolute -top-32 -right-32 w-80 h-80 rounded-full pointer-events-none"
         style={{ background: "rgb(var(--c-accent) / 0.06)" }}
@@ -282,7 +273,7 @@ export default function PublicRegistrationPage() {
       />
 
       <div className="app-shell flex flex-col relative">
-        {/* Header */}
+        
         <div className="sticky top-0 z-20 backdrop-blur-xl bg-surface-bg/80 pt-safe border-b border-surface-border/50">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
             <div className="flex items-center justify-start min-w-0">
@@ -309,7 +300,7 @@ export default function PublicRegistrationPage() {
             <div />
           </div>
 
-          {/* Progress bar */}
+          
           <div className="px-3 pb-3">
             <div className="flex items-center gap-2">
               {STEPS.map((s) => {
@@ -344,7 +335,7 @@ export default function PublicRegistrationPage() {
           </div>
         </div>
 
-        {/* Form */}
+        
         <form
           onSubmit={handleSubmit}
           className="relative flex-1 flex flex-col px-5 py-4 pb-36"
@@ -535,7 +526,7 @@ export default function PublicRegistrationPage() {
                 label="Sudah menikah"
               />
 
-              {/* ---------------------- Section Akun Login ---------------------- */}
+              
 
               <div className="mt-6 pt-5 border-t border-surface-border">
                 <h2 className="text-[18px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
@@ -634,7 +625,7 @@ export default function PublicRegistrationPage() {
         </form>
       </div>
 
-      {/* Bottom action */}
+      
       <div
         className={`fixed bottom-0 left-0 right-0 md:left-64 z-30 transition-transform duration-200 ${
           keyboardOpen ? "translate-y-full" : ""
@@ -671,9 +662,6 @@ export default function PublicRegistrationPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Modern Checkbox                               */
-/* -------------------------------------------------------------------------- */
 
 function ModernCheckbox({
   checked,

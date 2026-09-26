@@ -11,7 +11,6 @@ interface QuranAyatCardProps {
   onPlay: () => void;
   onToggleBookmark: () => void;
   fontSize?: DoaFontSize;
-  /** Tampilkan terjemahan Indonesia. Default false (fail-closed). */
   showTranslation?: boolean;
 }
 
@@ -31,7 +30,7 @@ export function QuranAyatCard({
       id={"ayat-" + ayat.nomorAyat}
       className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden transition-all duration-200 scroll-mt-32"
     >
-      {/* Header: nomor ayat + actions */}
+      
       <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-surface-border">
         <div className="flex items-center gap-2">
           <span className="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center text-[11px] font-bold tabular-nums flex-shrink-0">
@@ -77,7 +76,7 @@ export function QuranAyatCard({
         </div>
       </div>
 
-      {/* Body: Arab + Latin + Indonesia */}
+      
       <div className="selectable px-4 py-4 space-y-3">
         <div
           className="text-surface-text"

@@ -4,9 +4,6 @@ import type { DoaFontSize } from "../../hooks/useDoaFontSize";
 import { getQariName } from "../../data/quran";
 import { QuranAyatCard } from "./QuranAyatCard";
 
-/* -------------------------------------------------------------------------- */
-/*                              Per-Ayat View                                 */
-/* -------------------------------------------------------------------------- */
 
 export function PerAyatView({
   data,
@@ -144,9 +141,6 @@ export function PerAyatView({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Surah Header                                  */
-/* -------------------------------------------------------------------------- */
 
 export function SurahHeaderCard({ data }: { data: SurahDetail }) {
   return (
@@ -174,9 +168,6 @@ export function SurahHeaderCard({ data }: { data: SurahDetail }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Bismillah                                     */
-/* -------------------------------------------------------------------------- */
 
 export function BismillahBlock({
   showTranslation = false,
@@ -207,9 +198,6 @@ export function BismillahBlock({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Nav Footer                                    */
-/* -------------------------------------------------------------------------- */
 
 export function SurahNavFooter({
   data,
@@ -263,9 +251,6 @@ export function SurahNavFooter({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Skeleton                                      */
-/* -------------------------------------------------------------------------- */
 
 export function SurahSkeleton() {
   return (

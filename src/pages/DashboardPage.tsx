@@ -132,7 +132,7 @@ export default function DashboardPage() {
           )}
       </div>
 
-      {/* ------------------ Profile Menu Sheet ------------------ */}
+      
       <ProfileMenuSheet
         open={profileMenuOpen}
         onClose={() => setProfileMenuOpen(false)}
@@ -142,13 +142,7 @@ export default function DashboardPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Profile Menu Sheet                                */
-/* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/*                        SECTION HEADER                                      */
-/* -------------------------------------------------------------------------- */
 
 function SectionHeader({
   title,
@@ -176,9 +170,6 @@ function SectionHeader({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                        HERO STAT CARD                                      */
-/* -------------------------------------------------------------------------- */
 
 function HeroStatCard({
   label,
@@ -240,9 +231,6 @@ function HeroStatCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                        STAT TILE                                           */
-/* -------------------------------------------------------------------------- */
 
 type StatTone = "default" | "accent" | "warning" | "danger" | "info";
 
@@ -308,9 +296,6 @@ function StatTile({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                        MEETING CARD                                        */
-/* -------------------------------------------------------------------------- */
 
 function MeetingCard({
   meeting,
@@ -350,9 +335,6 @@ function MeetingCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                       ATTENTION LIST                                       */
-/* -------------------------------------------------------------------------- */
 
 function AttentionListSection({
   items,
@@ -421,9 +403,6 @@ function AttentionListSection({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                     GENERAL DASHBOARD                                      */
-/* -------------------------------------------------------------------------- */
 
 function GeneralDashboard({
   data,
@@ -486,7 +465,7 @@ function GeneralDashboard({
         </div>
       )}
 
-      {/* ============ FIX: kategori → button, navigate ke /jamaah?kategori=X ============ */}
+      
       <Card>
         <div className="flex items-center justify-between mb-3">
           <p className="text-ios-caption text-surface-muted font-medium">
@@ -526,7 +505,7 @@ function GeneralDashboard({
           </div>
         )}
       </Card>
-      {/* ========================================================================== */}
+      
 
       <div className="space-y-2">
         <SectionHeader
@@ -562,9 +541,6 @@ function GeneralDashboard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                       PNKB DASHBOARD                                       */
-/* -------------------------------------------------------------------------- */
 
 function PNKBDashboard({
   data,
@@ -611,9 +587,6 @@ function PNKBDashboard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                      ABSENSI DASHBOARD                                     */
-/* -------------------------------------------------------------------------- */
 
 function AbsensiDashboard({
   data,

@@ -27,9 +27,6 @@ import { DateInput } from "../components/common/DateInput";
 import { queryKeys } from "../lib/queryClient";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
 
 const emptyForm: Partial<Member> = {
   nama_lengkap: "",
@@ -51,9 +48,6 @@ const emptyForm: Partial<Member> = {
   pekerjaan: "",
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberFormPage() {
   const { id } = useParams();
@@ -68,7 +62,6 @@ export default function MemberFormPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [compressing, setCompressing] = useState(false);
-  // Sembunyikan bottom bar saat keyboard terbuka agar tidak menutupi form.
   const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
@@ -131,7 +124,6 @@ export default function MemberFormPage() {
       setPhotoFile(compressedFile);
       setPhotoPreview(URL.createObjectURL(compressedFile));
     } catch (err) {
-      console.error("Kompres gagal:", err);
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
       showToast("Foto dikompres gagal, pakai file asli", "warning");
@@ -159,7 +151,6 @@ export default function MemberFormPage() {
         const base64 = await fileToBase64(photoFile);
         await uploadApi.photo(memberId, base64, photoFile.type);
       }
-      // Invalidate cache supaya detail & list refresh
       if (memberId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.memberDetail(memberId),
@@ -440,9 +431,6 @@ export default function MemberFormPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Form Section                                  */
-/* -------------------------------------------------------------------------- */
 
 function FormSection({
   icon,
@@ -457,7 +445,7 @@ function FormSection({
 }) {
   return (
     <section className="bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
-      {/* Header section */}
+      
       <div className="px-4 py-3 border-b border-surface-border bg-surface-card2/40 flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
           {icon}
@@ -474,15 +462,12 @@ function FormSection({
         </div>
       </div>
 
-      {/* Body section */}
+      
       <div className="p-4">{children}</div>
     </section>
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Modern Checkbox                               */
-/* -------------------------------------------------------------------------- */
 
 function ModernCheckbox({
   checked,
@@ -526,20 +511,17 @@ function ModernCheckbox({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Member Form Skeleton                              */
-/* -------------------------------------------------------------------------- */
 
 function MemberFormSkeleton() {
   return (
     <div className="px-4 py-4 space-y-4">
-      {/* Photo skeleton */}
+      
       <div className="flex flex-col items-center">
         <div className="w-28 h-28 rounded-2xl bg-surface-card2 animate-pulse" />
         <div className="mt-3 h-6 w-32 rounded-full bg-surface-card2 animate-pulse" />
       </div>
 
-      {/* Sections skeleton */}
+      
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
@@ -566,9 +548,6 @@ function MemberFormSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helper Functions                              */
-/* -------------------------------------------------------------------------- */
 
 async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {

@@ -30,9 +30,6 @@ import {
   WAKTU_ORDER,
 } from "../hooks/useSholatJournal";
 
-/* -------------------------------------------------------------------------- */
-/*                              Tone → Tailwind                               */
-/* -------------------------------------------------------------------------- */
 
 const TONE_BG: Record<string, string> = {
   neutral: "bg-surface-card2 text-surface-muted border-surface-border",
@@ -98,7 +95,7 @@ export default function MemberSholatJournalPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Hero: Streak */}
+        
         <div className="rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 px-5 py-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
@@ -160,10 +157,10 @@ export default function MemberSholatJournalPage() {
           </div>
         </div>
 
-        {/* Badge */}
+        
         <BadgeSection streak={streak} />
 
-        {/* Checklist 5 waktu */}
+        
         <section className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -189,7 +186,7 @@ export default function MemberSholatJournalPage() {
           ))}
         </section>
 
-        {/* Ringkasan hari ini */}
+        
         {recorded > 0 && (
           <div className="rounded-2xl border border-surface-border bg-surface-card px-4 py-3 grid grid-cols-3 gap-2">
             <div className="text-center">
@@ -219,7 +216,7 @@ export default function MemberSholatJournalPage() {
           </div>
         )}
 
-        {/* History 7 hari */}
+        
         <section className="space-y-2.5">
           <p className="text-ios-footnote font-semibold text-surface-text px-1 flex items-center gap-1.5">
             <Calendar size={14} className="text-accent" />
@@ -303,9 +300,6 @@ function w_label(k: WaktuSholat): string {
   return WAKTU_LIST.find((w) => w.key === k)?.label ?? k;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              WaktuRow                                      */
-/* -------------------------------------------------------------------------- */
 
 function WaktuRow({
   waktu,
@@ -352,7 +346,7 @@ function WaktuRow({
         </div>
       </div>
 
-      {/* Status picker — 4 tombol */}
+      
       <div className="border-t border-surface-border px-3 py-2.5 flex gap-1.5">
         {STATUS_LIST.filter((s) => s.key !== "belum").map((s) => {
           const active = status === s.key;
@@ -374,9 +368,6 @@ function WaktuRow({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Badge Section                                 */
-/* -------------------------------------------------------------------------- */
 
 function BadgeSection({ streak }: { streak: number }) {
   const dzikir = useDzikirStreak();

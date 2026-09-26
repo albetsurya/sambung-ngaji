@@ -65,7 +65,7 @@ export default function MemberPuasaPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Hero: Puasa berikutnya */}
+        
         {nextPuasa ? (
           <div className="relative overflow-hidden rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 px-5 py-5">
             <div
@@ -132,7 +132,7 @@ export default function MemberPuasaPage() {
           </div>
         )}
 
-        {/* Info hari ini */}
+        
         {today.puasaList.length > 0 && (
           <div className="rounded-2xl border border-success/20 bg-success-soft/60 px-4 py-3.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-success mb-1">
@@ -147,7 +147,7 @@ export default function MemberPuasaPage() {
           </div>
         )}
 
-        {/* List puasa */}
+        
         <section className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -195,7 +195,7 @@ export default function MemberPuasaPage() {
           )}
         </section>
 
-        {/* Info sumber */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5 flex items-start gap-2.5">
           <Info
             size={14}
@@ -212,9 +212,6 @@ export default function MemberPuasaPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Puasa Card                                    */
-/* -------------------------------------------------------------------------- */
 
 function PuasaCard({ day }: { day: PuasaDay }) {
   const isToday = day.dayOffset === 0;
@@ -229,7 +226,7 @@ function PuasaCard({ day }: { day: PuasaDay }) {
           : "border-surface-border")
       }
     >
-      {/* Header: tanggal */}
+      
       <div className="px-4 py-3 flex items-center gap-3">
         <div
           className={
@@ -281,7 +278,7 @@ function PuasaCard({ day }: { day: PuasaDay }) {
         </div>
       </div>
 
-      {/* Puasa labels */}
+      
       <div className="border-t border-surface-border px-4 py-3 space-y-2">
         {day.puasaList.map((p) => (
           <PuasaLabel key={p.key} puasa={p} />

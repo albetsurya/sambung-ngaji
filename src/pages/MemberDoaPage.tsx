@@ -31,7 +31,6 @@ import { DOA_HARIAN, getDoaHarianKategori } from "../data/doa-harian";
 type Tab = "pagi" | "sore" | "harian";
 type FilterMode = "all" | "favorites";
 
-/* Ikon kategori doa harian — FontAwesome, mengikuti ikon tab Pagi/Sore. */
 const HARIAN_ICON: Record<string, typeof Moon> = {
   makan: Utensils,
   tidur: Moon,
@@ -59,12 +58,10 @@ export default function MemberDoaPage() {
 
   const isHarian = tab === "harian";
 
-  // Kategori untuk pagi/sore
   const kategori = isHarian
     ? null
     : getDoaKategori(tab as DoaWaktu);
 
-  // Data untuk tab aktif
   const activeEntries = useMemo(() => {
     if (isHarian) {
       const kat = getDoaHarianKategori(harianKategori);
@@ -76,7 +73,6 @@ export default function MemberDoaPage() {
   const { size: fontSize, spec: fontSizeSpec } = useDoaFontSize();
   const { isFavorite, toggle: toggleFav } = useDoaFavorites();
 
-  // Progress hanya untuk pagi/sore
   const { readIds, toggle, reset, count, total, percentage } = useDoaProgress(
     isHarian ? "pagi" : (tab as DoaWaktu),
     isHarian ? 0 : activeEntries.length,
@@ -141,7 +137,7 @@ export default function MemberDoaPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Tab switcher — 3 tab */}
+        
         <div className="flex rounded-2xl bg-surface-card2 border border-surface-border overflow-hidden">
           {[
             { key: "pagi" as Tab, label: "Pagi", Icon: Sun },
@@ -169,7 +165,7 @@ export default function MemberDoaPage() {
           })}
         </div>
 
-        {/* Kategori chips — hanya untuk tab Harian */}
+        
         {isHarian && (
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
             {DOA_HARIAN.map((k) => {
@@ -194,7 +190,7 @@ export default function MemberDoaPage() {
           </div>
         )}
 
-        {/* Filter chips — Semua / Favorit */}
+        
         <div className="flex gap-2">
           <button
             onClick={() => setFilter("all")}
@@ -221,7 +217,7 @@ export default function MemberDoaPage() {
           </button>
         </div>
 
-        {/* Progress — hanya pagi/sore, filter all */}
+        
         {!isHarian && filter === "all" && (
           <div className="rounded-2xl border border-surface-border bg-surface-card px-4 py-3">
             <div className="flex items-center justify-between gap-3 mb-2">
@@ -278,7 +274,7 @@ export default function MemberDoaPage() {
           </div>
         )}
 
-        {/* Empty state — favorit kosong */}
+        
         {visibleEntries.length === 0 && filter === "favorites" && (
           <div className="rounded-2xl border border-dashed border-surface-border bg-surface-card p-6 text-center">
             <div className="w-12 h-12 rounded-2xl bg-warning-soft flex items-center justify-center mx-auto mb-3">
@@ -293,7 +289,7 @@ export default function MemberDoaPage() {
           </div>
         )}
 
-        {/* Arab label — untuk pagi/sore */}
+        
         {!isHarian && visibleEntries.length > 0 && kategori && (
           <div className="text-center py-3 border-b border-surface-border/60">
             <p
@@ -315,7 +311,7 @@ export default function MemberDoaPage() {
           </div>
         )}
 
-        {/* List doa */}
+        
         {visibleEntries.length > 0 && (
           <div className="space-y-2.5">
             {visibleEntries.map((doa) => {
@@ -338,7 +334,7 @@ export default function MemberDoaPage() {
           </div>
         )}
 
-        {/* Info */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5">
           {!isHarian ? (
             <>

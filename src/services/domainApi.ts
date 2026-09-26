@@ -27,16 +27,6 @@ export const groupApi = {
   save: (payload: Partial<Group>) => call<Group>("saveGroup", payload),
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              MEETING API                                   */
-/* -------------------------------------------------------------------------- */
-/*
- * Backend actions (dari Code.js):
- * - getMeetings   → list
- * - createMeeting → create
- * - updateMeeting → update  (terima: meeting_id, tanggal, jam, group_id, acara, materi, status, catatan, kategori_target)
- * - deleteMeeting → remove  (terima: meeting_id)
- */
 
 export const meetingApi = {
   list: (params?: { from?: string; to?: string; group_id?: string }) =>
@@ -79,16 +69,6 @@ export const meetingApi = {
     }),
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              FRIDAY API (Petugas Jumat)                  */
-/* -------------------------------------------------------------------------- */
-/*
- * Backend actions:
- * - getFridaySchedules → list (terima: from, to — YYYY-MM-DD, opsional)
- * - saveFridaySchedule → upsert by tanggal (terima: tanggal wajib hari Jumat,
- *   khatib_imam, muadzin, penasihat, petugas_parkir, penata_sandal, catatan)
- * - deleteFridaySchedule → remove (terima: tanggal)
- */
 
 export interface FridaySchedulePayload {
   tanggal: string;
@@ -316,7 +296,7 @@ export const userApi = {
 export interface AuditLogEntry {
   log_id: string;
   user_id: string;
-  user_nama?: string; // ← BARU
+  user_nama?: string;
   action: string;
   target_type: string;
   target_id: string;
@@ -361,9 +341,6 @@ export const aiUsageApi = {
   stats: () => call<AiUsageStats>("getAiUsageStats", {}),
 };
 
-/* -------------------------------------------------------------------------- */
-/*                          BULK MEETING API                                  */
-/* -------------------------------------------------------------------------- */
 
 export interface BulkMeetingPreviewItem {
   tanggal: string;
@@ -416,21 +393,15 @@ export const bulkMeetingApi = {
   }) => call<BulkMeetingCreateResponse>("bulkCreateMeetings", params),
 };
 
-/* -------------------------------------------------------------------------- */
-/*                      ANNOUNCEMENT TEMPLATE CRUD                            */
-/* -------------------------------------------------------------------------- */
 
 export const announcementTemplateApi = {
-  /** List template aktif (untuk dropdown create announcement). */
   list: () => call<AnnouncementTemplate[]>("getAnnouncementTemplates", {}),
 
-  /** List semua template (termasuk inactive) — untuk halaman kelola. */
   listAll: (includeInactive = true) =>
     call<AnnouncementTemplate[]>("getAllAnnouncementTemplates", {
       include_inactive: includeInactive ? "true" : "false",
     }),
 
-  /** Detail 1 template (untuk edit). */
   detail: (template_id: string) =>
     call<AnnouncementTemplate>("getAnnouncementTemplateDetail", {
       template_id,

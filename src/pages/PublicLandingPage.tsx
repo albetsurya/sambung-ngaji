@@ -67,7 +67,7 @@ export default function PublicLandingPage() {
 
   return (
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
-      {/* Topbar ramping */}
+      
       <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80">
         <div className="flex items-center justify-between h-[52px] px-4 gap-2">
           <button
@@ -88,12 +88,12 @@ export default function PublicLandingPage() {
         </div>
       </header>
 
-      {/* Hero: sama seperti di beranda member */}
+      
       <div className="px-4 pt-4">
         <PrayerTimesCard />
       </div>
 
-      {/* Mood teaser */}
+      
       <div className="px-4 pt-4">
         <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
           <p className="text-ios-body font-semibold text-surface-text">
@@ -127,7 +127,7 @@ export default function PublicLandingPage() {
         </div>
       </div>
 
-      {/* Pengajian terdekat */}
+      
       {upcoming.length > 0 && (
         <div className="px-4 pt-4">
           <div className="flex items-center justify-between mb-2 px-0.5">
@@ -164,7 +164,7 @@ export default function PublicLandingPage() {
         </div>
       )}
 
-      {/* Fitur umum */}
+      
       <div className="px-4 py-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Fitur umum

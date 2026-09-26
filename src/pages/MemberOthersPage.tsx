@@ -38,9 +38,6 @@ import { AppMaintenanceSection } from "../components/common/AppMaintenanceSectio
 import { useAuth } from "../contexts/AuthContext";
 import { normalizeGender } from "../utils/format";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 interface MenuItem {
   key: string;
@@ -52,9 +49,6 @@ interface MenuItem {
   group: "tampilan" | "data" | "akun" | "tentang";
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberOthersPage() {
   const navigate = useNavigate();
@@ -68,11 +62,9 @@ export default function MemberOthersPage() {
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [search, setSearch] = useState("");
 
-  // Halaman ini selalu di /member/* — tetap di konteks jamaah
   const profilePath = "/member/profil";
 
   const MENU: MenuItem[] = [
-    // Grup Tampilan
     {
       key: "theme",
       label: "Tampilan & Tema",
@@ -82,7 +74,6 @@ export default function MemberOthersPage() {
       group: "tampilan",
     },
 
-    // Grup Data Saya
     {
       key: "progres",
       label: "Progres Saya",
@@ -148,7 +139,6 @@ export default function MemberOthersPage() {
       group: "data",
     },
 
-    // Grup Akun & Lainnya
     {
       key: "change-password",
       label: "Ganti Password",
@@ -183,7 +173,6 @@ export default function MemberOthersPage() {
     },
   ];
 
-  // Menu kembali ke admin — hanya untuk non-MEMBER yang punya member_id
   if (user?.role && user.role !== "MEMBER") {
     MENU.push({
       key: "back-admin",
@@ -275,7 +264,7 @@ export default function MemberOthersPage() {
       <Header title="Lainnya" showSyncButton />
 
       <div className="py-4">
-        {/* Profile header */}
+        
         <GroupedList>
           <ListRow
             insetDivider={false}
@@ -339,7 +328,7 @@ export default function MemberOthersPage() {
           </div>
         )}
 
-        {/* Logout */}
+        
         <div className="mt-4">
           <GroupedList>
             <ListRow
@@ -366,7 +355,7 @@ export default function MemberOthersPage() {
         </div>
       </div>
 
-      {/* Sheets & Modals */}
+      
       <ChangePasswordSheet
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}

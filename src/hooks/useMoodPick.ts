@@ -1,14 +1,7 @@
 import { useMemo } from "react";
 import type { Mood, MoodAyat, MoodDoa } from "../data/mood";
 
-/* -------------------------------------------------------------------------- */
-/*                              Hash helper                                   */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Hash string → uint32. Deterministik.
- * Simple FNV-1a.
- */
 function hashString(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -26,21 +19,13 @@ function todayIso(): string {
   return y + "-" + m + "-" + day;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Hook                                          */
-/* -------------------------------------------------------------------------- */
 
 export interface MoodPick {
   ayat: MoodAyat;
   doa: MoodDoa;
-  /** Seed harian — kalau user buka lagi hari ini, hasil konsisten */
   seed: string;
 }
 
-/**
- * Ambil 1 ayat + 1 doa dari pool mood, random tapi konsisten dalam 1 hari.
- * Besok akan dapat pilihan yang beda.
- */
 export function useMoodPick(mood: Mood): MoodPick {
   return useMemo(() => {
     const date = todayIso();

@@ -35,7 +35,6 @@ const TIME_RANGES_MS: Record<Exclude<TimeFilter, "">, number> = {
   "30d": 30 * 24 * 60 * 60 * 1000,
 };
 
-/* ------------------------- Action color helper ------------------------- */
 
 function getActionColor(action: string): "emerald" | "amber" | "red" | "ink" {
   const a = (action || "").toUpperCase();
@@ -47,12 +46,8 @@ function getActionColor(action: string): "emerald" | "amber" | "red" | "ink" {
   return "ink";
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              MAIN COMPONENT                                */
-/* -------------------------------------------------------------------------- */
 
 export default function AuditLogPage() {
-  /* ---------------------------- Filter state ---------------------------- */
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("");
@@ -60,7 +55,6 @@ export default function AuditLogPage() {
   const [targetFilter, setTargetFilter] = useState<string[]>([]);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
-  /* -------------------------------- Query -------------------------------- */
   const {
     data: rawLogs = [],
     isLoading,
@@ -72,7 +66,6 @@ export default function AuditLogPage() {
     staleTime: 60_000,
   });
 
-  /* --------------------- Unique options untuk filter --------------------- */
   const actionOptions = useMemo(() => {
     const set = new Set<string>();
     rawLogs.forEach((l) => {
@@ -89,12 +82,10 @@ export default function AuditLogPage() {
     return Array.from(set).sort();
   }, [rawLogs]);
 
-  /* ---------------------------- Filter logic ---------------------------- */
   const filteredLogs = useMemo(() => {
     const now = Date.now();
 
     return rawLogs.filter((l) => {
-      // 1. Search
       if (deferredSearch) {
         const q = deferredSearch.toLowerCase();
         const matches =
@@ -106,19 +97,16 @@ export default function AuditLogPage() {
         if (!matches) return false;
       }
 
-      // 2. Time filter
       if (timeFilter) {
         const t = new Date(l.timestamp).getTime();
         if (isNaN(t)) return false;
         if (now - t > TIME_RANGES_MS[timeFilter]) return false;
       }
 
-      // 3. Action filter
       if (actionFilter.length > 0 && !actionFilter.includes(l.action)) {
         return false;
       }
 
-      // 4. Target type filter
       if (targetFilter.length > 0 && !targetFilter.includes(l.target_type)) {
         return false;
       }
@@ -127,13 +115,11 @@ export default function AuditLogPage() {
     });
   }, [rawLogs, deferredSearch, timeFilter, actionFilter, targetFilter]);
 
-  /* ------------------------ Active filter counter ------------------------ */
   const activeFilterCount =
     (timeFilter ? 1 : 0) + actionFilter.length + targetFilter.length;
 
   const hasActiveFilters = activeFilterCount > 0 || search.length > 0;
 
-  /* ---------------------------- Reset filter ---------------------------- */
   function resetAllFilters() {
     setSearch("");
     setTimeFilter("");
@@ -157,7 +143,6 @@ export default function AuditLogPage() {
     );
   }
 
-  /* -------------------------------- Render -------------------------------- */
   return (
     <AppLayout hideNav>
       <Header
@@ -166,7 +151,7 @@ export default function AuditLogPage() {
         backLabel="Kembali"
       />
 
-      {/* ---------------------- Search + Filter Bar ---------------------- */}
+      
       <div className="px-4 pt-3 pb-2 flex gap-2">
         <div className="relative flex-1">
           <Search
@@ -207,7 +192,7 @@ export default function AuditLogPage() {
         </Button>
       </div>
 
-      {/* ---------------------- Active filter summary ---------------------- */}
+      
       {hasActiveFilters && (
         <div className="px-4 pb-2 flex items-center justify-between gap-2">
           <p className="text-ios-caption text-surface-muted truncate">
@@ -219,7 +204,7 @@ export default function AuditLogPage() {
         </div>
       )}
 
-      {/* ----------------------------- List ----------------------------- */}
+      
       <div className="py-3">
         {isLoading && <GroupedListSkeleton rows={6} />}
 
@@ -277,7 +262,7 @@ export default function AuditLogPage() {
           </GroupedList>
         )}
 
-        {/* Bottom note */}
+        
         {!isLoading && !error && filteredLogs.length > 0 && (
           <p className="text-center text-ios-caption text-surface-muted py-4">
             {filteredLogs.length === rawLogs.length
@@ -287,13 +272,13 @@ export default function AuditLogPage() {
         )}
       </div>
 
-      {/* ---------------------- Filter Sheet ---------------------- */}
+      
       <BottomSheet
         open={filterSheetOpen}
         onClose={() => setFilterSheetOpen(false)}
         title="Filter Audit Log"
       >
-        {/* Waktu */}
+        
         <div className="mb-4">
           <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
             Waktu
@@ -320,7 +305,7 @@ export default function AuditLogPage() {
           </div>
         </div>
 
-        {/* Action filter */}
+        
         {actionOptions.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2 px-0.5">
@@ -358,7 +343,7 @@ export default function AuditLogPage() {
           </div>
         )}
 
-        {/* Target type filter */}
+        
         {targetOptions.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2 px-0.5">
@@ -396,7 +381,7 @@ export default function AuditLogPage() {
           </div>
         )}
 
-        {/* Action buttons */}
+        
         <div className="flex gap-2 mt-4 pt-4 border-t border-surface-border">
           <Button
             variant="secondary"
@@ -418,9 +403,6 @@ export default function AuditLogPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              HELPER                                        */
-/* -------------------------------------------------------------------------- */
 
 function formatTime(timestamp: string): string {
   if (!timestamp) return "-";

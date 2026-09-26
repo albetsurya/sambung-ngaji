@@ -2,9 +2,9 @@ const BASE = "https://api.quran.com/api/v4";
 
 export interface MushafVerse {
   id: number;
-  verseKey: string;      // "1:1"
-  surah: number;         // 1
-  ayat: number;          // 1
+  verseKey: string;
+  surah: number;
+  ayat: number;
   textUthmani: string;
   pageNumber: number;
   juzNumber: number;
@@ -13,7 +13,6 @@ export interface MushafVerse {
 export interface MushafPage {
   page: number;
   verses: MushafVerse[];
-  /** Surah yang punya ayat 1 di halaman ini (untuk render judul surah) */
   surahStarts: { surah: number; ayat: number }[];
 }
 
@@ -29,10 +28,6 @@ interface ApiResponse {
   verses: ApiVerse[];
 }
 
-/**
- * Fetch 1 halaman mushaf (1-604) dari quran.com API.
- * Halaman standar Mushaf Madinah (15 baris per halaman).
- */
 export async function fetchMushafPage(page: number): Promise<MushafPage> {
   if (!Number.isInteger(page) || page < 1 || page > 604) {
     throw new Error("Nomor halaman tidak valid (1-604)");
@@ -70,10 +65,6 @@ export async function fetchMushafPage(page: number): Promise<MushafPage> {
   return { page, verses, surahStarts };
 }
 
-/**
- * Konversi nomor surah + ayat → nomor halaman (untuk "Lompat ke surah").
- * Kita pakai data statis (mapping start page per surah) supaya tidak perlu API call.
- */
 const SURAH_START_PAGE: Record<number, number> = {
   1: 1, 2: 2, 3: 50, 4: 77, 5: 106, 6: 128, 7: 151, 8: 177, 9: 187,
   10: 208, 11: 221, 12: 235, 13: 249, 14: 255, 15: 262, 16: 267,
@@ -98,10 +89,6 @@ export function surahToStartPage(surah: number): number {
   return SURAH_START_PAGE[surah] ?? 1;
 }
 
-/**
- * Konversi halaman → juz (untuk display header).
- * Pakai approximate — tampilkan juz dari ayat pertama halaman.
- */
 export function juzFromPage(verses: MushafVerse[]): number {
   return verses[0]?.juzNumber ?? 1;
 }

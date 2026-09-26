@@ -28,7 +28,6 @@ export default function GroupsPage() {
   const [editing, setEditing] = useState<Group | null>(null);
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  // Simpan kelompok hanya ADMIN (backend). PENGAWAS read-only.
   const { isAdminLike } = usePermission();
   const canEdit = isAdminLike;
 

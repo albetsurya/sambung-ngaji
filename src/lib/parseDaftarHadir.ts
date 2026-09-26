@@ -1,7 +1,3 @@
-/* ==========================================================================
-   Rule-based parser — PDF agenda rapat pengajian multi-section.
-   Handle: section `## N.`, field inline, tanggal range, tahun 2-digit.
-   ========================================================================== */
 
 export interface PdfTextItem {
   str: string;
@@ -24,7 +20,6 @@ export interface ParsedMeetingDraft {
   warning?: string;
 }
 
-/* ============================== Normalization ============================== */
 
 export function normalizeTextItems(rawItems: any[]): PdfTextItem[] {
   const out: PdfTextItem[] = [];
@@ -66,7 +61,6 @@ export function groupIntoLines(items: PdfTextItem[], tolerance = 3): string[] {
   );
 }
 
-/* ============================== Date ============================== */
 
 const HARI_LIST = [
   "Minggu",
@@ -118,8 +112,6 @@ function getHariFromIso(iso: string): string {
 function extractTanggal(text: string): { iso: string; isoEnd: string; hari: string } {
   const result = { iso: "", isoEnd: "", hari: "" };
 
-  // Pattern 1: DD NamaBulan YYYY atau range "17-19 Juli 2026"
-  // Capture group: [1]=start day, [2]=end day (opsional), [3]=bulan, [4]=tahun
   let m = text.match(
     new RegExp(
       `(\\d{1,2})(?:\\s*[-–]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
@@ -136,7 +128,6 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
     }
   }
 
-  // Pattern 2: DD-MM-YYYY atau DD/MM/YYYY
   if (!result.iso) {
     m = text.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
     if (m) {
@@ -144,7 +135,6 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
     }
   }
 
-  // Pattern 3: "TGL 17-23 ... SEPTEMBER 2026" — range dengan bulan di akhir
   if (!result.iso) {
     m = text.match(
       new RegExp(
@@ -158,7 +148,6 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
     }
   }
 
-  // Hari
   for (const h of HARI_LIST) {
     if (new RegExp("\\b" + h + "\\b", "i").test(text)) {
       result.hari = h;
@@ -166,7 +155,6 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
     }
   }
 
-  // Normalize "Jum'at" / "Jumat"
   if (!result.hari && /jum['']?at/i.test(text)) {
     result.hari = "Jumat";
   }
@@ -178,7 +166,6 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
   return result;
 }
 
-/* ============================== Field Extraction ============================== */
 
 const FIELD_LABELS = [
   "Hari\\s*/\\s*Tanggal",
@@ -195,10 +182,6 @@ const FIELD_LABELS = [
   "Catatan",
 ];
 
-/**
- * Extract semua field dari section body dalam 1 pass.
- * Handle field inline (` - Jam : ...`) dan multiline.
- */
 function extractAllFields(text: string): Record<string, string> {
   const labelPattern = FIELD_LABELS.join("|");
   const fieldRegex = new RegExp(
@@ -223,7 +206,6 @@ function extractAllFields(text: string): Record<string, string> {
     const rawEnd = next ? next.start : text.length;
     let value = text.slice(cur.valueStart, rawEnd).trim();
 
-    // Buang trailing `-` atau `•` yang mungkin jadi awal field berikutnya
     value = value.replace(/[\s\-•]+$/, "").trim();
     value = value.replace(/\s+/g, " ");
 
@@ -241,7 +223,6 @@ function getField(fields: Record<string, string>, ...keys: string[]): string {
   return "";
 }
 
-/* ============================== Gender / Kategori ============================== */
 
 function detectGenderFromTitle(text: string): "" | "L" | "P" {
   const upper = text.toUpperCase();
@@ -283,7 +264,6 @@ function detectKategoriFromTitle(text: string): string[] {
   return found;
 }
 
-/* ============================== Section Split ============================== */
 
 interface RawSection {
   header: string;
@@ -297,10 +277,8 @@ function splitSections(lines: string[]): RawSection[] {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    // Handle optional prefix "##", "#", "- " sebelum nomor
     const cleaned = trimmed.replace(/^[#\-\*•]+\s*/, "");
 
-    // Deteksi header section: "N. JUDUL" atau "N) JUDUL"
     const m = cleaned.match(/^(\d{1,2})[\.\)]\s+(.+)$/);
     if (m) {
       const title = m[2].trim();
@@ -320,20 +298,15 @@ function splitSections(lines: string[]): RawSection[] {
   return sections;
 }
 
-/* ============================== Parse Section ============================== */
 
 function parseSection(section: RawSection): ParsedMeetingDraft {
-  // Gabung body jadi 1 text, tapi pertahankan newline untuk multiline fields
   const bodyText = section.body.join("\n");
   const fullText = section.header + "\n" + bodyText;
 
-  // Extract semua field
   const fields = extractAllFields(fullText);
 
-  // Acara dari header
   const acara = section.header.replace(/\s+/g, " ").trim();
 
-  // Tanggal: prioritas dari field Hari/Tanggal
   const hariTanggal = getField(
     fields,
     "hari / tanggal",
@@ -343,22 +316,17 @@ function parseSection(section: RawSection): ParsedMeetingDraft {
   const tglSource = hariTanggal || fullText;
   const tgl = extractTanggal(tglSource);
 
-  // Jam
   const jam = getField(fields, "jam");
 
-  // Tempat
   const tempat = getField(fields, "tempat");
 
-  // Peserta
   const peserta = getField(fields, "peserta");
 
-  // Catatan = gabungan tempat + peserta
   const catatanParts: string[] = [];
   if (tempat) catatanParts.push(`Tempat: ${tempat}`);
   if (peserta) catatanParts.push(`Peserta: ${peserta}`);
   const catatan = catatanParts.join("\n");
 
-  // Confidence
   let confidence = 0;
   if (tgl.iso) confidence += 40;
   if (acara && acara.length >= 5) confidence += 25;
@@ -396,13 +364,7 @@ function cryptoId(): string {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-/* ============================== Auto-number ============================== */
 
-/**
- * Deteksi baris yang mengandung tanggal (Hari, DD Bulan YYYY / DD-MM-YYYY / dll)
- * dan sisipkan nomor urut di baris sebelumnya (header acara).
- * Gunakan sebelum parse kalau teks mentah tidak bernomor.
- */
 export function autoNumberText(text: string): string {
   const lines = text.split(/\r?\n/);
   const out: string[] = [];
@@ -421,7 +383,6 @@ export function autoNumberText(text: string): string {
     const alreadyNumbered = /^\d{1,2}[\.\)]\s/.test(trimmed);
 
     if (isDateLine && !alreadyNumbered) {
-      // Cari baris header sebelumnya (non-kosong, bukan tanggal, belum bernomor)
       let headerIdx = -1;
       for (let j = out.length - 1; j >= 0; j--) {
         const prev = out[j].trim();
@@ -436,7 +397,6 @@ export function autoNumberText(text: string): string {
         sectionNum++;
         out[headerIdx] = `${sectionNum}. ${out[headerIdx].trim()}`;
       } else {
-        // Tidak ada header sebelumnya → nomor di baris tanggal ini
         sectionNum++;
         out.push(`${sectionNum}. ${trimmed}`);
         continue;
@@ -449,7 +409,6 @@ export function autoNumberText(text: string): string {
   return out.join("\n");
 }
 
-/* ============================== Main Parser ============================== */
 
 function parseLines(lines: string[]): ParsedMeetingDraft[] {
   const cleaned = lines.map((l) => l.trim()).filter((l) => l.length > 0);
@@ -466,10 +425,6 @@ export function parseMeetingsFromPdf(rawItems: any[]): ParsedMeetingDraft[] {
   return parseLines(lines);
 }
 
-/**
- * Parse teks mentah (paste dari PDF/Docs/WA) jadi daftar draft jadwal.
- * Tiap section bernomor (`1. Judul`) jadi 1 jadwal.
- */
 export function parseMeetingsFromText(text: string): ParsedMeetingDraft[] {
   return parseLines(text.split(/\r?\n/));
 }

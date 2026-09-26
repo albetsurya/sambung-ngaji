@@ -20,7 +20,6 @@ function persist(key: string, dates: string[]) {
   try {
     localStorage.setItem(key, JSON.stringify(dates));
   } catch {
-    // ignore
   }
 }
 

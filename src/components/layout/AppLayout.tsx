@@ -27,7 +27,6 @@ interface HeaderProps {
   right?: ReactNode;
   showThemeToggle?: boolean;
   showSyncButton?: boolean;
-  /** Sembunyikan tombol back di desktop (halaman level-1 yg sudah ada di sidebar). Mobile tetap tampil. */
   hideBackOnDesktop?: boolean;
 }
 
@@ -62,7 +61,7 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
-      {/* ── Mobile Header (iOS Style) ── */}
+      
       <div className="md:hidden grid grid-cols-[1fr_auto_1fr] items-center h-[52px] px-3 gap-2">
         <div className="flex items-center justify-start min-w-0">
           {onBack && (
@@ -131,9 +130,9 @@ export function Header({
         </div>
       </div>
 
-      {/* ── Desktop Header (Vercel Style) ── */}
+      
       <div className="hidden md:flex items-center justify-between gap-4 h-16 px-6 lg:px-8">
-        {/* Left: Title + Subtitle + Back */}
+        
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {onBack && !hideBackOnDesktop && (
             <button
@@ -164,7 +163,7 @@ export function Header({
           </div>
         </div>
 
-        {/* Right: Actions */}
+        
         <div className="flex items-center gap-2.5 shrink-0">
           {showSyncButton && (
           <Button
@@ -204,8 +203,6 @@ export function AppLayout({
 
   const showAiChatFab = showAiChat && !hideNav;
   const showFloating = showAiChatFab || !!fab || !hideNav;
-  /* pb besar hanya untuk mobile (ruang jempol di atas tepi layar).
-     Di desktop dock mepet tepi bawah: md:pb-0. */
   const containerPadding = hideNav ? "pb-[68px] md:pb-0" : "pb-2 md:pb-0";
 
   useEffect(() => {
@@ -226,38 +223,33 @@ export function AppLayout({
 
   return (
     <div className="min-h-screen bg-surface-bg flex flex-col md:flex-row">
-      {/* Sidebar Desktop (Vercel Style) */}
+      
       <DesktopSidebar />
 
-      {/* Main Content Workspace */}
+      
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
         <div className="app-shell flex flex-col flex-1 w-full max-w-7xl md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
           <div
             className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}
           >
             {children}
-            {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
+            
             {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
           </div>
         </div>
       </div>
 
-      {/* FAB & BottomNav — di-render lewat Portal ke document.body
-          agar `position: fixed` selalu relatif ke viewport. */}
+      
       {showFloating &&
         createPortal(
           <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
-            {/*
-              `floating-dock` punya min-height:0 di CSS (media md),
-              jadi min-height:100vh dari .app-shell tidak bocor ke dock
-              dan FAB tidak nyangkut di tengah layar.
-            */}
+            
             <div
               className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
             >
               {showAiChatFab && (
                 <div className="pointer-events-auto">
-                  {/* Mobile: lingkaran FAB. Desktop: pil berlabel di pojok viewport. */}
+                  
                   <span className="md:hidden">
                     <FloatingActionButton
                       onClick={() => navigate("/ai-chat")}

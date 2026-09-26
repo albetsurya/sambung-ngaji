@@ -87,7 +87,6 @@ export function CalendarTab() {
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
   }
 
-  // Request delete dari detail sheet → tutup sheet, buka ConfirmDialog
   function handleRequestDelete(meeting: Meeting) {
     closeModal();
     setConfirmDelete(meeting);
@@ -160,7 +159,7 @@ export function CalendarTab() {
         onSelect={(m) => setModal({ view: "detail", meeting: m })}
       />
 
-      {/* Detail / Form Sheet */}
+      
       <BottomSheet
         open={modal.view !== "closed"}
         onClose={closeModal}
@@ -192,7 +191,7 @@ export function CalendarTab() {
         )}
       </BottomSheet>
 
-      {/* Confirm Delete */}
+      
       <ConfirmDialog
         open={!!confirmDelete}
         title="Hapus jadwal ini?"
@@ -213,7 +212,6 @@ export function CalendarTab() {
   );
 }
 
-/* ===================== Agenda List ===================== */
 
 function AgendaList({
   meetings,
@@ -325,7 +323,6 @@ function AgendaList({
   );
 }
 
-/* ===================== Detail ===================== */
 
 function MeetingDetailContent({
   meeting,
@@ -409,7 +406,6 @@ function MeetingDetailContent({
   );
 }
 
-/* ===================== Form ===================== */
 
 function MeetingFormContent({
   mode,
@@ -582,9 +578,6 @@ function MeetingFormContent({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Modern Checkbox                               */
-/* -------------------------------------------------------------------------- */
 
 function ModernCheckbox({
   checked,

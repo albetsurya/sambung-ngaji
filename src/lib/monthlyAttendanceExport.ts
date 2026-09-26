@@ -70,7 +70,6 @@ function rgbToArgb(rgb: [number, number, number]): string {
       .join("")
   );
 }
-/* ---- Geometri PDF (satu sumber kebenaran dengan exportRecapPDF) ---- */
 export const PDF_PAGE_MM = {
   portrait: { w: 210, h: 297 },
   landscape: { w: 297, h: 210 },
@@ -78,14 +77,10 @@ export const PDF_PAGE_MM = {
 export const PDF_TABLE_START_Y = 38;
 export const PDF_TABLE_MARGIN_X = 14;
 export const PDF_CELL_PADDING = 1.5;
-const PDF_MARGIN_BOTTOM = 37; // dikalibrasi: portrait font 7 terukur 38 baris
+const PDF_MARGIN_BOTTOM = 37;
 const PT_TO_MM = 0.3528;
 const JSPDF_LINE_HEIGHT = 1.15;
 
-/**
- * Baris per halaman dihitung dari geometri aktual, bukan tebakan.
- * Kalibrasi: portrait font 7 = 38 baris terukur.
- */
 export function rowsPerSheet(
   orientation: "portrait" | "landscape",
   fontSize: number,
@@ -98,10 +93,10 @@ export function rowsPerSheet(
   );
 }
 function getRateColor(rate: number): { bg: [number, number, number]; text: [number, number, number] } {
-  if (rate >= 80) return { bg: hexToRgb("dcfce7"), text: hexToRgb("166534") }; // hijau
-  if (rate >= 60) return { bg: hexToRgb("fef9c3"), text: hexToRgb("854d0e") }; // kuning
-  if (rate >= 40) return { bg: hexToRgb("ffedd5"), text: hexToRgb("9a3412") }; // oranye
-  return { bg: hexToRgb("fee2e2"), text: hexToRgb("991b1b") }; // merah
+  if (rate >= 80) return { bg: hexToRgb("dcfce7"), text: hexToRgb("166534") };
+  if (rate >= 60) return { bg: hexToRgb("fef9c3"), text: hexToRgb("854d0e") };
+  if (rate >= 40) return { bg: hexToRgb("ffedd5"), text: hexToRgb("9a3412") };
+  return { bg: hexToRgb("fee2e2"), text: hexToRgb("991b1b") };
 }
 
 export async function exportRecapPDF(matrix: RecapMatrix, monthLabel: string, kategoriLabel: string, fontSize = 7, orientation: "portrait" | "landscape" = "portrait") {

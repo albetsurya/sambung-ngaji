@@ -18,7 +18,6 @@ export const FRIDAY_ROLES: FridayRole[] = [
   { key: "penata_sandal", label: "Penata Sandal", short: "Sandal" },
 ];
 
-/** Daftar peran yang belum diisi pada satu jadwal. */
 export function missingRoles(s: FridaySchedule): FridayRole[] {
   return FRIDAY_ROLES.filter((r) => !(s[r.key] || "").trim());
 }
@@ -27,7 +26,6 @@ export function isFridayComplete(s: FridaySchedule): boolean {
   return missingRoles(s).length === 0;
 }
 
-/** YYYY-MM-DD hari ini (waktu lokal). */
 export function todayIso(): string {
   const d = new Date();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -35,13 +33,11 @@ export function todayIso(): string {
   return `${d.getFullYear()}-${m}-${day}`;
 }
 
-/** true kalau string YYYY-MM-DD jatuh di hari Jumat. */
 export function isFridayDate(iso: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
   return new Date(iso + "T00:00:00").getDay() === 5;
 }
 
-/** Pesan follow-up / broadcast untuk satu jadwal (siap kirim via WA). */
 export function buildFridayMessage(s: FridaySchedule): string {
   const v = (x: string) => (x || "").trim() || "(belum diisi)";
   return [

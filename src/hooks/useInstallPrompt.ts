@@ -5,11 +5,6 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-/**
- * Hook untuk menangkap event `beforeinstallprompt` PWA.
- * Browser mewajibkan aksi user untuk install, jadi kita simpan event-nya
- * lalu tampilkan tombol install yang memanggil `promptInstall()`.
- */
 export function useInstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(
     null,
@@ -29,7 +24,6 @@ export function useInstallPrompt() {
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
 
-    // Sudah berjalan sebagai aplikasi terinstal (standalone)?
     const media = window.matchMedia("(display-mode: standalone)");
     const iosStandalone =
       (navigator as unknown as { standalone?: boolean }).standalone === true;
@@ -56,7 +50,6 @@ export function useInstallPrompt() {
   }, [deferred]);
 
   return {
-    /** true jika browser siap menampilkan prompt install & belum terinstal */
     canInstall: !!deferred && !installed,
     installed,
     promptInstall,

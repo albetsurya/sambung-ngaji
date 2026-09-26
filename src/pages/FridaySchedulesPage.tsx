@@ -174,7 +174,6 @@ export default function FridaySchedulesPage() {
 
   function openCreate() {
     setEditing(null);
-    // Default tanggal: Jumat terdekat
     const d = new Date();
     const delta = (5 - d.getDay() + 7) % 7;
     d.setDate(d.getDate() + delta);
@@ -256,7 +255,7 @@ export default function FridaySchedulesPage() {
       />
 
       <div className="py-3 px-4 space-y-3">
-        {/* Ringkasan */}
+        
         {!isLoading && !error && upcoming.length > 0 && (
           <div className="rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3">
             <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
@@ -282,7 +281,7 @@ export default function FridaySchedulesPage() {
           </div>
         )}
 
-        {/* Tabs */}
+        
         <Segmented
           ariaLabel="Jenis jadwal"
           value={tab}
@@ -454,7 +453,7 @@ export default function FridaySchedulesPage() {
           })}
       </div>
 
-      {/* Form tambah / edit */}
+      
       <BottomSheet
         open={formOpen}
         onClose={() => {
@@ -506,7 +505,7 @@ export default function FridaySchedulesPage() {
         </div>
       </BottomSheet>
 
-      {/* Follow up */}
+      
       <BottomSheet
         open={!!followUp}
         onClose={() => setFollowUp(null)}
@@ -593,9 +592,6 @@ export default function FridaySchedulesPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              FORMAT TANGGAL                              */
-/* -------------------------------------------------------------------------- */
 
 function formatDateTime(iso?: string): string {
   if (!iso) return "-";

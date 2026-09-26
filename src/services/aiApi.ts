@@ -23,10 +23,8 @@ export const aiApi = {
       provider: provider || "",
     }),
 
-  /** Ambil provider aktif saat ini */
   getCurrentProvider: () => call<ProviderInfo>("getCurrentProvider", {}),
 
-  /** Set provider aktif */
   setProvider: (provider: string) =>
     call<ProviderInfo>("setAIProvider", { provider }),
 };

@@ -60,7 +60,7 @@ export function DesktopSidebar() {
 
   return (
     <aside className="hidden md:flex flex-col fixed top-0 bottom-0 left-0 w-64 border-r border-surface-border bg-surface-card z-30 select-none">
-      {/* Brand Header */}
+      
       <div className="flex items-center justify-between h-16 px-5 border-b border-surface-border">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(isMemberContext ? "/member" : "/")}>
           <div className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm shadow-accent/30">
@@ -83,7 +83,7 @@ export function DesktopSidebar() {
         )}
       </div>
 
-      {/* Navigation Section */}
+      
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 no-scrollbar">
         <div>
           <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
@@ -123,7 +123,7 @@ export function DesktopSidebar() {
           </nav>
         </div>
 
-        {/* Switcher mode untuk Admin */}
+        
         {isAdmin && (
           <div>
             <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
@@ -142,7 +142,7 @@ export function DesktopSidebar() {
         )}
       </div>
 
-      {/* Footer User & Quick Settings */}
+      
       <div className="p-3 border-t border-surface-border bg-surface-card2/50 space-y-2">
         {user ? (
           <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-card border border-surface-border">
