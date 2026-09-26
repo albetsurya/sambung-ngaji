@@ -320,8 +320,7 @@ export default function MembersListPage() {
       />
 
       <div
-        className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-        style={{ top: "calc(52px + var(--safe-top))" }}
+        className="sticky sticky-below-header z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
       >
         <div className="px-4 pt-2 pb-2 flex gap-2">
           <div className="relative flex-1">

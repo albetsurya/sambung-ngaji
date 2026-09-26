@@ -178,6 +178,21 @@ textarea:focus-visible {
     box-shadow: none;
     min-height: 100vh;
   }
+
+  /* Lebar pasti elemen shell di desktop.
+     Utilities md:max-w-* kalah prioritas melawan .app-shell
+     (CSS tak-berlapis menang atas utilities berlapis), jadi atur di sini.
+     Mobile tidak tersentuh: tetap mengikuti max-width 480px di atas. */
+  .sheet-narrow {
+    max-width: 32rem;
+  }
+  .modal-narrow {
+    max-width: 42rem;
+  }
+  /* Dock FAB: lepas dari batas 1280px agar menempel pojok viewport. */
+  .floating-dock {
+    max-width: none;
+  }
 }
 
 .pt-safe {
@@ -185,6 +200,36 @@ textarea:focus-visible {
 }
 .pb-safe {
   padding-bottom: calc(0.75rem + var(--safe-bottom));
+}
+
+/* ── Sticky bar tepat di bawah header.
+   Header mobile 52px, header desktop h-16 (64px). Satu sumber agar
+   search/tab/filter tidak terselip di bawah header saat scroll. ── */
+.sticky-below-header {
+  top: calc(52px + var(--safe-top, 0px));
+}
+/* Varian menumpuk di bawah banner info readonly (+34px). */
+.sticky-below-header-with-banner {
+  top: calc(52px + var(--safe-top, 0px) + 34px);
+}
+@media (min-width: 768px) {
+  .sticky-below-header {
+    top: calc(64px + var(--safe-top, 0px));
+  }
+  .sticky-below-header-with-banner {
+    top: calc(64px + var(--safe-top, 0px) + 34px);
+  }
+}
+
+/* ── Titik acuan zoom lembar preview: kiri-atas di mobile (geser
+   horizontal), tengah-atas di desktop (lembar tampil simetris). ── */
+.sheet-scale {
+  transform-origin: top left;
+}
+@media (min-width: 768px) {
+  .sheet-scale {
+    transform-origin: top center;
+  }
 }
 
 .ios-list-divider {

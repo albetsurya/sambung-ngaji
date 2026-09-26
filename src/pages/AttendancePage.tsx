@@ -725,8 +725,7 @@ export default function AttendancePage() {
 
       {isReadonly && (
         <div
-          className="sticky z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20"
-          style={{ top: "calc(52px + var(--safe-top))" }}
+          className="sticky sticky-below-header z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20"
         >
           <div className="px-4 py-2">
             <p className="text-ios-caption text-info leading-relaxed">
@@ -818,12 +817,7 @@ export default function AttendancePage() {
           {selectedMeeting && (
             <>
               <div
-                className="sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-                style={{
-                  top: isReadonly
-                    ? "calc(52px + var(--safe-top) + 34px)"
-                    : "calc(52px + var(--safe-top))",
-                }}
+                className={`sticky z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border ${isReadonly ? "sticky-below-header-with-banner" : "sticky-below-header"}`}
               >
                 <div className="px-4 pt-2 pb-2">
                   <div className="relative">

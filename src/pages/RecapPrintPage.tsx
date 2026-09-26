@@ -50,7 +50,14 @@ export default function RecapPrintPage() {
   const [fontSize, setFontSize] = useState<"7" | "9" | "11">("7");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [sheetIdx, setSheetIdx] = useState(0);
-  const [zoom, setZoom] = useState(0.5);
+  /* Zoom awal mengikuti layar: mobile 50% (muat lebar HP), desktop 100%.
+     Setelah itu sepenuhnya kendali pengguna via tombol −/+. */
+  const [zoom, setZoom] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 768px)").matches
+      ? 1
+      : 0.5,
+  );
 
   const bulan = searchParams.get("bulan") || "";
   const kategoriParam = searchParams.get("kategori") || "";
@@ -315,8 +322,8 @@ export default function RecapPrintPage() {
             <div className="overflow-x-auto -mx-4 px-4 pb-1">
               <section
                 key={safeIdx}
-                className="rounded-xl border border-slate-300 bg-white text-slate-900 overflow-hidden mx-auto shadow-sm"
-                style={{ width: `${sheetWidthMm}mm`, minWidth: `${sheetWidthMm}mm`, transform: `scale(${displayScale})`, transformOrigin: 'top left' }}
+                className="sheet-scale rounded-xl border border-slate-300 bg-white text-slate-900 overflow-hidden mx-auto shadow-sm"
+                style={{ width: `${sheetWidthMm}mm`, minWidth: `${sheetWidthMm}mm`, transform: `scale(${displayScale})` }}
               >
                 <div className="px-3 pt-3 pb-2 border-b border-slate-300">
                   <h2 className="text-[15px] font-bold leading-tight">

@@ -590,8 +590,7 @@ export function AttendancePageSkeleton({ rows = 8 }: { rows?: number }) {
       </div>
 
       <div
-        className="sticky px-4 z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
-        style={{ top: "calc(52px + var(--safe-top))" }}
+        className="sticky sticky-below-header px-4 z-20 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border"
       >
         <div className="pt-2 pb-2">
           <div className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card" />

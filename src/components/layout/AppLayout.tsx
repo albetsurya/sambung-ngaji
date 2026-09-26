@@ -172,7 +172,7 @@ export function Header({
               disabled={syncing}
               aria-label="Sync data"
               title="Sync data"
-              className="border border-surface-border bg-surface-card hover:bg-surface-card2"
+              className="border border-surface-border bg-surface-card hover:bg-surface-card2 gap-2"
             >
               <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
               <span className="text-ios-footnote font-medium hidden lg:inline">Refresh</span>
@@ -200,7 +200,9 @@ export function AppLayout({
 
   const showAiChatFab = showAiChat && !hideNav;
   const showFloating = showAiChatFab || !!fab || !hideNav;
-  const containerPadding = hideNav ? "pb-[68px]" : "pb-2";
+  /* pb-[68px] hanya untuk mobile (ruang jempol di atas tepi layar).
+     Di desktop dock menempel pojok, jadi samakan dengan halaman biasa. */
+  const containerPadding = hideNav ? "pb-[68px] md:pb-2" : "pb-2";
 
   useEffect(() => {
     let offset = 16;
@@ -225,7 +227,7 @@ export function AppLayout({
 
       {/* Main Content Workspace */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
-        <div className="app-shell flex flex-col flex-1 w-full max-w-7xl px-4 md:px-8 py-2 md:py-6">
+        <div className="app-shell flex flex-col flex-1 w-full max-w-7xl px-4 md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
           <div className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}>
             {children}
             {/* Penyangga agar item terbawah tidak tertutup FAB (halaman hideNav) */}
@@ -237,16 +239,27 @@ export function AppLayout({
       {showFloating && (
         <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
           <div
-            className={`app-shell px-3 md:px-8 ${containerPadding} md:pb-6 flex flex-col items-end md:justify-end gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
+            className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} md:pb-2 flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
           >
             {showAiChatFab && (
               <div className="pointer-events-auto">
-                <FloatingActionButton
+                {/* Mobile: lingkaran FAB. Desktop: pil berlabel di pojok viewport. */}
+                <span className="md:hidden">
+                  <FloatingActionButton
+                    onClick={() => navigate("/ai-chat")}
+                    label="Tanya AI"
+                    variant="secondary"
+                    icon={<Sparkles size={18} strokeWidth={2.2} />}
+                  />
+                </span>
+                <button
                   onClick={() => navigate("/ai-chat")}
-                  label="Tanya AI"
-                  variant="secondary"
-                  icon={<Sparkles size={18} strokeWidth={2.2} />}
-                />
+                  aria-label="Tanya AI"
+                  className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary text-ios-footnote font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95"
+                >
+                  <Sparkles size={18} strokeWidth={2.2} />
+                  Tanya AI
+                </button>
               </div>
             )}
             {fab && <div className="pointer-events-auto">{fab}</div>}

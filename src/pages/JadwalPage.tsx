@@ -63,8 +63,7 @@ export default function JadwalPage() {
 
       {/* Sticky tab bar */}
       <div
-        className="sticky z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
-        style={{ top: "calc(52px + var(--safe-top))" }}
+        className="sticky sticky-below-header z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
       >
         <div className="flex gap-1 overflow-x-auto no-scrollbar">
           {TABS.map((t) => {
