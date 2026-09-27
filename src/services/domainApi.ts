@@ -81,7 +81,7 @@ export interface FridaySchedulePayload {
 }
 
 export const fridayApi = {
-  list: (params?: { from?: string; to?: string }) =>
+  list: (params?: { from?: string; to?: string; group_id?: string }) =>
     call<FridaySchedule[]>("getFridaySchedules", params || {}),
 
   save: (payload: FridaySchedulePayload) =>

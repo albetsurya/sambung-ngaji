@@ -39,7 +39,8 @@ export const queryKeys = {
   userDetail: (userId: string) => ["user-detail", userId],
   auditLogs: (limit: number) => ["audit-logs", { limit }],
   aiUsage: () => ["ai-usage"],
-  fridaySchedules: () => ["friday-schedules", "v2"],
+  fridaySchedules: (group?: string) =>
+    group ? ["friday-schedules", "v2", group] : ["friday-schedules", "v2"],
   monitoring: (memberId: string) => ["monitoring", memberId],
   monitoringPaged: (memberId: string, filters?: object) =>
     filters

@@ -16,6 +16,7 @@ import {
   Sun,
   Moon,
   Sparkles,
+  Building2,
   User as UserIcon,
 } from "../common/FontAwesomeIcons";
 import { RoleBadge } from "../common";
@@ -46,7 +47,7 @@ export function DesktopSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDevelopment } = useEnvironment();
-  const { canSeeNav, isGlobal, role } = usePermission();
+  const { canSeeNav, isGlobal, role, groupId } = usePermission();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -55,6 +56,25 @@ export function DesktopSidebar() {
   const visible = isMemberContext
     ? items
     : items.filter((i) => canSeeNav(i.key));
+
+  /* Admin ber-kelompok: hub Kelompok Saya tepat di bawah Beranda. */
+  const isHubUser =
+    !isMemberContext &&
+    (role === "ADMIN" || role === "PENGAWAS") &&
+    !!groupId;
+  const navItems =
+    isHubUser && visible.length > 0
+      ? [
+          visible[0],
+          {
+            key: "kelompok-saya",
+            label: "Kelompok Saya",
+            to: "/kelompok-saya",
+            icon: Building2,
+          },
+          ...visible.slice(1),
+        ]
+      : visible;
 
   const isAdmin = role && role !== "MEMBER";
 
@@ -90,7 +110,7 @@ export function DesktopSidebar() {
             Navigasi Utama
           </div>
           <nav className="space-y-1">
-            {visible.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink

@@ -64,7 +64,7 @@ export default function FridaySchedulesPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  const { role, isAdminLike } = usePermission();
+  const { role, isAdminLike, assignedGroup } = usePermission();
   const canEdit = isAdminLike || role === "TIM_ABSENSI";
 
   const [tab, setTab] = useState<Tab>("upcoming");
@@ -82,8 +82,11 @@ export default function FridaySchedulesPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.fridaySchedules(),
-    queryFn: () => fridayApi.list(),
+    queryKey: queryKeys.fridaySchedules(assignedGroup ?? "all"),
+    queryFn: () =>
+      fridayApi.list({
+        ...(assignedGroup ? { group_id: assignedGroup } : {}),
+      }),
     staleTime: 5 * 60_000,
   });
 

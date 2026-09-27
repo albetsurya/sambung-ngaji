@@ -55,7 +55,7 @@ interface MenuEntry {
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
-  const { isAdminLike, isSuperAdmin, role } = usePermission();
+  const { isAdminLike, isSuperAdmin, role, assignedGroup } = usePermission();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -72,6 +72,10 @@ export default function OthersPage() {
   const pendingCount = pendingList.length;
   const showBadgeSkeleton = useDelayedLoading(pendingLoading, 300);
 
+  /* Admin ber-kelompok: menu granular diganti satu hub "Kelompok Saya". */
+  const isHubUser =
+    (role === "ADMIN" || role === "PENGAWAS") && !!assignedGroup;
+
   const menu = ([
     {
       key: "theme",
@@ -84,12 +88,23 @@ export default function OthersPage() {
     },
 
     {
+      key: "kelompok-saya",
+      label: "Kelompok Saya",
+      description: "Anggota, pendaftar & petugas kelompok ini",
+      Icon: Building2,
+      to: "/kelompok-saya",
+      show: isHubUser,
+      group: "jamaah",
+      badge: pendingCount > 0 ? pendingCount : undefined,
+      badgeLoading: pendingLoading,
+    },
+    {
       key: "pendaftar",
       label: "Pendaftar",
       description: "Verifikasi pendaftar baru",
       Icon: ClipboardList,
       to: "/lainnya/pendaftar",
-      show: isAdminLike,
+      show: isAdminLike && !isHubUser,
       group: "jamaah",
       badge: pendingCount > 0 ? pendingCount : undefined,
       badgeLoading: pendingLoading,
@@ -100,7 +115,7 @@ export default function OthersPage() {
       description: "User minta menjadi member",
       Icon: UserPlus,
       to: "/lainnya/permintaan-member",
-      show: isAdminLike,
+      show: isAdminLike && !isHubUser,
       group: "jamaah",
     },
     {
@@ -109,7 +124,7 @@ export default function OthersPage() {
       description: "Kelola kelompok pengajian",
       Icon: Building2,
       to: "/lainnya/kelompok",
-      show: isAdminLike,
+      show: isAdminLike && !isHubUser,
       group: "jamaah",
     },
     {
@@ -155,7 +170,9 @@ export default function OthersPage() {
       description: "Kelola petugas sholat Jumat",
       Icon: Mosque,
       to: "/lainnya/petugas-jumat",
-      show: isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS",
+      show:
+        (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
+        !isHubUser,
       group: "jadwal",
     },
 

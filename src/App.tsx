@@ -34,6 +34,7 @@ const AttendancePage = lazy(() => import("./pages/AttendancePage"));
 const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const OthersPage = lazy(() => import("./pages/OthersPage"));
 const GroupsPage = lazy(() => import("./pages/GroupsPage"));
+const GroupHubPage = lazy(() => import("./pages/GroupHubPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const AiChatPage = lazy(() => import("./pages/AiChatPage"));
@@ -370,6 +371,14 @@ function AppRoutes() {
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
                 <MembersListPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/kelompok-saya"
+            element={
+              <RoleRoute allowed={["ADMIN", "PENGAWAS"]}>
+                <GroupHubPage />
               </RoleRoute>
             }
           />
