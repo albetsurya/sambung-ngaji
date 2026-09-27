@@ -17,9 +17,6 @@ import { Button, ErrorState } from "../components/common";
 import { fetchSurahList, type SurahSummary } from "../data/quran";
 import { useQuranBookmark } from "../hooks/useQuranBookmark";
 
-/* -------------------------------------------------------------------------- */
-/*                              Helper                                        */
-/* -------------------------------------------------------------------------- */
 
 function toArabicNumber(n: number): string {
   const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
@@ -29,9 +26,6 @@ function toArabicNumber(n: number): string {
     .join("");
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main                                          */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberQuranPage() {
   const navigate = useNavigate();
@@ -49,7 +43,7 @@ export default function MemberQuranPage() {
   } = useQuery({
     queryKey: ["quran", "surah-list"],
     queryFn: fetchSurahList,
-    staleTime: 24 * 60 * 60 * 1000, // 24 jam — data tidak berubah
+    staleTime: 24 * 60 * 60 * 1000,
     gcTime: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -150,7 +144,7 @@ export default function MemberQuranPage() {
 
         {!isLoading && !error && (
           <>
-            {/* Card "Terakhir Dibaca" */}
+            
             {lastRead && !hasSearch && (
               <button
                 onClick={() =>
@@ -208,9 +202,6 @@ export default function MemberQuranPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              SurahRow                                      */
-/* -------------------------------------------------------------------------- */
 
 function SurahRow({
   surah,
@@ -277,9 +268,6 @@ function SurahRow({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Skeleton                                      */
-/* -------------------------------------------------------------------------- */
 
 function SurahListSkeleton({ rows = 10 }: { rows?: number }) {
   return (

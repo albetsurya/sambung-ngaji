@@ -2,9 +2,6 @@ import type { CSSProperties } from "react";
 import { GroupedList } from "./Surface";
 import { GridCols } from "../../pages/MembersListPage";
 
-/* -------------------------------------------------------------------------- */
-/*                              Skeleton Primitive                            */
-/* -------------------------------------------------------------------------- */
 
 interface SkeletonProps {
   className?: string;
@@ -41,9 +38,6 @@ export function Skeleton({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              List Skeleton                                 */
-/* -------------------------------------------------------------------------- */
 
 export function DashboardSkeleton() {
   return (
@@ -69,16 +63,7 @@ export function DashboardSkeleton() {
     </>
   );
 }
-/**
- * Skeleton untuk baris jamaah — mirror PERSIS layout Card + Avatar + text.
- * Tinggi text disesuaikan dengan line-height Tailwind:
- * - text-sm  → 20px
- * - text-xs  → 16px
- */
 
-/**
- * Skeleton untuk list jamaah penuh (banyak baris).
- */
 export function JamaahCardSkeleton() {
   return (
     <div className="px-4">
@@ -104,9 +89,6 @@ export function JamaahListSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                 Skeletons                                  */
-/* -------------------------------------------------------------------------- */
 
 export function JamaahRowSkeleton({ rows = 11 }: { rows?: number }) {
   return (
@@ -161,10 +143,6 @@ export function JamaahGridSkeleton({
   );
 }
 
-/**
- * Skeleton untuk GroupedList — mirror ListRow.
- * ListRow punya min-h-[52px] + px-4 py-3 + gap-3.
- */
 export function GroupedListSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div className="mx-4 my-4 bg-surface-card rounded-2xl border border-surface-border overflow-hidden shadow-sm">
@@ -186,17 +164,7 @@ export function GroupedListSkeleton({ rows = 4 }: { rows?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Dashboard Skeleton                            */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk HeroStatCard — mirror PERSIS layout asli:
- * - p-5
- * - baris atas: label text-xs (16px) + icon box w-9 h-9 (36px)
- * - value: text-[34px] (line-height ~36px) dengan mt-2
- * - footer: text-xs (16px) dengan mt-3
- */
 export function HeroCardSkeleton() {
   return (
     <div className="rounded-2xl border border-surface-border shadow-sm p-5 bg-surface-card">
@@ -214,12 +182,6 @@ export function HeroCardSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk StatTile — mirror PERSIS:
- * - p-4
- * - baris atas: label text-xs (16px) + icon w-7 h-7 (28px) dengan mb-3
- * - value: text-2xl (~32px)
- */
 export function StatTileSkeleton() {
   return (
     <div className="flex-1 bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4">
@@ -232,11 +194,6 @@ export function StatTileSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk section header — mirror:
- * - judul text-base (~24px)
- * - tombol "Lihat semua" text-xs (~16px)
- */
 export function SectionHeaderSkeleton() {
   return (
     <div className="flex items-center justify-between px-0.5 pt-1">
@@ -246,12 +203,6 @@ export function SectionHeaderSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk kartu distribusi kategori — mirror:
- * - Card p-4
- * - Header: label + total
- * - Grid 2 kolom × N baris, setiap baris bg-surface-card2 rounded-xl
- */
 export function CategoryDistributionSkeleton() {
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4">
@@ -274,13 +225,6 @@ export function CategoryDistributionSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk MeetingCard — mirror:
- * - Card p-4 flex items-center gap-3
- * - Icon box w-12 h-12 rounded-2xl
- * - Badge + teks + subtext
- * - Chevron di kanan
- */
 export function MeetingCardSkeleton() {
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4 flex items-center gap-3">
@@ -295,13 +239,6 @@ export function MeetingCardSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk AttentionCard — mirror:
- * - Card p-4 flex items-center gap-3
- * - Avatar circle 44px
- * - Nama + reason
- * - Chevron di kanan
- */
 export function AttentionCardSkeleton() {
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border shadow-sm p-4 flex items-center gap-3">
@@ -315,13 +252,7 @@ export function AttentionCardSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Announcement Skeleton                             */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk baris pengumuman — mirror ListRow dengan icon + 2 baris + badge.
- */
 export function AnnouncementRowSkeleton() {
   return (
     <div className="flex items-center gap-3 min-h-[60px] px-4 py-3">
@@ -340,9 +271,6 @@ export function AnnouncementRowSkeleton() {
   );
 }
 
-/**
- * Skeleton untuk list pengumuman penuh.
- */
 export function AnnouncementListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="py-3">
@@ -360,21 +288,11 @@ export function AnnouncementListSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Member Detail Skeleton                            */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk MemberSelfPage — mirror layout asli:
- * - Profile header (avatar 64px + nama + badge + kelompok)
- * - Tab bar (3 tab: Profil, Absensi, Pembinaan)
- * - Chip status + 2 section Biodata (ikon + label/value stacked)
- * - Section "Jadwal Pengajian Mendatang" dengan 2 card jadwal
- */
 export function MemberSelfSkeleton() {
   return (
     <>
-      {/* Profile header */}
+      
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Skeleton variant="circle" width={64} height={64} />
         <div className="flex-1 min-w-0 space-y-2">
@@ -386,7 +304,7 @@ export function MemberSelfSkeleton() {
         </div>
       </div>
 
-      {/* Tab bar */}
+      
       <div className="px-3 flex gap-1 overflow-x-auto no-scrollbar border-b border-surface-border pb-2">
         <div className="flex gap-1 overflow-hidden">
           {[80, 92, 106].map((w, i) => (
@@ -395,15 +313,15 @@ export function MemberSelfSkeleton() {
         </div>
       </div>
 
-      {/* Content — mirror tab "Profil" (Biodata sectioned) */}
+      
       <div className="px-4 py-4 space-y-4">
-        {/* Chip status */}
+        
         <div className="flex gap-2">
           <Skeleton width={92} height={24} className="rounded-full" />
           <Skeleton width={76} height={24} className="rounded-full" />
         </div>
 
-        {/* 2 section Biodata: label + card ikon stacked */}
+        
         {[4, 3].map((rowCount, s) => (
           <div key={s}>
             <div className="px-4 mb-2 mt-1">
@@ -430,13 +348,13 @@ export function MemberSelfSkeleton() {
           </div>
         ))}
 
-        {/* Section Jadwal Pengajian Mendatang */}
+        
         <div className="space-y-2">
           <div className="px-0.5">
             <Skeleton width={200} height={14} />
           </div>
 
-          {/* Card jadwal */}
+          
           {Array.from({ length: 2 }).map((_, i) => (
             <div
               key={i}
@@ -456,31 +374,23 @@ export function MemberSelfSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Member Form Skeleton                              */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk MemberFormPage — mirror:
- * - Photo picker 112px
- * - 3 section card dengan header + body
- */
 export function MemberFormSkeleton() {
   return (
     <div className="px-4 py-4 space-y-4">
-      {/* Photo */}
+      
       <div className="flex flex-col items-center">
         <Skeleton variant="rect" width={112} height={112} />
         <Skeleton width={128} height={24} className="mt-3 rounded-full" />
       </div>
 
-      {/* Sections */}
+      
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
           className="bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden"
         >
-          {/* Section header */}
+          
           <div className="px-4 py-3 border-b border-surface-border bg-surface-card2/40 flex items-center gap-3">
             <Skeleton variant="rect" width={36} height={36} />
             <div className="space-y-1.5 flex-1">
@@ -489,7 +399,7 @@ export function MemberFormSkeleton() {
             </div>
           </div>
 
-          {/* Section body */}
+          
           <div className="p-4 space-y-4">
             {Array.from({ length: i === 0 ? 3 : 2 }).map((_, j) => (
               <div key={j} className="space-y-2">
@@ -504,13 +414,7 @@ export function MemberFormSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Card Skeleton                                 */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk Card generik — dapat dikombinasikan dengan berbagai varian konten.
- */
 export function CardSkeleton({
   children,
   className = "",
@@ -526,16 +430,7 @@ export function CardSkeleton({
     </div>
   );
 }
-/* -------------------------------------------------------------------------- */
-/*                          Attendance Skeleton                               */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk CompactAttendanceRow — mirror:
- * - min-h-[56px] px-4
- * - Nama + kelompok
- * - 4 tombol status w-10 h-10
- */
 export function AttendanceRowSkeleton({
   divider = true,
 }: {
@@ -560,9 +455,6 @@ export function AttendanceRowSkeleton({
   );
 }
 
-/**
- * Skeleton untuk list absensi penuh.
- */
 export function AttendanceListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="bg-surface-card">
@@ -638,19 +530,19 @@ export function SettingsSkeleton() {
   return (
     <GroupedList>
       <div className="p-4 space-y-4">
-        {/* Judul */}
+        
         <div className="space-y-2">
           <Skeleton width={192} height={20} />
           <Skeleton width="100%" height={16} />
         </div>
 
-        {/* Input */}
+        
         <div className="space-y-2">
           <Skeleton width={80} height={16} />
           <Skeleton width="100%" height={48} />
         </div>
 
-        {/* Tombol */}
+        
         <Skeleton width="100%" height={48} />
       </div>
     </GroupedList>
@@ -667,14 +559,14 @@ export function UsersSkeleton({ rows = 4 }: { rows?: number }) {
             i !== rows - 1 ? "ios-list-divider" : ""
           }`}
         >
-          {/* Icon skeleton */}
+          
           <Skeleton variant="rect" width={36} height={36} />
-          {/* Text skeleton */}
+          
           <div className="flex-1 min-w-0 space-y-2">
             <Skeleton width="40%" height={16} />
             <Skeleton width="25%" height={12} />
           </div>
-          {/* Badge skeleton */}
+          
           <Skeleton
             variant="rect"
             width={80}
@@ -723,14 +615,7 @@ export function PendingMembersSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Calendar Skeleton                             */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk kalender bulanan (FullCalendar dayGrid + MemberCalendarView).
- * Mirror: toolbar (prev/title/next) + header 7 hari + grid 5x7 sel tanggal.
- */
 export function CalendarSkeleton() {
   return (
     <div className="rounded-2xl border border-surface-border bg-surface-card p-4 space-y-3">
@@ -758,14 +643,7 @@ export function CalendarSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Mushaf Skeleton                               */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk halaman mushaf — mirror MushafPageView:
- * frame max-w-2xl + baris header/footer + ~14 baris teks ayat.
- */
 const MUSHAF_LINE_WIDTHS = [
   "100%", "100%", "96%", "100%", "88%", "100%", "100%", "94%", "100%",
   "90%", "100%", "100%", "72%", "100%",
@@ -796,15 +674,7 @@ export function MushafPageSkeleton() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Recap Table Skeleton                          */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Skeleton untuk tabel rekap bulanan — mirror MemberAttendanceRecapPage:
- * toolbar (ringkasan + 2 tombol) + header (No/Nama/tanggal/%)
- * + 8 baris dengan sel No/Nama frozen.
- */
 export function RecapTableSkeleton({ rows = 8 }: { rows?: number }) {
   return (
     <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">

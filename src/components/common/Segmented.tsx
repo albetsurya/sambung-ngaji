@@ -6,11 +6,6 @@ export interface SegmentedOption<T extends string> {
   icon?: ReactNode;
 }
 
-/**
- * Segmented control konsisten aplikasi:
- * container kartu + opsi pill, opsi aktif accent fill.
- * Gantikan semua segmented/filter tab manual dengan ini.
- */
 export function Segmented<T extends string>({
   options,
   value,

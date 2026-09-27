@@ -1,10 +1,6 @@
 import type { Member } from "../types";
 import { CATEGORY_LABEL } from "./format";
 
-/**
- * Convert array of objects to CSV string.
- * Handle quote escaping & comma.
- */
 function toCsvValue(value: unknown): string {
   if (value === null || value === undefined) return "";
   var str = String(value);

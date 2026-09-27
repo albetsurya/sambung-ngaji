@@ -8,9 +8,6 @@ import {
   Loader2,
 } from "../components/common/FontAwesomeIcons";
 
-/* -------------------------------------------------------------------------- */
-/*                              Lazy Tabs                                     */
-/* -------------------------------------------------------------------------- */
 
 const CalendarTab = lazy(() =>
   import("../components/jadwal/CalendarTab").then((m) => ({
@@ -61,7 +58,7 @@ export default function JadwalPage() {
         backLabel="Kembali"
       />
 
-      {/* Sticky tab bar */}
+      
       <div
         className="sticky sticky-below-header z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
       >
@@ -87,7 +84,7 @@ export default function JadwalPage() {
         </div>
       </div>
 
-      {/* Tab content — lazy */}
+      
       <Suspense fallback={<TabFallback />}>
         <div key={tab}>
           {tab === "kalender" && <CalendarTab />}

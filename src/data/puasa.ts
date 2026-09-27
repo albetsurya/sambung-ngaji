@@ -1,6 +1,3 @@
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export interface PuasaInfo {
   key: string;
@@ -23,13 +20,9 @@ export interface PuasaDay {
   iso: string;
   hijri: HijriDate | null;
   puasaList: PuasaInfo[];
-  /** 0 = hari ini, 1 = besok, dst */
   dayOffset: number;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Puasa Definitions                             */
-/* -------------------------------------------------------------------------- */
 
 export const PUASA_SENIN: PuasaInfo = {
   key: "senin",
@@ -111,9 +104,6 @@ export const PUASA_SYAWAL: PuasaInfo = {
   tone: "success",
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              Hijri Helper                                  */
-/* -------------------------------------------------------------------------- */
 
 let hijriFmtCache: Intl.DateTimeFormat | null = null;
 let hijriMonthCache: Intl.DateTimeFormat | null = null;
@@ -135,10 +125,6 @@ function checkHijriSupported(): boolean {
   return hijriSupported;
 }
 
-/**
- * Konversi tanggal Masehi → Hijriah (Umm al-Qura).
- * Return null kalau browser tidak support.
- */
 export function toHijri(date: Date): HijriDate | null {
   if (!checkHijriSupported()) return null;
 
@@ -175,47 +161,36 @@ export function toHijri(date: Date): HijriDate | null {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Schedule Generator                            */
-/* -------------------------------------------------------------------------- */
 
-/** Cek puasa yang jatuh pada tanggal tertentu */
 export function detectPuasa(date: Date, hijri: HijriDate | null): PuasaInfo[] {
   const result: PuasaInfo[] = [];
-  const dayOfWeek = date.getDay(); // 0=Minggu, 1=Senin, ..., 4=Kamis
+  const dayOfWeek = date.getDay();
 
-  // Senin / Kamis
   if (dayOfWeek === 1) result.push(PUASA_SENIN);
   if (dayOfWeek === 4) result.push(PUASA_KAMIS);
 
   if (hijri) {
-    // Ayyamul Bidh: 13, 14, 15 (kecuali kalau bertepatan dengan hari tasyrik 11-13 Dzulhijjah)
     const isTasyrik =
       hijri.month === 12 && hijri.day >= 11 && hijri.day <= 13;
     if (!isTasyrik && (hijri.day === 13 || hijri.day === 14 || hijri.day === 15)) {
       result.push(PUASA_AYYAMUL_BIDH);
     }
 
-    // Muharram: Tasu'a (9) & Asyura (10)
     if (hijri.month === 1) {
       if (hijri.day === 9) result.push(PUASA_TASUA);
       if (hijri.day === 10) result.push(PUASA_ASYURA);
     }
 
-    // Dzulhijjah: Tarwiyah (8) & Arafah (9)
     if (hijri.month === 12) {
       if (hijri.day === 8) result.push(PUASA_TARWIYAH);
       if (hijri.day === 9) result.push(PUASA_ARAFAH);
     }
 
-    // Syawal: hari ke-2 sampai 7 (6 hari setelah Idul Fitri, sebelum tanggal 8 biasanya)
-    // Idul Fitri = 1 Syawal. Puasa Syawal 6 hari di luar hari raya.
     if (hijri.month === 10 && hijri.day >= 2 && hijri.day <= 7) {
       result.push(PUASA_SYAWAL);
     }
   }
 
-  // Dedup (kalau Ayyamul Bidh jatuh di Senin)
   const seen = new Set<string>();
   return result.filter((p) => {
     if (seen.has(p.key)) return false;
@@ -258,9 +233,6 @@ export function getPuasaSchedule(
   return out;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Format Helpers                                */
-/* -------------------------------------------------------------------------- */
 
 const HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const BULAN = [

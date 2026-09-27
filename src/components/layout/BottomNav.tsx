@@ -14,9 +14,6 @@ import {
   Calendar,
 } from "../common/FontAwesomeIcons";
 
-/* -------------------------------------------------------------------------- */
-/*                              Menu Definitions                              */
-/* -------------------------------------------------------------------------- */
 
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
@@ -39,22 +36,16 @@ const MEMBER_ITEMS = [
   { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export function BottomNav() {
   const location = useLocation();
   const { isDevelopment } = useEnvironment();
   const { canSeeNav } = usePermission();
 
-  // Konteks member: path mulai "/member". Admin yang masuk mode jamaah
-  // (akses /member/*) juga lihat nav versi member.
   const isMemberContext = location.pathname.startsWith("/member");
 
   const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
 
-  // Admin: filter berdasarkan permission. Member: semua item tampil.
   const visible = isMemberContext
     ? items
     : items.filter((i) => canSeeNav(i.key));

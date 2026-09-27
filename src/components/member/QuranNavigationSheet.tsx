@@ -62,15 +62,15 @@ export function QuranNavigationSheet({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md md:max-w-lg h-[85vh] md:h-auto md:max-h-[80vh] rounded-t-3xl md:rounded-3xl bg-surface-bg border-t md:border border-surface-border flex flex-col animate-[slideUp_0.2s_ease-out]"
+        className="w-full max-w-md md:max-w-lg h-[85vh] md:h-auto md:max-h-[80vh] rounded-t-3xl md:rounded-3xl bg-surface-bg surface-shift border-t md:border border-surface-border flex flex-col anim-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Handle */}
+        
         <div className="pt-3 pb-2 flex justify-center flex-shrink-0">
           <div className="w-10 h-1 rounded-full bg-surface-card2" />
         </div>
 
-        {/* Title */}
+        
         <div className="px-4 pb-3 flex items-center justify-between flex-shrink-0">
           <p className="text-ios-body font-semibold text-surface-text">
             Lompat ke...
@@ -84,7 +84,7 @@ export function QuranNavigationSheet({
           </button>
         </div>
 
-        {/* Tab switcher */}
+        
         <div className="px-4 pb-3 flex-shrink-0">
           <Segmented
             ariaLabel="Navigasi"
@@ -98,7 +98,7 @@ export function QuranNavigationSheet({
           />
         </div>
 
-        {/* Search */}
+        
         <div className="px-4 pb-3 flex-shrink-0">
           <div className="relative">
             <Search
@@ -127,7 +127,7 @@ export function QuranNavigationSheet({
           </div>
         </div>
 
-        {/* List */}
+        
         <div className="flex-1 overflow-y-auto px-4 pb-safe">
           {tab === "surah" && (
             <div className="space-y-1.5">
@@ -247,5 +247,4 @@ function SurahRow({
   );
 }
 
-/* Suppress unused */
 void Bookmark;

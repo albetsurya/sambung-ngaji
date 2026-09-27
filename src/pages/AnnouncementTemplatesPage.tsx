@@ -258,7 +258,7 @@ export default function AnnouncementTemplatesPage() {
         )}
       </div>
 
-      {/* Editor Sheet */}
+      
       <TemplateEditorSheet
         open={editorOpen}
         editing={editing}
@@ -278,13 +278,13 @@ export default function AnnouncementTemplatesPage() {
         }}
       />
 
-      {/* Preview Modal */}
+      
       <TemplatePreviewModal
         template={preview}
         onClose={() => setPreview(null)}
       />
 
-      {/* Delete Confirm */}
+      
       <ConfirmDialog
         open={!!deleteTarget}
         title="Nonaktifkan template?"
@@ -307,9 +307,6 @@ export default function AnnouncementTemplatesPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          EDITOR SHEET                                      */
-/* -------------------------------------------------------------------------- */
 
 function TemplateEditorSheet({
   open,
@@ -330,7 +327,6 @@ function TemplateEditorSheet({
   const [isi, setIsi] = useState("");
   const [active, setActive] = useState(true);
 
-  // Sinkronisasi saat sheet dibuka
   useMemo(() => {
     if (!open) return;
     if (editing) {
@@ -411,7 +407,7 @@ function TemplateEditorSheet({
         rows={8}
       />
 
-      {/* Variable chips */}
+      
       <div className="mb-3">
         <p className="text-ios-caption text-surface-muted mb-2 px-1">
           Variabel tersedia (tap untuk sisipkan):
@@ -430,7 +426,7 @@ function TemplateEditorSheet({
         </div>
       </div>
 
-      {/* Status toggle */}
+      
       <div className="mb-4">
         <button
           type="button"
@@ -485,9 +481,6 @@ function TemplateEditorSheet({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          PREVIEW MODAL                                     */
-/* -------------------------------------------------------------------------- */
 
 function TemplatePreviewModal({
   template,

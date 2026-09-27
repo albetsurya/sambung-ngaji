@@ -52,7 +52,6 @@ export default function MemberQuranMushafPage() {
       const v = Number(localStorage.getItem("mushaf-scale"));
       if (v >= 0.8 && v <= 1.4) return v;
     } catch {
-      // ignore
     }
     return 1;
   });
@@ -63,14 +62,12 @@ export default function MemberQuranMushafPage() {
   const swipeRef = useRef({ x: 0, y: 0, active: false });
   const hideTimer = useRef<number | null>(null);
 
-  // Surah list (untuk render judul surah)
   const { data: surahList = [] } = useQuery({
     queryKey: ["quran", "surah-list"],
     queryFn: fetchSurahList,
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  // Fetch halaman aktif
   const {
     data: pageData,
     isLoading,
@@ -83,7 +80,6 @@ export default function MemberQuranMushafPage() {
     gcTime: 60 * 60 * 1000,
   });
 
-  // Preload tetangga
   useEffect(() => {
     if (!pageData) return;
     const neighbors = [currentPage - 2, currentPage - 1, currentPage + 1, currentPage + 2];
@@ -101,21 +97,17 @@ export default function MemberQuranMushafPage() {
     return () => clearTimeout(t);
   }, [currentPage, pageData, queryClient]);
 
-  // Auto-save bookmark
   useEffect(() => {
     if (pageData) setLastPage(currentPage);
   }, [currentPage, pageData, setLastPage]);
 
-  // Persist scale
   useEffect(() => {
     try {
       localStorage.setItem("mushaf-scale", String(scale));
     } catch {
-      // ignore
     }
   }, [scale]);
 
-  // Auto-hide controls setelah 3 detik idle
   useEffect(() => {
     if (!controlsVisible) return;
     if (hideTimer.current) window.clearTimeout(hideTimer.current);
@@ -141,7 +133,6 @@ export default function MemberQuranMushafPage() {
     goToPage(currentPage - 1);
   }
 
-  // Gesture swipe
   function onPointerDown(x: number, y: number) {
     swipeRef.current = { x, y, active: true };
   }
@@ -152,15 +143,12 @@ export default function MemberQuranMushafPage() {
     const dy = y - swipeRef.current.y;
     swipeRef.current.active = false;
 
-    // Harus swipe horizontal (dx lebih besar dari dy), min 60px
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
 
-    // RTL: swipe dari kanan ke kiri (dx negatif) = next page
     if (dx < 0) nextPage();
     else prevPage();
   }
 
-  // Keyboard
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if (e.key === "ArrowLeft") nextPage();
@@ -226,7 +214,7 @@ export default function MemberQuranMushafPage() {
         }
       />
 
-      {/* Reader area */}
+      
       <div
         className="relative flex-1 overflow-hidden select-none"
         style={{ height: "calc(100vh - 52px - var(--safe-top) - 60px)" }}
@@ -248,7 +236,7 @@ export default function MemberQuranMushafPage() {
         {!isLoading && !error && pageData && (
           <div
             key={currentPage}
-            className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl animate-[fadeIn_0.15s_ease-out] pb-[140px]"
+            className="h-full overflow-y-auto bg-surface-card mx-auto max-w-2xl anim-fade-fast pb-[140px]"
           >
             <MushafPageView
               page={pageData}
@@ -259,7 +247,7 @@ export default function MemberQuranMushafPage() {
           </div>
         )}
 
-        {/* Floating page indicator (auto-hide) */}
+        
         <div
           className={
             "absolute left-1/2 -translate-x-1/2 bottom-3 pointer-events-none transition-opacity duration-300 " +
@@ -272,7 +260,7 @@ export default function MemberQuranMushafPage() {
         </div>
       </div>
 
-      {/* Bottom controls */}
+      
       <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe bg-surface-bg/95 backdrop-blur border-t border-surface-border">
         <div className="app-shell px-3 py-2.5 flex items-center gap-2">
           <Button
@@ -324,7 +312,7 @@ export default function MemberQuranMushafPage() {
           </Button>
         </div>
 
-        {/* Resume last page hint */}
+        
         {lastPage && lastPage !== currentPage && (
           <div className="app-shell px-3 pb-2">
             <Button
@@ -355,5 +343,4 @@ export default function MemberQuranMushafPage() {
   );
 }
 
-/* Suppress unused */
 void ChevronDown;

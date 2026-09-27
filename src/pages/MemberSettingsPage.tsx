@@ -25,6 +25,7 @@ import {
   ChangePasswordSheet,
   ChangeUsernameSheet,
   BackupDataSheet,
+  Segmented,
 } from "../components/common";
 import {
   ThemePickerRow,
@@ -32,13 +33,13 @@ import {
 } from "../components/common/ThemePickerSheet";
 import { AboutAppModal } from "../components/member/AboutAppModal";
 import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme, type ThemeMode } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";
 
 export default function MemberSettingsPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, mode, setMode } = useTheme();
   const { isMember } = usePermission();
 
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
@@ -61,7 +62,7 @@ export default function MemberSettingsPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* Card Profil Ringkas */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
           <div className="flex items-center gap-3">
             <Avatar
@@ -90,7 +91,7 @@ export default function MemberSettingsPage() {
           </div>
         </div>
 
-        {/* Akun */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Akun
@@ -130,46 +131,35 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Tampilan */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Tampilan
           </p>
           <GroupedList>
-            <ListRow
-              onClick={toggleTheme}
-              insetDivider={true}
-              leading={
-                <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
-                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                </span>
-              }
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-ios-body font-medium text-surface-text truncate">
-                    Mode Tampilan
-                  </p>
-                  <p className="text-ios-caption text-surface-muted truncate">
-                    {theme === "dark" ? "Mode gelap aktif" : "Mode terang aktif"}
-                  </p>
-                </div>
-                <span
-                  className={
-                    "relative inline-flex items-center w-11 h-6 rounded-full border border-surface-border transition-colors duration-300 shrink-0 " +
-                    (theme === "dark" ? "bg-accent" : "bg-surface-card2")
-                  }
-                  aria-hidden="true"
-                >
-                  <span
-                    className={
-                      "toggle-knob absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 " +
-                      (theme === "dark" ? "translate-x-5" : "translate-x-0")
-                    }
-                  />
-                </span>
-              </div>
-            </ListRow>
+            <div className="px-3 py-3">
+              <Segmented<ThemeMode>
+                options={[
+                  { value: "light", label: "Terang", icon: <Sun size={14} /> },
+                  { value: "dark", label: "Gelap", icon: <Moon size={14} /> },
+                  {
+                    value: "system",
+                    label: "Sistem",
+                    icon: <Palette size={14} />,
+                  },
+                ]}
+                value={mode}
+                onChange={setMode}
+                ariaLabel="Mode tampilan"
+              />
+              <p className="text-ios-caption text-surface-muted mt-2 px-1">
+                {mode === "system"
+                  ? `Mengikuti sistem (${theme === "dark" ? "gelap" : "terang"} saat ini).`
+                  : mode === "dark"
+                    ? "Mode gelap aktif."
+                    : "Mode terang aktif."}
+              </p>
+            </div>
 
             <ListRow
               onClick={() => setThemePickerOpen(true)}
@@ -193,7 +183,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Data */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Data
@@ -217,7 +207,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Info */}
+        
         <section>
           <p className="px-1 mb-2.5 text-ios-footnote font-semibold text-surface-text">
             Info
@@ -273,7 +263,7 @@ export default function MemberSettingsPage() {
           </GroupedList>
         </section>
 
-        {/* Logout */}
+        
         <GroupedList>
           <ListRow
             onClick={() => setConfirmLogoutOpen(true)}
@@ -294,7 +284,7 @@ export default function MemberSettingsPage() {
         </div>
       </div>
 
-      {/* Sheets & Modals */}
+      
       <ChangePasswordSheet
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}

@@ -2,17 +2,6 @@ import { del } from "idb-keyval";
 import { queryClient } from "./queryClient";
 import { createIDBPersister } from "./queryPersist";
 
-/**
- * Flush data lokal supaya aplikasi kembali fresh, tanpa logout.
- *
- * Yang dibersihkan:
- * - React Query cache (memory) + persist IDB ("pengajian-query-cache")
- * - localStorage scoped user ("sng:{userId}:*" / "sng:anon:*")
- * - sessionStorage
- * - Cache Storage milik Workbox (JS/CSS basi), SW registration dipertahankan
- *
- * Yang dipertahankan: cookie token login + tema ("pengajian_theme/preset").
- */
 export interface FlushResult {
   queryCleared: boolean;
   localKeys: number;
@@ -28,12 +17,10 @@ export async function flushAppData(
     cachesCleared: 0,
   };
 
-  // 1. React Query memory + IDB persist.
   try {
     queryClient.clear();
     result.queryCleared = true;
   } catch {
-    // ignore
   }
   try {
     await createIDBPersister().removeClient();
@@ -41,11 +28,9 @@ export async function flushAppData(
     try {
       await del("pengajian-query-cache");
     } catch {
-      // ignore
     }
   }
 
-  // 2. localStorage scoped user ini + anon (login & tema tidak ikut).
   try {
     const prefixes = ["sng:" + (userId || "anon") + ":"];
     if ((userId || "anon") !== "anon") prefixes.push("sng:anon:");
@@ -57,17 +42,13 @@ export async function flushAppData(
     victims.forEach((k) => localStorage.removeItem(k));
     result.localKeys = victims.length;
   } catch {
-    // ignore (private mode)
   }
 
-  // 3. sessionStorage.
   try {
     sessionStorage.clear();
   } catch {
-    // ignore
   }
 
-  // 4. Cache Storage (Workbox precache/runtime). SW tetap terdaftar.
   try {
     if ("caches" in window) {
       const names = await caches.keys();
@@ -77,19 +58,16 @@ export async function flushAppData(
             await caches.delete(n);
             result.cachesCleared++;
           } catch {
-            // ignore per-cache
           }
         }),
       );
     }
   } catch {
-    // ignore
   }
 
   return result;
 }
 
-/** Flush lalu reload supaya semua hook baca state fresh. */
 export async function flushAndReload(
   userId?: string | null,
   delayMs = 600,

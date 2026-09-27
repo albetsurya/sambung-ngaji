@@ -1,18 +1,10 @@
 import { scopedKey } from "./scopedStorage";
 
-/* -------------------------------------------------------------------------- */
-/*                              Constants                                     */
-/* -------------------------------------------------------------------------- */
 
 const APP_NAME = "sambung-ngaji";
 const BACKUP_VERSION = 1;
-const MAX_IMPORT_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_IMPORT_SIZE = 5 * 1024 * 1024;
 
-/**
- * Whitelist pattern backup.
- * `exact` → match key tepat.
- * `prefix` → match key yang diawali prefix (untuk key per-hari).
- */
 const BACKUP_PATTERNS: { type: "exact" | "prefix"; value: string; label: string }[] = [
   { type: "exact", value: "tahfidz-v1", label: "Hafalan Tahfidz" },
   { type: "exact", value: "sholat-journal-v1", label: "Jurnal Sholat" },
@@ -24,9 +16,6 @@ const BACKUP_PATTERNS: { type: "exact" | "prefix"; value: string; label: string 
   { type: "prefix", value: "dzikir-counts-", label: "Dzikir Counter" },
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export interface BackupPayload {
   app: typeof APP_NAME;
@@ -34,7 +23,6 @@ export interface BackupPayload {
   exported_at: string;
   user_id: string;
   username: string;
-  /** Map: baseKey (tanpa prefix sng:{userId}:) → value (string JSON) */
   keys: Record<string, string>;
 }
 
@@ -54,9 +42,6 @@ export interface ImportPreview {
   originalUsername: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 function matchesPattern(baseKey: string): boolean {
   return BACKUP_PATTERNS.some((p) =>
@@ -70,15 +55,12 @@ function formatSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(2) + " MB";
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Collect                                       */
-/* -------------------------------------------------------------------------- */
 
 export function collectBackup(
   userId: string,
   username: string,
 ): { payload: BackupPayload; stats: BackupStats } {
-  const prefix = scopedKey("", userId); // "sng:{userId}:"
+  const prefix = scopedKey("", userId);
   const keys: Record<string, string> = {};
   let sizeBytes = 0;
 
@@ -97,7 +79,6 @@ export function collectBackup(
       sizeBytes += fullKey.length + value.length;
     }
   } catch {
-    // ignore quota
   }
 
   const payload: BackupPayload = {
@@ -117,9 +98,6 @@ export function collectBackup(
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Download                                      */
-/* -------------------------------------------------------------------------- */
 
 export function downloadBackup(
   payload: BackupPayload,
@@ -142,9 +120,6 @@ export function downloadBackup(
   URL.revokeObjectURL(url);
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Parse + Validate                              */
-/* -------------------------------------------------------------------------- */
 
 export function parseBackupFile(
   text: string,
@@ -205,7 +180,6 @@ export function parseBackupFile(
   const originalUsername =
     typeof obj.username === "string" ? obj.username : "(tidak diketahui)";
 
-  // Tolak jika backup milik user lain
   if (originalUserId && originalUserId !== currentUserId) {
     throw new Error(
       "Backup ini milik @" +
@@ -235,9 +209,6 @@ export function parseBackupFile(
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Restore                                       */
-/* -------------------------------------------------------------------------- */
 
 export interface RestoreResult {
   restored: number;

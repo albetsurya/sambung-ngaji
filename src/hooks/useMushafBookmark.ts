@@ -11,7 +11,6 @@ function load(key: string): number | null {
     const n = Number(raw);
     if (Number.isInteger(n) && n >= 1 && n <= 604) return n;
   } catch {
-    // ignore
   }
   return null;
 }
@@ -25,7 +24,6 @@ export function useMushafBookmark() {
     load(storageKey),
   );
 
-  // Reload saat user berubah + migrasi key lama
   useEffect(() => {
     if (userId) {
       migrateKey(BASE_KEY, storageKey);
@@ -33,7 +31,6 @@ export function useMushafBookmark() {
     setLastPageState(load(storageKey));
   }, [storageKey, userId]);
 
-  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
       if (e.key === storageKey) setLastPageState(load(storageKey));
@@ -48,7 +45,6 @@ export function useMushafBookmark() {
       try {
         localStorage.setItem(storageKey, String(page));
       } catch {
-        // ignore
       }
     },
     [storageKey],
@@ -59,7 +55,6 @@ export function useMushafBookmark() {
     try {
       localStorage.removeItem(storageKey);
     } catch {
-      // ignore
     }
   }, [storageKey]);
 

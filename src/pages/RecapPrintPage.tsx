@@ -34,12 +34,6 @@ import {
   type RecapMatrixRow,
 } from "../lib/monthlyAttendanceExport";
 
-/**
- * Halaman pratinjau cetakan rekap absensi.
- * Tabel di sini = isi file PDF/Excel yang akan diunduh
- * (kolom dan angka yang sama, dari data yang sama).
- * Deep-linkable: ?bulan=YYYY-MM&kategori=&gender=
- */
 export default function RecapPrintPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -50,8 +44,6 @@ export default function RecapPrintPage() {
   const [fontSize, setFontSize] = useState<"7" | "9" | "11">("7");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const [sheetIdx, setSheetIdx] = useState(0);
-  /* Zoom awal mengikuti layar: mobile 50% (muat lebar HP), desktop 100%.
-     Setelah itu sepenuhnya kendali pengguna via tombol −/+. */
   const [zoom, setZoom] = useState(() =>
     typeof window !== "undefined" &&
     window.matchMedia("(min-width: 768px)").matches
@@ -106,8 +98,6 @@ export default function RecapPrintPage() {
 
   const matrix = dataQuery.data ?? null;
 
-  /* Zoom = skala tampilan preview saja, tidak mengubah ukuran lembar.
-     Lebar lembar = ukuran kertas A4 aktual (sesuai PDF). */
   const perSheet = rowsPerSheet(orientation, Number(fontSize));
   const sheetWidthMm = PDF_PAGE_MM[orientation].w;
   const displayScale = zoom;

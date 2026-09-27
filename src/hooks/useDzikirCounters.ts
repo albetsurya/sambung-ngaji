@@ -37,7 +37,6 @@ function persist(key: string, counts: Record<string, number>) {
   try {
     localStorage.setItem(key, JSON.stringify(counts));
   } catch {
-    // ignore
   }
 }
 
@@ -50,7 +49,6 @@ export function useDzikirCounters() {
     load(storageKey),
   );
 
-  // Reload saat user berubah + reset kalau ganti hari
   useEffect(() => {
     setCounts(load(storageKey));
     const t = setInterval(() => {
@@ -104,6 +102,5 @@ export function vibrate(ms: number | number[] = 30) {
       navigator.vibrate(ms);
     }
   } catch {
-    // ignore
   }
 }

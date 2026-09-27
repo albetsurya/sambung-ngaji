@@ -66,9 +66,6 @@ import {
 } from "../components/jadwal/GenderTargetPicker";
 import type { GenderTarget } from "../components/jadwal/GenderTargetPicker";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types & State                                 */
-/* -------------------------------------------------------------------------- */
 
 const STATUS_CONFIG: Record<
   AttendanceStatus,
@@ -133,9 +130,6 @@ type SheetState =
   | { view: "form"; mode: "create"; from: "picker" | "fab" }
   | { view: "form"; mode: "edit"; meeting: Meeting };
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function AttendancePage() {
   const navigate = useNavigate();
@@ -165,7 +159,6 @@ export default function AttendancePage() {
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [confirmLibur, setConfirmLibur] = useState<Meeting | null>(null);
 
-  /* -------------------------------- Data --------------------------------- */
 
   const meetingsQuery = useQuery({
     queryKey: queryKeys.meetings({ range: "recent" }),
@@ -269,7 +262,6 @@ export default function AttendancePage() {
     ? (hadirCount / filteredMembers.length) * 100
     : 0;
 
-  /* ------------------------------- Mutations ------------------------------- */
 
   const saveMutation = useMutation({
     mutationFn: attendanceApi.save,
@@ -343,26 +335,21 @@ export default function AttendancePage() {
     },
   });
 
-  /* ================= FIX: deleteMeetingMutation ================= */
   const deleteMeetingMutation = useMutation({
     mutationFn: (meetingId: string) => meetingApi.remove(meetingId),
     onSuccess: (_data, meetingId) => {
       showToast("Jadwal dihapus");
       setDeleteMeetingTarget(null);
 
-      // ✅ FIX: optimistic remove dari cache `meetings` — supaya card
-      // "Jadwal dipilih" langsung hilang tanpa nunggu refetch.
       queryClient.setQueryData<Meeting[]>(
         queryKeys.meetings({ range: "recent" }),
         (old = []) => old.filter((m) => m.meeting_id !== meetingId),
       );
 
-      // ✅ FIX: kalau yang dihapus = pinned, reset supaya fallback ke meeting lain.
       if (pinnedMeetingId === meetingId) {
         setPinnedMeetingId(null);
       }
 
-      // Refetch di background untuk konsistensi dengan server.
       queryClient.invalidateQueries({
         queryKey: queryKeys.meetings({ range: "recent" }),
       });
@@ -380,9 +367,7 @@ export default function AttendancePage() {
       );
     },
   });
-  /* ============================================================= */
 
-  /* -------------------------- Libur Mutation ------------------------ */
 
   const liburMutation = useMutation({
     mutationFn: ({ meetingId, status }: { meetingId: string; status: string }) =>
@@ -410,9 +395,7 @@ export default function AttendancePage() {
       );
     },
   });
-  /* ============================================================= */
 
-  /* -------------------------- Bulk Delete Mutation ------------------------ */
 
   const deleteBulkMutation = useMutation({
     mutationFn: (ids: string[]) => meetingApi.removeBulk(ids),
@@ -441,7 +424,6 @@ export default function AttendancePage() {
     await deleteBulkMutation.mutateAsync(ids);
   }
 
-  /* -------------------------- Attendance Handlers ------------------------- */
 
   async function tapStatus(memberId: string, status: AttendanceStatus) {
     if (!selectedMeeting) return;
@@ -564,7 +546,6 @@ export default function AttendancePage() {
     executeToggleLibur(meeting);
   }
 
-  /* ------------------------------- Callbacks ------------------------------ */
 
   function handleStatusChange(memberId: string, status: AttendanceStatus) {
     tapStatus(memberId, status);
@@ -582,7 +563,6 @@ export default function AttendancePage() {
   const isInitialLoading =
     loadingMeetings || (!!selectedMeetingId && !attendanceReady);
 
-  /* ------------------------ Sheet Navigation Logic ------------------------ */
 
   function openPicker() {
     setSheet({ view: "picker" });
@@ -623,10 +603,7 @@ export default function AttendancePage() {
     }
   }
 
-  /* ================= FIX: handleFormSaved ================= */
   function handleFormSaved(m: Meeting, mode: "create" | "edit") {
-    // ✅ FIX: optimistic update cache `meetings` — supaya card
-    // "Jadwal dipilih" langsung update tanpa nunggu refetch.
     if (mode === "create") {
       queryClient.setQueryData<Meeting[]>(
         queryKeys.meetings({ range: "recent" }),
@@ -640,14 +617,12 @@ export default function AttendancePage() {
       );
       setPinnedMeetingId(m.meeting_id);
     } else {
-      // mode === "edit"
       queryClient.setQueryData<Meeting[]>(
         queryKeys.meetings({ range: "recent" }),
         (old = []) => old.map((x) => (x.meeting_id === m.meeting_id ? m : x)),
       );
     }
 
-    // Refetch di background untuk konsistensi.
     queryClient.invalidateQueries({
       queryKey: queryKeys.meetings({ range: "recent" }),
     });
@@ -659,9 +634,6 @@ export default function AttendancePage() {
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
     invalidateRecap(queryClient);
 
-    // Navigasi
-    // ✅ FIX TS: cek `sheet.mode === "create"` dulu sebelum akses `sheet.from`
-    // karena `from` hanya ada pada discriminated union mode "create".
     if (mode === "edit") {
       closeSheet();
     } else if (
@@ -674,8 +646,6 @@ export default function AttendancePage() {
       closeSheet();
     }
   }
-  /* ============================================================= */
-  /* ============================================================= */
 
   function handleDeleteFromAction(meeting: Meeting) {
     closeSheet();
@@ -694,7 +664,6 @@ export default function AttendancePage() {
     return "";
   })();
 
-  /* --------------------------------- Render -------------------------------- */
 
   return (
     <AppLayout
@@ -905,7 +874,7 @@ export default function AttendancePage() {
                 </div>
               </div>
 
-              {/* Legend status absensi — compact */}
+              
               {!isReadonly && (
                 <div className="flex gap-3 px-4 py-2 border-t border-surface-border bg-surface-card/50 justify-end">
                   {ATTENDANCE_STATUSES.map((s) => {
@@ -980,7 +949,7 @@ export default function AttendancePage() {
         </>
       )}
 
-      {/* ------------------ SINGLE BOTTOM SHEET ------------------ */}
+      
       <BottomSheet
         open={sheet.view !== "closed"}
         onClose={handleSheetClose}
@@ -1033,7 +1002,7 @@ export default function AttendancePage() {
         )}
       </BottomSheet>
 
-      {/* ------------------ Confirm Dialogs ------------------ */}
+      
       <ConfirmDialog
         open={!!deleteMeetingTarget}
         title="Hapus jadwal pengajian?"
@@ -1107,9 +1076,6 @@ export default function AttendancePage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Compact Attendance Row                            */
-/* -------------------------------------------------------------------------- */
 
 const CompactAttendanceRow = memo(function CompactAttendanceRow({
   member,
@@ -1240,9 +1206,6 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
   );
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                 Helpers                                    */
-/* -------------------------------------------------------------------------- */
 
 function normalizeTargets(raw: unknown): MemberCategory[] {
   if (!raw) return [];
@@ -1258,9 +1221,6 @@ function normalizeTargets(raw: unknown): MemberCategory[] {
   return [];
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Gender Segmented                              */
-/* -------------------------------------------------------------------------- */
 
 function GenderSegmented({
   value,
@@ -1307,9 +1267,6 @@ function CategoryChip({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                      Sheet Content: PICKER VIEW                            */
-/* -------------------------------------------------------------------------- */
 
 function CreatePickerContent({
   onSingle,
@@ -1394,7 +1351,6 @@ function MeetingPickerContent({
 
   const today = getTodayIso();
 
-  /* --------------------------- Filter & Group --------------------------- */
 
   const filtered = useMemo(() => {
     if (!deferredSearch.trim()) return meetings;
@@ -1435,7 +1391,6 @@ function MeetingPickerContent({
     totalVisible > 0 && filtered.every((m) => selectedIds.has(m.meeting_id));
   const selectedCount = selectedIds.size;
 
-  /* --------------------------- Selection Actions --------------------------- */
 
   function enterSelectionMode(initialId?: string) {
     setSelectionMode(true);
@@ -1477,7 +1432,6 @@ function MeetingPickerContent({
       setConfirmOpen(false);
       exitSelectionMode();
     } catch {
-      // toast handled di parent
     } finally {
       setDeleting(false);
     }
@@ -1487,11 +1441,10 @@ function MeetingPickerContent({
     selectedIds.has(m.meeting_id),
   );
 
-  /* ------------------------------- Render -------------------------------- */
 
   return (
     <>
-      {/* Toolbar selection mode */}
+      
       {selectionMode ? (
         <div className="-mx-4 px-4 py-2 mb-3 bg-accent text-white rounded-2xl flex items-center gap-2">
           <button
@@ -1527,7 +1480,7 @@ function MeetingPickerContent({
         )
       )}
 
-      {/* Search */}
+      
       {meetings.length > 0 && !selectionMode && (
         <div className="relative mb-3">
           <Search
@@ -1563,7 +1516,7 @@ function MeetingPickerContent({
         </div>
       )}
 
-      {/* Grouped list */}
+      
       {grouped.map(({ monthKey, label, items }) => (
         <section key={monthKey} className="mb-4">
           <div className="sticky top-0 z-10 -mx-4 px-4 py-2 bg-surface-bg/95 backdrop-blur-sm border-b border-surface-border/60">
@@ -1800,9 +1753,6 @@ function MeetingPickerContent({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 function formatMonthLabel(monthKey: string): string {
   const [y, m] = monthKey.split("-").map(Number);
@@ -1920,9 +1870,6 @@ function MeetingActionContent({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                      Sheet Content: FORM VIEW                              */
-/* -------------------------------------------------------------------------- */
 
 function MeetingFormContent({
   mode,
@@ -2099,9 +2046,6 @@ function MeetingFormContent({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Modern Checkbox                               */
-/* -------------------------------------------------------------------------- */
 
 function ModernCheckbox({
   checked,

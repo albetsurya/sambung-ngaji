@@ -187,7 +187,7 @@ export default function AnnouncementsPage() {
         }
       />
 
-      {/* Sheet: Simpan sebagai Template */}
+      
       {saveTemplateSource && (
         <SaveAsTemplateSheet
           announcement={saveTemplateSource}
@@ -430,9 +430,6 @@ function CreateAnnouncementSheet({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          SAVE AS TEMPLATE SHEET                            */
-/* -------------------------------------------------------------------------- */
 
 function SaveAsTemplateSheet({
   announcement,
@@ -447,7 +444,6 @@ function SaveAsTemplateSheet({
   const [nama, setNama] = useState("");
   const [kode, setKode] = useState("");
 
-  // Sinkronisasi saat sheet dibuka
   useMemo(() => {
     setNama("");
     setKode("");

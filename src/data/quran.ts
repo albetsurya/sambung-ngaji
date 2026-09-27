@@ -37,9 +37,6 @@ interface EquranDetailResponse {
   data: SurahDetail;
 }
 
-/**
- * Fetch list 114 surah. Response kecil (~30KB) — boleh cache lama.
- */
 export async function fetchSurahList(): Promise<SurahSummary[]> {
   const res = await fetch(BASE + "/surat");
   if (!res.ok) throw new Error("Gagal memuat daftar surah (HTTP " + res.status + ")");
@@ -50,9 +47,6 @@ export async function fetchSurahList(): Promise<SurahSummary[]> {
   return json.data;
 }
 
-/**
- * Fetch detail 1 surah (ayat + terjemah + audio).
- */
 export async function fetchSurahDetail(nomor: number): Promise<SurahDetail> {
   const res = await fetch(BASE + "/surat/" + nomor);
   if (!res.ok) throw new Error("Gagal memuat surah (HTTP " + res.status + ")");
@@ -63,16 +57,10 @@ export async function fetchSurahDetail(nomor: number): Promise<SurahDetail> {
   return json.data;
 }
 
-/**
- * Helper: dapatkan URL audio ayat (default qari 01 = Misyari Rasyid).
- */
 export function getAyatAudioUrl(ayat: Ayat, qariKey = "01"): string {
   return ayat.audio[qariKey] || ayat.audio["01"] || "";
 }
 
-/**
- * Helper: dapatkan URL audio full surah (untuk play all).
- */
 export function getSurahAudioUrl(
   surah: SurahSummary,
   qariKey = "01",
@@ -81,9 +69,6 @@ export function getSurahAudioUrl(
 }
 
 
-/* -------------------------------------------------------------------------- */
-/*                              Qari List                                     */
-/* -------------------------------------------------------------------------- */
 
 export interface QariInfo {
   key: string;

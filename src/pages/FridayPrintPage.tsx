@@ -18,11 +18,6 @@ import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { todayIso } from "../utils/friday";
 
-/**
- * Halaman cetak jadwal petugas Jumat tersendiri (pengganti sheet).
- * Pratinjau WYSIWYG: hasil unduhan sama persis dengan yang tampil.
- * Deep-linkable: ?scope=upcoming|history
- */
 export default function FridayPrintPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -169,7 +164,7 @@ export default function FridayPrintPage() {
               Hasil unduhan sama persis dengan pratinjau di atas.
             </p>
 
-            {/* Node cetak off-screen */}
+            
             <div
               aria-hidden
               style={{ position: "fixed", left: -10000, top: 0, width: 900 }}

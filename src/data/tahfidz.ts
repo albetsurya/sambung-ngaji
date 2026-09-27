@@ -4,9 +4,9 @@ export interface TahfidzTarget {
   surah: number;
   namaLatin: string;
   arti: string;
-  jumlahAyat: number;   // total ayat surah
-  ayatStart: number;    // mulai dari ayat
-  ayatEnd: number;      // sampai ayat (inklusif)
+  jumlahAyat: number;
+  ayatStart: number;
+  ayatEnd: number;
   kategori: TahfidzKategori;
 }
 
@@ -38,12 +38,8 @@ export const TAHFIDZ_KATEGORI: TahfidzKategoriInfo[] = [
   },
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Target List                                   */
-/* -------------------------------------------------------------------------- */
 
 export const TAHFIDZ_TARGETS: TahfidzTarget[] = [
-  /* ===== JUZ 30 (37 surah) ===== */
   { surah: 78, namaLatin: "An-Naba", arti: "Berita Besar", jumlahAyat: 40, ayatStart: 1, ayatEnd: 40, kategori: "juz30" },
   { surah: 79, namaLatin: "An-Nazi'at", arti: "Malaikat Pencabut", jumlahAyat: 46, ayatStart: 1, ayatEnd: 46, kategori: "juz30" },
   { surah: 80, namaLatin: "'Abasa", arti: "Bermuka Masam", jumlahAyat: 42, ayatStart: 1, ayatEnd: 42, kategori: "juz30" },
@@ -82,11 +78,9 @@ export const TAHFIDZ_TARGETS: TahfidzTarget[] = [
   { surah: 113, namaLatin: "Al-Falaq", arti: "Waktu Subuh", jumlahAyat: 5, ayatStart: 1, ayatEnd: 5, kategori: "juz30" },
   { surah: 114, namaLatin: "An-Nas", arti: "Manusia", jumlahAyat: 6, ayatStart: 1, ayatEnd: 6, kategori: "juz30" },
 
-  /* ===== JUZ 1 ===== */
   { surah: 1, namaLatin: "Al-Fatihah", arti: "Pembukaan", jumlahAyat: 7, ayatStart: 1, ayatEnd: 7, kategori: "juz1" },
   { surah: 2, namaLatin: "Al-Baqarah", arti: "Sapi Betina", jumlahAyat: 286, ayatStart: 1, ayatEnd: 141, kategori: "juz1" },
 
-  /* ===== PILIHAN ===== */
   { surah: 18, namaLatin: "Al-Kahf", arti: "Gua", jumlahAyat: 110, ayatStart: 1, ayatEnd: 110, kategori: "pilihan" },
   { surah: 36, namaLatin: "Yasin", arti: "Yaasin", jumlahAyat: 83, ayatStart: 1, ayatEnd: 83, kategori: "pilihan" },
   { surah: 55, namaLatin: "Ar-Rahman", arti: "Yang Maha Pengasih", jumlahAyat: 78, ayatStart: 1, ayatEnd: 78, kategori: "pilihan" },
@@ -94,9 +88,6 @@ export const TAHFIDZ_TARGETS: TahfidzTarget[] = [
   { surah: 67, namaLatin: "Al-Mulk", arti: "Kerajaan", jumlahAyat: 30, ayatStart: 1, ayatEnd: 30, kategori: "pilihan" },
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 export function getTargetBySurah(surah: number): TahfidzTarget | undefined {
   return TAHFIDZ_TARGETS.find((t) => t.surah === surah);
@@ -108,18 +99,15 @@ export function getTargetsByKategori(
   return TAHFIDZ_TARGETS.filter((t) => t.kategori === kategori);
 }
 
-/** Jumlah ayat yang jadi target untuk surah ini */
 export function targetCount(target: TahfidzTarget): number {
   return target.ayatEnd - target.ayatStart + 1;
 }
 
-/** Total ayat semua target */
 export const TOTAL_TARGET_AYAT = TAHFIDZ_TARGETS.reduce(
   (sum, t) => sum + targetCount(t),
   0,
 );
 
-/** Key untuk localStorage: "78:1" */
 export function ayatKey(surah: number, ayat: number): string {
   return surah + ":" + ayat;
 }

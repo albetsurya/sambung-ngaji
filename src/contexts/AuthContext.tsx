@@ -1,4 +1,3 @@
-// AuthContext.tsx
 import {
   createContext,
   useContext,
@@ -12,34 +11,18 @@ import { getToken, clearToken, ApiError, setGroupId } from "../services/api";
 import { migrateAnonDataToUser } from "../lib/scopedStorage";
 import { useQueryClient } from "@tanstack/react-query";
 
-/* -------------------------------------------------------------------------- */
-/*                              Module-level Cache                            */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Cache promise validateSession untuk mencegah duplicate request
- * di React Strict Mode (yang menjalankan useEffect 2x di development).
- *
- * Request pertama → bikin promise, simpan di cache.
- * Request kedua   → pakai promise yang sama (tidak kirim request baru).
- * Setelah resolve → clear cache.
- */
 let validateSessionPromise: Promise<User> | null = null;
 
 function getValidateSessionPromise(): Promise<User> {
   if (!validateSessionPromise) {
     validateSessionPromise = authApi.validateSession().finally(() => {
-      // Clear cache setelah selesai (sukses atau gagal)
-      // supaya refresh berikutnya bikin request baru
       validateSessionPromise = null;
     });
   }
   return validateSessionPromise;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Auth Context                                  */
-/* -------------------------------------------------------------------------- */
 
 interface AuthContextValue {
   user: User | null;
@@ -62,13 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        // ✅ Pakai cached promise — kalau dipanggil 2x (Strict Mode),
-        //    request kedua pakai promise yang sama, tidak kirim request baru.
         const u = await getValidateSessionPromise();
 
         if (cancelled) return;
 
-        // Gabungkan progres tamu (anon) ke akun bila ada.
         migrateAnonDataToUser(u?.user_id);
         setGroupId(u?.group_id ?? null);
         setUser(u);
@@ -96,26 +76,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(username: string, password: string) {
-    console.log("🔐 AuthProvider.login called");
     const u = await authApi.login(username, password);
-    // Gabungkan progres tamu (anon) ke akun bila ada.
     migrateAnonDataToUser(u?.user_id);
     setGroupId(u?.group_id ?? null);
     setUser(u);
   }
 
   async function logout() {
-    console.log("🔐 AuthProvider.logout called");
 
-    // 1. Clear query cache + state + token DULU — biar UI instant redirect
     queryClient.clear();
     clearToken();
     setGroupId(null);
     setUser(null);
 
-    // 2. API call di background — tidak blocking, error di-ignore
     authApi.logout().catch((err) => {
-      console.warn("Logout API error (ignored):", err);
     });
   }
 
@@ -124,7 +98,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const u = await authApi.validateSession();
       setUser(u);
     } catch (err) {
-      console.warn("refreshUser failed:", err);
       setUser(null);
     }
   }

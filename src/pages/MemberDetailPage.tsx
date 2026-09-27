@@ -57,9 +57,6 @@ import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
 import { MonitoringTab } from "../components/monitoring/MonitoringTab";
 
-/* -------------------------------------------------------------------------- */
-/*                       AUTO-GENERATE USER CREDENTIALS                       */
-/* -------------------------------------------------------------------------- */
 
 function generateUsernameFromMember(member: Member): string {
   const panggilan = member.nama_panggilan?.trim();
@@ -104,9 +101,7 @@ export default function MemberDetailPage() {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const canEdit = role === "SUPER_ADMIN" || role === "ADMIN";
-  // Hapus member langsung: super admin + admin (backend menolak bila punya akun).
   const canDeleteMember = canEdit;
-  /* Tab Akun (akun user + zona berbahaya) hanya untuk pengelola. */
   const canSeeAkun = canManageUsers || canDeleteMember;
   const visibleTabs = canSeeAkun
     ? TABS
@@ -115,7 +110,6 @@ export default function MemberDetailPage() {
   const [createUserOpen, setCreateUserOpen] = useState(false);
   const [confirmDeleteMember, setConfirmDeleteMember] = useState(false);
 
-  /* ---------------------------- Queries ---------------------------- */
 
   const {
     data: member,
@@ -143,7 +137,6 @@ export default function MemberDetailPage() {
     staleTime: 60_000,
   });
 
-  // Me meetings untuk enrich attendance (dapat tanggal/hari/acara)
   const { data: meetings = [] } = useQuery({
     queryKey: queryKeys.meetings(),
     queryFn: () => meetingApi.list(),
@@ -185,7 +178,6 @@ export default function MemberDetailPage() {
     staleTime: 60_000,
   });
 
-  /* ---------------------------- Loading/Error ---------------------------- */
 
   if (isLoading) {
     return (
@@ -210,7 +202,6 @@ export default function MemberDetailPage() {
     );
   }
 
-  /* ---------------------------- Enrich attendance ---------------------------- */
 
   const meetingsById: Record<string, (typeof meetings)[number]> = {};
   meetings.forEach((m) => {
@@ -236,7 +227,6 @@ export default function MemberDetailPage() {
     })
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
-  /* ---------------------------- Render ---------------------------- */
 
   return (
     <AppLayout
@@ -273,7 +263,7 @@ export default function MemberDetailPage() {
         }
       />
 
-      {/* Header profile */}
+      
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
           src={member.foto_url}
@@ -300,7 +290,7 @@ export default function MemberDetailPage() {
         </div>
       </div>
 
-      {/* Sticky Tab bar */}
+      
       <div
         className="sticky sticky-below-header z-10 backdrop-blur-xl bg-surface-bg/80 border-b border-surface-border px-3 py-2"
       >
@@ -326,8 +316,8 @@ export default function MemberDetailPage() {
         </div>
       </div>
 
-      {/* Tab Content */}
-      <div className="px-4 py-4 animate-[fadeIn_0.2s_ease-out]" key={tab}>
+      
+      <div className="px-4 py-4 anim-fade" key={tab}>
         {tab === "Biodata" && <BiodataTab member={member} />}
         {tab === "Pendidikan" && (
           <EducationTab education={member.pendidikan || []} member={member} />
@@ -426,9 +416,6 @@ export default function MemberDetailPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          USER ACCOUNT SECTION                              */
-/* -------------------------------------------------------------------------- */
 
 function UserAccountSection({
   member,
@@ -502,9 +489,6 @@ function UserAccountSection({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                       CREATE USER FROM MEMBER SHEET                        */
-/* -------------------------------------------------------------------------- */
 
 function CreateUserFromMemberSheet({
   open,

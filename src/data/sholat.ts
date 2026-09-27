@@ -20,7 +20,6 @@ export interface StatusInfo {
   label: string;
   short: string;
   emoji: string;
-  /** Untuk warna background */
   tone: "neutral" | "success" | "warning" | "accent" | "danger";
 }
 
@@ -36,9 +35,6 @@ export function getStatusInfo(key: StatusSholat): StatusInfo {
   return STATUS_LIST.find((s) => s.key === key) ?? STATUS_LIST[0];
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 export function todayIso(): string {
   const d = new Date();
@@ -55,7 +51,6 @@ export function isoDate(d: Date): string {
   return y + "-" + m + "-" + day;
 }
 
-/** Format tanggal: "Senin, 18 Sep 2026" */
 export function formatDateId(iso: string): string {
   const d = new Date(iso + "T00:00:00");
   try {
@@ -70,7 +65,6 @@ export function formatDateId(iso: string): string {
   }
 }
 
-/** Format tanggal singkat: "Sen, 18 Sep" */
 export function formatDateShort(iso: string): string {
   const d = new Date(iso + "T00:00:00");
   try {

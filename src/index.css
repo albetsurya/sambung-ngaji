@@ -78,6 +78,43 @@ html.dark {
   color-scheme: dark;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+}
+
+.page-enter {
+  animation: pageEnter 0.22s ease-out;
+}
+
+.anim-fade {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.anim-fade-fast {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.anim-sheet {
+  animation: sheetIn 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.anim-pop {
+  animation: popIn 0.2s ease-out;
+}
+
+.anim-slide-up {
+  animation: slideUp 0.2s ease-out;
+}
+
+.surface-shift {
+  transition:
+    background-color 0.3s ease-out,
+    color 0.3s ease-out,
+    border-color 0.3s ease-out;
+}
+
 body {
   @apply bg-surface-bg text-surface-text antialiased;
   font-family:
@@ -309,14 +346,6 @@ img {
     transform: translateY(0);
   }
 }
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 @keyframes popIn {
   from {
     transform: scale(0.96);
@@ -325,6 +354,17 @@ img {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

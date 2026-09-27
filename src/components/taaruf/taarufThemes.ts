@@ -1,22 +1,14 @@
-/**
- * Pilihan tema CV Taaruf. Class Tailwind ditulis statis agar tidak
- * ter-tree-shake. Preview dan hasil cetakan selalu sama (WYSIWYG).
- */
 
 export type TaarufThemeKey = "emerald" | "navy" | "maroon" | "mono";
 
 export interface TaarufTheme {
   key: TaarufThemeKey;
   label: string;
-  /** Bilah aksen atas + dot timeline */
   bar: string;
   dot: string;
-  /** Label "CV TAARUF" */
   accentText: string;
-  /** Latar + border bingkai inisial foto */
   softBg: string;
   softBorder: string;
-  /** Contoh warna untuk swatch */
   swatch: string;
 }
 

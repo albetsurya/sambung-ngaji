@@ -12,7 +12,6 @@ export interface AudioTrack {
   url: string;
   title: string;
   subtitle?: string;
-  /** Index di dalam list — untuk navigasi prev/next */
   index: number;
   total: number;
 }
@@ -141,7 +140,7 @@ export function AudioPlayerMini({
       <div className="fixed bottom-0 left-0 right-0 md:left-64 z-50 pb-safe pointer-events-none">
         <div className="app-shell px-3 pb-3">
           <div className="pointer-events-auto rounded-2xl bg-surface-card border border-surface-border shadow-lg shadow-black/10 backdrop-blur-xl overflow-hidden">
-            {/* Progress bar */}
+            
             <div className="h-1 bg-surface-card2">
               <div
                 className="h-full bg-accent transition-all duration-300"
@@ -151,7 +150,7 @@ export function AudioPlayerMini({
               />
             </div>
 
-            {/* Seek input hidden — overlay on top bar */}
+            
             <input
               type="range"
               min={0}
@@ -164,7 +163,7 @@ export function AudioPlayerMini({
             />
 
             <div className="flex items-center gap-2 px-3 py-2.5">
-              {/* Play/pause */}
+              
               <button
                 onClick={togglePlay}
                 aria-label={playing ? "Pause" : "Play"}
@@ -179,7 +178,7 @@ export function AudioPlayerMini({
                 )}
               </button>
 
-              {/* Info */}
+              
               <div className="flex-1 min-w-0">
                 <p className="text-ios-body font-medium text-surface-text truncate">
                   {track.title}
@@ -190,7 +189,7 @@ export function AudioPlayerMini({
                 </p>
               </div>
 
-              {/* Prev/Next */}
+              
               <div className="flex items-center gap-0.5 flex-shrink-0">
                 {onPrev && (
                   <button
@@ -228,5 +227,4 @@ export function AudioPlayerMini({
   );
 }
 
-/* Suppress unused warning */
 void Volume2;

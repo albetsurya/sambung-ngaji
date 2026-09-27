@@ -34,7 +34,6 @@ function save(key: string, ids: Set<string>) {
   try {
     localStorage.setItem(key, JSON.stringify([...ids]));
   } catch {
-    // ignore
   }
 }
 
@@ -45,7 +44,6 @@ export function useDoaProgress(waktu: DoaWaktu, total: number) {
 
   const [readIds, setReadIds] = useState<Set<string>>(() => load(storageKey));
 
-  // Reload saat user / waktu berubah
   useEffect(() => {
     setReadIds(load(storageKey));
   }, [storageKey]);

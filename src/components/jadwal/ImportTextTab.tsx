@@ -27,9 +27,6 @@ import { formatDateShort } from "../../utils/format";
 import { GenderTargetPicker } from "./GenderTargetPicker";
 import type { GenderTarget } from "./GenderTargetPicker";
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                 */
-/* -------------------------------------------------------------------------- */
 
 const MAX_CHARS = 100_000;
 
@@ -294,7 +291,7 @@ export function ImportTextTab() {
         </>
       )}
 
-      {/* Edit Sheet */}
+      
       <BottomSheet
         open={!!editing}
         onClose={() => setEditing(null)}
@@ -312,9 +309,6 @@ export function ImportTextTab() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Draft Card                                     */
-/* -------------------------------------------------------------------------- */
 
 function DraftCard({
   index,
@@ -415,9 +409,6 @@ function DraftCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Edit Form                                      */
-/* -------------------------------------------------------------------------- */
 
 function EditDraftForm({
   draft,

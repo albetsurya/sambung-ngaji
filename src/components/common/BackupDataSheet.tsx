@@ -28,7 +28,6 @@ export function BackupDataSheet({
   const userId = user?.user_id || "";
   const username = user?.username || "";
 
-  // Hitung stats saat sheet dibuka
   const stats = collectBackup(userId, username).stats;
 
   function handleExport() {
@@ -60,7 +59,6 @@ export function BackupDataSheet({
         "error",
       );
     } finally {
-      // Reset input supaya bisa pilih file yang sama 2x
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -78,7 +76,6 @@ export function BackupDataSheet({
       setConfirmRestoreOpen(false);
       setPreview(null);
       onClose();
-      // Reload halaman supaya semua hook baca data baru
       setTimeout(() => window.location.reload(), 800);
     } catch (err) {
       showToast(
@@ -115,7 +112,7 @@ export function BackupDataSheet({
           </p>
         </div>
 
-        {/* Stats */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card p-4 mb-4">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -138,7 +135,7 @@ export function BackupDataSheet({
           </div>
         </div>
 
-        {/* Export */}
+        
         <button
           onClick={handleExport}
           disabled={stats.keyCount === 0}
@@ -169,7 +166,7 @@ export function BackupDataSheet({
           </div>
         </button>
 
-        {/* Import */}
+        
         <button
           onClick={handleFilePick}
           className="w-full rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all duration-200 hover:bg-surface-card2 active:scale-[0.99]"
@@ -207,7 +204,7 @@ export function BackupDataSheet({
         </div>
       </BottomSheet>
 
-      {/* Preview + Confirm Restore */}
+      
       {preview && (
         <BottomSheet
           open={!!preview}

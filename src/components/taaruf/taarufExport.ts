@@ -1,10 +1,6 @@
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
-/**
- * Export CV Taaruf dari node DOM (render off-screen tanpa catatan rahasia).
- * Hasil = apa yang tampil di preview (WYSIWYG).
- */
 
 async function capture(node: HTMLElement): Promise<HTMLCanvasElement> {
   return html2canvas(node, {
@@ -42,7 +38,6 @@ export function taarufFilename(
   return `${base}-${date}.${ext}`;
 }
 
-/** PNG siap bagikan (mis. WhatsApp). */
 export async function exportTaarufPng(
   node: HTMLElement,
   nama: string,
@@ -61,10 +56,6 @@ export async function exportTaarufPng(
   }
 }
 
-/**
- * PDF A4 — portrait untuk dokumen tegak, landscape untuk dokumen lebar
- * (mis. tabel). Multi-halaman bila konten melebihi 1 halaman.
- */
 export async function exportTaarufPdf(
   node: HTMLElement,
   nama: string,
@@ -85,13 +76,11 @@ export async function exportTaarufPdf(
   const contentW = pageW - margin * 2;
   const contentH = pageH - margin * 2;
 
-  // Tinggi gambar bila dilebarkan selebar konten (mm).
   const imgH = (contentW * canvas.height) / canvas.width;
 
   if (imgH <= contentH) {
     pdf.addImage(imgData, "PNG", margin, margin, contentW, imgH);
   } else {
-    // Potong per halaman.
     const slicePx = Math.floor((canvas.width * contentH) / contentW);
     let rendered = 0;
     let page = 0;

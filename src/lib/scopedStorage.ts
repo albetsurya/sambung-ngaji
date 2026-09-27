@@ -1,13 +1,3 @@
-/**
- * Storage helper yang di-scope per user_id.
- * Format key: "sng:{userId}:{baseKey}"
- * Fallback ke "sng:anon:{baseKey}" kalau belum login.
- *
- * Benefit:
- * - Multi-user di device yang sama tidak saling lihat data
- * - Login sebagai user lain → data berbeda
- * - Logout → data tetap ada (tinggal login lagi)
- */
 
 const PREFIX = "sng";
 
@@ -19,14 +9,6 @@ export function scopedKey(
   return PREFIX + ":" + uid + ":" + baseKey;
 }
 
-/**
- * Migrasi dari key lama (global) ke key baru (scoped).
- * Hanya migrasi kalau:
- * - oldKey ada isinya
- * - newKey belum ada (jangan overwrite)
- *
- * Setelah migrasi, old key dihapus.
- */
 export function migrateKey(oldKey: string, newKey: string): void {
   if (oldKey === newKey) return;
   try {
@@ -36,13 +18,9 @@ export function migrateKey(oldKey: string, newKey: string): void {
     localStorage.setItem(newKey, old);
     localStorage.removeItem(oldKey);
   } catch {
-    // ignore quota / private mode
   }
 }
 
-/**
- * Hapus semua key yang dimiliki user (kalau mau fitur "reset my data").
- */
 export function clearUserData(userId: string | null | undefined): number {
   const uid = userId || "anon";
   const prefix = PREFIX + ":" + uid + ":";
@@ -58,17 +36,10 @@ export function clearUserData(userId: string | null | undefined): number {
       removed++;
     }
   } catch {
-    // ignore
   }
   return removed;
 }
 
-/**
- * Migrasi data tamu (anon) ke akun saat login.
- * Tiap `sng:anon:{base}` dipindah ke `sng:{userId}:{base}` HANYA bila
- * target kosong (tidak menimpa data akun). Key anon yang dipindah dihapus.
- * @returns jumlah key yang dipindahkan.
- */
 export function migrateAnonDataToUser(
   userId: string | null | undefined,
 ): number {
@@ -94,12 +65,10 @@ export function migrateAnonDataToUser(
         localStorage.removeItem(from);
         moved++;
       } catch {
-        // quota penuh — hentikan, sisanya tetap anon
         break;
       }
     }
   } catch {
-    // ignore (private mode)
   }
   return moved;
 }

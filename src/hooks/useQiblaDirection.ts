@@ -1,15 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-/* -------------------------------------------------------------------------- */
-/*                              Konstanta                                     */
-/* -------------------------------------------------------------------------- */
 
 const KAABA_LAT = 21.4224779;
 const KAABA_LNG = 39.8251832;
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export type PermissionState =
   | "idle"
@@ -19,27 +13,18 @@ export type PermissionState =
   | "unsupported";
 
 export interface QiblaState {
-  /** Bearing kiblat dari utara (derajat, 0-360) */
   qiblaBearing: number | null;
-  /** Heading device (arah kompas device menghadap) — null kalau tidak ada sensor */
   deviceHeading: number | null;
-  /** Relative: kiblat dari device = deviceHeading - qiblaBearing (bisa negatif) */
   relativeToDevice: number | null;
-  /** Geolocation */
   coords: { lat: number; lng: number } | null;
   accuracy: number | null;
-  /** Permission state */
   permission: PermissionState;
   locationError: string | null;
   loading: boolean;
-  /** Fungsi */
   requestLocation: () => void;
   requestOrientation: () => void;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Bearing calc                                  */
-/* -------------------------------------------------------------------------- */
 
 function toRad(deg: number): number {
   return (deg * Math.PI) / 180;
@@ -63,9 +48,6 @@ function calculateQiblaBearing(lat: number, lng: number): number {
   return (toDeg(theta) + 360) % 360;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Hook                                          */
-/* -------------------------------------------------------------------------- */
 
 export function useQiblaDirection(): QiblaState {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
@@ -85,13 +67,11 @@ export function useQiblaDirection(): QiblaState {
   const relativeToDevice = useMemo(() => {
     if (qiblaBearing === null || deviceHeading === null) return null;
     let r = qiblaBearing - deviceHeading;
-    // Normalize ke -180..180
     while (r > 180) r -= 360;
     while (r < -180) r += 360;
     return r;
   }, [qiblaBearing, deviceHeading]);
 
-  /* ------------------------------ Geolocation ----------------------------- */
 
   const requestLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
@@ -126,7 +106,6 @@ export function useQiblaDirection(): QiblaState {
     );
   }, []);
 
-  /* --------------------------- Device orientation -------------------------- */
 
   const requestOrientation = useCallback(async () => {
     if (typeof window === "undefined" || !("DeviceOrientationEvent" in window)) {
@@ -134,7 +113,6 @@ export function useQiblaDirection(): QiblaState {
       return;
     }
 
-    // iOS 13+ butuh requestPermission di user gesture
     type OrientationWithPermission = typeof DeviceOrientationEvent & {
       requestPermission?: () => Promise<"granted" | "denied">;
     };
@@ -149,12 +127,10 @@ export function useQiblaDirection(): QiblaState {
         setPermission("denied");
       }
     } else {
-      // Android langsung granted
       setPermission("granted");
     }
   }, []);
 
-  /* --------------------- Listener: device orientation --------------------- */
 
   useEffect(() => {
     if (permission !== "granted") return;
@@ -164,24 +140,16 @@ export function useQiblaDirection(): QiblaState {
         webkitCompassHeading?: number;
       };
 
-      // iOS — webkitCompassHeading langsung kompas (0=N, 90=E, dst)
       if (typeof ev.webkitCompassHeading === "number") {
         setDeviceHeading(ev.webkitCompassHeading);
         return;
       }
 
-      // Android — pakai alpha (0 = north, tapi bisa absolute/relative)
       if (typeof e.alpha === "number") {
-        // Absolute orientation: alpha = 0 berarti menghadap utara
-        // Untuk compass heading, kita pakai 360 - alpha
         setDeviceHeading((360 - e.alpha) % 360);
       }
     }
 
-    // Prefer deviceorientationabsolute kalau ada (Android).
-    // Cast ke Window agar TS tidak narrowing ke `never`.
-    // Cast ke any — supaya TS tidak narrowing ke `never` setelah cek `in`.
-    // `deviceorientationabsolute` tidak ada di lib.dom bawaan TS.
     const win: any = window;
     const hasAbsolute = "ondeviceorientationabsolute" in win;
 
@@ -204,7 +172,6 @@ export function useQiblaDirection(): QiblaState {
     };
   }, [permission]);
 
-  /* -------------------------- Auto-start sekali --------------------------- */
 
   useEffect(() => {
     requestLocation();

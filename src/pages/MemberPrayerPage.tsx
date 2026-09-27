@@ -29,9 +29,6 @@ import {
   type SunnahTimeInfo,
 } from "../utils/prayerTimes";
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function MemberPrayerPage() {
   const navigate = useNavigate();
@@ -41,7 +38,6 @@ export default function MemberPrayerPage() {
   const [copied, setCopied] = useState(false);
   const [showMonthly, setShowMonthly] = useState(false);
 
-  // Update tiap detik
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
@@ -76,7 +72,6 @@ export default function MemberPrayerPage() {
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
-      // user cancelled share — diabaikan
     }
   }
 
@@ -97,7 +92,7 @@ export default function MemberPrayerPage() {
       />
 
       <div className="px-4 py-4 space-y-4 pb-8">
-        {/* --------------------- Hero: countdown besar --------------------- */}
+        
         <div className="relative overflow-hidden rounded-3xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 shadow-sm p-5">
           <div
             className="absolute -right-12 -top-12 w-40 h-40 rounded-full pointer-events-none"
@@ -135,7 +130,7 @@ export default function MemberPrayerPage() {
           </div>
         </div>
 
-        {/* ---------------------- 5 waktu sholat hari ini --------------------- */}
+        
         <section>
           <div className="flex items-center justify-between mb-2.5 px-1">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -213,7 +208,7 @@ export default function MemberPrayerPage() {
 
         </section>
 
-        {/* ---------------------- Waktu Sunnah & Info ---------------------- */}
+        
         <section>
           <p className="text-ios-footnote font-semibold text-surface-text mb-2.5 px-1">
             Waktu Sunnah & Info
@@ -231,7 +226,7 @@ export default function MemberPrayerPage() {
           </p>
         </section>
 
-        {/* ---------------------- Qiyamul Lail (1/3 akhir) ---------------------- */}
+        
         <section>
           <p className="text-ios-footnote font-semibold text-surface-text mb-2.5 px-1">
             Qiyamul Lail
@@ -269,7 +264,7 @@ export default function MemberPrayerPage() {
           </div>
         </section>
 
-        {/* ---------------------- Jadwal Sebulan (collapsible) ---------------------- */}
+        
         <section>
           <button
             onClick={() => setShowMonthly((v) => !v)}
@@ -299,7 +294,7 @@ export default function MemberPrayerPage() {
           {showMonthly && <MonthlyTable now={now} />}
         </section>
 
-        {/* ---------------------- Info Kemenag ---------------------- */}
+        
         <div className="rounded-2xl border border-surface-border bg-surface-card2/40 p-3.5">
           <p className="text-ios-caption text-surface-muted leading-relaxed">
             Perhitungan mengikuti metode <strong>Kemenag RI</strong> (Fajr 20°,
@@ -312,9 +307,6 @@ export default function MemberPrayerPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Sunnah Row                                     */
-/* -------------------------------------------------------------------------- */
 
 function SunnahRow({
   info,
@@ -359,9 +351,6 @@ function SunnahRow({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Monthly Table                                 */
-/* -------------------------------------------------------------------------- */
 
 function MonthlyTable({ now }: { now: Date }) {
   const schedule = useMemo(
@@ -373,7 +362,7 @@ function MonthlyTable({ now }: { now: Date }) {
 
   return (
     <div className="mt-2 rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
-      {/* Header */}
+      
       <div className="grid grid-cols-[40px_1fr_1fr_1fr_1fr_1fr] px-3 py-2.5 bg-surface-card2/50 border-b border-surface-border">
         <span className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted">
           Tgl
@@ -388,7 +377,7 @@ function MonthlyTable({ now }: { now: Date }) {
         ))}
       </div>
 
-      {/* Rows */}
+      
       <div className="max-h-[400px] overflow-y-auto">
         {schedule.map((day) => {
           const isToday = formatIso(day.date) === todayIso;
@@ -425,9 +414,6 @@ function MonthlyTable({ now }: { now: Date }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Format Helpers                                */
-/* -------------------------------------------------------------------------- */
 
 function formatIso(d: Date): string {
   const y = d.getFullYear();

@@ -23,9 +23,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { useEnvironment } from "../hooks/useEnvironment";
 import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types & Config                                */
-/* -------------------------------------------------------------------------- */
 
 const SUGGESTIONS = [
   "Berapa total jamaah aktif?",
@@ -82,7 +79,6 @@ function providerOf(key: string): (typeof PROVIDERS)[number] {
   );
 }
 
-/* Icon tile per provider: bintang Gemini, petir Groq, chip Nvidia. */
 function ProviderIcon({
   iconKey,
   size = 40,
@@ -113,17 +109,11 @@ function ProviderIcon({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Avatar Icon (Custom)                              */
-/* -------------------------------------------------------------------------- */
 
 function AiAvatar({ size = 32, iconKey = "auto" as ProviderKey }: { size?: number; iconKey?: ProviderKey }) {
   return <ProviderIcon iconKey={iconKey} size={size} circle />;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Component                                */
-/* -------------------------------------------------------------------------- */
 
 export default function AiChatPage() {
   const { showToast } = useToast();
@@ -141,7 +131,6 @@ export default function AiChatPage() {
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  /* ----------------------------- Load provider ----------------------------- */
   useEffect(() => {
     aiApi
       .getCurrentProvider()
@@ -150,17 +139,14 @@ export default function AiChatPage() {
         setActiveProvider(info.active);
       })
       .catch(() => {
-        // ignore
       });
   }, []);
 
-  /* ------------------------------ Auto scroll ------------------------------ */
   useEffect(() => {
     if (!hydrated) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading, hydrated]);
 
-  /* ----------------------------- Change provider --------------------------- */
   async function handleSelectProvider(key: ProviderKey) {
     setProviderSheetOpen(false);
     if (key === provider) return;
@@ -181,7 +167,6 @@ export default function AiChatPage() {
     }
   }
 
-  /* ------------------------------- Send chat ------------------------------- */
   async function handleSend(text?: string) {
     const query = (text || input).trim();
     if (!query || loading) return;
@@ -230,7 +215,6 @@ export default function AiChatPage() {
     }
   }
 
-  /* ---------------------------- Regenerate chat ---------------------------- */
   async function handleRegenerate() {
     if (loading) return;
 
@@ -290,8 +274,6 @@ export default function AiChatPage() {
   const currentProviderLabel =
     PROVIDERS.find((p) => p.key === provider)?.label || provider;
 
-  /* Provider efektif: yang benar-benar dipakai server kalau sudah tahu,
-     kalau belum ya pilihan user. Header + avatar ikut ini. */
   const effectiveKey: ProviderKey = (PROVIDERS.some((p) => p.key === activeProvider)
     ? activeProvider
     : provider) as ProviderKey;
@@ -304,7 +286,7 @@ export default function AiChatPage() {
 
   return (
     <AppLayout hideNav>
-      {/* -------------------- Custom Header (compact) -------------------- */}
+      
       <header className="sticky top-0 z-30 pt-safe border-b border-surface-border backdrop-blur-xl bg-surface-bg/80 supports-[backdrop-filter]:bg-surface-bg/70">
         <div className="flex items-center gap-1 h-[56px] px-2">
           <Button
@@ -368,7 +350,7 @@ export default function AiChatPage() {
       </header>
 
       <div className="flex-1 flex flex-col min-h-0">
-        {/* Chat area */}
+        
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
           {!hydrated && (
             <div className="flex items-center justify-center py-12">
@@ -398,7 +380,7 @@ export default function AiChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input area */}
+        
         <div className="sticky bottom-0 border-t border-surface-border backdrop-blur-xl bg-surface-bg/80">
           <div className="app-shell px-4 py-3 pb-safe">
             <div className="flex items-end gap-2">
@@ -436,7 +418,7 @@ export default function AiChatPage() {
         </div>
       </div>
 
-      {/* ------------------ Provider Picker Sheet ------------------ */}
+      
       <BottomSheet
         open={providerSheetOpen}
         onClose={() => setProviderSheetOpen(false)}
@@ -488,7 +470,7 @@ export default function AiChatPage() {
         </p>
       </BottomSheet>
 
-      {/* ------------------ Reset Confirmation Sheet ------------------ */}
+      
       <BottomSheet
         open={confirmResetOpen}
         onClose={() => setConfirmResetOpen(false)}
@@ -536,9 +518,6 @@ export default function AiChatPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Empty Chat                                    */
-/* -------------------------------------------------------------------------- */
 
 function EmptyChat({ onSuggest, iconKey }: { onSuggest: (text: string) => void; iconKey?: ProviderKey }) {
   return (
@@ -568,9 +547,6 @@ function EmptyChat({ onSuggest, iconKey }: { onSuggest: (text: string) => void; 
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Chat Bubble                                   */
-/* -------------------------------------------------------------------------- */
 
 function ChatBubble({
   message,
@@ -590,7 +566,6 @@ function ChatBubble({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // ignore
     }
   }
 
@@ -599,14 +574,12 @@ function ChatBubble({
       try {
         await navigator.share({ text: message.text });
       } catch {
-        // user cancelled
       }
     } else {
       handleCopy();
     }
   }
 
-  /* WhatsApp-style: runcing ke arah pengirim, tanpa avatar */
   if (isUser) {
     return (
       <div className="flex justify-end">
@@ -622,7 +595,6 @@ function ChatBubble({
     );
   }
 
-  /* AI bubble: runcing ke kiri */
   return (
     <div className="flex justify-start">
       <div className="max-w-[82%]">
@@ -683,9 +655,6 @@ function ActionButton({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Message Content Renderer                          */
-/* -------------------------------------------------------------------------- */
 
 function MessageContent({ text }: { text: string }) {
   const blocks = parseMarkdownBlocks(text);
@@ -698,9 +667,6 @@ function MessageContent({ text }: { text: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Markdown Parser                               */
-/* -------------------------------------------------------------------------- */
 
 type MdBlock =
   | { type: "text"; content: string }
@@ -721,7 +687,6 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
     const line = lines[i];
     const trimmed = line.trim();
 
-    /* ----------------------------- Code fence ----------------------------- */
     if (/^```/.test(trimmed)) {
       const language = trimmed.slice(3).trim();
       const codeLines: string[] = [];
@@ -735,15 +700,12 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    /* ------------------------ Horizontal rule ------------------------ */
-    /* ---, ***, ___ (min 3 karakter) */
     if (/^([-*_])\1{2,}$/.test(trimmed)) {
       blocks.push({ type: "divider" });
       i++;
       continue;
     }
 
-    /* ------------------------------ Heading ------------------------------ */
     const headingMatch = trimmed.match(/^(#{1,4})\s+(.+?)\s*#*$/);
     if (headingMatch) {
       blocks.push({
@@ -755,7 +717,6 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    /* ------------------------------- Table ------------------------------- */
     if (/^\|.*\|$/.test(trimmed) && i + 1 < lines.length) {
       const sepLine = lines[i + 1].trim();
       if (/^\|[\s:|-]+\|$/.test(sepLine)) {
@@ -771,7 +732,6 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       }
     }
 
-    /* ---------------------------- Blockquote ---------------------------- */
     if (/^>\s?/.test(trimmed)) {
       const content = trimmed.replace(/^>\s?/, "");
       blocks.push({ type: "quote", content });
@@ -779,7 +739,6 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    /* ------------------------- Numbered list ------------------------- */
     const numberedMatch = line.match(/^\s*(\d+)\.\s+(.+)$/);
     if (numberedMatch) {
       blocks.push({
@@ -791,7 +750,6 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    /* --------------------------- Bullet list --------------------------- */
     if (/^\s*[-•*]\s+/.test(line)) {
       const content = line.replace(/^\s*[-•*]\s+/, "").trim();
       blocks.push({ type: "bullet", content });
@@ -799,13 +757,11 @@ function parseMarkdownBlocks(text: string): MdBlock[] {
       continue;
     }
 
-    /* ---------------------------- Empty line ---------------------------- */
     if (!trimmed) {
       i++;
       continue;
     }
 
-    /* ----------------------------- Paragraph ----------------------------- */
     const textLines: string[] = [line];
     i++;
     while (
@@ -835,9 +791,6 @@ function splitTableRow(line: string): string[] {
     .map((c) => c.trim());
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Block Renderer                                */
-/* -------------------------------------------------------------------------- */
 
 function BlockRenderer({ block }: { block: MdBlock }) {
   switch (block.type) {
@@ -915,18 +868,13 @@ function BlockRenderer({ block }: { block: MdBlock }) {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Inline Renderer                               */
-/* -------------------------------------------------------------------------- */
 
 function renderInline(text: string): React.ReactNode[] {
-  /* Order matters: bold-italic dulu, baru bold, baru italic */
   const pattern =
     /(\*\*\*[^*\n]+\*\*\*|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|_[^_\n]+_|~~[^~\n]+~~|`[^`\n]+`|\[[^\]]+\]\([^)]+\))/g;
   const parts = text.split(pattern);
 
   return parts.map((part, i) => {
-    /* ***bold italic*** atau ___bold italic___ */
     if (
       (part.startsWith("***") && part.endsWith("***") && part.length > 6) ||
       (part.startsWith("___") && part.endsWith("___") && part.length > 6)
@@ -938,7 +886,6 @@ function renderInline(text: string): React.ReactNode[] {
         </strong>
       );
     }
-    /* **bold** atau __bold__ */
     if (
       (part.startsWith("**") && part.endsWith("**") && part.length > 4) ||
       (part.startsWith("__") && part.endsWith("__") && part.length > 4)
@@ -949,7 +896,6 @@ function renderInline(text: string): React.ReactNode[] {
         </strong>
       );
     }
-    /* *italic* atau _italic_ */
     if (
       ((part.startsWith("*") && part.endsWith("*") && !part.startsWith("**")) ||
         (part.startsWith("_") &&
@@ -963,7 +909,6 @@ function renderInline(text: string): React.ReactNode[] {
         </em>
       );
     }
-    /* ~~strike~~ */
     if (part.startsWith("~~") && part.endsWith("~~") && part.length > 4) {
       return (
         <span key={i} className="line-through opacity-70">
@@ -971,7 +916,6 @@ function renderInline(text: string): React.ReactNode[] {
         </span>
       );
     }
-    /* `code` */
     if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
       return (
         <code
@@ -985,7 +929,6 @@ function renderInline(text: string): React.ReactNode[] {
         </code>
       );
     }
-    /* [text](url) */
     const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (linkMatch) {
       return (
@@ -1004,9 +947,6 @@ function renderInline(text: string): React.ReactNode[] {
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Code Block                                    */
-/* -------------------------------------------------------------------------- */
 
 function CodeBlock({
   language,
@@ -1023,7 +963,6 @@ function CodeBlock({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // ignore
     }
   }
 
@@ -1050,9 +989,6 @@ function CodeBlock({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Markdown Table                                */
-/* -------------------------------------------------------------------------- */
 
 function MarkdownTable({
   headers,
@@ -1106,9 +1042,6 @@ function MarkdownTable({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Typing Indicator                                  */
-/* -------------------------------------------------------------------------- */
 
 function TypingIndicator() {
   return (

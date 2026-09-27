@@ -24,7 +24,7 @@ export default function RegistrationSuccessPage() {
 
   return (
     <div className="app-shell min-h-screen flex flex-col bg-surface-bg relative">
-      {/* Decorative circles */}
+      
       <div
         className="absolute -top-32 -right-32 w-80 h-80 rounded-full pointer-events-none"
         style={{ background: "rgb(var(--c-accent) / 0.06)" }}

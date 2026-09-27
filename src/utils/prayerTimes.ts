@@ -5,17 +5,10 @@ import {
   Madhab,
 } from "adhan";
 
-/* -------------------------------------------------------------------------- */
-/*                              Konfigurasi                                   */
-/* -------------------------------------------------------------------------- */
 
-// Desa Latukan, Kec. Karanggeneng, Kab. Lamongan
 export const LATUKAN_COORDS = { lat: -6.9879, lng: 112.3729 };
 export const LATUKAN_LABEL = "Latukan, Karanggeneng, Lamongan";
 
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
 
 export type PrayerKey =
   | "fajr"
@@ -27,10 +20,10 @@ export type PrayerKey =
 
 export interface PrayerInfo {
   key: PrayerKey;
-  label: string;       // Subuh, Syuruq, Dzuhur, Ashar, Maghrib, Isya
-  arabic: string;      // الفجر، الشروق، ...
+  label: string;
+  arabic: string;
   time: Date;
-  timeFormatted: string; // "HH:MM"
+  timeFormatted: string;
 }
 
 export interface PrayerDay {
@@ -41,7 +34,7 @@ export interface PrayerDay {
 export interface NextPrayerInfo {
   prayer: PrayerInfo;
   remainingMs: number;
-  remainingFormatted: string; // "HH:MM:SS"
+  remainingFormatted: string;
 }
 
 export const PRAYER_LABELS: Record<PrayerKey, { label: string; arabic: string }> = {
@@ -53,24 +46,13 @@ export const PRAYER_LABELS: Record<PrayerKey, { label: string; arabic: string }>
   isha: { label: "Isya", arabic: "العشاء" },
 };
 
-/* -------------------------------------------------------------------------- */
-/*                          Calculation Parameters                            */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Parameter perhitungan untuk Kemenag RI:
- * - Fajr angle: 20° (bukan 18° standar Karachi)
- * - Isha angle: 18°
- * - Madhab: Shafi (Ashar: panjang bayangan = panjang benda)
- * - Ihtiyati +2 menit untuk semua waktu (kehati-hatian)
- */
 function buildParams() {
   const params = CalculationMethod.Karachi();
   params.fajrAngle = 20;
   params.ishaAngle = 18;
   params.madhab = Madhab.Shafi;
 
-  // Ihtiyati Kemenag: +2 menit di semua waktu
   params.adjustments.fajr = 2;
   params.adjustments.sunrise = 2;
   params.adjustments.dhuhr = 2;
@@ -81,14 +63,7 @@ function buildParams() {
   return params;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Public API                                    */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Hitung waktu sholat untuk tanggal tertentu.
- * Default koordinat Latukan — bisa di-override kalau nanti user bisa pilih lokasi.
- */
 export function getPrayerTimesForDate(
   date: Date,
   lat: number = LATUKAN_COORDS.lat,
@@ -121,11 +96,6 @@ function buildPrayer(key: PrayerKey, time: Date): PrayerInfo {
   };
 }
 
-/**
- * Ambil sholat berikutnya dari waktu sekarang.
- * Sunrise (Syuruq) di-skip — bukan waktu sholat wajib.
- * Kalau semua sudah lewat hari ini → ambil Subuh besok.
- */
 export function getNextPrayer(
   now: Date = new Date(),
   lat: number = LATUKAN_COORDS.lat,
@@ -141,7 +111,6 @@ export function getNextPrayer(
     return buildNext(future[0], now);
   }
 
-  // Semua sudah lewat → Subuh besok
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDay = getPrayerTimesForDate(tomorrow, lat, lng);
@@ -158,10 +127,6 @@ function buildNext(prayer: PrayerInfo, now: Date): NextPrayerInfo {
   };
 }
 
-/**
- * Cek apakah waktu `now` sedang masuk waktu sholat tertentu.
- * Dipakai untuk highlight card waktu yang sedang aktif.
- */
 export function getCurrentPrayer(
   now: Date = new Date(),
   lat: number = LATUKAN_COORDS.lat,
@@ -169,7 +134,6 @@ export function getCurrentPrayer(
 ): PrayerKey | null {
   const today = getPrayerTimesForDate(now, lat, lng);
 
-  // Urutan waktu sholat (skip sunrise)
   const order: PrayerKey[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
   const map = new Map(today.prayers.map((p) => [p.key, p.time] as const));
 
@@ -185,9 +149,6 @@ export function getCurrentPrayer(
   return current;
 }
 
-/**
- * Jadwal sebulan penuh — untuk halaman detail.
- */
 export function getMonthlySchedule(
   year: number,
   month: number,
@@ -202,9 +163,6 @@ export function getMonthlySchedule(
   return out;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Waktu Sunnah & Info                               */
-/* -------------------------------------------------------------------------- */
 
 export type SunnahKey = "syuruq" | "dhuha" | "nisfulLail" | "sepertigaAkhir";
 
@@ -224,13 +182,6 @@ export interface SunnahTimes {
   sepertigaAkhir: SunnahTimeInfo;
 }
 
-/**
- * Hitung waktu-waktu sunnah & info tambahan:
- * - Syuruq: matahari terbit
- * - Dhuha: ±15 menit setelah syuruq (waktu sholat dhuha awal)
- * - Nisful Lail: pertengahan antara Maghrib & Subuh besok
- * - Sepertiga Akhir: 2/3 rentang malam dari Maghrib — waktu utama tahajud
- */
 export function getSunnahTimes(
   date: Date = new Date(),
   lat: number = LATUKAN_COORDS.lat,
@@ -240,24 +191,19 @@ export function getSunnahTimes(
   const syuruq = today.prayers.find((p) => p.key === "sunrise")!;
   const maghrib = today.prayers.find((p) => p.key === "maghrib")!;
 
-  // Subuh besok (untuk hitung malam)
   const tomorrow = new Date(date);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDay = getPrayerTimesForDate(tomorrow, lat, lng);
   const fajrTomorrow = tomorrowDay.prayers.find((p) => p.key === "fajr")!;
 
-  // Dhuha = syuruq + 15 menit
   const dhuhaTime = new Date(syuruq.time.getTime() + 15 * 60 * 1000);
 
-  // Rentang malam: Maghrib hari ini → Fajr besok
   const maghribMs = maghrib.time.getTime();
   const fajrMs = fajrTomorrow.time.getTime();
   const nightSpan = fajrMs - maghribMs;
 
-  // Nisful Lail: 50% malam
   const nisfulLailTime = new Date(maghribMs + Math.floor(nightSpan / 2));
 
-  // Sepertiga Akhir: 66.6% malam
   const sepertigaAkhirTime = new Date(
     maghribMs + Math.floor((nightSpan * 2) / 3),
   );
@@ -298,9 +244,6 @@ export function getSunnahTimes(
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Format Helpers                                */
-/* -------------------------------------------------------------------------- */
 
 export function formatTime(d: Date): string {
   const h = String(d.getHours()).padStart(2, "0");

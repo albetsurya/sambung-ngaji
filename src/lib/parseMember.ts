@@ -1,6 +1,3 @@
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export interface ParsedMember {
   blockIndex: number;
@@ -8,7 +5,7 @@ export interface ParsedMember {
   nama_panggilan: string;
   jenis_kelamin: "L" | "P" | "";
   tempat_lahir: string;
-  tanggal_lahir: string; // YYYY-MM-DD
+  tanggal_lahir: string;
   no_wa: string;
   alamat_rumah: string;
   desa: string;
@@ -29,14 +26,13 @@ export interface ParseResult {
   skipped: { blockPreview: string; reason: string }[];
 }
 
-/** Field target yang dikenali parser */
 type FieldTarget =
   | "nama_lengkap"
   | "nama_panggilan"
   | "jenis_kelamin"
   | "tempat_lahir"
   | "tanggal_lahir"
-  | "tempat_tanggal_lahir" // composite → di-split
+  | "tempat_tanggal_lahir"
   | "no_wa"
   | "alamat_rumah"
   | "desa"
@@ -50,15 +46,6 @@ type FieldTarget =
   | "sekolah"
   | "jurusan";
 
-/* -------------------------------------------------------------------------- */
-/*                              Synonyms Map                                  */
-/* -------------------------------------------------------------------------- */
-/*
- * Setiap target punya beberapa keyword. Keyword di-match setelah normalize:
- * lowercase, tanpa emoji, tanpa tanda baca.
- *
- * Urutan penting — keyword yang lebih spesifik ditaruh dulu.
- */
 
 const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
   {
@@ -165,9 +152,6 @@ const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
   },
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Constants                                     */
-/* -------------------------------------------------------------------------- */
 
 const BULAN_MAP: Record<string, string> = {
   januari: "01",
@@ -197,7 +181,6 @@ const BULAN_MAP: Record<string, string> = {
   dec: "12",
 };
 
-/** Line yang dianggap "header block" — memisahkan antar member */
 const HEADER_KEYWORDS = [
   "biodata",
   "data generus",
@@ -207,36 +190,21 @@ const HEADER_KEYWORDS = [
   "formulir",
 ];
 
-/* -------------------------------------------------------------------------- */
-/*                              Normalization                                 */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Hapus emoji, bullet, tanda baca berlebih, dan collapse spasi.
- * Hasil: string bersih untuk matching.
- */
 function normalize(s: string): string {
   return (
     s
-      // hapus emoji (berbagai range Unicode)
       .replace(
         /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu,
         "",
       )
-      // hapus bullet & bold mark
       .replace(/^[\s\-•*_#]+/, "")
-      // hapus trailing bold/italic
       .replace(/[*_#]+\s*$/, "")
-      // collapse spaces
       .replace(/\s+/g, " ")
       .trim()
   );
 }
 
-/**
- * Normalize untuk matching key — lebih agresif:
- * lowercase, hapus semua tanda baca, collapse spasi.
- */
 function normalizeKey(s: string): string {
   return normalize(s)
     .toLowerCase()
@@ -245,22 +213,13 @@ function normalizeKey(s: string): string {
     .trim();
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Field Matching                                */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Coba match line sebagai field + value.
- * Return null kalau bukan format field.
- */
 function tryParseField(
   line: string,
 ): { target: FieldTarget; value: string } | null {
   const clean = normalize(line);
   if (!clean) return null;
 
-  // Cari separator: prioritas ":" lalu "="
-  // Tapi hati-hati dengan "Tempat, Tanggal Lahir" — comma bukan separator
   const sepIdx = findSeparator(clean);
   if (sepIdx === -1) return null;
 
@@ -276,20 +235,13 @@ function tryParseField(
   return { target, value: rawValue };
 }
 
-/**
- * Cari index separator ":" atau "=" atau " - " (dengan spasi).
- * Return -1 kalau tidak ada.
- */
 function findSeparator(s: string): number {
-  // Prioritas 1: titik dua — selalu separator
   const colonIdx = s.indexOf(":");
   if (colonIdx > 0) return colonIdx;
 
-  // Prioritas 2: sama dengan
   const eqIdx = s.indexOf("=");
   if (eqIdx > 0) return eqIdx;
 
-  // Prioritas 3: " - " (dash dengan spasi di kedua sisi)
   const dashRegex = /\s[-–—]\s/;
   const dashMatch = s.match(dashRegex);
   if (dashMatch && dashMatch.index !== undefined && dashMatch.index > 0) {
@@ -299,22 +251,16 @@ function findSeparator(s: string): number {
   return -1;
 }
 
-/**
- * Match normalized key ke FieldTarget.
- * Return null kalau tidak match.
- */
 function matchFieldKey(rawKey: string): FieldTarget | null {
   const k = normalizeKey(rawKey);
   if (!k) return null;
 
-  // 1. Exact match — prioritas
   for (const { target, keywords } of FIELD_KEYWORDS) {
     for (const kw of keywords) {
       if (k === kw) return target;
     }
   }
 
-  // 2. Fuzzy — pick keyword TERPANJANG yang match (lebih spesifik)
   let bestMatch: { target: FieldTarget; length: number } | null = null;
   for (const { target, keywords } of FIELD_KEYWORDS) {
     for (const kw of keywords) {
@@ -330,15 +276,11 @@ function matchFieldKey(rawKey: string): FieldTarget | null {
   return bestMatch?.target ?? null;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Value Parsers                                 */
-/* -------------------------------------------------------------------------- */
 
 function parseTanggal(raw: string): string {
   if (!raw) return "";
   const s = raw.trim();
 
-  // Format 1: "09-OKTOBER-2006" / "10 Februari-2012" / "10-Februari-2012"
   const m1 = s.match(/(\d{1,2})\s*[-\s]\s*([a-zA-Z]+)\s*[-\s]\s*(\d{4})/);
   if (m1) {
     const [, d, bulan, y] = m1;
@@ -346,14 +288,12 @@ function parseTanggal(raw: string): string {
     if (mm) return `${y}-${mm}-${d.padStart(2, "0")}`;
   }
 
-  // Format 2: "09-10-2006" / "09/10/2006" (DD-MM-YYYY)
   const m2 = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
   if (m2) {
     const [, d, mm, y] = m2;
     return `${y}-${mm.padStart(2, "0")}-${d.padStart(2, "0")}`;
   }
 
-  // Format 3: "2006-10-09" (sudah ISO)
   const m3 = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
   if (m3) {
     const [, y, mm, d] = m3;
@@ -366,7 +306,6 @@ function parseTanggal(raw: string): string {
 function parseTempatTanggal(raw: string): { tempat: string; tanggal: string } {
   if (!raw) return { tempat: "", tanggal: "" };
 
-  // Coba split by comma terakhir
   const commaIdx = raw.lastIndexOf(",");
   if (commaIdx > 0) {
     const tempat = raw.slice(0, commaIdx).trim();
@@ -374,7 +313,6 @@ function parseTempatTanggal(raw: string): { tempat: string; tanggal: string } {
     return { tempat, tanggal: parseTanggal(tanggalRaw) };
   }
 
-  // Tidak ada comma — cek apakah raw itu tanggal saja
   const tgl = parseTanggal(raw);
   if (tgl) return { tempat: "", tanggal: tgl };
 
@@ -410,9 +348,6 @@ function parseBoolean(raw: string): boolean {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Block Detection                               */
-/* -------------------------------------------------------------------------- */
 
 function isHeaderLine(line: string): boolean {
   const k = normalizeKey(line);
@@ -420,12 +355,6 @@ function isHeaderLine(line: string): boolean {
   return HEADER_KEYWORDS.some((h) => k.includes(h));
 }
 
-/**
- * Split input text jadi blocks.
- * Block boundary:
- *  1. Header keyword (biodata, data generus, dll)
- *  2. Field nama_lengkap muncul 2x dalam 1 block (block baru)
- */
 function splitIntoBlocks(lines: string[]): string[][] {
   const blocks: string[][] = [];
   let current: string[] = [];
@@ -440,16 +369,13 @@ function splitIntoBlocks(lines: string[]): string[][] {
   for (const line of lines) {
     if (!line.trim()) continue;
 
-    // Header keyword → block baru
     if (isHeaderLine(line)) {
       flush();
-      continue; // header tidak masuk block
+      continue;
     }
 
-    // Cek apakah line ini field nama_lengkap
     const parsed = tryParseField(line);
     if (parsed?.target === "nama_lengkap") {
-      // Kalau current sudah punya nama → flush, mulai block baru
       if (currentHasNama) {
         flush();
       }
@@ -463,9 +389,6 @@ function splitIntoBlocks(lines: string[]): string[][] {
   return blocks;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Block Parser                                  */
-/* -------------------------------------------------------------------------- */
 
 interface BlockParseState {
   nama_lengkap: string;
@@ -564,10 +487,8 @@ function assignField(
       state.is_nikah = parseBoolean(value);
       break;
     case "is_kerja": {
-      // "Kesibukan" bisa "kuliah" / "sekolah" / "kerja" / "belum bekerja"
       const v = value.toLowerCase();
       state.is_kerja = v.includes("kerja") && !v.includes("belum");
-      // Simpan juga ke pekerjaan kalau belum ada
       if (!state.pekerjaan) state.pekerjaan = value;
       break;
     }
@@ -602,35 +523,27 @@ function parseBlock(lines: string[]): BlockParseState {
     const parsed = tryParseField(line);
 
     if (parsed) {
-      // Field baru — flush pending dulu
       flushPending();
 
       if (parsed.value) {
         assignField(state, parsed.target, parsed.value);
       } else {
-        // Field kosong — tunggu value di baris berikutnya
         pendingTarget = parsed.target;
         pendingBuffer = [];
       }
       continue;
     }
 
-    // Bukan field — kalau ada pendingTarget, append ke buffer
     if (pendingTarget) {
       pendingBuffer.push(line.trim());
     }
-    // Kalau tidak ada pending → ignore (narasi/header sisa)
   }
 
-  // Flush pending terakhir
   flushPending();
 
   return state;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main Parser                                   */
-/* -------------------------------------------------------------------------- */
 
 export function parseMemberText(text: string): ParseResult {
   const lines = text.split("\n");

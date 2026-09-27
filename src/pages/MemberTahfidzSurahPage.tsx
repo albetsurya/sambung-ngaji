@@ -37,7 +37,6 @@ function loadMode(): Mode {
     const v = localStorage.getItem(MODE_KEY);
     if (v === "uji" || v === "baca") return v;
   } catch {
-    // ignore
   }
   return "baca";
 }
@@ -46,7 +45,6 @@ function persistMode(m: Mode) {
   try {
     localStorage.setItem(MODE_KEY, m);
   } catch {
-    // ignore
   }
 }
 
@@ -73,10 +71,8 @@ export default function MemberTahfidzSurahPage() {
 
   const topRef = useRef<HTMLDivElement>(null);
 
-  // Ambil target surah
   const target = useMemo(() => getTargetBySurah(nomorNum), [nomorNum]);
 
-  // Query surah
   const {
     data,
     isLoading,
@@ -90,31 +86,25 @@ export default function MemberTahfidzSurahPage() {
     gcTime: 24 * 60 * 60 * 1000,
   });
 
-  // Ayat dari query param
   const ayatParam = Number(searchParams.get("ayat"));
 
-  // Persist mode
   useEffect(() => {
     persistMode(mode);
   }, [mode]);
 
-  // Reset revealed & playing saat ganti surah
   useEffect(() => {
     setRevealed(new Set());
     setPlayingAyat(null);
     topRef.current?.scrollIntoView({ behavior: "auto" });
   }, [nomorNum]);
 
-  // Persist qari
   useEffect(() => {
     try {
       localStorage.setItem("quran-qari", qariKey);
     } catch {
-      // ignore
     }
   }, [qariKey]);
 
-  // Auto-scroll ke ayat dari query
   useEffect(() => {
     if (!data || !ayatParam) return;
     const t = setTimeout(() => {
@@ -124,7 +114,6 @@ export default function MemberTahfidzSurahPage() {
     return () => clearTimeout(t);
   }, [data, ayatParam]);
 
-  // Filter ayat berdasarkan target (mis. Juz 1 = Al-Baqarah 1-141)
   const visibleAyat: Ayat[] = useMemo(() => {
     if (!data) return [];
     if (!target) return data.ayat;
@@ -133,7 +122,6 @@ export default function MemberTahfidzSurahPage() {
     );
   }, [data, target]);
 
-  // Stats surah
   const stats = useMemo(() => {
     if (!target || !data) return { hafal: 0, total: 0, percentage: 0 };
     let hafal = 0;
@@ -148,7 +136,6 @@ export default function MemberTahfidzSurahPage() {
     };
   }, [data, target, isHafal]);
 
-  // Track "last reviewed" saat user buka mode uji
   function revealAyat(num: number) {
     setRevealed((prev) => {
       const next = new Set(prev);
@@ -243,7 +230,7 @@ export default function MemberTahfidzSurahPage() {
 
       <div ref={topRef} />
 
-      {/* Progress bar surah */}
+      
       {target && stats.total > 0 && (
         <div className="px-4 pt-3">
           <div className="rounded-xl border border-surface-border bg-surface-card px-3 py-2 flex items-center gap-2">
@@ -267,7 +254,7 @@ export default function MemberTahfidzSurahPage() {
         </div>
       )}
 
-      {/* Mode toggle */}
+      
       <div className="px-4 pt-3">
         <Segmented
           ariaLabel="Mode tahfidz"
@@ -295,7 +282,7 @@ export default function MemberTahfidzSurahPage() {
 
         {!isLoading && data && (
           <>
-            {/* Hero surah */}
+            
             <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-soft/40 px-4 py-4 text-center">
               <p
                 className="text-accent mb-1.5"
@@ -322,7 +309,7 @@ export default function MemberTahfidzSurahPage() {
               )}
             </div>
 
-            {/* Info mode uji */}
+            
             {mode === "uji" && (
               <div className="rounded-xl bg-warning-soft/60 border border-warning/20 px-3.5 py-3">
                 <p className="text-ios-caption text-warning leading-relaxed">
@@ -332,7 +319,7 @@ export default function MemberTahfidzSurahPage() {
               </div>
             )}
 
-            {/* List ayat */}
+            
             {visibleAyat.map((ayat) => {
               const hafal = isHafal(nomorNum, ayat.nomorAyat);
               const revealedNow = revealed.has(ayat.nomorAyat);
@@ -358,7 +345,7 @@ export default function MemberTahfidzSurahPage() {
               );
             })}
 
-            {/* Prev/Next surah dalam kategori */}
+            
             <div className="flex gap-2 pt-3">
               {data.suratSebelumnya ? (
                 <button
@@ -436,9 +423,6 @@ export default function MemberTahfidzSurahPage() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Tahfidz Ayat Card                             */
-/* -------------------------------------------------------------------------- */
 
 function TahfidzAyatCard({
   ayat,
@@ -480,7 +464,7 @@ function TahfidzAyatCard({
           : "border-surface-border bg-surface-card")
       }
     >
-      {/* Header */}
+      
       <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-surface-border">
         <div className="flex items-center gap-2 min-w-0">
           <span
@@ -534,9 +518,9 @@ function TahfidzAyatCard({
         </div>
       </div>
 
-      {/* Body */}
+      
       <div className="px-4 py-4 space-y-3">
-        {/* Arab — blur kalau mode uji */}
+        
         <button
           onClick={onReveal}
           disabled={!hidden}
@@ -573,7 +557,7 @@ function TahfidzAyatCard({
           )}
         </button>
 
-        {/* Latin + terjemah — latin selalu tampil, terjemah khusus mubaligh */}
+        
         {!hidden && (
           <>
             <p
@@ -606,9 +590,6 @@ function TahfidzAyatCard({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 function formatAge(ts?: number): string {
   if (!ts) return "";

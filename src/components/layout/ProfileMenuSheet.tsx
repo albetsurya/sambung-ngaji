@@ -16,9 +16,6 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
 import { normalizeGender } from "../../utils/format";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export interface ProfileMenuItem {
   key: string;
@@ -34,17 +31,11 @@ export interface ProfileMenuItem {
 interface ProfileMenuSheetProps {
   open: boolean;
   onClose: () => void;
-  /** Path ke halaman profil — beda admin vs member */
   profilePath: string;
-  /** Item tambahan (muncul antara "Sinkronisasi" dan "Keluar") */
   extraItems?: ProfileMenuItem[];
-  /** Path tujuan setelah logout (default: /login) */
   logoutRedirect?: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Component                                     */
-/* -------------------------------------------------------------------------- */
 
 export function ProfileMenuSheet({
   open,
@@ -91,7 +82,7 @@ export function ProfileMenuSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Menu">
-      {/* Profile Header */}
+      
       <div className="mb-4 flex items-center gap-3.5 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
         <Avatar
           name={user?.nama || "?"}
@@ -111,7 +102,7 @@ export function ProfileMenuSheet({
         </div>
       </div>
 
-      {/* Menu Items */}
+      
       <div className="space-y-1.5">
         <MenuButton
           icon={<User size={18} strokeWidth={2.2} />}
@@ -163,7 +154,7 @@ export function ProfileMenuSheet({
           disabled={syncing}
         />
 
-        {/* Mode jamaah — hanya kalau user punya member_id */}
+        
         {user?.member_id && user.role !== "MEMBER" && (
           <MenuButton
             icon={<Home size={18} strokeWidth={2.2} />}
@@ -194,7 +185,7 @@ export function ProfileMenuSheet({
         ))}
       </div>
 
-      {/* Logout */}
+      
       <div className="mt-4 pt-4 border-t border-surface-border">
         <MenuButton
           icon={<LogOut size={18} strokeWidth={2.2} />}
@@ -209,9 +200,6 @@ export function ProfileMenuSheet({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              MenuButton                                    */
-/* -------------------------------------------------------------------------- */
 
 function MenuButton({
   icon,

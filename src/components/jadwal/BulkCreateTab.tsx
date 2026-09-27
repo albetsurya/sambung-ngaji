@@ -143,7 +143,6 @@ export function BulkCreateTab() {
   }
 
   function handlePreviewClose() {
-    // Reset preview — user close berarti mau edit form
     setPreviewOpen(false);
     setPreview(null);
   }
@@ -154,7 +153,7 @@ export function BulkCreateTab() {
 
   return (
     <div className="px-4 py-4 space-y-4 pb-8">
-      {/* Info banner */}
+      
       <div className="rounded-2xl bg-accent-soft border border-accent/15 p-3.5">
         <p className="text-ios-footnote text-accent/90 leading-relaxed">
           Buat jadwal pengajian sekaligus untuk 1 bulan penuh. Pilih bulan dan
@@ -162,7 +161,7 @@ export function BulkCreateTab() {
         </p>
       </div>
 
-      {/* Form */}
+      
       <Card>
         <p className="text-ios-footnote font-medium text-surface-muted mb-3">
           Periode
@@ -278,7 +277,7 @@ export function BulkCreateTab() {
         </div>
       </Card>
 
-      {/* Preview button */}
+      
       <Button
         fullWidth
         onClick={() => previewMutation.mutate()}
@@ -287,7 +286,7 @@ export function BulkCreateTab() {
         {previewMutation.isPending ? "Memuat preview..." : "Preview Jadwal"}
       </Button>
 
-      {/* Preview BottomSheet */}
+      
       <BottomSheet
         open={previewOpen}
         onClose={handlePreviewClose}
@@ -295,7 +294,7 @@ export function BulkCreateTab() {
       >
         {preview && (
           <>
-            {/* Summary */}
+            
             <div className="flex items-center justify-between mb-3">
               <p className="text-ios-caption text-surface-muted">
                 Ringkasan
@@ -330,7 +329,7 @@ export function BulkCreateTab() {
               </div>
             )}
 
-            {/* List tanggal — scroll internal */}
+            
             <p className="text-ios-caption text-surface-muted mb-2">
               Daftar tanggal:
             </p>
@@ -358,7 +357,7 @@ export function BulkCreateTab() {
               </div>
             </div>
 
-            {/* Action buttons */}
+            
             <div className="flex gap-2">
               <Button variant="secondary" fullWidth onClick={handlePreviewClose}>
                 Revisi Form
@@ -376,7 +375,7 @@ export function BulkCreateTab() {
         )}
       </BottomSheet>
 
-      {/* Confirm Dialog — muncul di atas sheet */}
+      
       <ConfirmDialog
         open={showConfirm}
         title="Konfirmasi Tambah Massal"
@@ -394,9 +393,6 @@ export function BulkCreateTab() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Row                                            */
-/* -------------------------------------------------------------------------- */
 
 function Row({
   label,

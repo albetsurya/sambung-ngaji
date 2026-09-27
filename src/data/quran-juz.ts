@@ -5,10 +5,6 @@ export interface JuzStart {
   surahNama: string;
 }
 
-/**
- * Titik awal 30 juz — mapping standar mushaf Madinah.
- * Dipakai untuk navigasi "Lompat ke Juz N".
- */
 export const JUZ_LIST: JuzStart[] = [
   { juz: 1, surah: 1, ayat: 1, surahNama: "Al-Fatihah" },
   { juz: 2, surah: 2, ayat: 142, surahNama: "Al-Baqarah" },

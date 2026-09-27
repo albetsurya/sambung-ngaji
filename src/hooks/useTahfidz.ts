@@ -11,9 +11,6 @@ import {
 
 const BASE_KEY = "tahfidz-v1";
 
-/* -------------------------------------------------------------------------- */
-/*                              Types                                         */
-/* -------------------------------------------------------------------------- */
 
 export interface AyatState {
   hafal: boolean;
@@ -23,9 +20,6 @@ export interface AyatState {
 
 export type TahfidzData = Record<string, AyatState>;
 
-/* -------------------------------------------------------------------------- */
-/*                              Persist                                       */
-/* -------------------------------------------------------------------------- */
 
 function load(key: string): TahfidzData {
   try {
@@ -43,13 +37,9 @@ function persist(key: string, data: TahfidzData) {
   try {
     localStorage.setItem(key, JSON.stringify(data));
   } catch {
-    // ignore
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Stats helpers                                 */
-/* -------------------------------------------------------------------------- */
 
 export interface SurahProgress {
   target: TahfidzTarget;
@@ -81,7 +71,6 @@ export function getSurahProgress(
 
 export function getJuzHafal(data: TahfidzData): number {
   let juzCount = 0;
-  // Juz 30 is 37 surahs
   let juz30Complete = true;
   for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz30")) {
     const p = getSurahProgress(data, t);
@@ -92,7 +81,6 @@ export function getJuzHafal(data: TahfidzData): number {
   }
   if (juz30Complete) juzCount += 1;
 
-  // Juz 1 is 2 surahs
   let juz1Complete = true;
   for (const t of TAHFIDZ_TARGETS.filter((x) => x.kategori === "juz1")) {
     const p = getSurahProgress(data, t);
@@ -165,9 +153,6 @@ export function getReviewQueue(
   }));
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Activity tracking                           */
-/* -------------------------------------------------------------------------- */
 
 const ACTIVITY_PREFIX = "tahfidz-activity";
 
@@ -186,7 +171,6 @@ function persistActivity(key: string, dates: string[]) {
   try {
     localStorage.setItem(key, JSON.stringify(dates));
   } catch {
-    // ignore
   }
 }
 
@@ -194,9 +178,6 @@ export function getTahfidzStreak(data: TahfidzData, activityDates: string[]): nu
   return calculateStreak(activityDates);
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Hook                                          */
-/* -------------------------------------------------------------------------- */
 
 export function useTahfidz() {
   const { user } = useAuth();
@@ -207,7 +188,6 @@ export function useTahfidz() {
   const [data, setData] = useState<TahfidzData>(() => load(storageKey));
   const [activityDates, setActivityDates] = useState<string[]>(() => loadActivity(activityKey));
 
-  // Reload saat user berubah + migrasi key lama
   useEffect(() => {
     if (userId) {
       migrateKey(BASE_KEY, storageKey);
@@ -216,7 +196,6 @@ export function useTahfidz() {
     setActivityDates(loadActivity(activityKey));
   }, [storageKey, userId, activityKey]);
 
-  // Sinkron antar tab
   useEffect(() => {
     function handler(e: StorageEvent) {
       if (e.key === storageKey) setData(load(storageKey));
@@ -251,7 +230,6 @@ export function useTahfidz() {
         }
 
         persist(storageKey, next);
-        // Record daily activity
         const iso = new Date().toISOString().slice(0, 10);
         setActivityDates((prev) => {
           if (prev.includes(iso)) return prev;

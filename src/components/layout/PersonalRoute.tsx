@@ -4,11 +4,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { LoadingScreen } from "../common";
 import { User } from "../common/FontAwesomeIcons";
 
-/**
- * PersonalRoute — akses halaman personal (tampilan jamaah).
- * Bisa diakses SEMUA role, ASAL user punya member_id (terhubung ke jamaah).
- * Kalau tidak punya member_id → tampilkan info "belum terhubung".
- */
 export function PersonalRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
 

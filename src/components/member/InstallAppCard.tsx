@@ -6,12 +6,6 @@ import { useInstallPrompt } from "../../hooks/useInstallPrompt";
 import { useToast } from "../../contexts/ToastContext";
 import { InstallConfirmModal } from "./InstallConfirmModal";
 
-/**
- * Kartu "Install Aplikasi".
- * - Tombol install (via beforeinstallprompt) untuk perangkat yang mendukung.
- * - QR code ke URL aplikasi: scan → buka di browser → ketuk "Install".
- * - Tombol salin/share link.
- */
 export function InstallAppCard() {
   const { showToast } = useToast();
   const { canInstall, installed, promptInstall } = useInstallPrompt();

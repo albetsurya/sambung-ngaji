@@ -34,7 +34,6 @@ export function usePermission() {
   const isPengawas = role === "PENGAWAS";
   const isMember = role === "MEMBER";
 
-  // SUPER_ADMIN = global, role lain = per kelompok
   const assignedGroup = isSuperAdmin ? null : groupId;
   const isGlobal = isSuperAdmin;
 

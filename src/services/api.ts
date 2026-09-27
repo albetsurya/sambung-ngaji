@@ -1,4 +1,3 @@
-// api.ts
 import type { ApiResponse } from "../types";
 import { API_BASE_URL } from "../constants";
 
@@ -27,16 +26,12 @@ const RETRY_DELAYS = [2000, 5000, 10000];
 const MAX_CONCURRENT_REQUESTS = 2;
 const MIN_DELAY_BETWEEN_REQUESTS_MS = 200;
 
-/* -------------------------------------------------------------------------- */
-/*                              Request Queue                                 */
-/* -------------------------------------------------------------------------- */
 
 let activeRequests = 0;
 let lastRequestTime = 0;
 const pendingQueue: Array<() => void> = [];
 
 async function acquireSlot(): Promise<void> {
-  // Delay minimum antar request supaya tidak spam GAS
   const now = Date.now();
   const elapsed = now - lastRequestTime;
   if (elapsed < MIN_DELAY_BETWEEN_REQUESTS_MS) {
@@ -66,9 +61,6 @@ function releaseSlot(): void {
   if (next) next();
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Token Management                              */
-/* -------------------------------------------------------------------------- */
 
 export function getToken(): string | null {
   const match = document.cookie.match(/(?:^|;\s*)pengajian_token=([^;]*)/);
@@ -83,9 +75,6 @@ export function clearToken() {
   document.cookie = "pengajian_token=; path=/; SameSite=Strict; Max-Age=-1";
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              ApiError                                      */
-/* -------------------------------------------------------------------------- */
 
 export class ApiError extends Error {
   response?: ApiResponse<unknown>;
@@ -107,26 +96,20 @@ export class ApiError extends Error {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                     Pembatalan + notifikasi retry                          */
-/* -------------------------------------------------------------------------- */
 
 const inflight = new Set<AbortController>();
 let abortEpoch = 0;
 
-/** Batalkan semua request API yang sedang berjalan (tombol Batal). */
 export function abortAllApiCalls() {
   abortEpoch++;
   for (const c of inflight) {
     try {
       c.abort("cancelled");
     } catch {
-      // ignore
     }
   }
 }
 
-/** Tidur yang bisa diinterupsi oleh abortAllApiCalls. false = dibatalkan. */
 function sleepCancellable(ms: number, epoch: number): Promise<boolean> {
   return new Promise((resolve) => {
     const start = Date.now();
@@ -152,14 +135,10 @@ export interface RetryInfo {
 
 let retryNotifier: ((info: RetryInfo) => void) | null = null;
 
-/** Daftarkan notifikasi retry (dipasang sekali dari App → toast). */
 export function setRetryNotifier(fn: ((info: RetryInfo) => void) | null) {
   retryNotifier = fn;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Helpers                                       */
-/* -------------------------------------------------------------------------- */
 
 function isHtmlResponse(text: string): boolean {
   const head = text.slice(0, 200).toLowerCase();
@@ -170,24 +149,15 @@ function isHtmlResponse(text: string): boolean {
   );
 }
 
-/**
- * Deteksi 404 dari GAS redirect expired.
- * Ciri: status 404, body kosong atau pesan generik Google (bukan JSON project).
- */
 function isGasRedirectExpired(status: number, text: string): boolean {
   if (status !== 404) return false;
-  // Body kosong atau pendek → kemungkinan besar redirect expired
   if (text.length < 500) return true;
-  // Body HTML error Google
   if (text.includes("Halaman Tidak Ditemukan")) return true;
   if (text.includes("Page Not Found")) return true;
   if (text.includes("Error 404")) return true;
   return false;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Main API Call                                 */
-/* -------------------------------------------------------------------------- */
 
 export async function call<T>(
   action: string,
@@ -208,7 +178,6 @@ export async function call<T>(
     } catch (error) {
       lastError = error;
 
-      // Jangan retry request yang dibatalkan user.
       if (error instanceof ApiError && error.cancelled) {
         throw error;
       }
@@ -220,11 +189,7 @@ export async function call<T>(
       }
 
       const delay = RETRY_DELAYS[attempt] ?? 10000;
-      console.warn(
-        `⚠️ API [${action}] gagal (attempt ${attempt + 1}/${MAX_RETRIES + 1}), retry dalam ${delay}ms...`,
-        error instanceof Error ? error.message : error,
-      );
-      // Beri tahu UI sekali (retry pertama) agar tidak diam.
+
       if (attempt === 0 && retryNotifier) {
         try {
           retryNotifier({
@@ -233,7 +198,6 @@ export async function call<T>(
             total: MAX_RETRIES + 1,
           });
         } catch {
-          // ignore
         }
       }
       const slept = await sleepCancellable(delay, epoch);
@@ -249,9 +213,6 @@ export async function call<T>(
   throw lastError;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Single API Call                               */
-/* -------------------------------------------------------------------------- */
 
 async function callOnce<T>(
   action: string,
@@ -270,7 +231,6 @@ async function callOnce<T>(
       action,
       ...params,
     };
-    // Auto-attach group_id untuk filter per kelompok
     const gid = getGroupId();
     if (gid) {
       payload.group_id = gid;
@@ -282,7 +242,6 @@ async function callOnce<T>(
     };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    // Cache buster hanya di attempt 0. Retry tanpa buster (pakai cache GAS).
     const url =
       attempt === 0
         ? API_BASE_URL.includes("?")
@@ -300,7 +259,6 @@ async function callOnce<T>(
         body,
         redirect: "follow",
         cache: "no-store",
-        // Kirim HttpOnly cookie sesi (backend juga pakai header sbg fallback).
         credentials: "include",
         signal: controller.signal,
       });
@@ -308,8 +266,6 @@ async function callOnce<T>(
       clearTimeout(timeoutId);
 
       if (err?.name === "AbortError") {
-        // Dibatalkan user via abortAllApiCalls (reason "cancelled")
-        // vs timeout internal (tanpa reason).
         if (controller.signal.reason === "cancelled") {
           throw new ApiError("Permintaan dibatalkan", undefined, {
             retryable: false,
@@ -348,7 +304,6 @@ async function callOnce<T>(
     const text = await response.text();
     const status = response.status;
 
-    /* ---------------- HTML response (deployment error) ---------------- */
     if (isHtmlResponse(text)) {
       const titleMatch = text.match(/<title>([^<]*)<\/title>/i);
       const title = titleMatch ? titleMatch[1] : "";
@@ -360,7 +315,6 @@ async function callOnce<T>(
       );
     }
 
-    /* ---------------- 404 dari GAS redirect expired ---------------- */
     if (isGasRedirectExpired(status, text)) {
       throw new ApiError(
         "Server sementara tidak tersedia. Mencoba ulang...",
@@ -369,7 +323,6 @@ async function callOnce<T>(
       );
     }
 
-    /* ---------------- 404 dengan body tidak dikenal ---------------- */
     if (status === 404) {
       throw new ApiError(
         "Server tidak merespon dengan benar. Mencoba ulang...",
@@ -378,7 +331,6 @@ async function callOnce<T>(
       );
     }
 
-    /* ---------------- 5xx ---------------- */
     if (status >= 500) {
       throw new ApiError(
         `Server error (${status}). Mencoba ulang...`,
@@ -387,7 +339,6 @@ async function callOnce<T>(
       );
     }
 
-    /* ---------------- 429 ---------------- */
     if (status === 429) {
       throw new ApiError("Server sedang sibuk. Mencoba ulang...", undefined, {
         retryable: true,
@@ -395,7 +346,6 @@ async function callOnce<T>(
       });
     }
 
-    /* ---------------- Parse JSON ---------------- */
     let data: ApiResponse<T>;
     try {
       data = JSON.parse(text);
@@ -407,11 +357,9 @@ async function callOnce<T>(
       );
     }
 
-    /* ---------------- Cek response GAS ---------------- */
     if (!data.success) {
       const msg = data.message || "Terjadi kesalahan";
 
-      // Deteksi "action wajib diisi" (redirect gagal) → retry
       if (
         msg.toLowerCase().includes("action wajib diisi") ||
         msg.toLowerCase().includes("action tidak dikenal")
@@ -421,7 +369,6 @@ async function callOnce<T>(
         });
       }
 
-      // Unauthorized → clear token, no retry
       if (
         msg.toLowerCase().includes("unauthorized") ||
         msg.toLowerCase().includes("sesi tidak valid") ||
@@ -444,9 +391,6 @@ async function callOnce<T>(
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Login / Logout                                */
-/* -------------------------------------------------------------------------- */
 
 export async function login(username: string, password: string) {
   const result = await call<{ token: string; user: any }>("login", {
@@ -464,25 +408,18 @@ export async function logout() {
   try {
     await call("logout", {});
   } catch (error) {
-    console.warn("Logout error (diabaikan):", error);
+
   } finally {
     clearToken();
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              Debug Functions                               */
-/* -------------------------------------------------------------------------- */
 
 export async function testApiConnection() {
-  console.log("=== 🧪 TEST API CONNECTION ===");
-  console.log("📋 Environment:", {
-    API_BASE_URL: API_BASE_URL,
-    mode: import.meta.env.MODE,
-  });
+
 
   if (!API_BASE_URL) {
-    console.error("❌ API_BASE_URL is empty!");
+
     return { success: false, error: "API_BASE_URL empty" };
   }
 
@@ -491,10 +428,10 @@ export async function testApiConnection() {
       "checkUsernameAvailability",
       { username: "test_connection_probe" },
     );
-    console.log("✅ API reachable:", result);
+
     return { success: true, data: result };
   } catch (error) {
-    console.error("❌ Connection error:", error);
+
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
@@ -503,13 +440,13 @@ export async function testApiConnection() {
 }
 
 export async function testApiGet() {
-  console.log("=== 🧪 TEST API GET ===");
+
   try {
     const url = `${API_BASE_URL}${API_BASE_URL.includes("?") ? "&" : "?"}action=validateSession&_t=${Date.now()}`;
     const response = await fetch(url, { method: "GET", cache: "no-store" });
     const text = await response.text();
-    console.log("📥 Status:", response.status);
-    console.log("📝 Response:", text.substring(0, 500));
+
+
     return { success: true, raw: text };
   } catch (error) {
     return {

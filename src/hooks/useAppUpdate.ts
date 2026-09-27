@@ -17,7 +17,6 @@ export function useAppUpdate() {
   return {
     updateAvailable: state.updateAvailable,
     checking: state.checking,
-    /** Cek + terapkan update bila ada. Resolve true bila update diterapkan. */
     checkForUpdate: checkForAppUpdate,
     applyUpdate: applyAppUpdate,
   };

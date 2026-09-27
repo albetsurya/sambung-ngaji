@@ -41,12 +41,12 @@ function AiAvatar({ size = 32 }: { size?: number }) {
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
-        {/* Sparkle utama */}
+        
         <path
           d="M12 2 L13.5 9 L20.5 10.5 L13.5 12 L12 19 L10.5 12 L3.5 10.5 L10.5 9 Z"
           fill="white"
         />
-        {/* Sparkle kecil */}
+        
         <path
           d="M19 17 L19.7 19.3 L22 20 L19.7 20.7 L19 23 L18.3 20.7 L16 20 L18.3 19.3 Z"
           fill="white"

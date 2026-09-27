@@ -28,11 +28,6 @@ const SECTION_LABEL: Record<TaarufSectionKey, string> = {
   pendidikan: "Pendidikan",
 };
 
-/**
- * Sheet CV Taaruf: preview WYSIWYG + sesuaikan isi & tata letak cetakan.
- * Perubahan di sini khusus cetakan ini. Tidak mengubah data tersimpan.
- * Tombol export PDF & gambar menyusul setelah desain disetujui.
- */
 export function TaarufCvSheet({
   open,
   onClose,
@@ -50,10 +45,6 @@ export function TaarufCvSheet({
   );
 }
 
-/**
- * Isi editor CV Taaruf (pratinjau + sesuaikan + unduh).
- * Dipakai di sheet maupun halaman cetak tersendiri.
- */
 export function TaarufCvEditor({
   member,
   resetKey,
@@ -70,7 +61,6 @@ export function TaarufCvEditor({
   const exportRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
 
-  // Reset tiap dibuka / ganti member.
   useEffect(() => {
     setEditing(false);
     setSelection(null);
@@ -200,7 +190,7 @@ export function TaarufCvEditor({
             Seret foto untuk crop, seret ⋮⋮ untuk menyusun ulang.
           </p>
 
-          {/* Toggle editor */}
+          
           <div className="max-w-[560px] mx-auto mt-4">
             <button
               onClick={() => setEditing((v) => !v)}
@@ -231,7 +221,7 @@ export function TaarufCvEditor({
                   untuk cetakan ini, tidak mengubah data yang tersimpan.
                 </p>
 
-                {/* Tema */}
+                
                 <div>
                   <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
                     Tema
@@ -265,7 +255,7 @@ export function TaarufCvEditor({
                   </div>
                 </div>
 
-                {/* Sisi foto */}
+                
                 <div>
                   <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
                     Posisi foto
@@ -284,7 +274,7 @@ export function TaarufCvEditor({
                   />
                 </div>
 
-                {/* Urutan bagian */}
+                
                 <div>
                   <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
                     Urutan bagian
@@ -319,7 +309,7 @@ export function TaarufCvEditor({
                   </div>
                 </div>
 
-                {/* Foto: zoom */}
+                
                 {member.foto_url && (
                   <div>
                     <div className="flex items-center justify-between mb-2 px-1">
@@ -360,7 +350,7 @@ export function TaarufCvEditor({
                   </div>
                 )}
 
-                {/* Isian: sembunyi + ubah */}
+                
                 <div>
                   <p className="text-ios-footnote font-medium text-surface-muted mb-1 px-1">
                     Isian cetakan
@@ -403,7 +393,7 @@ export function TaarufCvEditor({
                       );
                     })}
 
-                    {/* Toggle foto & bagian */}
+                    
                     {(
                       [
                         ["foto", "Foto", options.showPhoto],
@@ -493,7 +483,7 @@ export function TaarufCvEditor({
             Hasil unduhan sama persis dengan pratinjau di atas.
           </p>
 
-          {/* Node cetak off-screen: tanpa toolbar & tanpa catatan rahasia */}
+          
           <div
             aria-hidden
             style={{ position: "fixed", left: -10000, top: 0, width: 560 }}

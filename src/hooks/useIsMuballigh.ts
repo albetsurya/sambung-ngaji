@@ -3,11 +3,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { memberSelfApi } from "../services/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
 
-/**
- * true hanya jika profil member terkonfirmasi mubaligh.
- * Fail-closed: saat loading/gagal, bernilai false (terjemahan disembunyikan).
- * Query memakai key yang sama dengan halaman lain sehingga ikut cache.
- */
 export function useIsMuballigh(): boolean {
   const { user } = useAuth();
   const { data } = useQuery({
