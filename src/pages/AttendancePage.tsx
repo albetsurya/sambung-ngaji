@@ -181,7 +181,10 @@ export default function AttendancePage() {
   const selectedMeeting = useMemo(() => {
     if (meetings.length === 0) return null;
     if (pinnedMeetingId) {
-      return meetings.find((m) => m.meeting_id === pinnedMeetingId) || null;
+      /* Pin bisa basi (mis. jadwal kelompok lain pasca filter group):
+         kalau tak ketemu, jatuh ke pilihan default di bawah. */
+      const pinned = meetings.find((m) => m.meeting_id === pinnedMeetingId);
+      if (pinned) return pinned;
     }
     const today = new Date().toISOString().slice(0, 10);
     return meetings.find((m) => m.tanggal === today) || meetings[0] || null;
@@ -1469,42 +1472,41 @@ function MeetingPickerContent({
             {allVisibleSelected ? "Batal Semua" : "Pilih Semua"}
           </button>
         </div>
-      ) : (
-        meetings.length > 0 &&
-        canCreate && (
-          <div className="flex justify-end mb-3">
+      ) : null}
+
+      
+      {meetings.length > 0 && !selectionMode && (
+        <div className="flex items-center gap-2 mb-3">
+          <div className="relative flex-1 min-w-0">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari acara, tanggal, atau jam..."
+              className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+            />
+            {hasSearch && (
+              <button
+                onClick={() => setSearch("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+          {canCreate && (
             <Button
               variant="soft"
               size="xs"
               onClick={() => enterSelectionMode()}
+              className="shrink-0 min-h-[40px]"
             >
               Pilih
             </Button>
-          </div>
-        )
-      )}
-
-      
-      {meetings.length > 0 && !selectionMode && (
-        <div className="relative mb-3">
-          <Search
-            size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
-          />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari acara, tanggal, atau jam..."
-            className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
-          />
-          {hasSearch && (
-            <button
-              onClick={() => setSearch("")}
-              aria-label="Hapus pencarian"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2"
-            >
-              <X size={12} />
-            </button>
           )}
         </div>
       )}
