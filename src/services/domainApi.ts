@@ -40,7 +40,7 @@ export const meetingApi = {
     materi?: string;
     catatan?: string;
     kategori_target?: string[];
-    gender_target?: "" | "L" | "P";
+    gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
   }) => call<Meeting>("createMeeting", payload),
 
@@ -54,7 +54,7 @@ export const meetingApi = {
     status?: string;
     catatan?: string;
     kategori_target?: string[];
-    gender_target?: "" | "L" | "P";
+    gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
   }) => call<Meeting>("updateMeeting", payload),
 

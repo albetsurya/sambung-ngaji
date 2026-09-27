@@ -123,7 +123,8 @@ export interface Meeting {
   status: string;
   catatan?: string;
   kategori_target?: MemberCategory[];
-  gender_target?: "" | "L" | "P";
+  /* "" = semua (UI saja); null = semua (format database, lolos CHECK) */
+  gender_target?: "" | "L" | "P" | null;
   send_reminder?: boolean;
   created_by?: string;
   created_at?: string;

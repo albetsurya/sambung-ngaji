@@ -73,7 +73,7 @@ export function ImportTextTab() {
             materi: "",
             catatan: item.catatan || "",
             kategori_target: item.kategoriTarget,
-            gender_target: item.genderTarget,
+            gender_target: item.genderTarget || null,
           });
           success++;
         } catch (err) {

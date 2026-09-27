@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { meetingApi, groupApi } from "../../services/domainApi";
 import { queryKeys } from "../../lib/queryClient";
 import { useToast } from "../../contexts/ToastContext";
+import { usePermission } from "../../hooks/usePermission";
 
 import { DateInput } from "../common/DateInput";
 import { GenderTargetPicker, getGenderTarget } from "./GenderTargetPicker";
@@ -35,6 +36,7 @@ type ModalState =
 export function CalendarTab() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const { assignedGroup } = usePermission();
 
   const [range, setRange] = useState(() => {
     const now = new Date();
@@ -50,8 +52,13 @@ export function CalendarTab() {
   const [confirmDelete, setConfirmDelete] = useState<Meeting | null>(null);
 
   const meetingsQuery = useQuery({
-    queryKey: ["meetings", "calendar", range],
-    queryFn: () => meetingApi.list({ from: range.from, to: range.to }),
+    queryKey: ["meetings", "calendar", range, assignedGroup ?? "all"],
+    queryFn: () =>
+      meetingApi.list({
+        from: range.from,
+        to: range.to,
+        ...(assignedGroup ? { group_id: assignedGroup } : {}),
+      }),
     staleTime: 2 * 60_000,
   });
 
@@ -421,13 +428,16 @@ function MeetingFormContent({
   onSaved: () => void;
 }) {
   const { showToast } = useToast();
+  const { assignedGroup } = usePermission();
   const isEdit = mode === "edit";
 
   const [tanggal, setTanggal] = useState(
     initialTanggal || meeting?.tanggal || getTodayIso(),
   );
   const [jam, setJam] = useState(meeting?.jam || "Isya di tempat");
-  const [groupId, setGroupId] = useState(meeting?.group_id || "");
+  const [groupId, setGroupId] = useState(
+    meeting?.group_id || assignedGroup || "",
+  );
   const [acara, setAcara] = useState(meeting?.acara || "Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>(
     Array.isArray(meeting?.kategori_target)
@@ -437,15 +447,17 @@ function MeetingFormContent({
   const [genderTarget, setGenderTarget] = useState<GenderTarget>(
     getGenderTarget(meeting),
   );
-  const [sendReminder, setSendReminder] = useState(
-    meeting?.send_reminder !== false,
-  );
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
     queryFn: () => groupApi.list(),
     staleTime: 5 * 60_000,
   });
+
+  /* Admin ber-kelompok: kunci ke kelompoknya, tidak bisa pilih kelompok lain. */
+  const visibleGroups = assignedGroup
+    ? groups.filter((g) => g.group_id === assignedGroup)
+    : groups;
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -455,8 +467,9 @@ function MeetingFormContent({
         group_id: groupId,
         acara,
         kategori_target: kategoriTarget,
-        gender_target: genderTarget,
-        send_reminder: sendReminder,
+        /* "" (Semua) dikirim null agar lolos CHECK database. */
+        gender_target: genderTarget || null,
+        send_reminder: true,
       };
       if (isEdit && meeting) {
         return meetingApi.update({
@@ -502,7 +515,7 @@ function MeetingFormContent({
         onChange={(e) => setGroupId(e.target.value)}
       >
         <option value="">Pilih kelompok</option>
-        {groups.map((g) => (
+        {visibleGroups.map((g) => (
           <option key={g.group_id} value={g.group_id}>
             {g.group_name}
           </option>
@@ -556,13 +569,6 @@ function MeetingFormContent({
         onChange={setGenderTarget}
       />
 
-      <ModernCheckbox
-        checked={sendReminder}
-        onChange={setSendReminder}
-        label="Kirim Reminder WA"
-        description="Kirim otomatis H-8 jam sebelum acara ke grup pengajian"
-      />
-
       <Button
         fullWidth
         onClick={() => mutation.mutate()}
@@ -575,48 +581,5 @@ function MeetingFormContent({
             : "Buat Jadwal"}
       </Button>
     </>
-  );
-}
-
-
-function ModernCheckbox({
-  checked,
-  onChange,
-  label,
-  description,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-  description?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 active:scale-[0.99] text-left ${
-        checked
-          ? "bg-accent-soft border-accent/40"
-          : "bg-surface-card border-surface-border hover:bg-surface-card2"
-      }`}
-    >
-      <div
-        className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-          checked
-            ? "bg-accent text-white"
-            : "bg-surface-card2 border border-surface-border"
-        }`}
-      >
-        {checked && <Check size={14} strokeWidth={3} />}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-ios-body font-medium text-surface-text">{label}</p>
-        {description && (
-          <p className="text-ios-caption text-surface-muted mt-0.5">
-            {description}
-          </p>
-        )}
-      </div>
-    </button>
   );
 }
