@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Trash2,
   Search,
+  SlidersHorizontal,
   X,
 } from "../components/common/FontAwesomeIcons";
 import {
@@ -38,10 +39,10 @@ import type { Member, MemberCategory, Role, User } from "../types";
 import { CATEGORY_LABEL } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
 import { useToast } from "../contexts/ToastContext";
+import { usePermission, ROLE_LABEL } from "../hooks/usePermission";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { UsersSkeleton } from "../components/common/Skeleton";
 import { queryKeys } from "../lib/queryClient";
-import { ROLE_LABEL } from "../hooks/usePermission";
 
 const ROLE_DESCRIPTION: Record<Role, string> = {
   SUPER_ADMIN: "Akses penuh ke semua fitur",
@@ -85,22 +86,36 @@ export default function UsersPage() {
   const [fSearch, setFSearch] = useState("");
   const [fGender, setFGender] = useState<"" | "L" | "P">("");
   const [fKategori, setFKategori] = useState<MemberCategory | "">("");
+  const [fStatus, setFStatus] = useState<"" | "ACTIVE" | "INACTIVE">("");
+  const [fRole, setFRole] = useState<Role | "">("");
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+
+  const activeFilterCount = useMemo(
+    () =>
+      (fStatus ? 1 : 0) +
+      (fRole ? 1 : 0) +
+      (fGender ? 1 : 0),
+    [fStatus, fRole, fGender],
+  );
 
   const filteredUsers = useMemo(() => {
     const q = fSearch.trim().toLowerCase();
     return users.filter((u) => {
       const member = u.member_id ? memberById.get(u.member_id) : undefined;
       if (q) {
-        const hay = `${u.nama} ${u.username} ${member?.nama_lengkap ?? ""}`.toLowerCase();
+        const hay = `${u.nama} ${u.username} ${u.role} ${member?.nama_lengkap ?? ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
+      if (fRole && u.role !== fRole) return false;
       if (fGender && member?.jenis_kelamin !== fGender) return false;
       if (fKategori && member?.kategori !== fKategori) return false;
+      if (fStatus === "ACTIVE" && u.status_aktif === false) return false;
+      if (fStatus === "INACTIVE" && u.status_aktif !== false) return false;
       return true;
     });
-  }, [users, memberById, fSearch, fGender, fKategori]);
+  }, [users, memberById, fSearch, fGender, fKategori, fStatus, fRole]);
 
-  const hasActiveFilter = fSearch.trim() !== "" || fGender !== "" || fKategori !== "";
+  const hasActiveFilter = fSearch.trim() !== "" || activeFilterCount > 0;
 
   return (
     <AppLayout
@@ -120,31 +135,48 @@ export default function UsersPage() {
         backLabel="Kembali"
       />
 
-      <div className="px-4 pt-3 space-y-2">
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
-          />
-          <input
-            value={fSearch}
-            onChange={(e) => setFSearch(e.target.value)}
-            placeholder="Cari nama / username"
-            className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
-          />
-          {fSearch.length > 0 && (
-            <button
-              onClick={() => setFSearch("")}
-              aria-label="Hapus pencarian"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          )}
+      <div className="px-4 pt-3 space-y-2.5">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-muted"
+            />
+            <input
+              value={fSearch}
+              onChange={(e) => setFSearch(e.target.value)}
+              placeholder="Cari nama, username, role..."
+              className="w-full min-h-[40px] rounded-xl border border-surface-border bg-surface-card pl-9 pr-9 text-[16px] text-surface-text placeholder:text-surface-muted/70 shadow-sm transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
+            />
+            {fSearch.length > 0 && (
+              <button
+                onClick={() => setFSearch("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-surface-muted hover:bg-surface-card2 transition-colors"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            iconOnly
+            onClick={() => setFilterSheetOpen(true)}
+            aria-label="Filter User"
+            className="relative bg-surface-card border border-surface-border hover:bg-surface-card2 min-w-[40px] h-[40px] rounded-xl flex items-center justify-center shrink-0"
+          >
+            <SlidersHorizontal size={16} />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
         </div>
 
-        
-        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
           <FilterChip
             active={fKategori === ""}
             label="Semua"
@@ -159,25 +191,6 @@ export default function UsersPage() {
             />
           ))}
         </div>
-
-        
-        <div className="flex gap-2">
-          <div className="flex-1 min-w-0">
-            <Segmented
-              ariaLabel="Filter jenis kelamin"
-              size="sm"
-              value={fGender}
-              onChange={setFGender}
-              options={[
-                { value: "", label: "Semua" },
-                { value: "L", label: "Laki-laki" },
-                { value: "P", label: "Perempuan" },
-              ]}
-            />
-          </div>
-        </div>
-
-
       </div>
 
       <div className="py-3">
@@ -239,6 +252,11 @@ export default function UsersPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    {u.status_aktif === false && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-danger-soft text-danger border border-danger/20">
+                        Nonaktif
+                      </span>
+                    )}
                     <RoleBadge role={u.role} />
                     <Button
                       variant="ghost"
@@ -292,6 +310,77 @@ export default function UsersPage() {
         }}
       />
 
+      <BottomSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        title="Filter User"
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
+              Status Akun
+            </p>
+            <Segmented<"" | "ACTIVE" | "INACTIVE">
+              ariaLabel="Filter status user"
+              value={fStatus}
+              onChange={setFStatus}
+              options={[
+                { value: "", label: "Semua" },
+                { value: "ACTIVE", label: "Aktif" },
+                { value: "INACTIVE", label: "Non-Aktif" },
+              ]}
+            />
+          </div>
+
+          <div>
+            <Select
+              label="Filter Role"
+              value={fRole}
+              onChange={(e) => setFRole(e.target.value as Role | "")}
+            >
+              <option value="">Semua Role</option>
+              {Object.entries(ROLE_LABEL).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
+              Jenis Kelamin Jamaah
+            </p>
+            <Segmented<"" | "L" | "P">
+              ariaLabel="Filter jenis kelamin"
+              value={fGender}
+              onChange={setFGender}
+              options={[
+                { value: "", label: "Semua" },
+                { value: "L", label: "Laki-laki (L)" },
+                { value: "P", label: "Perempuan (P)" },
+              ]}
+            />
+          </div>
+
+          {activeFilterCount > 0 && (
+            <div className="pt-2">
+              <Button
+                variant="ghost"
+                fullWidth
+                onClick={() => {
+                  setFStatus("");
+                  setFRole("");
+                  setFGender("");
+                }}
+              >
+                Reset Filter Slider
+              </Button>
+            </div>
+          )}
+        </div>
+      </BottomSheet>
+
       <DeleteUserConfirmModal
         user={deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -332,6 +421,7 @@ function CreateUserSheet({
   const [role, setRole] = useState<Role>("MEMBER");
   const [memberId, setMemberId] = useState("");
   const { showToast } = useToast();
+  const { isSuperAdmin } = usePermission();
 
   useEffect(() => {
     if (!open) return;
@@ -424,11 +514,13 @@ function CreateUserSheet({
           value={role}
           onChange={(e) => setRole(e.target.value as Role)}
         >
-          {Object.entries(ROLE_LABEL).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
-          ))}
+          {Object.entries(ROLE_LABEL)
+            .filter(([k]) => isSuperAdmin || k !== "SUPER_ADMIN")
+            .map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
         </Select>
 
         <p className="-mt-2 mb-4 text-ios-caption text-surface-muted px-0.5">
@@ -466,6 +558,7 @@ function EditUserSheet({
   onRequestDelete: (u: User) => void;
 }) {
   const { showToast } = useToast();
+  const { isSuperAdmin } = usePermission();
   const [nama, setNama] = useState("");
   const [role, setRole] = useState<Role>("MEMBER");
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
@@ -518,6 +611,20 @@ function EditUserSheet({
     onError: (err) => {
       showToast(
         err instanceof ApiError ? err.message : "Gagal menonaktifkan user",
+        "error",
+      );
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: () => userApi.update(user!.user_id, { status_aktif: true }),
+    onSuccess: () => {
+      showToast("User diaktifkan kembali");
+      onUpdated();
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal mengaktifkan user",
         "error",
       );
     },
@@ -583,11 +690,13 @@ function EditUserSheet({
             value={role}
             onChange={(e) => setRole(e.target.value as Role)}
           >
-            {Object.entries(ROLE_LABEL).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
-            ))}
+            {Object.entries(ROLE_LABEL)
+              .filter(([k]) => isSuperAdmin || k !== "SUPER_ADMIN")
+              .map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
           </Select>
           <p className="-mt-2 mb-3 text-ios-caption text-surface-muted px-0.5">
             {ROLE_DESCRIPTION[role]}
@@ -602,19 +711,29 @@ function EditUserSheet({
           </Button>
         </div>
 
-        {user.status_aktif !== false && user.role !== "SUPER_ADMIN" && (
+        {user.role !== "SUPER_ADMIN" && (
           <div className="mt-6 pt-4 border-t border-surface-border">
-            <Button
-              variant="danger"
-              fullWidth
-              onClick={() => setConfirmDeactivate(true)}
-            >
-              Nonaktifkan User
-            </Button>
+            {user.status_aktif !== false ? (
+              <Button
+                variant="danger"
+                fullWidth
+                onClick={() => setConfirmDeactivate(true)}
+              >
+                Nonaktifkan User
+              </Button>
+            ) : (
+              <Button
+                fullWidth
+                onClick={() => activateMutation.mutate()}
+                disabled={activateMutation.isPending}
+              >
+                {activateMutation.isPending ? "Mengaktifkan..." : "Aktifkan User"}
+              </Button>
+            )}
           </div>
         )}
 
-        {user.role !== "SUPER_ADMIN" && (
+        {isSuperAdmin && user.role !== "SUPER_ADMIN" && (
           <div className="mt-6 pt-4 border-t border-surface-border">
             <p className="text-ios-caption text-danger font-medium mb-2 px-0.5">
               Zona Berbahaya

@@ -486,7 +486,7 @@ function AppRoutes() {
             <Route
               path="ai-usage"
               element={
-                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+                <RoleRoute allowed={["SUPER_ADMIN"]}>
                   <AiUsagePage />
                 </RoleRoute>
               }
@@ -494,7 +494,7 @@ function AppRoutes() {
             <Route
               path="users"
               element={
-                <RoleRoute allowed={["SUPER_ADMIN"]}>
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <UsersPage />
                 </RoleRoute>
               }

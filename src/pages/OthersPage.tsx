@@ -74,7 +74,8 @@ export default function OthersPage() {
 
   /* Admin ber-kelompok: menu granular diganti satu hub "Kelompok Saya". */
   const isHubUser =
-    (role === "ADMIN" || role === "PENGAWAS") && !!assignedGroup;
+    (role === "ADMIN" || role === "PENGAWAS" || role === "TIM_ABSENSI") &&
+    !!assignedGroup;
 
   const menu = ([
     {
@@ -90,11 +91,11 @@ export default function OthersPage() {
     {
       key: "kelompok-saya",
       label: "Kelompok Saya",
-      description: "Anggota, pendaftar & petugas kelompok ini",
+      description: "Anggota, jadwal, absensi & pendaftar kelompok ini",
       Icon: Building2,
       to: "/kelompok-saya",
       show: isHubUser,
-      group: "jamaah",
+      group: "akun",
       badge: pendingCount > 0 ? pendingCount : undefined,
       badgeLoading: pendingLoading,
     },
@@ -133,7 +134,7 @@ export default function OthersPage() {
       description: "Paste text biodata dari WhatsApp",
       Icon: FileText,
       to: "/lainnya/import-jamaah",
-      show: isAdminLike,
+      show: isAdminLike && !isHubUser,
       group: "jamaah",
     },
     {
@@ -142,7 +143,7 @@ export default function OthersPage() {
       description: "Bagikan link pendaftaran",
       Icon: QrCode,
       to: "/lainnya/qr-code",
-      show: isAdminLike,
+      show: isAdminLike && !isHubUser,
       group: "jamaah",
     },
 
@@ -152,7 +153,7 @@ export default function OthersPage() {
       description: "Kalender, tambah massal, import PDF",
       Icon: Calendar,
       to: "/lainnya/jadwal",
-      show: isAdminLike || role === "TIM_ABSENSI",
+      show: (isAdminLike || role === "TIM_ABSENSI") && !isHubUser,
       group: "jadwal",
     },
     {
@@ -161,7 +162,9 @@ export default function OthersPage() {
       description: "Matriks kehadiran bulanan",
       Icon: CalendarCheck,
       to: "/lainnya/rekap-absensi",
-      show: isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS",
+      show:
+        (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
+        !isHubUser,
       group: "jadwal",
     },
     {
@@ -182,7 +185,7 @@ export default function OthersPage() {
       description: "Atur akun & hak akses",
       Icon: KeyRound,
       to: "/lainnya/users",
-      show: isSuperAdmin,
+      show: isSuperAdmin || (isAdminLike && !isHubUser),
       group: "sistem",
     },
     {
@@ -191,7 +194,7 @@ export default function OthersPage() {
       description: "Statistik pemakaian AI",
       Icon: Sparkles,
       to: "/lainnya/ai-usage",
-      show: isAdminLike,
+      show: isSuperAdmin,
       group: "sistem",
     },
     {
@@ -234,11 +237,11 @@ export default function OthersPage() {
     : menu;
 
   const GROUP_LABEL: Record<MenuGroup, string> = {
-    tampilan: "Tampilan",
-    jamaah: "Jamaah & Pendaftaran",
+    tampilan: "Pengaturan Aplikasi",
+    jamaah: "Jamaah & Kelompok",
     jadwal: "Jadwal & Absensi",
-    sistem: "Sistem",
-    akun: "Akun",
+    sistem: "Sistem & Hak Akses",
+    akun: "Akun Saya",
   };
 
   const GROUP_ORDER: MenuGroup[] = [

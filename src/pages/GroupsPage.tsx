@@ -172,7 +172,7 @@ export default function GroupsPage() {
   );
 }
 
-function GroupSheet({
+export function GroupSheet({
   open,
   group,
   onClose,
