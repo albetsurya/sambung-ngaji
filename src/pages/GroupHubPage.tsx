@@ -56,7 +56,7 @@ export default function GroupHubPage() {
   }[] = [
     {
       key: "anggota",
-      label: "Anggota",
+      label: "Kelola Anggota",
       description: "Kelola jamaah kelompok ini",
       Icon: Users,
       to: "/jamaah",
