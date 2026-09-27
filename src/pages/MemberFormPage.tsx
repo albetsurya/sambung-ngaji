@@ -360,7 +360,7 @@ export default function MemberFormPage() {
           />
 
           {!form.is_nikah && (
-            <div className="space-y-3 pt-1">
+            <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <Input
                   label="Tinggi Badan (cm)"
@@ -477,7 +477,7 @@ function FormSection({
       </div>
 
       
-      <div className="p-4">{children}</div>
+      <div className="p-4 flex flex-col gap-4 [&_label]:mb-0">{children}</div>
     </section>
   );
 }
