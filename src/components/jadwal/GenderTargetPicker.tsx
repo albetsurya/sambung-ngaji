@@ -6,9 +6,11 @@ export type GenderTarget = "" | "L" | "P";
 export function GenderTargetPicker({
   value,
   onChange,
+  size = "sm",
 }: {
   value: GenderTarget;
   onChange: (v: GenderTarget) => void;
+  size?: "xs" | "sm" | "md";
 }) {
   return (
     <div className="mb-4">
@@ -20,7 +22,7 @@ export function GenderTargetPicker({
       </p>
       <Segmented<GenderTarget>
         ariaLabel="Target gender"
-        size="sm"
+        size={size}
         value={value}
         onChange={onChange}
         options={[

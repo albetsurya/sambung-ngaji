@@ -16,7 +16,7 @@ export function Segmented<T extends string>({
   options: SegmentedOption<T>[];
   value: T;
   onChange: (v: T) => void;
-  size?: "sm" | "md";
+  size?: "xs" | "sm" | "md";
   ariaLabel?: string;
 }) {
   return (
@@ -34,7 +34,11 @@ export function Segmented<T extends string>({
             onClick={() => onChange(opt.value)}
             aria-pressed={active}
             className={`flex-1 rounded-xl text-ios-footnote font-medium flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-[0.98] ${
-              size === "sm" ? "min-h-[36px]" : "min-h-[44px]"
+              size === "xs"
+                ? "min-h-[30px] px-2 text-ios-caption"
+                : size === "sm"
+                  ? "min-h-[36px]"
+                  : "min-h-[44px]"
             } ${
               active
                 ? "bg-accent text-white shadow-sm"

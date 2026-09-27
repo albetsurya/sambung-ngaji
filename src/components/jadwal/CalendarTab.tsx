@@ -551,7 +551,7 @@ function MeetingFormContent({
                 key={c}
                 type="button"
                 onClick={() => toggleKategori(c)}
-                className={`px-3.5 py-1.5 rounded-full text-ios-footnote font-medium border transition-all active:scale-[0.97] ${
+                className={`px-3 py-1 rounded-full text-ios-caption font-medium border transition-all active:scale-[0.97] ${
                   active
                     ? "bg-accent text-white border-accent shadow-sm shadow-accent/30"
                     : "bg-surface-card text-surface-text/80 border-surface-border hover:bg-surface-card2"
@@ -567,6 +567,7 @@ function MeetingFormContent({
       <GenderTargetPicker
         value={genderTarget}
         onChange={setGenderTarget}
+        size="xs"
       />
 
       <Button
