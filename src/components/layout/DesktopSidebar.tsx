@@ -34,6 +34,11 @@ const ADMIN_ITEMS = [
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 
+const KELOLA_ITEMS = [
+  { label: "Semua Kelompok", to: "/kelola-global", icon: Building2 },
+  { label: "Per Kelompok", to: "/lainnya", icon: Users },
+];
+
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },
   { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
@@ -47,7 +52,7 @@ export function DesktopSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDevelopment } = useEnvironment();
-  const { canSeeNav, isGlobal, role, groupId } = usePermission();
+  const { canSeeNav, isGlobal, isSuperAdmin, role, groupId } = usePermission();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -142,6 +147,45 @@ export function DesktopSidebar() {
             })}
           </nav>
         </div>
+
+        {isSuperAdmin && !isMemberContext && (
+          <div>
+            <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
+              Kelola
+            </div>
+            <nav className="space-y-1">
+              {KELOLA_ITEMS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.to + item.label}
+                    to={item.to}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-xl text-ios-subhead transition-all duration-150 group ${
+                        isActive
+                          ? "bg-accent/10 text-accent font-semibold shadow-xs"
+                          : "text-surface-muted hover:text-surface-text hover:bg-surface-card2"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <Icon
+                          size={18}
+                          strokeWidth={isActive ? 2.3 : 1.8}
+                          className={`transition-colors ${
+                            isActive ? "text-accent" : "text-surface-muted group-hover:text-surface-text"
+                          }`}
+                        />
+                        <span className="flex-1 truncate">{item.label}</span>
+                      </>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
+        )}
 
         
         {isAdmin && (

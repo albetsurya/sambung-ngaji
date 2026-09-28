@@ -1,5 +1,29 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import type { Role } from "../types";
+
+export const FOCUS_GROUP_KEY = "superadmin_focus_group";
+
+export function getSuperAdminFocusGroup(): string | null {
+  try {
+    return localStorage.getItem(FOCUS_GROUP_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setSuperAdminFocusGroup(groupId: string | null) {
+  try {
+    if (groupId) {
+      localStorage.setItem(FOCUS_GROUP_KEY, groupId);
+    } else {
+      localStorage.removeItem(FOCUS_GROUP_KEY);
+    }
+  } catch {
+    /* abaikan */
+  }
+  window.dispatchEvent(new Event("focusgroupchange"));
+}
 
 export const ROLE_LABEL: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
@@ -24,6 +48,22 @@ export function usePermission() {
   const role = user?.role as Role | undefined;
   const groupId = user?.group_id ?? null;
 
+  const [focusGroupId, setFocusGroupId] = useState<string | null>(
+    getSuperAdminFocusGroup,
+  );
+
+  useEffect(() => {
+    const handleGroupChange = () => {
+      setFocusGroupId(getSuperAdminFocusGroup());
+    };
+    window.addEventListener("focusgroupchange", handleGroupChange);
+    window.addEventListener("storage", handleGroupChange);
+    return () => {
+      window.removeEventListener("focusgroupchange", handleGroupChange);
+      window.removeEventListener("storage", handleGroupChange);
+    };
+  }, []);
+
   function canSeeNav(key: string) {
     if (!role) return false;
     return NAV_BY_ROLE[role]?.includes(key) || false;
@@ -34,18 +74,19 @@ export function usePermission() {
   const isPengawas = role === "PENGAWAS";
   const isMember = role === "MEMBER";
 
-  const assignedGroup = isSuperAdmin ? null : groupId;
-  const isGlobal = isSuperAdmin;
+  const assignedGroup = isSuperAdmin ? focusGroupId : groupId;
+  const isGlobal = isSuperAdmin && !focusGroupId;
 
   const canViewAllMembers = isGlobal || role === "ADMIN" || role === "PENGAWAS";
   const canEditMembers = isGlobal || role === "ADMIN";
   const canWriteMonitoring =
     isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
-  const canManageUsers = isGlobal;
+  const canManageUsers = isGlobal || isSuperAdmin;
 
   return {
     role,
     groupId,
+    focusGroupId,
     assignedGroup,
     isGlobal,
     canSeeNav,
@@ -57,5 +98,6 @@ export function usePermission() {
     canEditMembers,
     canWriteMonitoring,
     canManageUsers,
+    setSuperAdminFocusGroup,
   };
 }

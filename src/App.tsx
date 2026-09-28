@@ -35,6 +35,7 @@ const AnnouncementsPage = lazy(() => import("./pages/AnnouncementsPage"));
 const OthersPage = lazy(() => import("./pages/OthersPage"));
 const GroupsPage = lazy(() => import("./pages/GroupsPage"));
 const GroupHubPage = lazy(() => import("./pages/GroupHubPage"));
+const GlobalHubPage = lazy(() => import("./pages/GlobalHubPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const AiChatPage = lazy(() => import("./pages/AiChatPage"));
@@ -377,8 +378,16 @@ function AppRoutes() {
           <Route
             path="/kelompok-saya"
             element={
-              <RoleRoute allowed={["ADMIN", "PENGAWAS"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <GroupHubPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/kelola-global"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN"]}>
+                <GlobalHubPage />
               </RoleRoute>
             }
           />

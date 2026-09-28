@@ -19,7 +19,7 @@ export interface RejectPayload {
 }
 
 export const pendingApi = {
-  list: (params: { status?: PendingStatus } = {}) =>
+  list: (params: { status?: PendingStatus; group_id?: string } = {}) =>
     call<PendingMember[]>("getPendingMembers", params),
 
   detail: (submission_id: string) =>

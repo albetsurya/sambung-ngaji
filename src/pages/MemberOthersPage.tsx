@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import {
   Calendar,
   CalendarCheck,
+  ClipboardList,
   BookOpen,
   RefreshCw,
   KeyRound,
@@ -15,6 +16,7 @@ import {
   Trophy,
   Search,
   Mosque,
+  Moon,
   ChevronRight,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
@@ -94,7 +96,7 @@ export default function MemberOthersPage() {
       key: "sholat-jurnal",
       label: "Jurnal Sholat",
       description: "Tracker 5 waktu + streak",
-      Icon: CalendarCheck,
+      Icon: ClipboardList,
       to: "/member/sholat-jurnal",
       group: "data",
     },
@@ -134,7 +136,7 @@ export default function MemberOthersPage() {
       key: "puasa",
       label: "Puasa Sunnah",
       description: "Jadwal 60 hari ke depan",
-      Icon: Calendar,
+      Icon: Moon,
       to: "/member/puasa",
       group: "data",
     },
@@ -169,7 +171,7 @@ export default function MemberOthersPage() {
       description: "Info, panduan & privasi",
       Icon: Info,
       action: "about",
-      group: "tentang",
+      group: "akun",
     },
   ];
 
@@ -215,6 +217,37 @@ export default function MemberOthersPage() {
         setAboutOpen(true);
         break;
     }
+  }
+
+  function renderDataGrid() {
+    const items = visibleMenu.filter((m) => m.group === "data");
+    if (items.length === 0) return null;
+    return (
+      <section>
+        <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+          Data Saya
+        </p>
+        <div className="px-4 grid grid-cols-4 gap-2.5">
+          {items.map((m) => {
+            const Icon = m.Icon;
+            return (
+              <button
+                key={m.key}
+                onClick={() => handleMenuClick(m)}
+                className="flex flex-col items-center gap-1.5 rounded-2xl border border-surface-border bg-surface-card py-3.5 px-1 shadow-sm transition-all active:scale-[0.97]"
+              >
+                <span className="w-11 h-11 rounded-2xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                  <Icon size={20} />
+                </span>
+                <span className="text-[11px] leading-tight font-medium text-surface-text text-center line-clamp-2">
+                  {m.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    );
   }
 
   function renderGroup(title: string, group: MenuItem["group"]) {
@@ -310,10 +343,19 @@ export default function MemberOthersPage() {
           </div>
         </div>
 
-        {renderGroup("Tampilan", "tampilan")}
-        {renderGroup("Data Saya", "data")}
-        {renderGroup("Akun", "akun")}
-        {renderGroup("Tentang", "tentang")}
+        {q ? (
+          <>
+            {renderGroup("Tampilan", "tampilan")}
+            {renderGroup("Data Saya", "data")}
+            {renderGroup("Akun", "akun")}
+          </>
+        ) : (
+          <>
+            {renderGroup("Tampilan", "tampilan")}
+            {renderDataGrid()}
+            {renderGroup("Akun", "akun")}
+          </>
+        )}
 
         <AppMaintenanceSection />
 

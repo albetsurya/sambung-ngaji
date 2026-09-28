@@ -28,9 +28,10 @@ import {
   BottomSheet,
   Button,
   Segmented,
+  Select,
 } from "../components/common";
 import { memberApi, type MemberFilters } from "../services/memberApi";
-import { userApi } from "../services/domainApi";
+import { groupApi, userApi } from "../services/domainApi";
 import type { Member, MemberCategory, Role } from "../types";
 import {
   CATEGORY_LABEL,
@@ -38,7 +39,7 @@ import {
   normalizeGender,
 } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
-import { usePermission } from "../hooks/usePermission";
+import { usePermission, setSuperAdminFocusGroup } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
 import {
   JamaahGridSkeleton,
@@ -72,9 +73,15 @@ const GRID_ROW_HEIGHTS: Record<GridCols, number> = {
 
 export default function MembersListPage() {
   const navigate = useNavigate();
-  const { role } = usePermission();
+  const { role, assignedGroup, isSuperAdmin } = usePermission();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { data: groups = [] } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    staleTime: 5 * 60_000,
+  });
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -131,8 +138,9 @@ export default function MembersListPage() {
     if (debouncedSearch) f.search = debouncedSearch;
     if (kategori) f.kategori = kategori;
     if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
+    if (assignedGroup) f.kelompok = assignedGroup;
     return f;
-  }, [debouncedSearch, kategori, jenisKelamin]);
+  }, [debouncedSearch, kategori, jenisKelamin, assignedGroup]);
 
   const isPNKB = role === "TIM_PNKB";
 
@@ -174,8 +182,8 @@ export default function MembersListPage() {
   const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
 
   const activeFilterCount = useMemo(
-    () => (jenisKelamin ? 1 : 0) + (kategori ? 1 : 0),
-    [jenisKelamin, kategori],
+    () => (jenisKelamin ? 1 : 0) + (kategori ? 1 : 0) + (assignedGroup ? 1 : 0),
+    [jenisKelamin, kategori, assignedGroup],
   );
 
   const hasActiveSearch = search.length > 0;
@@ -570,6 +578,35 @@ export default function MembersListPage() {
 
           <div>
             <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
+              Filter Kelompok
+            </p>
+            {isSuperAdmin ? (
+              <Select
+                value={assignedGroup || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSuperAdminFocusGroup(val || null);
+                }}
+              >
+                <option value="">Semua Kelompok</option>
+                {groups.map((g) => (
+                  <option key={g.group_id} value={g.group_id}>
+                    {g.group_name}
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <Select disabled value={assignedGroup || ""}>
+                <option value={assignedGroup || ""}>
+                  {groups.find((g) => g.group_id === assignedGroup)?.group_name ||
+                    "Kelompok Anda"}
+                </option>
+              </Select>
+            )}
+          </div>
+
+          <div>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
               Filter Jenis Kelamin
             </p>
             <Segmented<"" | "L" | "P">
@@ -642,6 +679,9 @@ export default function MembersListPage() {
               onClick={() => {
                 setJenisKelamin("");
                 setKategori("");
+                if (isSuperAdmin) {
+                  setSuperAdminFocusGroup(null);
+                }
                 setActionsOpen(false);
               }}
             >

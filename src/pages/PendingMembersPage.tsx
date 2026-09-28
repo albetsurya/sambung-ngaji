@@ -17,6 +17,7 @@ import {
 } from "../components/common";
 import { PendingMembersSkeleton } from "../components/common/Skeleton";
 import { pendingApi } from "../services/pendingApi";
+import { usePermission } from "../hooks/usePermission";
 import type { PendingMember, PendingStatus } from "../types";
 import { formatDateShort } from "../utils/format";
 import { ApiError } from "../services/api";
@@ -44,7 +45,10 @@ const STATUS_BADGE: Record<
 
 export default function PendingMembersPage() {
   const navigate = useNavigate();
+  const { assignedGroup } = usePermission();
   const [filter, setFilter] = useState<PendingStatus | "ALL">("PENDING");
+
+  const statusParam = filter === "ALL" ? undefined : filter;
 
   const {
     data: list = [],
@@ -53,9 +57,11 @@ export default function PendingMembersPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: queryKeys.pendingMembers(filter === "ALL" ? undefined : filter),
+    queryKey: queryKeys.pendingMembers(statusParam, assignedGroup),
     queryFn: () => {
-      const params = filter === "ALL" ? {} : { status: filter };
+      const params: { status?: PendingStatus; group_id?: string } = {};
+      if (statusParam) params.status = statusParam;
+      if (assignedGroup) params.group_id = assignedGroup;
       return pendingApi.list(params);
     },
     staleTime: 60_000,

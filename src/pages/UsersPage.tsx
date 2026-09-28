@@ -26,6 +26,7 @@ import {
   LoadingOverlay,
   GroupedList,
   ListRow,
+  ChevronRow,
   ErrorState,
   EmptyState,
   ConfirmDialog,
@@ -55,6 +56,7 @@ const ROLE_DESCRIPTION: Record<Role, string> = {
 
 export default function UsersPage() {
   const navigate = useNavigate();
+  const { assignedGroup } = usePermission();
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<User | null>(null);
   const [resetTarget, setResetTarget] = useState<{
@@ -70,14 +72,16 @@ export default function UsersPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.users(),
-    queryFn: () => userApi.list(),
+    queryKey: queryKeys.users(assignedGroup),
+    queryFn: () =>
+      userApi.list(assignedGroup ? { group_id: assignedGroup } : {}),
     staleTime: 2 * 60_000,
   });
 
   const { data: members = [] } = useQuery({
-    queryKey: queryKeys.members(),
-    queryFn: () => memberApi.list({}),
+    queryKey: queryKeys.members(assignedGroup ? { kelompok: assignedGroup } : undefined),
+    queryFn: () =>
+      memberApi.list(assignedGroup ? { kelompok: assignedGroup } : {}),
     staleTime: 5 * 60_000,
   });
 
@@ -228,58 +232,62 @@ export default function UsersPage() {
         )}
 
         {!isLoading && !error && filteredUsers.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredUsers.map((u) => {
+          <GroupedList>
+            {filteredUsers.map((u, i) => {
               const member = u.member_id ? memberById.get(u.member_id) : null;
               return (
-                <div
+                <ListRow
                   key={u.user_id}
                   onClick={() => setEditTarget(u)}
-                  className="bg-surface-card rounded-2xl border border-surface-border p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:border-accent/40 hover:shadow-sm transition-all"
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                  insetDivider={i !== filteredUsers.length - 1}
+                  leading={
                     <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-semibold">
                       {u.nama ? u.nama.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-ios-body font-semibold text-surface-text truncate">
-                        {u.nama}
-                      </p>
-                      <p className="text-ios-footnote text-surface-muted truncate">
+                  }
+                >
+                  <ChevronRow>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-ios-body font-semibold text-surface-text truncate">
+                          {u.nama}
+                        </p>
+                        <p className="text-ios-footnote text-surface-muted truncate">
                         @{u.username}
                         {member ? ` · ${member.nama_lengkap}` : ""}
-                      </p>
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {u.status_aktif === false && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-danger-soft text-danger border border-danger/20">
+                            Nonaktif
+                          </span>
+                        )}
+                        <RoleBadge role={u.role} />
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          iconOnly
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setResetTarget({
+                              userId: u.user_id,
+                              userName: u.nama || u.username,
+                            });
+                          }}
+                          aria-label={`Reset password ${u.nama}`}
+                          title="Reset password"
+                          className="hover:bg-accent-soft hover:text-accent"
+                        >
+                          <KeyRound size={14} />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {u.status_aktif === false && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-danger-soft text-danger border border-danger/20">
-                        Nonaktif
-                      </span>
-                    )}
-                    <RoleBadge role={u.role} />
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      iconOnly
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setResetTarget({
-                          userId: u.user_id,
-                          userName: u.nama || u.username,
-                        });
-                      }}
-                      aria-label={`Reset password ${u.nama}`}
-                      title="Reset password"
-                      className="hover:bg-accent-soft hover:text-accent"
-                    >
-                      <KeyRound size={14} />
-                    </Button>
-                  </div>
-                </div>
+                  </ChevronRow>
+                </ListRow>
               );
             })}
-          </div>
+          </GroupedList>
         )}
       </div>
 

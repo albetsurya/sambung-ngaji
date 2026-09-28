@@ -78,6 +78,7 @@ export default function GroupsPage() {
     >
       <Header
         title="Kelompok"
+        subtitle="Data master kelompok pengajian"
         onBack={() => history.back()}
         backLabel="Kembali"
       />

@@ -23,11 +23,11 @@ export const queryKeys = {
   memberDetail: (id: string) => ["member", id],
   memberUserStatus: (id: string) => ["member-user-status", id],
   groups: () => ["groups"],
-  pendingMembers: (status?: string) =>
-    status ? ["pending-members", { status }] : ["pending-members"],
+  pendingMembers: (status?: string, groupId?: string | null) =>
+    ["pending-members", { status, groupId: groupId || "all" }],
   pendingDetail: (id: string) => ["pending-member", id],
-  memberRequests: (status?: string) =>
-    status ? ["member-requests", { status }] : ["member-requests"],
+  memberRequests: (status?: string, groupId?: string | null) =>
+    ["member-requests", { status, groupId: groupId || "all" }],
   dashboard: () => ["dashboard"],
   meetings: (filters?: Record<string, unknown>) =>
     filters ? ["meetings", filters] : ["meetings"],
@@ -35,7 +35,8 @@ export const queryKeys = {
   attendancePage: (meetingId: string) => ["attendance-page", meetingId],
   attendanceMembers: () => ["attendance-members"],
   attendanceByMember: (memberId: string) => ["attendance-member", memberId],
-  users: () => ["users"],
+  users: (groupId?: string | null) =>
+    groupId ? ["users", { groupId }] : ["users"],
   userDetail: (userId: string) => ["user-detail", userId],
   auditLogs: (limit: number) => ["audit-logs", { limit }],
   aiUsage: () => ["ai-usage"],

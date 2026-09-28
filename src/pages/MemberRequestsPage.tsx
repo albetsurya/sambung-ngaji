@@ -19,6 +19,7 @@ import {
 import { PendingMembersSkeleton } from "../components/common/Skeleton";
 import { memberRequestApi } from "../services/domainApi";
 import type { MemberRequestEntry } from "../services/domainApi";
+import { usePermission } from "../hooks/usePermission";
 import { formatDateShort } from "../utils/format";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
@@ -34,8 +35,9 @@ const STATUS_BADGE: Record<
 };
 
 export default function MemberRequestsPage() {
-  const { showToast } = useToast();
   const qc = useQueryClient();
+  const { showToast } = useToast();
+  const { assignedGroup } = usePermission();
   const [pendingAction, setPendingAction] = useState<MemberRequestEntry | null>(
     null,
   );
@@ -50,8 +52,12 @@ export default function MemberRequestsPage() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: queryKeys.memberRequests("PENDING"),
-    queryFn: () => memberRequestApi.list("PENDING"),
+    queryKey: queryKeys.memberRequests("PENDING", assignedGroup),
+    queryFn: () =>
+      memberRequestApi.list(
+        "PENDING",
+        assignedGroup ? { group_id: assignedGroup } : {},
+      ),
     staleTime: 30_000,
   });
 

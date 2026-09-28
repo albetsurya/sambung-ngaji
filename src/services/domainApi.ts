@@ -246,8 +246,11 @@ export interface RequestBecomeMemberResult {
 
 export const memberRequestApi = {
   becomeMember: () => call<RequestBecomeMemberResult>("requestBecomeMember", {}),
-  list: (status?: string) =>
-    call<MemberRequestEntry[]>("getMemberRequests", status ? { status } : {}),
+  list: (status?: string, params: { group_id?: string } = {}) =>
+    call<MemberRequestEntry[]>("getMemberRequests", {
+      ...(status ? { status } : {}),
+      ...params,
+    }),
   approve: (request_id: string) =>
     call<MemberRequestEntry>("approveMemberRequest", { request_id }),
   reject: (request_id: string, reason?: string) =>
@@ -264,7 +267,8 @@ export const dashboardApi = {
 };
 
 export const userApi = {
-  list: () => call<import("../types").User[]>("getUsers"),
+  list: (params: { group_id?: string } = {}) =>
+    call<import("../types").User[]>("getUsers", params),
 
   detail: (user_id: string) =>
     call<import("../types").User>("getUserDetail", { user_id }),
