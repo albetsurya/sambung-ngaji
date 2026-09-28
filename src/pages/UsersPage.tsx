@@ -80,9 +80,9 @@ export default function UsersPage() {
   });
 
   const { data: members = [] } = useQuery({
-    queryKey: queryKeys.members(assignedGroup ? { kelompok: assignedGroup } : undefined),
+    queryKey: queryKeys.members(assignedGroup ? { group_id: assignedGroup } : undefined),
     queryFn: () =>
-      memberApi.list(assignedGroup ? { kelompok: assignedGroup } : {}),
+      memberApi.list(assignedGroup ? { group_id: assignedGroup } : {}),
     staleTime: 5 * 60_000,
   });
 

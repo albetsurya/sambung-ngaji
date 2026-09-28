@@ -6,6 +6,7 @@ export interface MemberFilters {
   kategori?: string;
   jenis_kelamin?: string;
   kelompok?: string;
+  group_id?: string;
   desa?: string;
   includeInactive?: boolean;
   limit?: number;

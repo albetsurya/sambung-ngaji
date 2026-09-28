@@ -28,7 +28,8 @@ export const queryKeys = {
   pendingDetail: (id: string) => ["pending-member", id],
   memberRequests: (status?: string, groupId?: string | null) =>
     ["member-requests", { status, groupId: groupId || "all" }],
-  dashboard: () => ["dashboard"],
+  dashboard: (groupId?: string | null) =>
+    groupId ? ["dashboard", { groupId }] : ["dashboard"],
   meetings: (filters?: Record<string, unknown>) =>
     filters ? ["meetings", filters] : ["meetings"],
   attendance: (meetingId: string) => ["attendance", meetingId],

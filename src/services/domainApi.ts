@@ -271,7 +271,8 @@ export const memberRequestApi = {
 };
 
 export const dashboardApi = {
-  general: () => restGet<DashboardGeneral>("/api/v1/dashboard"),
+  general: (params?: { group_id?: string }) =>
+    restGet<DashboardGeneral>("/api/v1/dashboard", params),
   pnkb: () => restGet<DashboardPNKB>("/api/v1/dashboard"),
   absensi: () => restGet<DashboardAbsensi>("/api/v1/dashboard"),
 };

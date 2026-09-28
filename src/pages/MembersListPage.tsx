@@ -138,7 +138,7 @@ export default function MembersListPage() {
     if (debouncedSearch) f.search = debouncedSearch;
     if (kategori) f.kategori = kategori;
     if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
-    if (assignedGroup) f.kelompok = assignedGroup;
+    if (assignedGroup) f.group_id = assignedGroup;
     return f;
   }, [debouncedSearch, kategori, jenisKelamin, assignedGroup]);
 

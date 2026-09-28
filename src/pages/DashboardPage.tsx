@@ -38,12 +38,14 @@ import type {
 import { ApiError } from "../services/api";
 import { DashboardSkeleton } from "../components/common/Skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePermission } from "../hooks/usePermission";
 import { queryKeys } from "../lib/queryClient";
 
 type IconType = LucideIcon;
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { assignedGroup } = usePermission();
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const {
@@ -52,8 +54,9 @@ export default function DashboardPage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.dashboard(),
-    queryFn: () => dashboardApi.general(),
+    queryKey: queryKeys.dashboard(assignedGroup),
+    queryFn: () =>
+      dashboardApi.general(assignedGroup ? { group_id: assignedGroup } : {}),
     staleTime: 30_000,
   });
 
