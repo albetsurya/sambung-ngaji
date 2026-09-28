@@ -12,8 +12,8 @@ import {
   RefreshCw,
   User,
   Calendar,
+  FileText,
 } from "../common/FontAwesomeIcons";
-
 
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
@@ -25,6 +25,7 @@ const ADMIN_ITEMS = [
     to: "/pengumuman",
     icon: Megaphone,
   },
+  { key: "keuangan", label: "Keuangan", to: "/finance", icon: FileText },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 
