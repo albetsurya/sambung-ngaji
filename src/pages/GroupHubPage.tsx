@@ -12,7 +12,6 @@ import {
   Mosque,
   QrCode,
   UserPlus,
-  Users,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -53,13 +52,16 @@ export default function GroupHubPage() {
     queryFn: () => groupApi.list(),
     staleTime: 5 * 60_000,
   });
+
   const allGroups = useMemo(
     () => groupsQuery.data ?? [],
     [groupsQuery.data],
   );
+
   const activeFocusGroupId = isSuperAdmin ? (urlGroupId || focusGroupId) : null;
   const effectiveGroupId = isSuperAdmin ? activeFocusGroupId : assignedGroup;
   const myGroup = allGroups.find((g) => g.group_id === effectiveGroupId);
+  const isGlobalMode = isSuperAdmin && !activeFocusGroupId;
 
   const saveMutation = useMutation({
     mutationFn: (payload: Partial<Group>) => groupApi.save(payload),
@@ -94,103 +96,122 @@ export default function GroupHubPage() {
     to: string;
     section: "jamaah" | "jadwal";
     badge?: number;
-  }[] = [
-    {
-      key: "users",
-      label: "Manajemen User",
-      description: "Kelola akun & hak akses kelompok ini",
-      Icon: KeyRound,
-      to: "/lainnya/users",
-      section: "jamaah",
-    },
-    {
-      key: "pendaftar",
-      label: "Pendaftar",
-      description:
-        isSuperAdmin && focusGroupId
-          ? "Verifikasi pendaftar kelompok ini"
-          : "Verifikasi pendaftar baru",
-      Icon: ClipboardList,
-      to: "/lainnya/pendaftar",
-      section: "jamaah",
-      badge:
-        pendingCount > 0 && !(isSuperAdmin && focusGroupId)
-          ? pendingCount
-          : undefined,
-    },
-    {
-      key: "permintaan-member",
-      label: "Permintaan Member",
-      description: "User minta menjadi member",
-      Icon: UserPlus,
-      to: "/lainnya/permintaan-member",
-      section: "jamaah",
-    },
-    {
-      key: "import-jamaah",
-      label: "Import Jamaah",
-      description: "Paste text biodata dari WhatsApp",
-      Icon: FileText,
-      to: "/lainnya/import-jamaah",
-      section: "jamaah",
-    },
-    {
-      key: "qr-code",
-      label: "QR Pendaftaran",
-      description: "Bagikan link pendaftaran kelompok",
-      Icon: QrCode,
-      to: "/lainnya/qr-code",
-      section: "jamaah",
-    },
+  }[] = useMemo(() => {
+    return [
+      {
+        key: "users",
+        label: "Manajemen User",
+        description: isGlobalMode
+          ? "Atur akun & hak akses semua kelompok"
+          : "Kelola akun & hak akses kelompok ini",
+        Icon: KeyRound,
+        to: "/lainnya/users",
+        section: "jamaah",
+      },
+      {
+        key: "pendaftar",
+        label: "Pendaftar",
+        description: isGlobalMode
+          ? "Verifikasi pendaftar baru semua kelompok"
+          : "Verifikasi pendaftar kelompok ini",
+        Icon: ClipboardList,
+        to: "/lainnya/pendaftar",
+        section: "jamaah",
+        badge:
+          pendingCount > 0 && (!isSuperAdmin || isGlobalMode)
+            ? pendingCount
+            : undefined,
+      },
+      {
+        key: "permintaan-member",
+        label: "Permintaan Member",
+        description: "User minta menjadi member",
+        Icon: UserPlus,
+        to: "/lainnya/permintaan-member",
+        section: "jamaah",
+      },
+      ...(isGlobalMode
+        ? [
+            {
+              key: "kelompok",
+              label: "Kelompok",
+              description: "Kelola data master kelompok pengajian",
+              Icon: Building2,
+              to: "/lainnya/kelompok",
+              section: "jamaah" as const,
+            },
+          ]
+        : []),
+      {
+        key: "import-jamaah",
+        label: "Import Jamaah",
+        description: "Paste text biodata dari WhatsApp",
+        Icon: FileText,
+        to: "/lainnya/import-jamaah",
+        section: "jamaah",
+      },
+      {
+        key: "qr-code",
+        label: "QR Pendaftaran",
+        description: isGlobalMode
+          ? "Bagikan link pendaftaran"
+          : "Bagikan link pendaftaran kelompok",
+        Icon: QrCode,
+        to: "/lainnya/qr-code",
+        section: "jamaah",
+      },
+      {
+        key: "jadwal",
+        label: "Kelola Jadwal",
+        description: "Kalender, tambah massal & import PDF",
+        Icon: Calendar,
+        to: "/lainnya/jadwal",
+        section: "jadwal",
+      },
+      {
+        key: "rekap-absensi",
+        label: "Rekap Absensi",
+        description: "Matriks kehadiran bulanan",
+        Icon: CalendarCheck,
+        to: "/lainnya/rekap-absensi",
+        section: "jadwal",
+      },
+      {
+        key: "petugas-jumat",
+        label: "Petugas Jumat",
+        description: "Kelola petugas sholat Jumat",
+        Icon: Mosque,
+        to: "/lainnya/petugas-jumat",
+        section: "jadwal",
+      },
+    ];
+  }, [isGlobalMode, pendingCount, isSuperAdmin]);
 
-    {
-      key: "jadwal",
-      label: "Kelola Jadwal",
-      description: "Kalender, tambah massal & import PDF",
-      Icon: Calendar,
-      to: "/lainnya/jadwal",
-      section: "jadwal",
-    },
-    {
-      key: "rekap-absensi",
-      label: "Rekap Absensi",
-      description: "Matriks kehadiran bulanan",
-      Icon: CalendarCheck,
-      to: "/lainnya/rekap-absensi",
-      section: "jadwal",
-    },
-    {
-      key: "petugas-jumat",
-      label: "Petugas Jumat",
-      description: "Kelola petugas sholat Jumat",
-      Icon: Mosque,
-      to: "/lainnya/petugas-jumat",
-      section: "jadwal",
-    },
-  ];
+  const headerTitle = isSuperAdmin ? "Kelola Kelompok" : "Kelompok Saya";
+  const headerSubtitle = isSuperAdmin
+    ? isGlobalMode
+      ? "Semua Kelompok · mode super admin"
+      : `${myGroup?.group_name || ""} · mode super admin`
+    : myGroup?.group_name;
 
   return (
     <AppLayout>
       <Header
-        title={isSuperAdmin && focusGroupId ? "Kelola Kelompok" : "Kelompok Saya"}
-        subtitle={
-          isSuperAdmin && focusGroupId && myGroup
-            ? `${myGroup.group_name} · mode super admin`
-            : myGroup?.group_name
-        }
+        title={headerTitle}
+        subtitle={headerSubtitle}
         onBack={() => navigate("/lainnya")}
         backLabel="Lainnya"
       />
 
       <div className="py-4">
-        {isSuperAdmin && activeFocusGroupId && (
+        {isSuperAdmin && (
           <div className="px-4 mb-2.5 flex gap-2 overflow-x-auto no-scrollbar pb-1">
             <FilterChip
-              active={false}
+              active={isGlobalMode}
               label="Semua"
               onClick={() => {
                 setSuperAdminFocusGroup(null);
-                navigate("/kelola-global");
+                if (urlGroupId) navigate("/kelompok-saya");
               }}
             />
             {allGroups.map((g) => (
@@ -199,89 +220,53 @@ export default function GroupHubPage() {
                 active={g.group_id === activeFocusGroupId}
                 label={g.group_name}
                 onClick={() => {
-                  if (g.group_id !== activeFocusGroupId) {
-                    setSuperAdminFocusGroup(g.group_id);
-                    navigate(`/kelompok-saya?group_id=${g.group_id}`);
-                  }
+                  setSuperAdminFocusGroup(g.group_id);
+                  navigate(`/kelompok-saya?group_id=${g.group_id}`);
                 }}
               />
             ))}
           </div>
         )}
-        {!effectiveGroupId ? (
-          isSuperAdmin ? (
-            <section>
-              <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                Pilih Kelompok
-              </p>
-              <GroupedList>
-                {allGroups.map((g, i) => (
+
+        {!isSuperAdmin && !effectiveGroupId ? (
+          <EmptyState
+            title="Tanpa kelompok"
+            description="Akun Anda belum dipetakan ke kelompok mana pun."
+          />
+        ) : (
+          <>
+            {myGroup && (
+              <section>
+                <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+                  {myGroup.group_name}
+                </p>
+                <GroupedList>
                   <ListRow
-                    key={g.group_id}
-                    onClick={() =>
-                      navigate(`/kelompok-saya?group_id=${g.group_id}`)
-                    }
-                    insetDivider={i !== allGroups.length - 1}
-                    leading={
-                      <span className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-[15px] shrink-0">
-                        {(g.group_name || "?").charAt(0).toUpperCase()}
-                      </span>
-                    }
+                    insetDivider={false}
+                    onClick={() => setEditSheetOpen(true)}
                   >
                     <ChevronRow>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-ios-body font-medium text-surface-text truncate">
-                          {g.group_name}
-                        </p>
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {g.pembina ? `Pembina: ${g.pembina}` : ""}
-                          {g.jadwal ? ` · ${g.jadwal}` : ""}
-                        </p>
+                      <div className="flex items-center gap-3 w-full min-w-0">
+                        <span className="w-11 h-11 rounded-2xl bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0">
+                          {(myGroup.group_name || "?").charAt(0).toUpperCase()}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-ios-body font-semibold text-surface-text truncate">
+                            {groupsQuery.isLoading
+                              ? "Memuat..."
+                              : myGroup.group_name}
+                          </p>
+                          <p className="text-ios-caption text-surface-muted truncate">
+                            Pembina: {myGroup.pembina || "-"} ·{" "}
+                            {myGroup.jadwal || ""}
+                          </p>
+                        </div>
                       </div>
                     </ChevronRow>
                   </ListRow>
-                ))}
-              </GroupedList>
-            </section>
-          ) : (
-            <EmptyState
-              title="Tanpa kelompok"
-              description="Akun Anda belum dipetakan ke kelompok mana pun."
-            />
-          )
-        ) : (
-          <>
-            <section>
-              <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                {myGroup ? `${myGroup.group_name}` : "Kelompok"}
-              </p>
-              <GroupedList>
-                <ListRow
-                  insetDivider={false}
-                  onClick={myGroup ? () => setEditSheetOpen(true) : undefined}
-                >
-                  <ChevronRow>
-                    <div className="flex items-center gap-3 w-full min-w-0">
-                      <span className="w-11 h-11 rounded-2xl bg-accent text-white flex items-center justify-center font-bold text-lg shrink-0">
-                        {(myGroup?.group_name || "?").charAt(0).toUpperCase()}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-ios-body font-semibold text-surface-text truncate">
-                          {groupsQuery.isLoading
-                            ? "Memuat..."
-                            : (myGroup?.group_name ?? "-")}
-                        </p>
-                        <p className="text-ios-caption text-surface-muted truncate">
-                          {myGroup
-                            ? `Pembina: ${myGroup.pembina || "-"} · ${myGroup.jadwal || ""}`
-                            : ""}
-                        </p>
-                      </div>
-                    </div>
-                  </ChevronRow>
-                </ListRow>
-              </GroupedList>
-            </section>
+                </GroupedList>
+              </section>
+            )}
 
             {[
               { key: "jamaah" as const, label: "Jamaah & Keanggotaan" },

@@ -430,7 +430,14 @@ export default function OthersPage() {
             </p>
             <GroupedList>
               <ListRow
-                onClick={() => navigate("/kelola-global")}
+                onClick={() =>
+                  navigate(
+                    focusGroupId
+                      ? `/kelompok-saya?group_id=${focusGroupId}`
+                      : "/kelompok-saya",
+                  )
+                }
+                insetDivider={false}
                 leading={
                   <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
                     <Building2 size={16} />
@@ -441,10 +448,12 @@ export default function OthersPage() {
                   <div className="flex items-center justify-between gap-2 w-full">
                     <div className="min-w-0 flex-1">
                       <p className="text-ios-body font-medium text-surface-text truncate">
-                        Semua Kelompok
+                        Kelola Kelompok
                       </p>
                       <p className="text-ios-caption text-surface-muted truncate">
-                        Kelola global semua kelompok
+                        {focusGroup
+                          ? `Fokus: ${focusGroup.group_name} · Ketuk untuk buka hub`
+                          : "Kelola semua atau per kelompok"}
                       </p>
                     </div>
                     {pendingLoading && showBadgeSkeleton ? (
@@ -456,35 +465,6 @@ export default function OthersPage() {
                         {pendingCount > 99 ? "99+" : pendingCount}
                       </span>
                     ) : null}
-                  </div>
-                </ChevronRow>
-              </ListRow>
-              <ListRow
-                onClick={() => {
-                  setGroupSearch("");
-                  setGroupSheetOpen(true);
-                }}
-                insetDivider={false}
-                leading={
-                  <span className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-[15px] shrink-0">
-                    {(focusGroup?.group_name || "S").charAt(0).toUpperCase()}
-                  </span>
-                }
-              >
-                <ChevronRow>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-ios-body font-medium text-surface-text truncate">
-                      {groupsLoading
-                        ? "Memuat kelompok..."
-                        : focusGroup
-                          ? `Per Kelompok: ${focusGroup.group_name}`
-                          : "Per Kelompok"}
-                    </p>
-                    <p className="text-ios-caption text-surface-muted truncate">
-                      {focusGroup
-                        ? `Ketuk untuk ganti · ${focusGroup.pembina ? `Pembina: ${focusGroup.pembina}` : "kelola seperti admin kelompok"}`
-                        : `Ketuk untuk pilih · ${allGroups.length} kelompok`}
-                    </p>
                   </div>
                 </ChevronRow>
               </ListRow>
@@ -576,7 +556,7 @@ export default function OthersPage() {
                 onClick={() => {
                   selectFocusGroup(null);
                   setGroupSheetOpen(false);
-                  navigate("/kelola-global");
+                  navigate("/kelompok-saya");
                 }}
                 insetDivider={sheetGroups.length > 0}
                 leading={

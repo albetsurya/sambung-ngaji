@@ -35,8 +35,7 @@ const ADMIN_ITEMS = [
 ];
 
 const KELOLA_ITEMS = [
-  { label: "Semua Kelompok", to: "/kelola-global", icon: Building2 },
-  { label: "Per Kelompok", to: "/lainnya", icon: Users },
+  { label: "Kelola Kelompok", to: "/kelompok-saya", icon: Building2 },
 ];
 
 const MEMBER_ITEMS = [
