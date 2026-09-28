@@ -1,10 +1,11 @@
-import { call, setToken, clearToken } from "./api";
+import { setToken, clearToken } from "./api";
+import { restGet, restPost } from "./apiClient";
 import type { User } from "../types";
 
 export const authApi = {
   async login(username: string, password: string) {
     try {
-      const data = await call<{ token: string; user: User }>("login", {
+      const data = await restPost<{ token: string; user: User }>("/api/v1/auth/login", {
         username,
         password,
       });
@@ -17,7 +18,7 @@ export const authApi = {
 
   async logout() {
     try {
-      await call("logout", {});
+      await restPost("/api/v1/auth/logout");
     } catch (error) {
     } finally {
       clearToken();
@@ -26,7 +27,7 @@ export const authApi = {
 
   async validateSession() {
     try {
-      const data = await call<{ user: User }>("validateSession", {});
+      const data = await restGet<{ user: User }>("/api/v1/auth/validate-session");
       return data.user;
     } catch (error) {
       throw error;

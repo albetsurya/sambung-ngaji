@@ -1,4 +1,4 @@
-import { call } from "./api";
+import { restGet, restPost } from "./apiClient";
 import type { PendingMember, PendingStatus } from "../types";
 
 export interface ApprovePayload {
@@ -20,17 +20,17 @@ export interface RejectPayload {
 
 export const pendingApi = {
   list: (params: { status?: PendingStatus; group_id?: string } = {}) =>
-    call<PendingMember[]>("getPendingMembers", params),
+    restGet<PendingMember[]>("/api/v1/pending", params),
 
   detail: (submission_id: string) =>
-    call<PendingMember>("getPendingMemberDetail", { submission_id }),
+    restGet<PendingMember>("/api/v1/pending/detail", { submission_id }),
 
   approve: (payload: ApprovePayload) =>
-    call<ApproveResult>("approvePendingMember", payload),
+    restPost<ApproveResult>("/api/v1/pending/approve", payload),
 
   reject: (payload: RejectPayload) =>
-    call<{ submission_id: string; status: PendingStatus }>(
-      "rejectPendingMember",
+    restPost<{ submission_id: string; status: PendingStatus }>(
+      "/api/v1/pending/reject",
       payload,
     ),
 };

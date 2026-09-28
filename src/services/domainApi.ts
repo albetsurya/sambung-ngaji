@@ -1,5 +1,4 @@
-import { call, callREST } from "./api";
-import { restGet, restPost } from "./apiClient";
+import { restGet, restPost, restPut, restDelete } from "./apiClient";
 import type {
   Education,
   Group,
@@ -14,13 +13,6 @@ import type {
   Member,
   FridaySchedule,
 } from "../types";
-export const educationApi = {
-  list: (member_id: string) => call<Education[]>("getEducation", { member_id }),
-  save: (payload: Partial<Education>) =>
-    call<Education>("saveEducation", payload),
-  remove: (education_id: string) =>
-    call<Education>("deleteEducation", { education_id }),
-};
 
 export const groupApi = {
   list: (includeInactive = false) =>
@@ -28,10 +20,9 @@ export const groupApi = {
   save: (payload: Partial<Group>) => restPost<Group>("/api/v1/groups", payload),
 };
 
-
 export const meetingApi = {
   list: (params?: { from?: string; to?: string; group_id?: string }) =>
-    call<Meeting[]>("getMeetings", params || {}),
+    restGet<Meeting[]>("/api/v1/meetings", params || {}),
 
   create: (payload: {
     tanggal: string;
@@ -43,7 +34,7 @@ export const meetingApi = {
     kategori_target?: string[];
     gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
-  }) => call<Meeting>("createMeeting", payload),
+  }) => restPost<Meeting>("/api/v1/meetings", payload),
 
   update: (payload: {
     meeting_id: string;
@@ -57,19 +48,18 @@ export const meetingApi = {
     kategori_target?: string[];
     gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
-  }) => call<Meeting>("updateMeeting", payload),
+  }) => restPut<Meeting>("/api/v1/meetings", payload),
 
   remove: (meeting_id: string) =>
-    call<{ meeting_id: string; deleted_attendance: number }>("deleteMeeting", {
+    restDelete<{ meeting_id: string; deleted_attendance: number }>("/api/v1/meetings", {
       meeting_id,
     }),
 
   removeBulk: (meeting_ids: string[]) =>
-    call<{ requested: number; deleted: number }>("deleteMeetingsBulk", {
+    restDelete<{ requested: number; deleted: number }>("/api/v1/meetings/bulk", {
       meeting_ids,
     }),
 };
-
 
 export interface FridaySchedulePayload {
   tanggal: string;
@@ -83,47 +73,54 @@ export interface FridaySchedulePayload {
 
 export const fridayApi = {
   list: (params?: { from?: string; to?: string; group_id?: string }) =>
-    call<FridaySchedule[]>("getFridaySchedules", params || {}),
+    restGet<FridaySchedule[]>("/api/v1/friday", params || {}),
 
   save: (payload: FridaySchedulePayload) =>
-    call<FridaySchedule>("saveFridaySchedule", payload),
+    restPost<FridaySchedule>("/api/v1/friday", payload),
 
   remove: (tanggal: string) =>
-    call<{ tanggal: string; deleted: boolean }>("deleteFridaySchedule", {
+    restDelete<{ tanggal: string; deleted: boolean }>("/api/v1/friday", {
       tanggal,
     }),
 
   markSent: (tanggal: string) =>
-    call<{ marked: boolean }>("markFridayReminderSent", { tanggal }),
+    restPost<{ marked: boolean }>("/api/v1/friday/mark-reminder-sent", { tanggal }),
 };
 
 export const attendanceApi = {
   getPage: (meeting_id: string) =>
-    call<{
+    restGet<{
       meeting: Meeting;
       members: Member[];
       attendance: AttendanceRecord[];
-    }>("getAttendancePage", { meeting_id }),
+    }>("/api/v1/attendance/page", { meeting_id }),
+
   byMeeting: (meeting_id: string) =>
-    call<AttendanceRecord[]>("getAttendance", { meeting_id }),
+    restGet<AttendanceRecord[]>("/api/v1/attendance", { meeting_id }),
+
   byMember: (member_id: string) =>
-    call<AttendanceRecord[]>("getAttendance", { member_id }),
+    restGet<AttendanceRecord[]>("/api/v1/attendance", { member_id }),
+
   save: (payload: {
     meeting_id: string;
     member_id: string;
     status: string;
     catatan?: string;
-  }) => call<AttendanceRecord>("saveAttendance", payload),
+  }) => restPost<AttendanceRecord>("/api/v1/attendance", payload),
+
   bulkSave: (
     meeting_id: string,
     items: { member_id: string; status: string; catatan?: string }[],
-  ) => call<AttendanceRecord[]>("bulkSaveAttendance", { meeting_id, items }),
+  ) => restPost<AttendanceRecord[]>("/api/v1/attendance/bulk", { meeting_id, items }),
+
   remove: (payload: { meeting_id: string; member_id: string }) =>
-    call<{ deleted: number }>("deleteAttendance", payload),
+    restDelete<{ deleted: number }>("/api/v1/attendance", payload),
+
   removeByMeeting: (meeting_id: string) =>
-    call<{ deleted: number }>("deleteAttendanceByMeeting", { meeting_id }),
+    restDelete<{ deleted: number }>("/api/v1/attendance/meeting", { meeting_id }),
+
   removeByMember: (member_id: string) =>
-    call<{ deleted: number }>("deleteAttendanceByMember", { member_id }),
+    restDelete<{ deleted: number }>("/api/v1/attendance/member", { member_id }),
 };
 
 export interface PagedResponse<T> {
@@ -138,46 +135,53 @@ export const monitoringApi = {
   list: (
     member_id: string,
     options: { limit?: number; offset?: number } = {},
-  ) => call<MonitoringEntry[]>("getMonitoring", { member_id, ...options }),
+  ) => restGet<MonitoringEntry[]>("/api/v1/monitoring", { member_id, ...options }),
 
   listPaged: (
     member_id: string,
     options: { limit?: number; offset?: number } = {},
   ) =>
-    call<PagedResponse<MonitoringEntry>>("getMonitoring", {
+    restGet<PagedResponse<MonitoringEntry>>("/api/v1/monitoring", {
       member_id,
       paged: true,
       ...options,
     }),
 
   create: (payload: Partial<MonitoringEntry>) =>
-    call<MonitoringEntry>("createMonitoring", payload),
+    restPost<MonitoringEntry>("/api/v1/monitoring", payload),
+
   update: (monitoring_id: string, payload: Partial<MonitoringEntry>) =>
-    call<MonitoringEntry>("updateMonitoring", { monitoring_id, ...payload }),
+    restPut<MonitoringEntry>("/api/v1/monitoring", { monitoring_id, ...payload }),
 };
 
 export const announcementApi = {
-  templates: () => call<AnnouncementTemplate[]>("getAnnouncementTemplates"),
+  templates: () => restGet<AnnouncementTemplate[]>("/api/v1/announcements/templates"),
+
   generate: (payload: Record<string, unknown>) =>
-    call<{ generated_text: string; warning: string; hari: string }>(
-      "generateAnnouncement",
+    restPost<{ generated_text: string; warning: string; hari: string }>(
+      "/api/v1/announcements/generate",
       payload,
     ),
+
   generateWeekly: (payload: Record<string, unknown>) =>
-    call<
+    restPost<
       {
         hari: string;
         tanggal: string;
         generated_text: string;
         warning: string;
       }[]
-    >("generateWeeklyAnnouncements", payload),
+    >("/api/v1/announcements/generate-weekly", payload),
+
   create: (payload: Record<string, unknown>) =>
-    call<Announcement>("createAnnouncement", payload),
+    restPost<Announcement>("/api/v1/announcements", payload),
+
   update: (announcement_id: string, payload: Record<string, unknown>) =>
-    call<Announcement>("updateAnnouncement", { announcement_id, ...payload }),
+    restPut<Announcement>("/api/v1/announcements", { announcement_id, ...payload }),
+
   list: (params: { group_id?: string; status?: string } = {}) =>
-    call<Announcement[]>("getAnnouncements", params),
+    restGet<Announcement[]>("/api/v1/announcements", params),
+
   listPaged: (
     params: {
       group_id?: string;
@@ -186,7 +190,7 @@ export const announcementApi = {
       offset?: number;
     } = {},
   ) =>
-    call<PagedResponse<Announcement>>("getAnnouncements", {
+    restGet<PagedResponse<Announcement>>("/api/v1/announcements", {
       ...params,
       paged: true,
     }),
@@ -199,7 +203,7 @@ export const uploadApi = {
     mime_type: string,
     old_foto_url?: string,
   ) => {
-    return call<{ foto_url: string }>("uploadPhoto", {
+    return restPost<{ foto_url: string }>("/api/v1/photo", {
       member_id: member_id || "",
       base64,
       mime_type,
@@ -208,7 +212,7 @@ export const uploadApi = {
   },
 
   delete: (member_id?: string) =>
-    call<{ deleted: boolean }>("deletePhoto", member_id ? { member_id } : {}),
+    restDelete<{ deleted: boolean }>("/api/v1/photo", member_id ? { member_id } : {}),
 };
 
 export interface MoodEntry {
@@ -221,10 +225,12 @@ export interface MoodEntry {
 
 export const moodApi = {
   save: (mood_key: string, tanggal?: string) =>
-    call<MoodEntry>("saveMood", { mood_key, ...(tanggal ? { tanggal } : {}) }),
-  listMy: (limit = 100) => call<MoodEntry[]>("getMyMoods", { limit }),
+    restPost<MoodEntry>("/api/v1/moods", { mood_key, ...(tanggal ? { tanggal } : {}) }),
+
+  listMy: (limit = 100) => restGet<MoodEntry[]>("/api/v1/moods/my", { limit }),
+
   listMember: (member_id: string, limit = 100) =>
-    call<MoodEntry[]>("getMemberMoods", { member_id, limit }),
+    restGet<MoodEntry[]>("/api/v1/moods/member", { member_id, limit }),
 };
 
 export interface MemberRequestEntry {
@@ -246,54 +252,57 @@ export interface RequestBecomeMemberResult {
 }
 
 export const memberRequestApi = {
-  becomeMember: () => call<RequestBecomeMemberResult>("requestBecomeMember", {}),
+  becomeMember: () => restPost<RequestBecomeMemberResult>("/api/v1/member-requests/become"),
+
   list: (status?: string, params: { group_id?: string } = {}) =>
-    call<MemberRequestEntry[]>("getMemberRequests", {
+    restGet<MemberRequestEntry[]>("/api/v1/member-requests", {
       ...(status ? { status } : {}),
       ...params,
     }),
+
   approve: (request_id: string) =>
-    call<MemberRequestEntry>("approveMemberRequest", { request_id }),
+    restPost<MemberRequestEntry>("/api/v1/member-requests/approve", { request_id }),
+
   reject: (request_id: string, reason?: string) =>
-    call<{ rejected: boolean }>("rejectMemberRequest", {
+    restPost<{ rejected: boolean }>("/api/v1/member-requests/reject", {
       request_id,
       ...(reason ? { reason } : {}),
     }),
 };
 
 export const dashboardApi = {
-  general: () => call<DashboardGeneral>("getDashboard"),
-  pnkb: () => call<DashboardPNKB>("getDashboard"),
-  absensi: () => call<DashboardAbsensi>("getDashboard"),
+  general: () => restGet<DashboardGeneral>("/api/v1/dashboard"),
+  pnkb: () => restGet<DashboardPNKB>("/api/v1/dashboard"),
+  absensi: () => restGet<DashboardAbsensi>("/api/v1/dashboard"),
 };
 
 export const userApi = {
   list: (params: { group_id?: string } = {}) =>
-    call<import("../types").User[]>("getUsers", params),
+    restGet<import("../types").User[]>("/api/v1/users", params),
 
   detail: (user_id: string) =>
-    call<import("../types").User>("getUserDetail", { user_id }),
+    restGet<import("../types").User>("/api/v1/users/detail", { user_id }),
 
   create: (payload: Record<string, unknown>) =>
-    call<import("../types").User>("createUser", payload),
+    restPost<import("../types").User>("/api/v1/users", payload),
 
   update: (user_id: string, payload: Record<string, unknown>) =>
-    call<import("../types").User>("updateUser", { user_id, ...payload }),
+    restPut<import("../types").User>("/api/v1/users", { user_id, ...payload }),
 
   updateRole: (user_id: string, role: string) =>
-    call<import("../types").User>("updateUserRole", { user_id, role }),
+    restPut<import("../types").User>("/api/v1/users/role", { user_id, role }),
 
   changePassword: (payload: { old_password: string; new_password: string }) =>
-    call<{ changed: boolean }>("changeMyPassword", payload),
+    restPost<{ changed: boolean }>("/api/v1/auth/change-password", payload),
 
   changeUsername: (payload: { password: string; new_username: string }) =>
-    call<{ changed: boolean; username: string }>("changeMyUsername", payload),
+    restPost<{ changed: boolean; username: string }>("/api/v1/auth/change-username", payload),
 
   resetPassword: (payload: { user_id: string; new_password: string }) =>
-    call<{ reset: boolean; user_id: string }>("resetUserPassword", payload),
+    restPost<{ reset: boolean; user_id: string }>("/api/v1/users/reset-password", payload),
 
   deletePermanent: (user_id: string) =>
-    call<{ deleted: boolean; user_id: string }>("deleteUserPermanent", {
+    restDelete<{ deleted: boolean; user_id: string }>("/api/v1/users", {
       user_id,
     }),
 };
@@ -311,7 +320,7 @@ export interface AuditLogEntry {
 export const auditApi = {
   list: (
     params: { user_id?: string; target_type?: string; limit?: number } = {},
-  ) => call<AuditLogEntry[]>("getAuditLogs", params),
+  ) => restGet<AuditLogEntry[]>("/api/v1/audit-logs", params),
 };
 
 export interface AiUsageStats {
@@ -343,9 +352,8 @@ export interface AiUsageStats {
 }
 
 export const aiUsageApi = {
-  stats: () => call<AiUsageStats>("getAiUsageStats", {}),
+  stats: () => restGet<AiUsageStats>("/api/v1/ai/usage"),
 };
-
 
 export interface BulkMeetingPreviewItem {
   tanggal: string;
@@ -383,7 +391,7 @@ export const bulkMeetingApi = {
     materi?: string;
     catatan?: string;
     kategori_target?: string[];
-  }) => call<BulkMeetingPreviewResponse>("previewBulkMeetings", params),
+  }) => restPost<BulkMeetingPreviewResponse>("/api/v1/meetings/bulk-preview", params),
 
   create: (params: {
     tahun: number;
@@ -395,20 +403,19 @@ export const bulkMeetingApi = {
     materi?: string;
     catatan?: string;
     kategori_target?: string[];
-  }) => call<BulkMeetingCreateResponse>("bulkCreateMeetings", params),
+  }) => restPost<BulkMeetingCreateResponse>("/api/v1/meetings/bulk-create", params),
 };
 
-
 export const announcementTemplateApi = {
-  list: () => call<AnnouncementTemplate[]>("getAnnouncementTemplates", {}),
+  list: () => restGet<AnnouncementTemplate[]>("/api/v1/announcements/templates"),
 
   listAll: (includeInactive = true) =>
-    call<AnnouncementTemplate[]>("getAllAnnouncementTemplates", {
+    restGet<AnnouncementTemplate[]>("/api/v1/announcements/templates/all", {
       include_inactive: includeInactive ? "true" : "false",
     }),
 
   detail: (template_id: string) =>
-    call<AnnouncementTemplate>("getAnnouncementTemplateDetail", {
+    restGet<AnnouncementTemplate>("/api/v1/announcements/templates/detail", {
       template_id,
     }),
 
@@ -417,7 +424,7 @@ export const announcementTemplateApi = {
     kode: string;
     isi_template: string;
     status_aktif?: boolean;
-  }) => call<AnnouncementTemplate>("createAnnouncementTemplate", payload),
+  }) => restPost<AnnouncementTemplate>("/api/v1/announcements/templates", payload),
 
   update: (
     template_id: string,
@@ -428,14 +435,14 @@ export const announcementTemplateApi = {
       status_aktif?: boolean;
     },
   ) =>
-    call<AnnouncementTemplate>("updateAnnouncementTemplate", {
+    restPut<AnnouncementTemplate>("/api/v1/announcements/templates", {
       template_id,
       ...payload,
     }),
 
   remove: (template_id: string) =>
-    call<{ deleted: boolean; template_id: string }>(
-      "deleteAnnouncementTemplate",
+    restDelete<{ deleted: boolean; template_id: string }>(
+      "/api/v1/announcements/templates",
       { template_id },
     ),
 
@@ -444,5 +451,5 @@ export const announcementTemplateApi = {
     isi_template?: string;
     nama_template: string;
     kode: string;
-  }) => call<AnnouncementTemplate>("createTemplateFromAnnouncement", payload),
+  }) => restPost<AnnouncementTemplate>("/api/v1/announcements/templates/from-announcement", payload),
 };

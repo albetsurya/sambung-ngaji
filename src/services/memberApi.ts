@@ -1,4 +1,4 @@
-import { call } from "./api";
+import { restGet, restPost, restPut, restDelete } from "./apiClient";
 import type { Member, MemberUserStatus } from "../types";
 
 export interface MemberFilters {
@@ -21,36 +21,39 @@ export interface PagedResponse<T> {
 }
 
 export const memberApi = {
-  list: (filters: MemberFilters = {}) => call<Member[]>("getMembers", filters),
+  list: (filters: MemberFilters = {}) =>
+    restGet<Member[]>("/api/v1/members", filters),
 
   listPNKB: (filters: MemberFilters = {}) =>
-    call<Member[]>("getPNKBMembers", filters),
+    restGet<Member[]>("/api/v1/members/pnkb", filters),
 
   listPaged: (filters: MemberFilters = {}) =>
-    call<PagedResponse<Member>>("getMembersPaged", filters),
+    restGet<PagedResponse<Member>>("/api/v1/members/paged", filters),
 
   listPNKBPaged: (filters: MemberFilters = {}) =>
-    call<PagedResponse<Member>>("getPNKBMembersPaged", filters),
+    restGet<PagedResponse<Member>>("/api/v1/members/pnkb-paged", filters),
 
   listForAttendance: (filters: MemberFilters = {}) =>
-    call<Member[]>("getAttendanceMembers", filters),
+    restGet<Member[]>("/api/v1/members/attendance", filters),
 
-  detail: (member_id: string) => call<Member>("getMemberDetail", { member_id }),
+  detail: (member_id: string) =>
+    restGet<Member>("/api/v1/members/detail", { member_id }),
 
-  create: (payload: Partial<Member>) => call<Member>("createMember", payload),
+  create: (payload: Partial<Member>) =>
+    restPost<Member>("/api/v1/members", payload),
 
   update: (member_id: string, payload: Partial<Member>) =>
-    call<Member>("updateMember", { member_id, ...payload }),
+    restPut<Member>("/api/v1/members", { member_id, ...payload }),
 
   deactivate: (member_id: string) =>
-    call<Member>("deactivateMember", { member_id }),
+    restPost<Member>("/api/v1/members/deactivate", { member_id }),
 
   delete: (member_id: string) =>
-    call<{ deleted: boolean }>("deleteMember", { member_id }),
+    restDelete<{ deleted: boolean }>("/api/v1/members", { member_id }),
 
   getUserStatus: (member_id: string) =>
-    call<MemberUserStatus>("getMemberUserStatus", { member_id }),
+    restGet<MemberUserStatus>("/api/v1/users/member-status", { member_id }),
 
   listForExport: (filters: MemberFilters = {}) =>
-    call<Member[]>("getMembersForExport", filters),
+    restGet<Member[]>("/api/v1/members/export", filters),
 };

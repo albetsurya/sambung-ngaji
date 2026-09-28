@@ -1,4 +1,4 @@
-import { call } from "./api";
+import { restGet, restPost } from "./apiClient";
 
 export interface SubmitRegistrationPayload {
   nama_lengkap: string;
@@ -51,12 +51,12 @@ export const publicApi = {
     payload: SubmitRegistrationPayload,
   ): Promise<SubmitRegistrationResponse> => {
     const clientIp = await getClientIp();
-    return call<SubmitRegistrationResponse>("submitPublicRegistration", {
+    return restPost<SubmitRegistrationResponse>("/api/v1/public/register", {
       ...payload,
       _client_ip: clientIp,
     });
   },
 
   checkUsername: (username: string) =>
-    call<CheckUsernameResult>("checkUsernameAvailability", { username }),
+    restGet<CheckUsernameResult>("/api/v1/public/check-username", { username }),
 };

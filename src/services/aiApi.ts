@@ -1,4 +1,4 @@
-import { call } from "./api";
+import { restGet, restPost } from "./apiClient";
 
 export interface AiChatResponse {
   reply: string;
@@ -17,14 +17,14 @@ export const aiApi = {
     history: { role: "user" | "assistant"; text: string }[] = [],
     provider?: string,
   ) =>
-    call<AiChatResponse>("aiChat", {
+    restPost<AiChatResponse>("/api/v1/ai/chat", {
       message,
       history: JSON.stringify(history),
       provider: provider || "",
     }),
 
-  getCurrentProvider: () => call<ProviderInfo>("getCurrentProvider", {}),
+  getCurrentProvider: () => restGet<ProviderInfo>("/api/v1/ai/provider"),
 
   setProvider: (provider: string) =>
-    call<ProviderInfo>("setAIProvider", { provider }),
+    restPost<ProviderInfo>("/api/v1/ai/provider", { provider }),
 };

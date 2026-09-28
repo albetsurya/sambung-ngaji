@@ -1,4 +1,4 @@
-import { call } from "./api";
+import { restGet, restPut, restDelete } from "./apiClient";
 import type {
   Member,
   MyAttendanceEntry,
@@ -17,7 +17,7 @@ let getDashboardPromise: Promise<DashboardData> | null = null;
 
 function getDashboardCached(): Promise<DashboardData> {
   if (!getDashboardPromise) {
-    getDashboardPromise = call<DashboardData>("getMyDashboard", {}).finally(
+    getDashboardPromise = restGet<DashboardData>("/api/v1/dashboard/my").finally(
       () => {
         getDashboardPromise = null;
       },
@@ -29,17 +29,17 @@ function getDashboardCached(): Promise<DashboardData> {
 export const memberSelfApi = {
   getDashboard: getDashboardCached,
 
-  getProfile: () => call<Member>("getMyProfile", {}),
+  getProfile: () => restGet<Member>("/api/v1/auth/me"),
 
   updateProfile: (payload: Partial<Member>) =>
-    call<Member>("updateMyProfile", payload),
+    restPut<Member>("/api/v1/auth/me", payload),
 
-  getAttendance: () => call<MyAttendanceEntry[]>("getMyAttendance", {}),
+  getAttendance: () => restGet<MyAttendanceEntry[]>("/api/v1/auth/my-attendance"),
 
-  getMonitoring: () => call<MonitoringEntry[]>("getMyMonitoring", {}),
+  getMonitoring: () => restGet<MonitoringEntry[]>("/api/v1/auth/my-monitoring"),
 
   getUpcomingMeetings: (limit = 10) =>
-    call<Meeting[]>("getUpcomingMeetings", { limit }),
+    restGet<Meeting[]>("/api/v1/auth/upcoming-meetings", { limit }),
 
-  deletePhoto: () => call<{ deleted: boolean }>("deletePhoto", {}),
+  deletePhoto: () => restDelete<{ deleted: boolean }>("/api/v1/photo"),
 };
