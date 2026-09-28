@@ -456,8 +456,49 @@ export async function testApiGet() {
   }
 }
 
+export async function callREST<T>(
+  method: "GET" | "POST" | "PUT" | "DELETE",
+  path: string,
+  data?: Record<string, any>,
+  queryParams?: Record<string, any>,
+): Promise<T> {
+  let baseUrl = API_BASE_URL.endsWith("/api")
+    ? API_BASE_URL.slice(0, -4)
+    : API_BASE_URL;
+  let url = `${baseUrl}${path}`;
+  if (queryParams) {
+    const search = new URLSearchParams();
+    Object.entries(queryParams).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) search.append(k, String(v));
+    });
+    const q = search.toString();
+    if (q) url += `?${q}`;
+  }
+
+  const token = getToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: data ? JSON.stringify(data) : undefined,
+  });
+
+  const json: ApiResponse<T> = await res.json();
+  if (!json.success) {
+    throw new ApiError(json.message || "REST Request failed", undefined, {
+      statusCode: res.status,
+    });
+  }
+  return json.data;
+}
+
 export default {
   call,
+  callREST,
   login,
   logout,
   getToken,

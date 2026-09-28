@@ -1,4 +1,5 @@
-import { call } from "./api";
+import { call, callREST } from "./api";
+import { restGet, restPost } from "./apiClient";
 import type {
   Education,
   Group,
@@ -23,8 +24,8 @@ export const educationApi = {
 
 export const groupApi = {
   list: (includeInactive = false) =>
-    call<Group[]>("getGroups", { includeInactive }),
-  save: (payload: Partial<Group>) => call<Group>("saveGroup", payload),
+    restGet<Group[]>("/api/v1/groups", { includeInactive }),
+  save: (payload: Partial<Group>) => restPost<Group>("/api/v1/groups", payload),
 };
 
 
