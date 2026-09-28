@@ -28,7 +28,7 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
   // Map member payments
   const paymentMap = new Map<string, ShodaqohPayment>();
   payments.forEach((p) => {
-    paymentMap.set(p.memberId, p);
+    paymentMap.set(p.member_id, p);
   });
 
   let sumTarget = 0;
@@ -105,16 +105,16 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
               </thead>
               <tbody>
                 {members.map((m, idx) => {
-                  const p = paymentMap.get(m.id);
-                  const target = Number(m.nominalBulanan) || 0;
-                  const ir = Number(p?.susulan_ir) || 0;
+                  const p = paymentMap.get(m.member_id);
+                  const target = Number(m.monthly_target) || 0;
+                  const ir = Number(p?.carryover_ir) || 0;
                   const sambung = Number(p?.uang_sambung) || 0;
                   const jimpitan = Number(p?.jimpitan) || 0;
                   const siar = Number(p?.siar_siar) || 0;
                   const seribuan = Number(p?.seribuan) || 0;
                   const kafan = Number(p?.kafan) || 0;
                   const ukhro = Number(p?.ukhro_mt) || 0;
-                  const total = Number(p?.total) || (ir + sambung + jimpitan + siar + seribuan + kafan + ukhro);
+                  const total = Number(p?.total_amount) || (ir + sambung + jimpitan + siar + seribuan + kafan + ukhro);
 
                   sumTarget += target;
                   sumIr += ir;
@@ -127,9 +127,9 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
                   sumTotal += total;
 
                   return (
-                    <tr key={m.id} className="border-b border-slate-300">
+                    <tr key={m.member_id} className="border-b border-slate-300">
                       <td className="border border-slate-300 p-1 text-center">{idx + 1}</td>
-                      <td className="border border-slate-300 p-1 font-semibold">{m.nama}</td>
+                      <td className="border border-slate-300 p-1 font-semibold">{m.member_name}</td>
                       <td className="border border-slate-300 p-1 text-right font-mono">{target > 0 ? formatRp(target) : "—"}</td>
                       <td className="border border-slate-300 p-1 text-right font-mono">{ir > 0 ? formatRp(ir) : "—"}</td>
                       <td className="border border-slate-300 p-1 text-right font-mono">{sambung > 0 ? formatRp(sambung) : "—"}</td>
@@ -141,7 +141,7 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
                       <td className="border border-slate-300 p-1 text-right font-mono font-bold text-slate-900">
                         {total > 0 ? formatRp(total) : "—"}
                       </td>
-                      <td className="border border-slate-300 p-1">{p?.keterangan || ""}</td>
+                      <td className="border border-slate-300 p-1">{p?.notes || ""}</td>
                     </tr>
                   );
                 })}

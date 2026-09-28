@@ -17,11 +17,11 @@ export const FinanceLedgerPage: React.FC = () => {
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
 
   const [txForm, setTxForm] = useState({
-    tanggal: new Date().toISOString().slice(0, 10),
-    account: "",
-    keterangan: "",
-    jenis: "Debet" as "Debet" | "Kredit",
-    jumlah: 0,
+    transaction_date: new Date().toISOString().slice(0, 10),
+    account_name: "",
+    description: "",
+    transaction_type: "DEBIT" as "DEBIT" | "CREDIT",
+    amount: 0,
   });
 
   // Carry Forward State
@@ -51,50 +51,54 @@ export const FinanceLedgerPage: React.FC = () => {
   const handleOpenAddModal = () => {
     setEditingTx(null);
     setTxForm({
-      tanggal: new Date().toISOString().slice(0, 10),
-      account: "",
-      keterangan: "",
-      jenis: "Debet",
-      jumlah: 0,
+      transaction_date: new Date().toISOString().slice(0, 10),
+      account_name: "",
+      description: "",
+      transaction_type: "DEBIT",
+      amount: 0,
     });
     setIsTxModalOpen(true);
   };
 
   const handleOpenEditModal = (tx: Transaction) => {
     setEditingTx(tx);
-    const deb = Number(tx.debet) || 0;
-    const kre = Number(tx.kredit) || 0;
+    const deb = Number(tx.debit) || 0;
+    const kre = Number(tx.credit) || 0;
     setTxForm({
-      tanggal: tx.tanggal || new Date().toISOString().slice(0, 10),
-      account: tx.account || "",
-      keterangan: tx.keterangan || "",
-      jenis: deb > 0 ? "Debet" : "Kredit",
-      jumlah: deb > 0 ? deb : kre,
+      transaction_date: tx.transaction_date || new Date().toISOString().slice(0, 10),
+      account_name: tx.account_name || "",
+      description: tx.description || "",
+      transaction_type: deb > 0 ? "DEBIT" : "CREDIT",
+      amount: deb > 0 ? deb : kre,
     });
     setIsTxModalOpen(true);
   };
 
   const handleSubmitTx = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!txForm.keterangan.trim()) {
+    if (!txForm.description.trim()) {
       showToast("Keterangan wajib diisi", "error");
       return;
     }
-    if (txForm.jumlah <= 0) {
+    if (txForm.amount <= 0) {
       showToast("Jumlah nominal harus lebih besar dari 0", "error");
       return;
     }
 
     try {
+      const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
+      const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
+
       if (editingTx && editingTx.no) {
         await financeApi.editTransaction(
           {
             no: editingTx.no,
-            tanggal: txForm.tanggal,
-            account: txForm.account,
-            keterangan: txForm.keterangan,
-            jenis: txForm.jenis,
-            jumlah: txForm.jumlah,
+            transaction_date: txForm.transaction_date,
+            account_name: txForm.account_name,
+            description: txForm.description,
+            transaction_type: txForm.transaction_type,
+            debit: deb,
+            credit: kre,
           },
           kasType
         );
@@ -102,11 +106,12 @@ export const FinanceLedgerPage: React.FC = () => {
       } else {
         await financeApi.addTransaction(
           {
-            tanggal: txForm.tanggal,
-            account: txForm.account,
-            keterangan: txForm.keterangan,
-            jenis: txForm.jenis,
-            jumlah: txForm.jumlah,
+            transaction_date: txForm.transaction_date,
+            account_name: txForm.account_name,
+            description: txForm.description,
+            transaction_type: txForm.transaction_type,
+            debit: deb,
+            credit: kre,
           },
           kasType
         );
@@ -153,9 +158,9 @@ export const FinanceLedgerPage: React.FC = () => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
-      (t.keterangan || "").toLowerCase().includes(q) ||
-      (t.account || "").toLowerCase().includes(q) ||
-      (t.tanggal || "").toLowerCase().includes(q)
+      (t.description || "").toLowerCase().includes(q) ||
+      (t.account_name || "").toLowerCase().includes(q) ||
+      (t.transaction_date || "").toLowerCase().includes(q)
     );
   });
 
@@ -227,25 +232,25 @@ export const FinanceLedgerPage: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Awal</p>
           <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-            {formatRp(kasData?.saldoAwal || 0)}
+            {formatRp(kasData?.initial_balance || 0)}
           </h4>
         </div>
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm border-l-4 border-l-emerald-500">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Penerimaan (Debet)</p>
           <h4 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-            {formatRp(kasData?.totalDebet || 0)}
+            {formatRp(kasData?.total_debit || 0)}
           </h4>
         </div>
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm border-l-4 border-l-rose-500">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Pengeluaran (Kredit)</p>
           <h4 className="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">
-            {formatRp(kasData?.totalKredit || 0)}
+            {formatRp(kasData?.total_credit || 0)}
           </h4>
         </div>
         <div className="bg-gradient-to-br from-emerald-800 to-teal-900 text-white p-5 rounded-2xl shadow-md">
           <p className="text-xs font-medium text-emerald-200">Saldo Akhir</p>
           <h4 className="text-xl font-bold text-white mt-1">
-            {formatRp(kasData?.saldoAkhir || 0)}
+            {formatRp(kasData?.ending_balance || 0)}
           </h4>
         </div>
       </div>
@@ -288,17 +293,17 @@ export const FinanceLedgerPage: React.FC = () => {
                 {filteredTransactions.map((t, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3 text-center text-slate-400 font-mono text-xs">{idx + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">{t.tanggal}</td>
-                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{t.account || "Lainnya"}</td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{t.keterangan}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">{t.transaction_date}</td>
+                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{t.account_name || "Lainnya"}</td>
+                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{t.description}</td>
                     <td className="px-4 py-3 text-right font-mono font-medium text-emerald-600 dark:text-emerald-400">
-                      {Number(t.debet) > 0 ? formatRp(Number(t.debet)) : "—"}
+                      {Number(t.debit) > 0 ? formatRp(Number(t.debit)) : "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-mono font-medium text-rose-600 dark:text-rose-400">
-                      {Number(t.kredit) > 0 ? formatRp(Number(t.kredit)) : "—"}
+                      {Number(t.credit) > 0 ? formatRp(Number(t.credit)) : "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-100">
-                      {formatRp(Number(t.saldo) || 0)}
+                      {formatRp(Number(t.balance) || 0)}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -338,8 +343,8 @@ export const FinanceLedgerPage: React.FC = () => {
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tanggal</label>
                 <input
                   type="date"
-                  value={txForm.tanggal}
-                  onChange={(e) => setTxForm({ ...txForm, tanggal: e.target.value })}
+                  value={txForm.transaction_date}
+                  onChange={(e) => setTxForm({ ...txForm, transaction_date: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
                   required
                 />
@@ -352,9 +357,9 @@ export const FinanceLedgerPage: React.FC = () => {
                     <input
                       type="radio"
                       name="jenis"
-                      value="Debet"
-                      checked={txForm.jenis === "Debet"}
-                      onChange={() => setTxForm({ ...txForm, jenis: "Debet" })}
+                      value="DEBIT"
+                      checked={txForm.transaction_type === "DEBIT"}
+                      onChange={() => setTxForm({ ...txForm, transaction_type: "DEBIT" })}
                     />
                     <span>Penerimaan (Debet)</span>
                   </label>
@@ -362,9 +367,9 @@ export const FinanceLedgerPage: React.FC = () => {
                     <input
                       type="radio"
                       name="jenis"
-                      value="Kredit"
-                      checked={txForm.jenis === "Kredit"}
-                      onChange={() => setTxForm({ ...txForm, jenis: "Kredit" })}
+                      value="CREDIT"
+                      checked={txForm.transaction_type === "CREDIT"}
+                      onChange={() => setTxForm({ ...txForm, transaction_type: "CREDIT" })}
                     />
                     <span>Pengeluaran (Kredit)</span>
                   </label>
@@ -376,8 +381,8 @@ export const FinanceLedgerPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
-                  value={txForm.account}
-                  onChange={(e) => setTxForm({ ...txForm, account: e.target.value })}
+                  value={txForm.account_name}
+                  onChange={(e) => setTxForm({ ...txForm, account_name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
                 />
               </div>
@@ -387,8 +392,8 @@ export const FinanceLedgerPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Uraian transaksi lengkap"
-                  value={txForm.keterangan}
-                  onChange={(e) => setTxForm({ ...txForm, keterangan: e.target.value })}
+                  value={txForm.description}
+                  onChange={(e) => setTxForm({ ...txForm, description: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
                   required
                 />
@@ -399,8 +404,8 @@ export const FinanceLedgerPage: React.FC = () => {
                 <input
                   type="number"
                   placeholder="0"
-                  value={txForm.jumlah || ""}
-                  onChange={(e) => setTxForm({ ...txForm, jumlah: Number(e.target.value) })}
+                  value={txForm.amount || ""}
+                  onChange={(e) => setTxForm({ ...txForm, amount: Number(e.target.value) })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono font-bold"
                   required
                 />
@@ -468,10 +473,10 @@ export const FinanceLedgerPage: React.FC = () => {
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         transactions={kasData?.transactions || []}
-        saldoAwal={kasData?.saldoAwal || 0}
-        saldoAkhir={kasData?.saldoAkhir || 0}
-        periodLabel={new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-        kasTypeLabel={kasType === "kas_amil" ? "Kas Amil" : "Kas Utama"}
+        initial_balance={kasData?.initial_balance || 0}
+        ending_balance={kasData?.ending_balance || 0}
+        period_label={new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+        kas_type_label={kasType === "kas_amil" ? "Kas Amil" : "Kas Utama"}
         mode={printMode}
       />
     </div>

@@ -75,7 +75,7 @@ export const ShodaqohPage: React.FC = () => {
     }
     try {
       if (editingMember) {
-        await financeApi.updateShodaqohMember(editingMember.id, memberName, memberTarget);
+        await financeApi.updateShodaqohMember(editingMember.member_id, memberName, memberTarget);
         showToast("Anggota shodaqoh berhasil diperbarui", "success");
       } else {
         await financeApi.addShodaqohMember(memberName, memberTarget);
@@ -117,7 +117,7 @@ export const ShodaqohPage: React.FC = () => {
 
     // Try pre-filling last nominals
     try {
-      const lastRes = await financeApi.getShodaqohLastNominals(member.id, selectedMonth);
+      const lastRes = await financeApi.getShodaqohLastNominals(member.member_id, selectedMonth);
       if (lastRes && lastRes.success && lastRes.values) {
         const v = lastRes.values;
         setPaymentForm((prev) => ({
@@ -158,7 +158,7 @@ export const ShodaqohPage: React.FC = () => {
 
     const payload = {
       paymentId: paymentForm.paymentId,
-      memberId: selectedMember.id,
+      memberId: selectedMember.member_id,
       tanggalPembayaran: paymentForm.tanggalPembayaran,
       total,
       susulan_ir: paymentForm.susulan_ir,
@@ -297,12 +297,12 @@ export const ShodaqohPage: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {membersList.map((m) => {
-              const payment = paymentsList.find((p) => p.memberId === m.id);
-              const hasPaid = Boolean(payment && payment.total > 0);
+              const payment = paymentsList.find((p) => p.member_id === m.member_id);
+              const hasPaid = Boolean(payment && payment.total_amount > 0);
 
               return (
                 <div
-                  key={m.id}
+                  key={m.member_id}
                   className={`p-4 rounded-xl border transition-all ${
                     hasPaid
                       ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-300/60 dark:border-emerald-800/40"
@@ -311,9 +311,9 @@ export const ShodaqohPage: React.FC = () => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">{m.nama}</h4>
+                      <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">{m.member_name}</h4>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Target: <span className="font-mono font-semibold">{formatRp(m.nominalBulanan)}</span>
+                        Target: <span className="font-mono font-semibold">{formatRp(m.monthly_target)}</span>
                       </p>
                     </div>
                     <span
@@ -332,10 +332,10 @@ export const ShodaqohPage: React.FC = () => {
                     <div className="mt-3 pt-3 border-t border-slate-200/80 dark:border-slate-800 text-xs space-y-1">
                       <div className="flex justify-between font-mono">
                         <span className="text-slate-500">Total Terbayar:</span>
-                        <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatRp(payment.total)}</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatRp(payment.total_amount)}</span>
                       </div>
-                      {payment.keterangan && (
-                        <p className="text-[11px] text-slate-500 italic truncate">Ket: {payment.keterangan}</p>
+                      {payment.notes && (
+                        <p className="text-[11px] text-slate-500 italic truncate">Ket: {payment.notes}</p>
                       )}
                     </div>
                   )}
@@ -353,8 +353,8 @@ export const ShodaqohPage: React.FC = () => {
                       <button
                         onClick={() => {
                           setEditingMember(m);
-                          setMemberName(m.nama);
-                          setMemberTarget(m.nominalBulanan);
+                          setMemberName(m.member_name);
+                          setMemberTarget(m.monthly_target);
                           setIsMemberModalOpen(true);
                         }}
                         className="text-slate-500 hover:text-slate-700 font-medium"
@@ -362,7 +362,7 @@ export const ShodaqohPage: React.FC = () => {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDeleteMember(m.id)}
+                        onClick={() => handleDeleteMember(m.member_id)}
                         className="text-rose-500 hover:text-rose-700 font-medium"
                       >
                         Hapus
@@ -434,7 +434,7 @@ export const ShodaqohPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                   Input Pembayaran Shodaqoh
                 </h3>
-                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{selectedMember.nama}</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{selectedMember.member_name}</p>
               </div>
               <button
                 type="button"

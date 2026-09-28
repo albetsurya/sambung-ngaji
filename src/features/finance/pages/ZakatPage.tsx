@@ -16,11 +16,11 @@ export const ZakatPage: React.FC = () => {
   const [editingZakat, setEditingZakat] = useState<ZakatItem | null>(null);
 
   const [form, setForm] = useState({
-    tipeZakat: "FITRAH" as "FITRAH" | "MAL",
-    namaMuzaki: "",
-    jumlahJiwa: 1,
-    totalBerasKg: 0,
-    totalUangRp: 0,
+    zakat_type: "FITRAH" as "FITRAH" | "MAL",
+    muzakki_name: "",
+    soul_count: 1,
+    total_rice_kg: 0,
+    total_money_rp: 0,
   });
 
   // Print Modal
@@ -48,18 +48,18 @@ export const ZakatPage: React.FC = () => {
   const handleOpenAddModal = () => {
     setEditingZakat(null);
     setForm({
-      tipeZakat: "FITRAH",
-      namaMuzaki: "",
-      jumlahJiwa: 1,
-      totalBerasKg: 2.7,
-      totalUangRp: 0,
+      zakat_type: "FITRAH",
+      muzakki_name: "",
+      soul_count: 1,
+      total_rice_kg: 2.7,
+      total_money_rp: 0,
     });
     setIsModalOpen(true);
   };
 
   const handleSaveZakat = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.namaMuzaki.trim()) {
+    if (!form.muzakki_name.trim()) {
       showToast("Nama Muzakki wajib diisi", "error");
       return;
     }
@@ -67,7 +67,7 @@ export const ZakatPage: React.FC = () => {
     try {
       if (editingZakat) {
         await financeApi.manageZakat("updateZakat", {
-          id: editingZakat.id,
+          zakat_id: editingZakat.zakat_id,
           ...form,
         });
         showToast("Data zakat berhasil diperbarui", "success");
@@ -82,10 +82,10 @@ export const ZakatPage: React.FC = () => {
     }
   };
 
-  const handleDeleteZakat = async (id: string) => {
+  const handleDeleteZakat = async (zakatId: string) => {
     if (!window.confirm("Yakin ingin menghapus catatan zakat ini?")) return;
     try {
-      await financeApi.manageZakat("deleteZakat", { id });
+      await financeApi.manageZakat("deleteZakat", { zakat_id: zakatId });
       showToast("Catatan zakat berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -93,9 +93,9 @@ export const ZakatPage: React.FC = () => {
     }
   };
 
-  const handleCompleteZakat = async (id: string) => {
+  const handleCompleteZakat = async (zakatId: string) => {
     try {
-      await financeApi.manageZakat("completeZakat", { id });
+      await financeApi.manageZakat("completeZakat", { zakat_id: zakatId });
       showToast("Status zakat berhasil diset Selesai / Tuntas", "success");
       loadData();
     } catch (err: any) {
@@ -107,14 +107,14 @@ export const ZakatPage: React.FC = () => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
-      (z.namaMuzaki || "").toLowerCase().includes(q) ||
-      (z.tipeZakat || "").toLowerCase().includes(q)
+      (z.muzakki_name || "").toLowerCase().includes(q) ||
+      (z.zakat_type || "").toLowerCase().includes(q)
     );
   });
 
-  const totalJiwa = zakatList.reduce((sum, z) => sum + (Number(z.jumlahJiwa) || 1), 0);
-  const totalBeras = zakatList.reduce((sum, z) => sum + (Number(z.totalBerasKg) || 0), 0);
-  const totalUang = zakatList.reduce((sum, z) => sum + (Number(z.totalUangRp) || 0), 0);
+  const totalJiwa = zakatList.reduce((sum, z) => sum + (Number(z.soul_count) || 1), 0);
+  const totalBeras = zakatList.reduce((sum, z) => sum + (Number(z.total_rice_kg) || 0), 0);
+  const totalUang = zakatList.reduce((sum, z) => sum + (Number(z.total_money_rp) || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -179,20 +179,20 @@ export const ZakatPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {filteredZakat.map((z, idx) => (
-                  <tr key={z.id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                  <tr key={z.zakat_id || idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3 text-center text-slate-400 font-mono text-xs">{idx + 1}</td>
-                    <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{z.namaMuzaki}</td>
+                    <td className="px-4 py-3 font-bold text-slate-800 dark:text-slate-100">{z.muzakki_name}</td>
                     <td className="px-4 py-3 text-center">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        {z.tipeZakat || "FITRAH"}
+                        {z.zakat_type || "FITRAH"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center font-mono font-semibold">{z.jumlahJiwa || 1}</td>
+                    <td className="px-4 py-3 text-center font-mono font-semibold">{z.soul_count || 1}</td>
                     <td className="px-4 py-3 text-right font-mono font-medium text-emerald-600 dark:text-emerald-400">
-                      {z.totalBerasKg ? `${z.totalBerasKg} Kg` : "—"}
+                      {z.total_rice_kg ? `${z.total_rice_kg} Kg` : "—"}
                     </td>
                     <td className="px-4 py-3 text-right font-mono font-medium text-teal-600 dark:text-teal-400">
-                      {z.totalUangRp ? formatRp(z.totalUangRp) : "—"}
+                      {z.total_money_rp ? formatRp(z.total_money_rp) : "—"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span
@@ -218,14 +218,14 @@ export const ZakatPage: React.FC = () => {
                         </button>
                         {z.status !== "COMPLETED" && (
                           <button
-                            onClick={() => handleCompleteZakat(z.id)}
+                            onClick={() => handleCompleteZakat(z.zakat_id)}
                             className="text-teal-600 font-medium hover:underline"
                           >
                             Set Tuntas
                           </button>
                         )}
                         <button
-                          onClick={() => handleDeleteZakat(z.id)}
+                          onClick={() => handleDeleteZakat(z.zakat_id)}
                           className="text-rose-500 font-medium hover:underline"
                         >
                           Hapus
@@ -254,8 +254,8 @@ export const ZakatPage: React.FC = () => {
                       type="radio"
                       name="tipeZakat"
                       value="FITRAH"
-                      checked={form.tipeZakat === "FITRAH"}
-                      onChange={() => setForm({ ...form, tipeZakat: "FITRAH" })}
+                      checked={form.zakat_type === "FITRAH"}
+                      onChange={() => setForm({ ...form, zakat_type: "FITRAH" })}
                     />
                     <span>Zakat Fitrah</span>
                   </label>
@@ -264,8 +264,8 @@ export const ZakatPage: React.FC = () => {
                       type="radio"
                       name="tipeZakat"
                       value="MAL"
-                      checked={form.tipeZakat === "MAL"}
-                      onChange={() => setForm({ ...form, tipeZakat: "MAL" })}
+                      checked={form.zakat_type === "MAL"}
+                      onChange={() => setForm({ ...form, zakat_type: "MAL" })}
                     />
                     <span>Zakat Mal</span>
                   </label>
@@ -277,8 +277,8 @@ export const ZakatPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Nama Pembayar Zakat"
-                  value={form.namaMuzaki}
-                  onChange={(e) => setForm({ ...form, namaMuzaki: e.target.value })}
+                  value={form.muzakki_name}
+                  onChange={(e) => setForm({ ...form, muzakki_name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
                   required
                 />
@@ -289,8 +289,8 @@ export const ZakatPage: React.FC = () => {
                 <input
                   type="number"
                   min={1}
-                  value={form.jumlahJiwa}
-                  onChange={(e) => setForm({ ...form, jumlahJiwa: Number(e.target.value) })}
+                  value={form.soul_count}
+                  onChange={(e) => setForm({ ...form, soul_count: Number(e.target.value) })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono"
                   required
                 />
@@ -302,8 +302,8 @@ export const ZakatPage: React.FC = () => {
                   <input
                     type="number"
                     step="0.1"
-                    value={form.totalBerasKg || ""}
-                    onChange={(e) => setForm({ ...form, totalBerasKg: Number(e.target.value) })}
+                    value={form.total_rice_kg || ""}
+                    onChange={(e) => setForm({ ...form, total_rice_kg: Number(e.target.value) })}
                     className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono font-bold text-emerald-600"
                   />
                 </div>
@@ -311,8 +311,8 @@ export const ZakatPage: React.FC = () => {
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Total Uang (Rp)</label>
                   <input
                     type="number"
-                    value={form.totalUangRp || ""}
-                    onChange={(e) => setForm({ ...form, totalUangRp: Number(e.target.value) })}
+                    value={form.total_money_rp || ""}
+                    onChange={(e) => setForm({ ...form, total_money_rp: Number(e.target.value) })}
                     className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono font-bold text-teal-600"
                   />
                 </div>

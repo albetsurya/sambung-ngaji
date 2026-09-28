@@ -32,7 +32,7 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
               Pratinjau Cetak: {mode === "kwitansi" ? "Kwitansi Tanda Terima Zakat" : "Rekapitulasi Zakat"}
             </h3>
-            <p className="text-xs text-slate-500">Muzakki: {zakat.namaMuzaki}</p>
+            <p className="text-xs text-slate-500">Muzakki: {zakat.muzakki_name}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -75,26 +75,26 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
               <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded border border-slate-300 font-mono text-[11px]">
                 <div>
                   <span className="text-slate-500">No. Transaksi Zakat:</span>
-                  <p className="font-bold text-slate-900">{zakat.id}</p>
+                  <p className="font-bold text-slate-900">{zakat.zakat_id}</p>
                 </div>
                 <div>
                   <span className="text-slate-500">Tanggal Penerimaan:</span>
-                  <p className="font-bold text-slate-900">{zakat.tanggal || new Date().toISOString().slice(0, 10)}</p>
+                  <p className="font-bold text-slate-900">{zakat.transaction_date || new Date().toISOString().slice(0, 10)}</p>
                 </div>
               </div>
 
               <div className="border-t border-b border-slate-300 py-3 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-slate-600">Telah Terima Dari (Muzakki):</span>
-                  <span className="font-bold text-slate-900 text-sm uppercase">{zakat.namaMuzaki}</span>
+                  <span className="font-bold text-slate-900 text-sm uppercase">{zakat.muzakki_name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Jenis Zakat:</span>
-                  <span className="font-semibold text-emerald-800 uppercase">{zakat.tipeZakat}</span>
+                  <span className="font-semibold text-emerald-800 uppercase">{zakat.zakat_type}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Jumlah Tanggungan Jiwa:</span>
-                  <span className="font-mono font-semibold text-slate-900">{zakat.jumlahJiwa || 1} Orang</span>
+                  <span className="font-mono font-semibold text-slate-900">{zakat.soul_count || 1} Orang</span>
                 </div>
               </div>
 
@@ -105,11 +105,11 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
                 </h4>
                 <div className="flex justify-between font-mono text-xs">
                   <span>Beras (Kg):</span>
-                  <span className="font-bold text-slate-900">{zakat.totalBerasKg ? `${zakat.totalBerasKg} Kg` : "—"}</span>
+                  <span className="font-bold text-slate-900">{zakat.total_rice_kg ? `${zakat.total_rice_kg} Kg` : "—"}</span>
                 </div>
                 <div className="flex justify-between font-mono text-xs">
                   <span>Uang (Rp):</span>
-                  <span className="font-bold text-emerald-700">{zakat.totalUangRp ? formatRp(zakat.totalUangRp) : "—"}</span>
+                  <span className="font-bold text-emerald-700">{zakat.total_money_rp ? formatRp(zakat.total_money_rp) : "—"}</span>
                 </div>
               </div>
 
@@ -127,7 +127,7 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
             <div className="mt-8 flex justify-between text-center text-xs">
               <div>
                 <p className="text-slate-600 mb-10">Muzakki / Pembayar</p>
-                <p className="font-bold underline uppercase">( {zakat.namaMuzaki} )</p>
+                <p className="font-bold underline uppercase">( {zakat.muzakki_name} )</p>
               </div>
               <div>
                 <p className="text-slate-600 mb-10">Panitia Amil Zakat</p>
