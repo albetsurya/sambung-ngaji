@@ -61,7 +61,7 @@ interface MenuEntry {
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
-  const { isAdminLike, isSuperAdmin, role, assignedGroup } = usePermission();
+  const { isAdminLike, isSuperAdmin, role, assignedGroup, canAccessFinance } = usePermission();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -231,6 +231,15 @@ export default function OthersPage() {
         group: "jadwal",
       },
 
+      {
+        key: "finance",
+        label: "Keuangan (SabilKas)",
+        description: "Kas utama/amil, shodaqoh, zakat & AI",
+        Icon: FileText,
+        to: "/finance",
+        show: canAccessFinance,
+        group: "sistem",
+      },
       {
         key: "users",
         label: "Manajemen User",

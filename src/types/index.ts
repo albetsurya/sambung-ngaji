@@ -3,6 +3,7 @@ import { call } from "../services/api";
 export type Role =
   | "SUPER_ADMIN"
   | "ADMIN"
+  | "TIM_KU"
   | "TIM_PNKB"
   | "TIM_ABSENSI"
   | "PENGAWAS"

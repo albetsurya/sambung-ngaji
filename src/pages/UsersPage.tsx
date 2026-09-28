@@ -48,6 +48,7 @@ import { queryKeys } from "../lib/queryClient";
 const ROLE_DESCRIPTION: Record<Role, string> = {
   SUPER_ADMIN: "Akses penuh ke semua fitur",
   ADMIN: "Kelola jamaah, kelompok, dan absensi",
+  TIM_KU: "Kelola modul keuangan (kas, shodaqoh, zakat)",
   TIM_PNKB: "Khusus pembinaan pra nikah",
   TIM_ABSENSI: "Khusus absensi pengajian",
   PENGAWAS: "Lihat semua data + tulis pembinaan",

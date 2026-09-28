@@ -28,6 +28,7 @@ export function setSuperAdminFocusGroup(groupId: string | null) {
 export const ROLE_LABEL: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
   ADMIN: "Admin",
+  TIM_KU: "Tim KU",
   TIM_PNKB: "Tim PNKB",
   TIM_ABSENSI: "Tim Absensi",
   PENGAWAS: "Pengawas",
@@ -35,8 +36,9 @@ export const ROLE_LABEL: Record<Role, string> = {
 };
 
 const NAV_BY_ROLE: Record<Role, string[]> = {
-  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
+  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "keuangan", "lainnya"],
   ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
+  TIM_KU: ["beranda", "keuangan", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
   TIM_ABSENSI: ["beranda", "absensi", "lainnya"],
   PENGAWAS: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
@@ -71,6 +73,7 @@ export function usePermission() {
 
   const isSuperAdmin = role === "SUPER_ADMIN";
   const isAdminLike = role === "SUPER_ADMIN" || role === "ADMIN";
+  const isTimKu = role === "TIM_KU";
   const isPengawas = role === "PENGAWAS";
   const isMember = role === "MEMBER";
 
@@ -82,6 +85,7 @@ export function usePermission() {
   const canWriteMonitoring =
     isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
   const canManageUsers = isGlobal || isSuperAdmin;
+  const canAccessFinance = isSuperAdmin || role === "TIM_KU";
 
   return {
     role,
@@ -92,12 +96,14 @@ export function usePermission() {
     canSeeNav,
     isSuperAdmin,
     isAdminLike,
+    isTimKu,
     isPengawas,
     isMember,
     canViewAllMembers,
     canEditMembers,
     canWriteMonitoring,
     canManageUsers,
+    canAccessFinance,
     setSuperAdminFocusGroup,
   };
 }

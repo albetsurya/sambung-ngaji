@@ -228,6 +228,7 @@ export function Badge({
 export const ROLE_BADGE_COLOR: Record<Role, keyof typeof BADGE_COLORS> = {
   SUPER_ADMIN: "red",
   ADMIN: "emerald",
+  TIM_KU: "teal",
   TIM_PNKB: "amber",
   TIM_ABSENSI: "amber",
   PENGAWAS: "ink",

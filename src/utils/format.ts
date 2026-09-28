@@ -224,6 +224,17 @@ export function normalizeGender(value?: string | null): "L" | "P" | undefined {
   return undefined;
 }
 
+export function formatRp(n: number | null | undefined): string {
+  if (n === null || n === undefined || isNaN(n)) return "Rp 0";
+  return (
+    "Rp " +
+    Math.round(n)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  );
+}
+export const fmtRp = formatRp;
+
 export function getDisplayName(member: Member): string {
   const usia = getMemberAge(member.tanggal_lahir);
   if (usia === null || usia < 40) return member.nama_lengkap;

@@ -43,6 +43,37 @@ const AnnouncementTemplatesPage = lazy(
 );
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
+
+const FinanceGuard = lazy(() =>
+  import("./features/finance/components/FinanceGuard").then((m) => ({
+    default: m.FinanceGuard,
+  })),
+);
+const FinanceLayout = lazy(() =>
+  import("./features/finance/components/FinanceLayout").then((m) => ({
+    default: m.FinanceLayout,
+  })),
+);
+const FinanceLedgerPage = lazy(() =>
+  import("./features/finance/pages/FinanceLedgerPage").then((m) => ({
+    default: m.FinanceLedgerPage,
+  })),
+);
+const ShodaqohPage = lazy(() =>
+  import("./features/finance/pages/ShodaqohPage").then((m) => ({
+    default: m.ShodaqohPage,
+  })),
+);
+const ZakatPage = lazy(() =>
+  import("./features/finance/pages/ZakatPage").then((m) => ({
+    default: m.ZakatPage,
+  })),
+);
+const FinanceAiPage = lazy(() =>
+  import("./features/finance/pages/FinanceAiPage").then((m) => ({
+    default: m.FinanceAiPage,
+  })),
+);
 const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
 const MemberDoaPage = lazy(() => import("./pages/MemberDoaPage"));
 const MemberDzikirPage = lazy(() => import("./pages/MemberDzikirPage"));
@@ -366,6 +397,17 @@ function AppRoutes() {
         />
 
         <Route element={<ProtectedRoute />}>
+          {/* Finance Module (Accessible by SUPER_ADMIN & TIM_KU) */}
+          <Route element={<FinanceGuard />}>
+            <Route path="/finance" element={<FinanceLayout />}>
+              <Route index element={<Navigate to="/finance/ledger" replace />} />
+              <Route path="ledger" element={<FinanceLedgerPage />} />
+              <Route path="shodaqoh" element={<ShodaqohPage />} />
+              <Route path="zakat" element={<ZakatPage />} />
+              <Route path="assistant" element={<FinanceAiPage />} />
+            </Route>
+          </Route>
+
           <Route
             path="/jamaah"
             element={
