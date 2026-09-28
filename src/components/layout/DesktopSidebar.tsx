@@ -32,7 +32,6 @@ const ADMIN_ITEMS = [
     to: "/pengumuman",
     icon: Megaphone,
   },
-  { key: "keuangan", label: "Keuangan", to: "/finance", icon: FileText },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 

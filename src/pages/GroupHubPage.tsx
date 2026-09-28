@@ -34,7 +34,7 @@ import type { Group } from "../types";
 export default function GroupHubPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { assignedGroup, isSuperAdmin, focusGroupId } = usePermission();
+  const { assignedGroup, isSuperAdmin, focusGroupId, canAccessFinance } = usePermission();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editSheetOpen, setEditSheetOpen] = useState(false);
@@ -94,10 +94,24 @@ export default function GroupHubPage() {
     description: string;
     Icon: ComponentType<{ size?: number; className?: string }>;
     to: string;
-    section: "jamaah" | "jadwal";
+    section: "jamaah" | "jadwal" | "keuangan";
     badge?: number;
   }[] = useMemo(() => {
     return [
+      ...(canAccessFinance
+        ? [
+            {
+              key: "finance",
+              label: "Keuangan (SabilKas)",
+              description: isGlobalMode
+                ? "Buku kas, shodaqoh, zakat & AI (semua kelompok)"
+                : "Buku kas, shodaqoh, zakat & AI kelompok ini",
+              Icon: FileText,
+              to: "/finance",
+              section: "keuangan" as const,
+            },
+          ]
+        : []),
       {
         key: "users",
         label: "Manajemen User",
@@ -185,7 +199,7 @@ export default function GroupHubPage() {
         section: "jadwal",
       },
     ];
-  }, [isGlobalMode, pendingCount, isSuperAdmin]);
+  }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance]);
 
   const headerTitle = isSuperAdmin ? "Kelola Kelompok" : "Kelompok Saya";
   const headerSubtitle = isSuperAdmin
@@ -269,6 +283,7 @@ export default function GroupHubPage() {
             )}
 
             {[
+              { key: "keuangan" as const, label: "Keuangan & SabilKas" },
               { key: "jamaah" as const, label: "Jamaah & Keanggotaan" },
               { key: "jadwal" as const, label: "Jadwal & Absensi" },
             ].map((sec) => {
