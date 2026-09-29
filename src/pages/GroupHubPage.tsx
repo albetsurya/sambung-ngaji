@@ -8,9 +8,13 @@ import {
   CalendarCheck,
   ClipboardList,
   FileText,
+  Heart,
   KeyRound,
+  Landmark,
   Mosque,
   QrCode,
+  ScrollText as Scroll,
+  Sparkles,
   UserPlus,
 } from "../components/common/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
@@ -101,13 +105,41 @@ export default function GroupHubPage() {
       ...(canAccessFinance
         ? [
             {
-              key: "finance",
-              label: "Keuangan (SabilKas)",
+              key: "kas",
+              label: "Kas",
               description: isGlobalMode
-                ? "Buku kas, shodaqoh, zakat & AI (semua kelompok)"
-                : "Buku kas, shodaqoh, zakat & AI kelompok ini",
-              Icon: FileText,
-              to: "/finance",
+                ? "Buku kas semua kelompok"
+                : "Buku kas kelompok ini",
+              Icon: Landmark,
+              to: "/finance/ledger",
+              section: "keuangan" as const,
+            },
+            {
+              key: "shodaqoh",
+              label: "Shodaqoh",
+              description: isGlobalMode
+                ? "Iuran bulanan semua kelompok"
+                : "Iuran bulanan kelompok ini",
+              Icon: Heart,
+              to: "/finance/monthly-dues",
+              section: "keuangan" as const,
+            },
+            {
+              key: "zakat",
+              label: "Zakat",
+              description: isGlobalMode
+                ? "Zakat fitrah & mal semua kelompok"
+                : "Zakat fitrah & mal kelompok ini",
+              Icon: Scroll,
+              to: "/finance/zakat",
+              section: "keuangan" as const,
+            },
+            {
+              key: "ai-keuangan",
+              label: "Asisten AI",
+              description: "Tanya jawab keuangan",
+              Icon: Sparkles,
+              to: "/finance/assistant",
               section: "keuangan" as const,
             },
           ]

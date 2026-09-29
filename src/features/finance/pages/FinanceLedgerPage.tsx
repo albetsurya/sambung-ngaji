@@ -1,24 +1,50 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { financeApi, type Transaction, type KasDataResponse, type CashType } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
+import { AppLayout, Header, FloatingActionButton } from "../../../components/layout/AppLayout";
+import {
+  Button,
+  Input,
+  FilterChip,
+  Segmented,
+  GroupedList,
+  ListRow,
+  ChevronRow,
+  BottomSheet,
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+  Card,
+} from "../../../components/common";
+import { GroupedListSkeleton } from "../../../components/common/Skeleton";
+import {
+  Plus,
+  Minus,
+  Printer,
+  Search,
+  Landmark,
+} from "../../../components/common/FontAwesomeIcons";
 import { KasPrintModal } from "../components/KasPrintModal";
+import { ApiError } from "../../../services/api";
 
 export const FinanceLedgerPage: React.FC = () => {
+  const navigate = useNavigate();
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
 
-  const [cashType, setKasType] = useState<CashType>("main");
+  const [cashType, setCashType] = useState<CashType>("main");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [kasData, setKasData] = useState<KasDataResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("all");
+  const [showAllTx, setShowAllTx] = useState(false);
 
-  // Modal States
-  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [isTxSheetOpen, setIsTxSheetOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
-
   const [txForm, setTxForm] = useState({
     transaction_date: new Date().toISOString().slice(0, 10),
     account_name: "",
@@ -26,12 +52,15 @@ export const FinanceLedgerPage: React.FC = () => {
     transaction_type: "DEBIT" as "DEBIT" | "CREDIT",
     amount: 0,
   });
+  const [savingTx, setSavingTx] = useState(false);
 
-  // Carry Forward State
-  const [isCarryModalOpen, setIsCarryModalOpen] = useState(false);
+  const [isCarrySheetOpen, setIsCarrySheetOpen] = useState(false);
   const [carryMonth, setCarryMonth] = useState("");
+  const [carryingOver, setCarryingOver] = useState(false);
 
-  // Print State
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printMode, setPrintMode] = useState<"rincian" | "rekap">("rincian");
 
@@ -42,11 +71,14 @@ export const FinanceLedgerPage: React.FC = () => {
       return;
     }
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await financeApi.getKasTransactions(assignedGroup, cashType);
       setKasData(res);
     } catch (err: any) {
-      showToast(err.message || "Gagal memuat data kas", "error");
+      const msg = err instanceof ApiError ? err.message : "Gagal memuat data kas";
+      setLoadError(msg);
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }
@@ -56,7 +88,7 @@ export const FinanceLedgerPage: React.FC = () => {
     loadData();
   }, [cashType, assignedGroup]);
 
-  const handleOpenAddModal = () => {
+  const handleOpenAddSheet = () => {
     setEditingTx(null);
     setTxForm({
       transaction_date: new Date().toISOString().slice(0, 10),
@@ -65,10 +97,10 @@ export const FinanceLedgerPage: React.FC = () => {
       transaction_type: "DEBIT",
       amount: 0,
     });
-    setIsTxModalOpen(true);
+    setIsTxSheetOpen(true);
   };
 
-  const handleOpenEditModal = (tx: Transaction) => {
+  const handleOpenEditSheet = (tx: Transaction) => {
     setEditingTx(tx);
     const deb = Number(tx.debit) || 0;
     const kre = Number(tx.credit) || 0;
@@ -79,7 +111,7 @@ export const FinanceLedgerPage: React.FC = () => {
       transaction_type: deb > 0 ? "DEBIT" : "CREDIT",
       amount: deb > 0 ? deb : kre,
     });
-    setIsTxModalOpen(true);
+    setIsTxSheetOpen(true);
   };
 
   const handleSubmitTx = async (e: React.FormEvent) => {
@@ -92,11 +124,10 @@ export const FinanceLedgerPage: React.FC = () => {
       showToast("Jumlah nominal harus lebih besar dari 0", "error");
       return;
     }
-
+    setSavingTx(true);
     try {
       const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
       const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
-
       if (editingTx && editingTx.cash_id) {
         await financeApi.editTransaction(
           assignedGroup,
@@ -127,22 +158,28 @@ export const FinanceLedgerPage: React.FC = () => {
         );
         showToast("Transaksi berhasil ditambahkan", "success");
       }
-      setIsTxModalOpen(false);
+      setIsTxSheetOpen(false);
       loadData();
     } catch (err: any) {
-      showToast(err.message || "Gagal menyimpan transaksi", "error");
+      showToast(err instanceof ApiError ? err.message : "Gagal menyimpan transaksi", "error");
+    } finally {
+      setSavingTx(false);
     }
   };
 
-  const handleDeleteTx = async (tx: Transaction) => {
-    if (!tx.cash_id) return;
-    if (!window.confirm("Yakin ingin menghapus transaksi ini?")) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget?.cash_id) return;
+    setDeleting(true);
     try {
-      await financeApi.deleteTransaction(assignedGroup, tx.cash_id, cashType);
+      await financeApi.deleteTransaction(assignedGroup, deleteTarget.cash_id, cashType);
       showToast("Transaksi berhasil dihapus", "success");
+      setDeleteTarget(null);
+      setIsTxSheetOpen(false);
       loadData();
     } catch (err: any) {
-      showToast(err.message || "Gagal menghapus transaksi", "error");
+      showToast(err instanceof ApiError ? err.message : "Gagal menghapus transaksi", "error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -151,17 +188,20 @@ export const FinanceLedgerPage: React.FC = () => {
       showToast("Pilih bulan target terlebih dahulu", "error");
       return;
     }
+    setCarryingOver(true);
     try {
       const res = await financeApi.carryForwardBalance(assignedGroup, carryMonth, cashType);
       if (res.success) {
         showToast(res.message || "Saldo awal berhasil dibawa ke bulan berikutnya", "success");
-        setIsCarryModalOpen(false);
+        setIsCarrySheetOpen(false);
         loadData();
       } else {
         showToast(res.message || "Gagal membuat saldo awal", "error");
       }
     } catch (err: any) {
-      showToast(err.message || "Gagal membawa saldo", "error");
+      showToast(err instanceof ApiError ? err.message : "Gagal membawa saldo", "error");
+    } finally {
+      setCarryingOver(false);
     }
   };
 
@@ -207,12 +247,7 @@ export const FinanceLedgerPage: React.FC = () => {
   const periodEnding = openingBalance + sumDebit - sumCredit;
   const surplus = sumDebit - sumCredit;
 
-  const [showAllTx, setShowAllTx] = useState(false);
-  const [fabOpen, setFabOpen] = useState(false);
-
-  const filteredTransactions = (kasData?.transactions || []).filter((t) => {
-    if (selectedMonth !== "all" && (t.transaction_date || "").slice(0, 7) !== selectedMonth)
-      return false;
+  const searchFiltered = periodTx.filter((t) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -221,445 +256,368 @@ export const FinanceLedgerPage: React.FC = () => {
       (t.transaction_date || "").toLowerCase().includes(q)
     );
   });
+  const visibleTx = showAllTx ? searchFiltered : [...searchFiltered].slice(-5).reverse();
+
+  const heroBalance = selectedMonth === "all" ? kasData?.ending_balance || 0 : periodEnding;
 
   return (
-    <div className="space-y-6">
-      {/* Top Controls */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        {/* Kas Type Segmented Switch */}
-        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-          <button
-            onClick={() => setKasType("main")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              cashType === "main"
-                ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
-          >
-            Kas Utama
-          </button>
-          <button
-            onClick={() => setKasType("amil")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              cashType === "amil"
-                ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
-          >
-            Kas Amil
-          </button>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleOpenAddModal}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors"
-          >
-            <span>+ Tambah Transaksi</span>
-          </button>
-          <button
-            onClick={() => setIsCarryModalOpen(true)}
-            className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium transition-colors"
-          >
-            Bawa Saldo Awal
-          </button>
-          <button
-            onClick={() => {
-              setPrintMode("rekap");
-              setIsPrintModalOpen(true);
-            }}
-            className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium transition-colors"
-          >
-            Cetak Rekap
-          </button>
-          <button
+    <AppLayout
+      fab={
+        <FloatingActionButton
+          onClick={handleOpenAddSheet}
+          label="Tambah Transaksi"
+        />
+      }
+    >
+      <Header
+        title={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
+        subtitle={monthLabel(selectedMonth)}
+        onBack={() => navigate("/lainnya")}
+        backLabel="Lainnya"
+        showSyncButton={false}
+        right={
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
             onClick={() => {
               setPrintMode("rincian");
               setIsPrintModalOpen(true);
             }}
-            className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium transition-colors"
+            aria-label="Cetak laporan"
+            title="Cetak laporan"
           >
-            Cetak Rincian
-          </button>
-        </div>
-      </div>
+            <Printer size={16} />
+          </Button>
+        }
+      />
 
-      {/* Period Filter */}
-      <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          Periode
-        </span>
-        <select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          className="ml-auto px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold text-slate-800 dark:text-slate-100 border-0"
-          aria-label="Pilih periode"
-        >
-          <option value="all">Semua Periode</option>
-          {monthOptions.map((m) => (
-            <option key={m} value={m}>
-              {monthLabel(m)}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Hero: Saldo Kas */}
-      <div className="bg-white dark:bg-slate-900 px-6 pt-6 pb-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <p className="font-bold text-xs tracking-wider uppercase text-slate-500 dark:text-slate-400">
-          Saldo Kas {cashType === "amil" ? "Amil" : "Utama"}
-        </p>
-        <p className="font-mono text-3xl font-extrabold mt-1.5 leading-none text-slate-900 dark:text-white">
-          {formatRp(selectedMonth === "all" ? kasData?.ending_balance || 0 : periodEnding)}
-        </p>
-        <p className="text-xs mt-2 font-semibold tracking-wide text-slate-500 dark:text-slate-400">
-          <span>{monthLabel(selectedMonth)}</span>
-          <span className="mx-1 text-slate-300">·</span>
-          <span className="font-extrabold text-slate-800 dark:text-slate-100">
-            {periodTx.length} transaksi
-          </span>
-        </p>
-        <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-            {selectedMonth === "all" ? "Saldo Awal (Awal Tahun)" : "Saldo Awal (Awal Bulan)"}
-          </span>
-          <span className="text-xs text-slate-300">·</span>
-          <span className="font-mono text-sm font-extrabold text-slate-800 dark:text-slate-100">
-            {formatRp(selectedMonth === "all" ? 0 : openingBalance)}
-          </span>
-        </div>
-      </div>
-
-      {/* Pemasukan / Pengeluaran */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Pemasukan</p>
-          <p className="font-mono text-base font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
-            {formatRp(sumDebit)}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Pengeluaran</p>
-          <p className="font-mono text-base font-extrabold mt-1 text-rose-600 dark:text-rose-400">
-            {formatRp(sumCredit)}
-          </p>
-        </div>
-      </div>
-
-      {/* Surplus */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Surplus Periode Ini
-          </p>
-          <p className="font-mono text-base font-extrabold mt-1 text-slate-800 dark:text-slate-100">
-            {formatRp(surplus)}
-          </p>
-        </div>
-        <span
-          className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-            surplus >= 0
-              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-              : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
-          }`}
-        >
-          {surplus >= 0 ? "Surplus" : "Defisit"}
-        </span>
-      </div>
-
-      {!assignedGroup && (
-        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-sm text-amber-800 dark:text-amber-200">
-          {isSuperAdmin
-            ? "Pilih kelompok dulu (menu Lainnya → Kelompok Saya) untuk membuka kas kelompok."
-            : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."}
-        </div>
-      )}
-
-      {/* Transaksi Terbaru */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
-          <h2 className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
-            {showAllTx ? "Riwayat Transaksi" : "Transaksi Terbaru"}
-          </h2>
-          <button
-            onClick={() => setShowAllTx((v) => !v)}
-            className="text-xs font-bold text-emerald-600 dark:text-emerald-400"
-          >
-            {showAllTx ? "Tutup" : "Lihat semua"}
-          </button>
-        </div>
-
-        {showAllTx && (
-          <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
-            <input
-              type="text"
-              placeholder="Cari tanggal, kategori, keterangan…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full max-w-sm px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 focus:ring-2 focus:ring-emerald-500"
-            />
-            <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
-              Total: {filteredTransactions.length} transaksi
-            </span>
-          </div>
-        )}
-
-        {loading ? (
-          <div className="p-12 text-center text-slate-400 text-sm">Memuat data kas...</div>
-        ) : (showAllTx ? filteredTransactions : [...filteredTransactions].slice(-5).reverse()).length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-sm">Tidak ada transaksi ditemukan.</div>
+      <div className="py-4">
+        {!assignedGroup ? (
+          <EmptyState
+            title="Kelompok belum dipilih"
+            description={
+              isSuperAdmin
+                ? "Pilih kelompok dulu di menu Kelompok Saya untuk membuka kas kelompok."
+                : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."
+            }
+            icon={<Landmark size={26} className="text-accent" />}
+            action={<Button size="sm" onClick={() => navigate("/lainnya")}>Ke Menu Lainnya</Button>}
+          />
+        ) : loadError && !kasData ? (
+          <ErrorState message={loadError} onRetry={loadData} />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
-                <tr>
-                  <th className="px-4 py-3 text-center w-12">No</th>
-                  <th className="px-4 py-3 w-28">Tanggal</th>
-                  <th className="px-4 py-3 w-36">Akun / Kategori</th>
-                  <th className="px-4 py-3">Keterangan</th>
-                  <th className="px-4 py-3 text-right">Debet</th>
-                  <th className="px-4 py-3 text-right">Kredit</th>
-                  <th className="px-4 py-3 text-right">Saldo</th>
-                  <th className="px-4 py-3 text-center w-24">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {(showAllTx ? filteredTransactions : [...filteredTransactions].slice(-5).reverse()).map((t, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 text-center text-slate-400 font-mono text-xs">{idx + 1}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">{t.transaction_date}</td>
-                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200">{t.account_name || "Lainnya"}</td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{t.description}</td>
-                    <td className="px-4 py-3 text-right font-mono font-medium text-emerald-600 dark:text-emerald-400">
-                      {Number(t.debit) > 0 ? formatRp(Number(t.debit)) : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono font-medium text-rose-600 dark:text-rose-400">
-                      {Number(t.credit) > 0 ? formatRp(Number(t.credit)) : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono font-bold text-slate-800 dark:text-slate-100">
-                      {formatRp(Number(t.balance) || 0)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleOpenEditModal(t)}
-                          className="text-emerald-600 hover:text-emerald-700 font-medium text-xs"
-                        >
-                          Edit
-                        </button>
-                        {t.cash_id && (
-                          <button
-                            onClick={() => handleDeleteTx(t)}
-                            className="text-rose-600 hover:text-rose-700 font-medium text-xs"
-                          >
-                            Hapus
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* FAB Speed-dial */}
-      <div className="fixed bottom-24 right-4 z-40 flex flex-col items-end gap-2">
-        {fabOpen && (
           <>
-            <button
-              onClick={() => {
-                setFabOpen(false);
-                setIsCarryModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-lg"
-            >
-              Bawa Saldo Awal
-            </button>
-            <button
-              onClick={() => {
-                setFabOpen(false);
-                setPrintMode("rincian");
-                setIsPrintModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-lg"
-            >
-              Cetak Laporan
-            </button>
-            <button
-              onClick={() => {
-                setFabOpen(false);
-                handleOpenAddModal();
-              }}
-              className="px-4 py-2.5 bg-emerald-600 rounded-full text-xs font-bold text-white shadow-lg"
-            >
-              + Tambah Transaksi
-            </button>
-          </>
-        )}
-        <button
-          onClick={() => setFabOpen((v) => !v)}
-          aria-label="Menu cepat kas"
-          className={`w-14 h-14 rounded-full text-2xl font-bold text-white shadow-xl transition-transform ${
-            fabOpen ? "bg-slate-700 rotate-45" : "bg-emerald-600"
-          }`}
-        >
-          +
-        </button>
-      </div>
-
-      {/* Modal Add/Edit Transaction */}
-      {isTxModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
-              {editingTx ? "Edit Transaksi Kas" : "Tambah Transaksi Kas Baru"}
-            </h3>
-            <form onSubmit={handleSubmitTx} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tanggal</label>
-                <input
-                  type="date"
-                  value={txForm.transaction_date}
-                  onChange={(e) => setTxForm({ ...txForm, transaction_date: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Jenis Transaksi</label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 text-sm font-medium text-emerald-600 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="jenis"
-                      value="DEBIT"
-                      checked={txForm.transaction_type === "DEBIT"}
-                      onChange={() => setTxForm({ ...txForm, transaction_type: "DEBIT" })}
-                    />
-                    <span>Penerimaan (Debet)</span>
-                  </label>
-                  <label className="flex items-center gap-2 text-sm font-medium text-rose-600 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="jenis"
-                      value="CREDIT"
-                      checked={txForm.transaction_type === "CREDIT"}
-                      onChange={() => setTxForm({ ...txForm, transaction_type: "CREDIT" })}
-                    />
-                    <span>Pengeluaran (Kredit)</span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Akun / Kategori</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
-                  value={txForm.account_name}
-                  onChange={(e) => setTxForm({ ...txForm, account_name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Keterangan Detail</label>
-                <input
-                  type="text"
-                  placeholder="Uraian transaksi lengkap"
-                  value={txForm.description}
-                  onChange={(e) => setTxForm({ ...txForm, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Nominal (Rp)</label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  value={txForm.amount || ""}
-                  onChange={(e) => setTxForm({ ...txForm, amount: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono font-bold"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsTxModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 rounded-xl text-sm font-medium"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold"
-                >
-                  Simpan Transaksi
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Carry Forward Modal */}
-      {isCarryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Bawa Saldo Awal ke Bulan Berikutnya</h3>
-            <p className="text-xs text-slate-500">
-              Sistem akan otomatis menghitung saldo akhir bulan ini dan mencatatnya sebagai "SALDO AWAL" di bulan yang dipilih.
-            </p>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Bulan Target (YYYY-MM)</label>
-              <input
-                type="month"
-                value={carryMonth}
-                onChange={(e) => setCarryMonth(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono"
+            <div className="px-4 mb-2.5">
+              <Segmented<CashType>
+                ariaLabel="Jenis kas"
+                value={cashType}
+                onChange={(v) => {
+                  setCashType(v);
+                  setSelectedMonth("all");
+                }}
+                options={[
+                  { value: "main", label: "Kas Utama" },
+                  { value: "amil", label: "Kas Amil" },
+                ]}
               />
             </div>
-            <div className="flex justify-end gap-2 pt-4">
-              <button
-                type="button"
-                onClick={() => setIsCarryModalOpen(false)}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 rounded-xl text-sm font-medium"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleCarryForward}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold"
-              >
-                Proses Saldo Awal
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Print Modal */}
+            <section>
+              <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+                Periode
+              </p>
+              <div className="px-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                {["all", ...monthOptions].map((m) => (
+                  <FilterChip
+                    key={m}
+                    active={selectedMonth === m}
+                    label={monthLabel(m)}
+                    onClick={() => setSelectedMonth(m)}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+                Ringkasan
+              </p>
+              <Card className="mx-4">
+                <p className="text-ios-caption font-semibold uppercase tracking-wider text-surface-muted">
+                  Saldo Kas {cashType === "amil" ? "Amil" : "Utama"}
+                </p>
+                <p className="font-display text-[30px] font-extrabold mt-1 leading-none text-surface-text">
+                  {formatRp(heroBalance)}
+                </p>
+                <p className="text-ios-footnote mt-2 font-medium text-surface-muted">
+                  {monthLabel(selectedMonth)}
+                  <span className="mx-1.5 text-surface-muted/50">·</span>
+                  <span className="font-bold text-surface-text">{periodTx.length} transaksi</span>
+                </p>
+                <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-surface-border">
+                  <span className="text-ios-footnote font-medium text-surface-muted">
+                    {selectedMonth === "all" ? "Saldo Awal (Awal Tahun)" : "Saldo Awal (Awal Bulan)"}
+                  </span>
+                  <span className="text-ios-footnote font-bold text-surface-text ml-auto">
+                    {formatRp(selectedMonth === "all" ? 0 : openingBalance)}
+                  </span>
+                </div>
+              </Card>
+
+              <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
+                <Card className="!p-3.5">
+                  <p className="text-ios-caption font-semibold uppercase tracking-wider text-success">Pemasukan</p>
+                  <p className="font-display text-ios-nav font-extrabold mt-0.5 text-success">
+                    {formatRp(sumDebit)}
+                  </p>
+                </Card>
+                <Card className="!p-3.5">
+                  <p className="text-ios-caption font-semibold uppercase tracking-wider text-danger">Pengeluaran</p>
+                  <p className="font-display text-ios-nav font-extrabold mt-0.5 text-danger">
+                    {formatRp(sumCredit)}
+                  </p>
+                </Card>
+              </div>
+
+              <GroupedList>
+                <ListRow insetDivider={false}>
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <div className="min-w-0">
+                      <p className="text-ios-body font-medium text-surface-text">Surplus Periode Ini</p>
+                      <p className="font-display text-ios-nav font-extrabold text-surface-text">
+                        {formatRp(surplus)}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-ios-caption font-bold shrink-0 ${
+                        surplus >= 0
+                          ? "bg-success-soft text-success"
+                          : "bg-danger-soft text-danger"
+                      }`}
+                    >
+                      {surplus >= 0 ? "Surplus" : "Defisit"}
+                    </span>
+                  </div>
+                </ListRow>
+              </GroupedList>
+            </section>
+
+            <section>
+              <div className="px-4 mb-2.5 mt-5 flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+                  {showAllTx ? "Riwayat Transaksi" : "Transaksi Terbaru"}
+                </p>
+                <button
+                  onClick={() => setShowAllTx((v) => !v)}
+                  className="text-ios-footnote font-semibold text-accent active:scale-[0.97]"
+                >
+                  {showAllTx ? "Tutup" : "Lihat semua"}
+                </button>
+              </div>
+
+              {showAllTx && (
+                <div className="px-4 mb-2.5">
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari tanggal, kategori, keterangan…"
+                  />
+                </div>
+              )}
+
+              {loading ? (
+                <GroupedListSkeleton rows={5} />
+              ) : visibleTx.length === 0 ? (
+                <EmptyState
+                  title="Belum ada transaksi"
+                  description={
+                    searchQuery
+                      ? "Tidak ada transaksi yang cocok dengan pencarian."
+                      : "Catat transaksi pertama memakai tombol + di bawah."
+                  }
+                />
+              ) : (
+                <GroupedList>
+                  {visibleTx.map((t, idx) => {
+                    const isIn = (Number(t.debit) || 0) > 0;
+                    return (
+                      <ListRow
+                        key={t.cash_id || idx}
+                        onClick={() => handleOpenEditSheet(t)}
+                        insetDivider={idx !== visibleTx.length - 1}
+                        leading={
+                          <span
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                              isIn
+                                ? "bg-success-soft text-success"
+                                : "bg-danger-soft text-danger"
+                            }`}
+                          >
+                            {isIn ? <Plus size={15} /> : <Minus size={15} />}
+                          </span>
+                        }
+                      >
+                        <ChevronRow>
+                          <div className="flex items-center justify-between gap-2 w-full">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-ios-body font-medium text-surface-text truncate">
+                                {t.description || "—"}
+                              </p>
+                              <p className="text-ios-caption text-surface-muted truncate">
+                                {t.transaction_date}
+                                {t.account_name ? ` · ${t.account_name}` : ""}
+                              </p>
+                            </div>
+                            <p
+                              className={`font-mono text-ios-subhead font-bold shrink-0 ${
+                                isIn ? "text-success" : "text-danger"
+                              }`}
+                            >
+                              {isIn ? "+" : "−"}
+                              {formatRp(isIn ? Number(t.debit) : Number(t.credit))}
+                            </p>
+                          </div>
+                        </ChevronRow>
+                      </ListRow>
+                    );
+                  })}
+                </GroupedList>
+              )}
+
+              <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
+                <Button variant="secondary" size="sm" onClick={() => setIsCarrySheetOpen(true)}>
+                  Bawa Saldo Awal
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setPrintMode("rekap");
+                    setIsPrintModalOpen(true);
+                  }}
+                >
+                  Cetak Rekap
+                </Button>
+              </div>
+            </section>
+          </>
+        )}
+      </div>
+
+      <BottomSheet
+        open={isTxSheetOpen}
+        onClose={() => setIsTxSheetOpen(false)}
+        title={editingTx ? "Edit Transaksi" : "Tambah Transaksi"}
+      >
+        <form onSubmit={handleSubmitTx}>
+          <Input
+            label="Tanggal"
+            type="date"
+            value={txForm.transaction_date}
+            onChange={(e) => setTxForm({ ...txForm, transaction_date: e.target.value })}
+            required
+          />
+          <div className="mb-4">
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
+              Jenis Transaksi
+            </p>
+            <Segmented<"DEBIT" | "CREDIT">
+              ariaLabel="Jenis transaksi"
+              value={txForm.transaction_type}
+              onChange={(v) => setTxForm({ ...txForm, transaction_type: v })}
+              options={[
+                { value: "DEBIT", label: "Penerimaan" },
+                { value: "CREDIT", label: "Pengeluaran" },
+              ]}
+            />
+          </div>
+          <Input
+            label="Akun / Kategori"
+            placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
+            value={txForm.account_name}
+            onChange={(e) => setTxForm({ ...txForm, account_name: e.target.value })}
+          />
+          <Input
+            label="Keterangan"
+            placeholder="Uraian transaksi"
+            value={txForm.description}
+            onChange={(e) => setTxForm({ ...txForm, description: e.target.value })}
+            required
+          />
+          <Input
+            label="Nominal (Rp)"
+            type="number"
+            placeholder="0"
+            value={txForm.amount || ""}
+            onChange={(e) => setTxForm({ ...txForm, amount: Number(e.target.value) })}
+            required
+          />
+          <Button type="submit" fullWidth disabled={savingTx}>
+            {savingTx ? "Menyimpan…" : editingTx ? "Simpan Perubahan" : "Simpan Transaksi"}
+          </Button>
+          {editingTx?.cash_id && (
+            <Button
+              type="button"
+              variant="softDanger"
+              fullWidth
+              className="mt-2.5"
+              onClick={() => setDeleteTarget(editingTx)}
+            >
+              Hapus Transaksi
+            </Button>
+          )}
+        </form>
+      </BottomSheet>
+
+      <BottomSheet
+        open={isCarrySheetOpen}
+        onClose={() => setIsCarrySheetOpen(false)}
+        title="Bawa Saldo Awal"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCarryForward();
+          }}
+        >
+          <p className="text-ios-footnote text-surface-muted mb-4 px-1">
+            Saldo akhir bulan ini dicatat otomatis sebagai “SALDO AWAL” di bulan target.
+          </p>
+          <Input
+            label="Bulan Target (YYYY-MM)"
+            type="month"
+            value={carryMonth}
+            onChange={(e) => setCarryMonth(e.target.value)}
+            required
+          />
+          <Button type="submit" fullWidth disabled={carryingOver}>
+            {carryingOver ? "Memproses…" : "Proses Saldo Awal"}
+          </Button>
+        </form>
+      </BottomSheet>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Hapus transaksi?"
+        description={`“${deleteTarget?.description}” (${deleteTarget ? formatRp(Number(deleteTarget.debit) || Number(deleteTarget.credit)) : ""}) akan dihapus permanen.`}
+        confirmLabel="Ya, hapus"
+        danger
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <KasPrintModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         transactions={kasData?.transactions || []}
         initial_balance={kasData?.initial_balance || 0}
         ending_balance={kasData?.ending_balance || 0}
-        period_label={new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
+        period_label={monthLabel(selectedMonth)}
         cash_type_label={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
         mode={printMode}
       />
-    </div>
+    </AppLayout>
   );
 };
