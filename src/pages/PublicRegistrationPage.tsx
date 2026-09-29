@@ -25,6 +25,7 @@ import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 
 interface FormData {
+  group_id: string;
   nama_lengkap: string;
   nama_panggilan: string;
   jenis_kelamin: "L" | "P" | "";
@@ -48,6 +49,7 @@ interface FormData {
 }
 
 const EMPTY_FORM: FormData = {
+  group_id: "",
   nama_lengkap: "",
   nama_panggilan: "",
   jenis_kelamin: "",
@@ -88,6 +90,7 @@ export default function PublicRegistrationPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
+  const [groups, setGroups] = useState<{ group_id: string; group_name: string }[]>([]);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -97,6 +100,10 @@ export default function PublicRegistrationPage() {
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  useEffect(() => {
+    publicApi.listGroups().then(setGroups).catch(() => {});
+  }, []);
 
 
   useEffect(() => {
@@ -145,6 +152,9 @@ export default function PublicRegistrationPage() {
     if (step === 2) {
       if (!form.no_wa.trim()) {
         return { ok: false, message: "Nomor WhatsApp wajib diisi" };
+      }
+      if (!form.group_id) {
+        return { ok: false, message: "Kelompok wajib dipilih" };
       }
       const normalized = normalizePhoneNumber(form.no_wa);
       if (normalized.length < 10 || normalized.length > 15) {
@@ -221,6 +231,7 @@ export default function PublicRegistrationPage() {
     setSubmitting(true);
     try {
       const result = await publicApi.submitRegistration({
+        group_id: form.group_id || undefined,
         nama_lengkap: form.nama_lengkap.trim(),
         nama_panggilan: form.nama_panggilan.trim(),
         jenis_kelamin: form.jenis_kelamin as "L" | "P",
@@ -432,6 +443,20 @@ export default function PublicRegistrationPage() {
                   onChange={(e) => update("daerah", e.target.value)}
                 />
               </div>
+              <Select
+                label="Kelompok *"
+                value={form.group_id}
+                onChange={(e) => update("group_id", e.target.value)}
+                hint="Pilih kelompok pengajian Anda"
+                required
+              >
+                <option value="">Pilih kelompok</option>
+                {groups.map((g) => (
+                  <option key={g.group_id} value={g.group_id}>
+                    {g.group_name}
+                  </option>
+                ))}
+              </Select>
             </div>
           )}
 

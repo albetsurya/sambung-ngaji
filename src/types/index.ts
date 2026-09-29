@@ -57,6 +57,8 @@ export interface User {
 
 export interface Member {
   member_id: string;
+  group_id?: string;
+  group_name?: string;
   nama_lengkap: string;
   nama_panggilan?: string;
   jenis_kelamin?: "L" | "P" | "";
@@ -252,6 +254,7 @@ export interface DashboardAbsensi {
 
 export interface PendingMember {
   submission_id: string;
+  group_id?: string;
   nama_lengkap: string;
   nama_panggilan?: string;
   jenis_kelamin: "L" | "P";

@@ -1,6 +1,7 @@
 import { restGet, restPost } from "./apiClient";
 
 export interface SubmitRegistrationPayload {
+  group_id?: string;
   nama_lengkap: string;
   nama_panggilan?: string;
   jenis_kelamin: "L" | "P";
@@ -47,7 +48,11 @@ async function getClientIp(): Promise<string> {
 }
 
 export const publicApi = {
-  submitRegistration: async (
+  listGroups: () =>
+    restGet<{ group_id: string; group_name: string }[]>(
+      "/api/v1/public/groups",
+      {},
+    ),  submitRegistration: async (
     payload: SubmitRegistrationPayload,
   ): Promise<SubmitRegistrationResponse> => {
     const clientIp = await getClientIp();

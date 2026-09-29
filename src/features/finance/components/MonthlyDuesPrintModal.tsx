@@ -28,6 +28,28 @@ export const MonthlyDuesPrintModal: React.FC<MonthlyDuesPrintModalProps> = ({
     paymentMap.set(p.member_id, p);
   });
 
+  function carryNote(p?: DuePayment): string {
+    const parts: string[] = [];
+    const items = p?.carryover_items || [];
+    if (items.length) {
+      const lbl = items
+        .map((it) => {
+          const m = /^(\d{4})-(\d{2})$/.exec(it.month);
+          const name = m
+            ? new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleDateString("id-ID", {
+                month: "short",
+                year: "numeric",
+              })
+            : it.month;
+          return `${name} (${formatRp(it.amount)})`;
+        })
+        .join(", ");
+      parts.push(`Susulan: ${lbl}`);
+    }
+    if (p?.notes) parts.push(p.notes);
+    return parts.join(" · ");
+  }
+
   let sumTarget = 0;
   let sumIr = 0;
   let sumSambung = 0;
@@ -127,7 +149,7 @@ export const MonthlyDuesPrintModal: React.FC<MonthlyDuesPrintModalProps> = ({
                     <td className="border border-slate-300 p-1 text-right font-mono font-bold text-slate-900">
                       {total > 0 ? formatRp(total) : "—"}
                     </td>
-                    <td className="border border-slate-300 p-1">{p?.notes || ""}</td>
+                    <td className="border border-slate-300 p-1">{carryNote(p)}</td>
                   </tr>
                 );
               })}

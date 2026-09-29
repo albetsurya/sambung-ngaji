@@ -302,7 +302,7 @@ function ApproveSheet({
   onSuccess: () => void;
 }) {
   const { showToast } = useToast();
-  const [kelompok, setKelompok] = useState("");
+  const [groupId, setGroupId] = useState("");
 
   const { data: groups = [] } = useQuery({
     queryKey: queryKeys.groups(),
@@ -313,15 +313,19 @@ function ApproveSheet({
 
   useEffect(() => {
     if (!open) return;
-    setKelompok("");
+    // Prefill dari pilihan pendaftar saat daftar, kalau ada.
+    setGroupId(data.group_id || "");
   }, [open]);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      pendingApi.approve({
+    mutationFn: () => {
+      const g = groups.find((x) => x.group_id === groupId);
+      return pendingApi.approve({
         submission_id: data.submission_id,
-        kelompok,
-      }),
+        group_id: groupId || undefined,
+        kelompok: g?.group_name || undefined,
+      });
+    },
     onSuccess: () => onSuccess(),
     onError: (err) => {
       showToast(
@@ -352,14 +356,14 @@ function ApproveSheet({
         </div>
 
         <Select
-          label="Kelompok (opsional)"
-          value={kelompok}
-          onChange={(e) => setKelompok(e.target.value)}
-          hint="Bisa diubah nanti oleh admin"
+          label="Kelompok (wajib)"
+          value={groupId}
+          onChange={(e) => setGroupId(e.target.value)}
+          hint="Wajib dipilih agar group_id tersimpan"
         >
           <option value="">Pilih kelompok</option>
           {groups.map((g) => (
-            <option key={g.group_id} value={g.group_name}>
+            <option key={g.group_id} value={g.group_id}>
               {g.group_name}
             </option>
           ))}
