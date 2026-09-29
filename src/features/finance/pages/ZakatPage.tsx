@@ -29,6 +29,28 @@ export const ZakatPage: React.FC = () => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedPrintZakat, setSelectedPrintZakat] = useState<ZakatItem | null>(null);
 
+  // Detail Sheet
+  const [detailZakat, setDetailZakat] = useState<ZakatItem | null>(null);
+  const [detailTab, setDetailTab] = useState<"muzaki" | "rincian" | "mustahik">("rincian");
+
+  const rincian = (z: ZakatItem | null) => {
+    const total = Number(z?.total_money_rp) || 0;
+    const mustahik = total * 0.45;
+    const sabilillah = total * 0.4;
+    const amil = total * 0.15;
+    return {
+      total,
+      mustahik,
+      mustahikKelompok: mustahik * 0.8,
+      mustahikDaerah: mustahik * 0.2,
+      sabilillah,
+      amil,
+      amilKelompok: amil * 0.8,
+      amilDesa: amil * 0.1333,
+      amilDaerah: amil * 0.0667,
+    };
+  };
+
   const loadData = async () => {
     if (!assignedGroup) {
       setZakatList([]);
@@ -223,6 +245,15 @@ export const ZakatPage: React.FC = () => {
                       <div className="flex items-center justify-center gap-2 text-xs">
                         <button
                           onClick={() => {
+                            setDetailZakat(z);
+                            setDetailTab("rincian");
+                          }}
+                          className="text-slate-600 dark:text-slate-300 font-medium hover:underline"
+                        >
+                          Detail
+                        </button>
+                        <button
+                          onClick={() => {
                             setSelectedPrintZakat(z);
                             setIsPrintModalOpen(true);
                           }}
@@ -348,6 +379,119 @@ export const ZakatPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Sheet */}
+      {detailZakat && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm" onClick={() => setDetailZakat(null)}>
+          <div
+            className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto sm:hidden" />
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-800 dark:text-slate-100">
+                  {detailZakat.muzakki_name}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {detailZakat.zakat_type === "MAL" ? "Zakat Mal" : "Zakat Fitrah"} · {detailZakat.soul_count} jiwa
+                  {detailZakat.transaction_date ? ` · ${detailZakat.transaction_date}` : ""}
+                </p>
+              </div>
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap ${
+                  detailZakat.status === "COMPLETED"
+                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                    : "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                }`}
+              >
+                {detailZakat.status === "COMPLETED" ? "Tuntas" : "Proses"}
+              </span>
+            </div>
+
+            <div className="flex gap-2">
+              {(["muzaki", "rincian", "mustahik"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setDetailTab(t)}
+                  className={`flex-1 px-3 py-2 rounded-xl text-xs font-bold capitalize transition-colors ${
+                    detailTab === t
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                  }`}
+                >
+                  {t === "muzaki" ? "Muzaki" : t === "rincian" ? "Rincian" : "Mustahik"}
+                </button>
+              ))}
+            </div>
+
+            {detailTab === "rincian" && (() => {
+              const r = rincian(detailZakat);
+              const row = (label: string, pct: string, val: number, indent = false) => (
+                <div className={`flex items-center justify-between py-2 ${indent ? "pl-4" : ""} border-b border-slate-100 dark:border-slate-800 last:border-0`}>
+                  <span className="text-sm text-slate-600 dark:text-slate-300">
+                    {label} <span className="text-xs text-slate-400 font-semibold">{pct}</span>
+                  </span>
+                  <span className="font-mono text-sm font-bold text-slate-800 dark:text-slate-100">{formatRp(val)}</span>
+                </div>
+              );
+              return (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-1">
+                  <div className="flex items-center justify-between py-2 border-b border-slate-200 dark:border-slate-700">
+                    <span className="text-sm font-bold">Total Dana</span>
+                    <span className="font-mono font-extrabold text-emerald-600">{formatRp(r.total)}</span>
+                  </div>
+                  {row("Mustahik", "45%", r.mustahik)}
+                  {row("Kelompok", "80% dari mustahik", r.mustahikKelompok, true)}
+                  {row("Daerah", "20% dari mustahik", r.mustahikDaerah, true)}
+                  {row("Sabilillah", "40%", r.sabilillah)}
+                  {row("Amil", "15%", r.amil)}
+                  {row("Amil Kelompok", "12%", r.amilKelompok, true)}
+                  {row("Amil Desa", "2%", r.amilDesa, true)}
+                  {row("Amil Daerah", "1%", r.amilDaerah, true)}
+                </div>
+              );
+            })()}
+
+            {detailTab === "muzaki" && (
+              <div className="space-y-2">
+                {(detailZakat.muzakki_list || []).length === 0 ? (
+                  <p className="text-sm text-slate-400 text-center py-6">Belum ada rincian muzakki.</p>
+                ) : (
+                  (detailZakat.muzakki_list || []).map((m: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm">
+                      <span className="font-semibold">{m.nama || m.name || `Muzaki ${i + 1}`}</span>
+                      <span className="font-mono">{m.amount ? formatRp(m.amount) : ""}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {detailTab === "mustahik" && (
+              <div className="space-y-2">
+                {(detailZakat.mustahik_list || []).length === 0 ? (
+                  <p className="text-sm text-slate-400 text-center py-6">Belum ada penyaluran mustahik.</p>
+                ) : (
+                  (detailZakat.mustahik_list || []).map((m: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm">
+                      <span className="font-semibold">{m.nama || m.name || `Mustahik ${i + 1}`}</span>
+                      <span className="font-mono">{m.amount ? formatRp(m.amount) : ""}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={() => setDetailZakat(null)}
+              className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-semibold"
+            >
+              Tutup
+            </button>
           </div>
         </div>
       )}

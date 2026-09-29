@@ -1,11 +1,11 @@
 import { restGet, restPost, restPut, restDelete } from "../../../services/apiClient";
 
 
-export type KasType = "main" | "kas_amil";
+export type CashType = "main" | "amil";
 
 export interface Transaction {
   no?: number;
-  kas_id?: string;
+  cash_id?: string;
   transaction_date: string;
   account_name?: string;
   description: string;
@@ -19,7 +19,7 @@ export interface Transaction {
 export interface KasDataResponse {
   success: boolean;
   message?: string;
-  kas_type?: string;
+  cash_type?: string;
   transactions?: Transaction[];
   initial_balance?: number;
   total_debit?: number;
@@ -27,14 +27,14 @@ export interface KasDataResponse {
   ending_balance?: number;
 }
 
-export interface ShodaqohMember {
+export interface DueMember {
   member_id: string;
   member_name: string;
   monthly_target: number;
   status: string;
 }
 
-export interface ShodaqohPayment {
+export interface DuePayment {
   payment_id: string;
   member_id: string;
   payment_date: string;
@@ -51,7 +51,7 @@ export interface ShodaqohPayment {
   notes: string;
 }
 
-export interface ShodaqohDashboard {
+export interface DuesDashboard {
   target: number;
   received: number;
   paidCount: number;
@@ -59,13 +59,13 @@ export interface ShodaqohDashboard {
   memberCount: number;
 }
 
-export interface ShodaqohDataResponse {
+export interface DuesDataResponse {
   success: boolean;
   message?: string;
   selected_month?: string;
-  members?: ShodaqohMember[];
-  payments?: ShodaqohPayment[];
-  dashboard?: ShodaqohDashboard;
+  members?: DueMember[];
+  payments?: DuePayment[];
+  dashboard?: DuesDashboard;
   recap?: Record<string, any>;
 }
 
@@ -89,7 +89,7 @@ export interface ZakatResponse {
 }
 
 interface KasSummaryDTO {
-  kas_type: string;
+  cash_type: string;
   transactions: any[];
   initial_balance: number;
   total_debit: number;
@@ -102,7 +102,7 @@ function toTransaction(raw: any, idx: number): Transaction {
   const credit = Number(raw.credit ?? raw.kredit ?? 0);
   return {
     no: raw.no ?? idx + 1,
-    kas_id: raw.kas_id,
+    cash_id: raw.cash_id ?? (raw as any).kas_id,
     transaction_date: raw.transaction_date || raw.tanggal || "",
     account_name: raw.account_name || raw.account || "",
     description: raw.description || raw.keterangan || "",
@@ -114,7 +114,7 @@ function toTransaction(raw: any, idx: number): Transaction {
   };
 }
 
-function toMember(raw: any): ShodaqohMember {
+function toMember(raw: any): DueMember {
   return {
     member_id: raw.member_id || "",
     member_name: raw.member_name || "",
@@ -129,7 +129,7 @@ function toMonths(v: any): string[] {
   return [];
 }
 
-function toPayment(raw: any): ShodaqohPayment {
+function toPayment(raw: any): DuePayment {
   return {
     payment_id: raw.payment_id || "",
     member_id: raw.member_id || "",
@@ -171,16 +171,16 @@ function requireGroup(groupId?: string | null): string {
 export const financeApi = {
   getKasTransactions: async (
     groupId: string | null | undefined,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    const res = await restGet<KasSummaryDTO>("/api/v1/finance/kas", {
+    const res = await restGet<KasSummaryDTO>("/api/v1/finance/cash-ledger", {
       group_id: gid,
-      kas_type: kasType,
+      cash_type: cashType,
     });
     return {
       success: true,
-      kas_type: res.kas_type,
+      cash_type: res.cash_type,
       transactions: (res.transactions || []).map(toTransaction),
       initial_balance: Number(res.initial_balance ?? 0),
       total_debit: Number(res.total_debit ?? 0),
@@ -192,84 +192,84 @@ export const financeApi = {
   addTransaction: async (
     groupId: string | null | undefined,
     data: Omit<Transaction, "no">,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restPost("/api/v1/finance/kas", {
+    await restPost("/api/v1/finance/cash-ledger", {
       group_id: gid,
-      kas_type: kasType,
+      cash_type: cashType,
       tanggal: data.transaction_date,
       account_name: data.account_name,
       description: data.description,
       debit: data.debit || 0,
       credit: data.credit || 0,
     });
-    return financeApi.getKasTransactions(gid, kasType);
+    return financeApi.getKasTransactions(gid, cashType);
   },
 
   editTransaction: async (
     groupId: string | null | undefined,
     data: Transaction,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restPost("/api/v1/finance/kas", {
+    await restPost("/api/v1/finance/cash-ledger", {
       group_id: gid,
-      kas_id: data.kas_id,
-      kas_type: kasType,
+      cash_id: data.cash_id,
+      cash_type: cashType,
       tanggal: data.transaction_date,
       account_name: data.account_name,
       description: data.description,
       debit: data.debit || 0,
       credit: data.credit || 0,
     });
-    return financeApi.getKasTransactions(gid, kasType);
+    return financeApi.getKasTransactions(gid, cashType);
   },
 
   duplicateTransaction: async (
     groupId: string | null | undefined,
     data: Transaction,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restPost("/api/v1/finance/kas/duplicate", {
+    await restPost("/api/v1/finance/cash-ledger/duplicate", {
       group_id: gid,
-      kas_type: kasType,
-      kas_id: data.kas_id,
+      cash_type: cashType,
+      cash_id: data.cash_id,
     });
-    return financeApi.getKasTransactions(gid, kasType);
+    return financeApi.getKasTransactions(gid, cashType);
   },
 
   deleteTransaction: async (
     groupId: string | null | undefined,
     kasId: string,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restDelete("/api/v1/finance/kas", { group_id: gid, kas_id: kasId });
-    return financeApi.getKasTransactions(gid, kasType);
+    await restDelete("/api/v1/finance/cash-ledger", { group_id: gid, kas_id: kasId });
+    return financeApi.getKasTransactions(gid, cashType);
   },
 
   carryForwardBalance: async (
     groupId: string | null | undefined,
     monthKey: string,
-    kasType: KasType = "main",
+    cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restPost("/api/v1/finance/kas/carry-forward", {
+    await restPost("/api/v1/finance/cash-ledger/carry-forward", {
       group_id: gid,
-      kas_type: kasType,
+      cash_type: cashType,
       month: monthKey,
     });
-    return financeApi.getKasTransactions(gid, kasType);
+    return financeApi.getKasTransactions(gid, cashType);
   },
 
   getShodaqohData: async (
     groupId: string | null | undefined,
     monthKey?: string,
-  ): Promise<ShodaqohDataResponse> => {
+  ): Promise<DuesDataResponse> => {
     const gid = requireGroup(groupId);
-    const res = await restGet<any>("/api/v1/finance/shodaqoh", {
+    const res = await restGet<any>("/api/v1/finance/monthly-dues", {
       group_id: gid,
       ...(monthKey ? { month: monthKey } : {}),
     });
@@ -282,27 +282,27 @@ export const financeApi = {
     };
   },
 
-  addShodaqohMember: async (
+  addDueMember: async (
     groupId: string | null | undefined,
     member_name: string,
     monthly_target: number,
   ) => {
     const gid = requireGroup(groupId);
-    return restPost("/api/v1/finance/shodaqoh/members", {
+    return restPost("/api/v1/finance/monthly-dues/members", {
       group_id: gid,
       member_name,
       monthly_target,
     });
   },
 
-  updateShodaqohMember: async (
+  updateDueMember: async (
     groupId: string | null | undefined,
     member_id: string,
     member_name: string,
     monthly_target: number,
   ) => {
     const gid = requireGroup(groupId);
-    return restPost("/api/v1/finance/shodaqoh/members", {
+    return restPost("/api/v1/finance/monthly-dues/members", {
       group_id: gid,
       member_id,
       member_name,
@@ -310,23 +310,23 @@ export const financeApi = {
     });
   },
 
-  deleteShodaqohMember: async (
+  deleteDueMember: async (
     groupId: string | null | undefined,
     member_id: string,
   ) => {
     const gid = requireGroup(groupId);
-    return restDelete("/api/v1/finance/shodaqoh/members", {
+    return restDelete("/api/v1/finance/monthly-dues/members", {
       group_id: gid,
       member_id,
     });
   },
 
-  createShodaqohPayment: async (
+  createDuePayment: async (
     groupId: string | null | undefined,
     data: Record<string, any>,
   ) => {
     const gid = requireGroup(groupId);
-    return restPost("/api/v1/finance/shodaqoh/payments", {
+    return restPost("/api/v1/finance/monthly-dues/payments", {
       group_id: gid,
       ...data,
     });
@@ -337,30 +337,30 @@ export const financeApi = {
     member_id: string,
   ) => {
     const gid = requireGroup(groupId);
-    const res = await restGet<any>("/api/v1/finance/shodaqoh/nominals", {
+    const res = await restGet<any>("/api/v1/finance/monthly-dues/last-nominals", {
       group_id: gid,
       member_id,
     });
     return { success: true, values: res };
   },
 
-  updateShodaqohPayment: async (
+  updateDuePayment: async (
     groupId: string | null | undefined,
     data: Record<string, any>,
   ) => {
     const gid = requireGroup(groupId);
-    return restPost("/api/v1/finance/shodaqoh/payments", {
+    return restPost("/api/v1/finance/monthly-dues/payments", {
       group_id: gid,
       ...data,
     });
   },
 
-  reverseShodaqohPayment: async (
+  reverseDuePayment: async (
     groupId: string | null | undefined,
     payment_id: string,
   ) => {
     const gid = requireGroup(groupId);
-    return restPost("/api/v1/finance/shodaqoh/payments/reverse", {
+    return restPost("/api/v1/finance/monthly-dues/payments/reverse", {
       group_id: gid,
       payment_id,
     });

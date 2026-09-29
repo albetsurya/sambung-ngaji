@@ -59,9 +59,9 @@ const FinanceLedgerPage = lazy(() =>
     default: m.FinanceLedgerPage,
   })),
 );
-const ShodaqohPage = lazy(() =>
-  import("./features/finance/pages/ShodaqohPage").then((m) => ({
-    default: m.ShodaqohPage,
+const MonthlyDuesPage = lazy(() =>
+  import("./features/finance/pages/MonthlyDuesPage").then((m) => ({
+    default: m.MonthlyDuesPage,
   })),
 );
 const ZakatPage = lazy(() =>
@@ -402,7 +402,8 @@ function AppRoutes() {
             <Route path="/finance" element={<FinanceLayout />}>
               <Route index element={<Navigate to="/finance/ledger" replace />} />
               <Route path="ledger" element={<FinanceLedgerPage />} />
-              <Route path="shodaqoh" element={<ShodaqohPage />} />
+              <Route path="shodaqoh" element={<Navigate to="/finance/monthly-dues" replace />} />
+              <Route path="monthly-dues" element={<MonthlyDuesPage />} />
               <Route path="zakat" element={<ZakatPage />} />
               <Route path="assistant" element={<FinanceAiPage />} />
             </Route>
