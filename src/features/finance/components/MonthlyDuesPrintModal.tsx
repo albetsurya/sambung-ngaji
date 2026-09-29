@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import type { DueMember, DuePayment } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { Button, Modal } from "../../../components/common";
-import { Printer } from "../../../components/common/FontAwesomeIcons";
+import { FinancePrintActions } from "./FinancePrintActions";
 
 interface MonthlyDuesPrintModalProps {
   isOpen: boolean;
@@ -22,10 +22,6 @@ export const MonthlyDuesPrintModal: React.FC<MonthlyDuesPrintModalProps> = ({
   const printRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const paymentMap = new Map<string, DuePayment>();
   payments.forEach((p) => {
@@ -51,10 +47,11 @@ export const MonthlyDuesPrintModal: React.FC<MonthlyDuesPrintModalProps> = ({
       <p className="text-ios-footnote text-surface-muted -mt-1 mb-4 px-1">
         Periode: {periodLabel}
       </p>
-      <div className="flex gap-2.5 mb-4">
-        <Button fullWidth onClick={handlePrint} leftIcon={<Printer size={14} />}>
-          Cetak Matriks
-        </Button>
+      <div className="mb-4 space-y-2.5">
+        <FinancePrintActions
+          exportRef={printRef}
+          filename={`Matriks-Shodaqoh-${periodLabel}`}
+        />
         <Button variant="secondary" fullWidth onClick={onClose}>
           Tutup
         </Button>

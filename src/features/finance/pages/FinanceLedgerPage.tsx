@@ -332,7 +332,7 @@ export const FinanceLedgerPage: React.FC = () => {
                   <FilterChip
                     key={m}
                     active={selectedMonth === m}
-                    label={monthLabel(m)}
+                    label={m === "all" ? "Semua Periode" : monthShort(m)}
                     onClick={() => setSelectedMonth(m)}
                   />
                 ))}
@@ -360,7 +360,7 @@ export const FinanceLedgerPage: React.FC = () => {
                     {selectedMonth === "all" ? "Saldo Awal (Awal Tahun)" : "Saldo Awal (Awal Bulan)"}
                   </span>
                   <span className="text-ios-footnote font-bold text-surface-text ml-auto">
-                    {formatRp(selectedMonth === "all" ? 0 : openingBalance)}
+                    {formatRp(selectedMonth === "all" ? kasData?.initial_balance || 0 : openingBalance)}
                   </span>
                 </div>
               </Card>

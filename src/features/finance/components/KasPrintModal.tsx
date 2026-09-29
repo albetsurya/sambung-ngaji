@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import type { Transaction } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { Button, Modal } from "../../../components/common";
-import { Printer } from "../../../components/common/FontAwesomeIcons";
+import { FinancePrintActions } from "./FinancePrintActions";
 
 interface KasPrintModalProps {
   isOpen: boolean;
@@ -29,10 +29,6 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleTriggerPrint = () => {
-    window.print();
-  };
-
   const penerimaanGrouped: Record<string, number> = {};
   const pengeluaranGrouped: Record<string, number> = {};
   let totalDebit = 0;
@@ -40,8 +36,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
 
   transactions.forEach((t) => {
     const isSaldoAwal =
-      (t.description && t.description.toUpperCase().includes("SALDO AWAL")) ||
-      (t.account_name && t.account_name.toUpperCase().includes("SALDO AWAL"));
+      String(t.account_name || "").trim().toUpperCase() === "SALDO AWAL";
 
     const deb = Number(t.debit) || 0;
     const kre = Number(t.credit) || 0;
@@ -52,7 +47,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
       totalDebit += deb;
     }
 
-    if (kre > 0) {
+    if (!isSaldoAwal && kre > 0) {
       const key = (t.account_name || t.description || "LAINNYA").trim().toUpperCase();
       pengeluaranGrouped[key] = (pengeluaranGrouped[key] || 0) + kre;
       totalCredit += kre;
@@ -68,10 +63,11 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
       <p className="text-ios-footnote text-surface-muted -mt-1 mb-4 px-1">
         {cash_type_label} • {period_label}
       </p>
-      <div className="flex gap-2.5 mb-4">
-        <Button fullWidth onClick={handleTriggerPrint} leftIcon={<Printer size={14} />}>
-          Cetak Berkas
-        </Button>
+      <div className="mb-4 space-y-2.5">
+        <FinancePrintActions
+          exportRef={printRef}
+          filename={`${cash_type_label}-${period_label}`}
+        />
         <Button variant="secondary" fullWidth onClick={onClose}>
           Tutup
         </Button>

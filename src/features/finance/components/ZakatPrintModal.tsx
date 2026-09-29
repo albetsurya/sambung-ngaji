@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import type { ZakatItem } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { Button, Modal } from "../../../components/common";
-import { Printer } from "../../../components/common/FontAwesomeIcons";
+import { FinancePrintActions } from "./FinancePrintActions";
 
 interface ZakatPrintModalProps {
   isOpen: boolean;
@@ -21,10 +21,6 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
 
   if (!isOpen || !zakat) return null;
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <Modal
       open={isOpen}
@@ -34,10 +30,11 @@ export const ZakatPrintModal: React.FC<ZakatPrintModalProps> = ({
       <p className="text-ios-footnote text-surface-muted -mt-1 mb-4 px-1">
         Muzakki: {zakat.muzakki_name}
       </p>
-      <div className="flex gap-2.5 mb-4">
-        <Button fullWidth onClick={handlePrint} leftIcon={<Printer size={14} />}>
-          Cetak Kwitansi
-        </Button>
+      <div className="mb-4 space-y-2.5">
+        <FinancePrintActions
+          exportRef={printRef}
+          filename={`Kwitansi-Zakat-${zakat.muzakki_name}`}
+        />
         <Button variant="secondary" fullWidth onClick={onClose}>
           Tutup
         </Button>
