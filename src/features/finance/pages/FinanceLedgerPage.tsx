@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { financeApi, type Transaction, type KasDataResponse, type CashType } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
@@ -24,9 +24,11 @@ import {
   Plus,
   Minus,
   Printer,
+  RefreshCw,
   Search,
   Landmark,
 } from "../../../components/common/FontAwesomeIcons";
+import { useFinanceSync } from "../hooks/useFinanceSync";
 import { KasPrintModal } from "../components/KasPrintModal";
 import { ApiError } from "../../../services/api";
 
@@ -87,6 +89,8 @@ export const FinanceLedgerPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [cashType, assignedGroup]);
+
+  const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
 
   const handleOpenAddSheet = () => {
     setEditingTx(null);
@@ -231,23 +235,63 @@ export const FinanceLedgerPage: React.FC = () => {
   };
 
   const allTx = kasData?.transactions || [];
-  const periodTx =
-    selectedMonth === "all"
-      ? allTx
-      : allTx.filter((t) => (t.transaction_date || "").slice(0, 7) === selectedMonth);
-  const sumDebit = periodTx.reduce((s, t) => s + (Number(t.debit) || 0), 0);
-  const sumCredit = periodTx.reduce((s, t) => s + (Number(t.credit) || 0), 0);
-  const openingBalance = (() => {
-    if (selectedMonth === "all" || periodTx.length === 0) return 0;
-    const firstId = periodTx[0].cash_id;
-    const idx = allTx.findIndex((t) => t.cash_id === firstId);
-    if (idx <= 0) return 0;
-    return Number(allTx[idx - 1].balance) || 0;
-  })();
-  const periodEnding = openingBalance + sumDebit - sumCredit;
-  const surplus = sumDebit - sumCredit;
 
-  const searchFiltered = periodTx.filter((t) => {
+  const scopeData = useMemo(() => {
+    if (selectedMonth === "all") {
+      return {
+        awal: kasData?.initial_balance || 0,
+        debet: kasData?.total_debit || 0,
+        kredit: kasData?.total_credit || 0,
+        akhir: kasData?.ending_balance || 0,
+        list: allTx,
+      };
+    }
+    const isSaldoAwalRow = (t: Transaction) =>
+      (t.account_name || "").trim().toUpperCase() === "SALDO AWAL";
+
+    const monthTx = allTx.filter(
+      (t) => (t.transaction_date || "").slice(0, 7) === selectedMonth
+    );
+    const before = allTx.filter(
+      (t) => (t.transaction_date || "").slice(0, 7) < selectedMonth
+    );
+
+    const awal =
+      before.length > 0
+        ? Number(before[before.length - 1].balance) || 0
+        : kasData?.initial_balance || 0;
+
+    let debet = 0;
+    let kredit = 0;
+    monthTx.forEach((t) => {
+      if (!isSaldoAwalRow(t)) {
+        debet += Number(t.debit) || 0;
+        kredit += Number(t.credit) || 0;
+      }
+    });
+
+    const akhir =
+      monthTx.length > 0 ? Number(monthTx[monthTx.length - 1].balance) || awal : awal;
+
+    return {
+      awal,
+      debet,
+      kredit,
+      akhir,
+      list: monthTx,
+    };
+  }, [selectedMonth, allTx, kasData]);
+
+  const sumDebit = scopeData.debet;
+  const sumCredit = scopeData.kredit;
+  const openingBalance = scopeData.awal;
+  const heroBalance = scopeData.akhir;
+  const surplus = sumDebit - sumCredit;
+  const periodTx = scopeData.list;
+
+  const [fabOpen, setFabOpen] = useState(false);
+
+  const filteredTransactions = periodTx.filter((t) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -256,9 +300,7 @@ export const FinanceLedgerPage: React.FC = () => {
       (t.transaction_date || "").toLowerCase().includes(q)
     );
   });
-  const visibleTx = showAllTx ? searchFiltered : [...searchFiltered].slice(-5).reverse();
-
-  const heroBalance = selectedMonth === "all" ? kasData?.ending_balance || 0 : periodEnding;
+  const visibleTx = showAllTx ? filteredTransactions : [...filteredTransactions].slice(-5).reverse();
 
   return (
     <AppLayout
@@ -276,19 +318,34 @@ export const FinanceLedgerPage: React.FC = () => {
         backLabel="Lainnya"
         showSyncButton={false}
         right={
-          <Button
-            variant="ghost"
-            size="xs"
-            iconOnly
-            onClick={() => {
-              setPrintMode("rincian");
-              setIsPrintModalOpen(true);
-            }}
-            aria-label="Cetak laporan"
-            title="Cetak laporan"
-          >
-            <Printer size={16} />
-          </Button>
+          <div className="flex items-center gap-1">
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={() => syncSheet(assignedGroup)}
+                disabled={syncingSheet}
+                aria-label="Sync dari spreadsheet"
+                title="Sync dari spreadsheet"
+              >
+                <RefreshCw size={16} className={syncingSheet ? "animate-spin" : ""} />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => {
+                setPrintMode("rincian");
+                setIsPrintModalOpen(true);
+              }}
+              aria-label="Cetak laporan"
+              title="Cetak laporan"
+            >
+              <Printer size={16} />
+            </Button>
+          </div>
         }
       />
 
@@ -611,9 +668,9 @@ export const FinanceLedgerPage: React.FC = () => {
       <KasPrintModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
-        transactions={kasData?.transactions || []}
-        initial_balance={kasData?.initial_balance || 0}
-        ending_balance={kasData?.ending_balance || 0}
+        transactions={periodTx}
+        initial_balance={openingBalance}
+        ending_balance={heroBalance}
         period_label={monthLabel(selectedMonth)}
         cash_type_label={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
         mode={printMode}
