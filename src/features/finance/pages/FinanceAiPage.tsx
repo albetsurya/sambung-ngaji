@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { financeApi } from "../api/financeApi";
+import { aiApi } from "../../../services/aiApi";
 import { useToast } from "../../../contexts/ToastContext";
 import { AppLayout, Header } from "../../../components/layout/AppLayout";
 import { Button, Input, EmptyState } from "../../../components/common";
@@ -43,17 +43,18 @@ export const FinanceAiPage: React.FC = () => {
     setLoading(true);
     try {
       const historyPayload = messages.slice(-10).map((m) => ({
-        role: m.sender === "user" ? "user" : "model",
-        parts: [{ text: m.text }],
+        role: (m.sender === "user" ? "user" : "assistant") as "user" | "assistant",
+        text: m.text,
       }));
-      const res = await financeApi.sendAiChatQuery(userText, historyPayload);
-      const reply = res?.data?.reply || res?.data?.text || "";
-      if (res && res.success && reply) {
-        setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+      const res = await aiApi.chat(userText, historyPayload);
+      if (res?.reply) {
+        setMessages((prev) => [...prev, { sender: "ai", text: res.reply }]);
       } else {
-        const errMsg = res?.message || "Gagal mendapatkan respon dari AI.";
-        showToast(errMsg, "error");
-        setMessages((prev) => [...prev, { sender: "ai", text: `[Error]: ${errMsg}` }]);
+        showToast("Gagal mendapatkan respon dari AI.", "error");
+        setMessages((prev) => [
+          ...prev,
+          { sender: "ai", text: "[Error]: Gagal mendapatkan respon dari AI." },
+        ]);
       }
     } catch (err: any) {
       const msg = err instanceof ApiError ? err.message : "Gagal menghubungi AI Assistant";

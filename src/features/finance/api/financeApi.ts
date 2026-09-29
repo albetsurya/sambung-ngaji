@@ -430,19 +430,4 @@ export const financeApi = {
     });
   },
 
-  sendAiChatQuery: async (
-    message: string,
-    history: any[] = [],
-  ): Promise<{ success: boolean; message?: string; data: any }> => {
-    const normalized = (history || []).map((m: any) => {
-      const text =
-        m.text ??
-        (Array.isArray(m.parts) ? m.parts.map((p: any) => p.text || "").join("\n") : "") ??
-        "";
-      const role = m.role === "model" || m.role === "assistant" ? "assistant" : "user";
-      return { role, text };
-    });
-    const res = await restPost<any>("/api/v1/ai/chat", { message, history: normalized });
-    return { success: true, data: res };
-  },
 };
