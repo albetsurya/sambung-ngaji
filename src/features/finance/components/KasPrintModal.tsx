@@ -9,7 +9,7 @@ interface KasPrintModalProps {
   initial_balance: number;
   ending_balance: number;
   period_label: string;
-  kas_type_label: string;
+  cash_type_label: string;
   mode: "rincian" | "rekap";
 }
 
@@ -20,7 +20,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
   initial_balance,
   ending_balance,
   period_label,
-  kas_type_label,
+  cash_type_label,
   mode,
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
@@ -68,7 +68,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
               Pratinjau Cetak: {mode === "rekap" ? "Laporan Rekapitulasi Kas" : "Rincian Transaksi Kas"}
             </h3>
             <p className="text-xs text-slate-500">
-              {kas_type_label} • {period_label}
+              {cash_type_label} • {period_label}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -100,7 +100,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                 {mode === "rekap" ? "LAPORAN REKAPITULASI KAS" : "LAPORAN TRANSAKSI KAS"}
               </h1>
               <h2 className="text-md font-semibold text-slate-700 uppercase mt-1">
-                {kas_type_label.toUpperCase()}
+                {cash_type_label.toUpperCase()}
               </h2>
               <p className="text-xs text-slate-600 mt-1 uppercase tracking-wider">
                 PERIODE: {period_label.toUpperCase()}

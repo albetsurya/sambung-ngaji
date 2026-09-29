@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { financeApi, type Transaction, type KasDataResponse } from "../api/financeApi";
+import { financeApi, type Transaction, type KasDataResponse, type CashType } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
@@ -9,7 +9,7 @@ export const FinanceLedgerPage: React.FC = () => {
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
 
-  const [kasType, setKasType] = useState<"main" | "kas_amil">("main");
+  const [cashType, setKasType] = useState<CashType>("main");
   const [loading, setLoading] = useState(true);
   const [kasData, setKasData] = useState<KasDataResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +43,7 @@ export const FinanceLedgerPage: React.FC = () => {
     }
     setLoading(true);
     try {
-      const res = await financeApi.getKasTransactions(assignedGroup, kasType);
+      const res = await financeApi.getKasTransactions(assignedGroup, cashType);
       setKasData(res);
     } catch (err: any) {
       showToast(err.message || "Gagal memuat data kas", "error");
@@ -54,7 +54,7 @@ export const FinanceLedgerPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [kasType, assignedGroup]);
+  }, [cashType, assignedGroup]);
 
   const handleOpenAddModal = () => {
     setEditingTx(null);
@@ -97,11 +97,11 @@ export const FinanceLedgerPage: React.FC = () => {
       const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
       const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
 
-      if (editingTx && editingTx.kas_id) {
+      if (editingTx && editingTx.cash_id) {
         await financeApi.editTransaction(
           assignedGroup,
           {
-            kas_id: editingTx.kas_id,
+            cash_id: editingTx.cash_id,
             transaction_date: txForm.transaction_date,
             account_name: txForm.account_name,
             description: txForm.description,
@@ -109,7 +109,7 @@ export const FinanceLedgerPage: React.FC = () => {
             debit: deb,
             credit: kre,
           },
-          kasType
+          cashType
         );
         showToast("Transaksi berhasil diperbarui", "success");
       } else {
@@ -123,7 +123,7 @@ export const FinanceLedgerPage: React.FC = () => {
             debit: deb,
             credit: kre,
           },
-          kasType
+          cashType
         );
         showToast("Transaksi berhasil ditambahkan", "success");
       }
@@ -135,10 +135,10 @@ export const FinanceLedgerPage: React.FC = () => {
   };
 
   const handleDeleteTx = async (tx: Transaction) => {
-    if (!tx.kas_id) return;
+    if (!tx.cash_id) return;
     if (!window.confirm("Yakin ingin menghapus transaksi ini?")) return;
     try {
-      await financeApi.deleteTransaction(assignedGroup, tx.kas_id, kasType);
+      await financeApi.deleteTransaction(assignedGroup, tx.cash_id, cashType);
       showToast("Transaksi berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -152,7 +152,7 @@ export const FinanceLedgerPage: React.FC = () => {
       return;
     }
     try {
-      const res = await financeApi.carryForwardBalance(assignedGroup, carryMonth, kasType);
+      const res = await financeApi.carryForwardBalance(assignedGroup, carryMonth, cashType);
       if (res.success) {
         showToast(res.message || "Saldo awal berhasil dibawa ke bulan berikutnya", "success");
         setIsCarryModalOpen(false);
@@ -174,6 +174,14 @@ export const FinanceLedgerPage: React.FC = () => {
   ).sort();
 
   const monthLabel = (key: string) => {
+    if (key === "all") return "Semua Periode";
+    const [y, m] = key.split("-");
+    return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("id-ID", {
+      month: "long",
+      year: "numeric",
+    });
+  };
+  const monthShort = (key: string) => {
     if (key === "all") return "Semua";
     const [y, m] = key.split("-");
     return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("id-ID", {
@@ -181,6 +189,26 @@ export const FinanceLedgerPage: React.FC = () => {
       year: "2-digit",
     });
   };
+
+  const allTx = kasData?.transactions || [];
+  const periodTx =
+    selectedMonth === "all"
+      ? allTx
+      : allTx.filter((t) => (t.transaction_date || "").slice(0, 7) === selectedMonth);
+  const sumDebit = periodTx.reduce((s, t) => s + (Number(t.debit) || 0), 0);
+  const sumCredit = periodTx.reduce((s, t) => s + (Number(t.credit) || 0), 0);
+  const openingBalance = (() => {
+    if (selectedMonth === "all" || periodTx.length === 0) return 0;
+    const firstId = periodTx[0].cash_id;
+    const idx = allTx.findIndex((t) => t.cash_id === firstId);
+    if (idx <= 0) return 0;
+    return Number(allTx[idx - 1].balance) || 0;
+  })();
+  const periodEnding = openingBalance + sumDebit - sumCredit;
+  const surplus = sumDebit - sumCredit;
+
+  const [showAllTx, setShowAllTx] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
 
   const filteredTransactions = (kasData?.transactions || []).filter((t) => {
     if (selectedMonth !== "all" && (t.transaction_date || "").slice(0, 7) !== selectedMonth)
@@ -203,7 +231,7 @@ export const FinanceLedgerPage: React.FC = () => {
           <button
             onClick={() => setKasType("main")}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              kasType === "main"
+              cashType === "main"
                 ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
             }`}
@@ -211,9 +239,9 @@ export const FinanceLedgerPage: React.FC = () => {
             Kas Utama
           </button>
           <button
-            onClick={() => setKasType("kas_amil")}
+            onClick={() => setKasType("amil")}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              kasType === "kas_amil"
+              cashType === "amil"
                 ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
             }`}
@@ -257,32 +285,88 @@ export const FinanceLedgerPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Saldo Awal</p>
-          <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">
-            {formatRp(kasData?.initial_balance || 0)}
-          </h4>
+      {/* Period Filter */}
+      <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          Periode
+        </span>
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="ml-auto px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-bold text-slate-800 dark:text-slate-100 border-0"
+          aria-label="Pilih periode"
+        >
+          <option value="all">Semua Periode</option>
+          {monthOptions.map((m) => (
+            <option key={m} value={m}>
+              {monthLabel(m)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Hero: Saldo Kas */}
+      <div className="bg-white dark:bg-slate-900 px-6 pt-6 pb-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <p className="font-bold text-xs tracking-wider uppercase text-slate-500 dark:text-slate-400">
+          Saldo Kas {cashType === "amil" ? "Amil" : "Utama"}
+        </p>
+        <p className="font-mono text-3xl font-extrabold mt-1.5 leading-none text-slate-900 dark:text-white">
+          {formatRp(selectedMonth === "all" ? kasData?.ending_balance || 0 : periodEnding)}
+        </p>
+        <p className="text-xs mt-2 font-semibold tracking-wide text-slate-500 dark:text-slate-400">
+          <span>{monthLabel(selectedMonth)}</span>
+          <span className="mx-1 text-slate-300">·</span>
+          <span className="font-extrabold text-slate-800 dark:text-slate-100">
+            {periodTx.length} transaksi
+          </span>
+        </p>
+        <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            {selectedMonth === "all" ? "Saldo Awal (Awal Tahun)" : "Saldo Awal (Awal Bulan)"}
+          </span>
+          <span className="text-xs text-slate-300">·</span>
+          <span className="font-mono text-sm font-extrabold text-slate-800 dark:text-slate-100">
+            {formatRp(selectedMonth === "all" ? 0 : openingBalance)}
+          </span>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm border-l-4 border-l-emerald-500">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Penerimaan (Debet)</p>
-          <h4 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-            {formatRp(kasData?.total_debit || 0)}
-          </h4>
+      </div>
+
+      {/* Pemasukan / Pengeluaran */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Pemasukan</p>
+          <p className="font-mono text-base font-extrabold mt-1 text-emerald-600 dark:text-emerald-400">
+            {formatRp(sumDebit)}
+          </p>
         </div>
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm border-l-4 border-l-rose-500">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Pengeluaran (Kredit)</p>
-          <h4 className="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">
-            {formatRp(kasData?.total_credit || 0)}
-          </h4>
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Pengeluaran</p>
+          <p className="font-mono text-base font-extrabold mt-1 text-rose-600 dark:text-rose-400">
+            {formatRp(sumCredit)}
+          </p>
         </div>
-        <div className="bg-gradient-to-br from-emerald-800 to-teal-900 text-white p-5 rounded-2xl shadow-md">
-          <p className="text-xs font-medium text-emerald-200">Saldo Akhir</p>
-          <h4 className="text-xl font-bold text-white mt-1">
-            {formatRp(kasData?.ending_balance || 0)}
-          </h4>
+      </div>
+
+      {/* Surplus */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Surplus Periode Ini
+          </p>
+          <p className="font-mono text-base font-extrabold mt-1 text-slate-800 dark:text-slate-100">
+            {formatRp(surplus)}
+          </p>
         </div>
+        <span
+          className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+            surplus >= 0
+              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+              : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+          }`}
+        >
+          {surplus >= 0 ? "Surplus" : "Defisit"}
+        </span>
       </div>
 
       {!assignedGroup && (
@@ -293,42 +377,38 @@ export const FinanceLedgerPage: React.FC = () => {
         </div>
       )}
 
-      {monthOptions.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          {["all", ...monthOptions].map((m) => (
-            <button
-              key={m}
-              onClick={() => setSelectedMonth(m)}
-              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                selectedMonth === m
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-              }`}
-            >
-              {monthLabel(m)}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Search & Transaction Table */}
+      {/* Transaksi Terbaru */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
-          <input
-            type="text"
-            placeholder="Cari transaksi atau akun..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full max-w-sm px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 focus:ring-2 focus:ring-emerald-500"
-          />
-          <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
-            Total: {filteredTransactions.length} transaksi
-          </span>
+          <h2 className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
+            {showAllTx ? "Riwayat Transaksi" : "Transaksi Terbaru"}
+          </h2>
+          <button
+            onClick={() => setShowAllTx((v) => !v)}
+            className="text-xs font-bold text-emerald-600 dark:text-emerald-400"
+          >
+            {showAllTx ? "Tutup" : "Lihat semua"}
+          </button>
         </div>
+
+        {showAllTx && (
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+            <input
+              type="text"
+              placeholder="Cari tanggal, kategori, keterangan…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-sm px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 focus:ring-2 focus:ring-emerald-500"
+            />
+            <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+              Total: {filteredTransactions.length} transaksi
+            </span>
+          </div>
+        )}
 
         {loading ? (
           <div className="p-12 text-center text-slate-400 text-sm">Memuat data kas...</div>
-        ) : filteredTransactions.length === 0 ? (
+        ) : (showAllTx ? filteredTransactions : [...filteredTransactions].slice(-5).reverse()).length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-sm">Tidak ada transaksi ditemukan.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -346,7 +426,7 @@ export const FinanceLedgerPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {filteredTransactions.map((t, idx) => (
+                {(showAllTx ? filteredTransactions : [...filteredTransactions].slice(-5).reverse()).map((t, idx) => (
                   <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3 text-center text-slate-400 font-mono text-xs">{idx + 1}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">{t.transaction_date}</td>
@@ -369,7 +449,7 @@ export const FinanceLedgerPage: React.FC = () => {
                         >
                           Edit
                         </button>
-                        {t.kas_id && (
+                        {t.cash_id && (
                           <button
                             onClick={() => handleDeleteTx(t)}
                             className="text-rose-600 hover:text-rose-700 font-medium text-xs"
@@ -385,6 +465,51 @@ export const FinanceLedgerPage: React.FC = () => {
             </table>
           </div>
         )}
+      </div>
+
+      {/* FAB Speed-dial */}
+      <div className="fixed bottom-24 right-4 z-40 flex flex-col items-end gap-2">
+        {fabOpen && (
+          <>
+            <button
+              onClick={() => {
+                setFabOpen(false);
+                setIsCarryModalOpen(true);
+              }}
+              className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-lg"
+            >
+              Bawa Saldo Awal
+            </button>
+            <button
+              onClick={() => {
+                setFabOpen(false);
+                setPrintMode("rincian");
+                setIsPrintModalOpen(true);
+              }}
+              className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs font-bold text-slate-700 dark:text-slate-200 shadow-lg"
+            >
+              Cetak Laporan
+            </button>
+            <button
+              onClick={() => {
+                setFabOpen(false);
+                handleOpenAddModal();
+              }}
+              className="px-4 py-2.5 bg-emerald-600 rounded-full text-xs font-bold text-white shadow-lg"
+            >
+              + Tambah Transaksi
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => setFabOpen((v) => !v)}
+          aria-label="Menu cepat kas"
+          className={`w-14 h-14 rounded-full text-2xl font-bold text-white shadow-xl transition-transform ${
+            fabOpen ? "bg-slate-700 rotate-45" : "bg-emerald-600"
+          }`}
+        >
+          +
+        </button>
       </div>
 
       {/* Modal Add/Edit Transaction */}
@@ -532,7 +657,7 @@ export const FinanceLedgerPage: React.FC = () => {
         initial_balance={kasData?.initial_balance || 0}
         ending_balance={kasData?.ending_balance || 0}
         period_label={new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" })}
-        kas_type_label={kasType === "kas_amil" ? "Kas Amil" : "Kas Utama"}
+        cash_type_label={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
         mode={printMode}
       />
     </div>

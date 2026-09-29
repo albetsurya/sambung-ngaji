@@ -1,16 +1,16 @@
 import React, { useRef } from "react";
-import type { ShodaqohMember, ShodaqohPayment } from "../api/financeApi";
+import type { DueMember, DuePayment } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 
-interface ShodaqohPrintModalProps {
+interface MonthlyDuesPrintModalProps {
   isOpen: boolean;
   onClose: () => void;
-  members: ShodaqohMember[];
-  payments: ShodaqohPayment[];
+  members: DueMember[];
+  payments: DuePayment[];
   periodLabel: string;
 }
 
-export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
+export const MonthlyDuesPrintModal: React.FC<MonthlyDuesPrintModalProps> = ({
   isOpen,
   onClose,
   members,
@@ -26,7 +26,7 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
   };
 
   // Map member payments
-  const paymentMap = new Map<string, ShodaqohPayment>();
+  const paymentMap = new Map<string, DuePayment>();
   payments.forEach((p) => {
     paymentMap.set(p.member_id, p);
   });
@@ -107,12 +107,12 @@ export const ShodaqohPrintModal: React.FC<ShodaqohPrintModalProps> = ({
                 {members.map((m, idx) => {
                   const p = paymentMap.get(m.member_id);
                   const target = Number(m.monthly_target) || 0;
-                  const ir = Number(p?.carryover_ir) || 0;
-                  const sambung = Number(p?.uang_sambung) || 0;
-                  const jimpitan = Number(p?.jimpitan) || 0;
-                  const siar = Number(p?.siar_siar) || 0;
-                  const seribuan = Number(p?.seribuan) || 0;
-                  const kafan = Number(p?.kafan) || 0;
+                  const ir = Number((p as any)?.carryover_ir ?? (p as any)?.susulan_ir) || 0;
+                  const sambung = Number((p as any)?.connecting_fund ?? (p as any)?.uang_sambung) || 0;
+                  const jimpitan = Number((p as any)?.community_dues ?? (p as any)?.jimpitan) || 0;
+                  const siar = Number((p as any)?.outreach_fund ?? (p as any)?.siar_siar) || 0;
+                  const seribuan = Number((p as any)?.thousand_fund ?? (p as any)?.seribuan) || 0;
+                  const kafan = Number((p as any)?.funeral_fund ?? (p as any)?.kafan) || 0;
                   const ukhro = Number(p?.ukhro_mt) || 0;
                   const total = Number(p?.total_amount) || (ir + sambung + jimpitan + siar + seribuan + kafan + ukhro);
 

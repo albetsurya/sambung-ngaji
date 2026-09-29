@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import {
   financeApi,
-  type ShodaqohMember,
-  type ShodaqohPayment,
-  type ShodaqohDataResponse,
+  type DueMember,
+  type DuePayment,
+  type DuesDataResponse,
 } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
-import { ShodaqohPrintModal } from "../components/ShodaqohPrintModal";
+import { MonthlyDuesPrintModal } from "../components/MonthlyDuesPrintModal";
 
-export const ShodaqohPage: React.FC = () => {
+export const MonthlyDuesPage: React.FC = () => {
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ShodaqohDataResponse | null>(null);
+  const [data, setData] = useState<DuesDataResponse | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     const d = new Date();
     const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -24,13 +24,13 @@ export const ShodaqohPage: React.FC = () => {
 
   // Modal States
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<ShodaqohMember | null>(null);
+  const [editingMember, setEditingMember] = useState<DueMember | null>(null);
   const [memberName, setMemberName] = useState("");
   const [memberTarget, setMemberTarget] = useState(0);
 
   // Payment Form Modal
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<ShodaqohMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<DueMember | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     payment_id: "",
     payment_date: new Date().toISOString().slice(0, 10),
@@ -51,6 +51,8 @@ export const ShodaqohPage: React.FC = () => {
 
   // Print Modal
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "LUNAS" | "BELUM">("ALL");
 
   const loadData = async () => {
     if (!assignedGroup) {
@@ -82,10 +84,10 @@ export const ShodaqohPage: React.FC = () => {
     }
     try {
       if (editingMember) {
-        await financeApi.updateShodaqohMember(assignedGroup, editingMember.member_id, memberName, memberTarget);
+        await financeApi.updateDueMember(assignedGroup, editingMember.member_id, memberName, memberTarget);
         showToast("Anggota shodaqoh berhasil diperbarui", "success");
       } else {
-        await financeApi.addShodaqohMember(assignedGroup, memberName, memberTarget);
+        await financeApi.addDueMember(assignedGroup, memberName, memberTarget);
         showToast("Anggota shodaqoh berhasil ditambahkan", "success");
       }
       setIsMemberModalOpen(false);
@@ -98,7 +100,7 @@ export const ShodaqohPage: React.FC = () => {
   const handleDeleteMember = async (memberId: string) => {
     if (!window.confirm("Yakin ingin menghapus anggota ini dari daftar shodaqoh?")) return;
     try {
-      await financeApi.deleteShodaqohMember(assignedGroup, memberId);
+      await financeApi.deleteDueMember(assignedGroup, memberId);
       showToast("Anggota shodaqoh berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -107,7 +109,7 @@ export const ShodaqohPage: React.FC = () => {
   };
 
   // Payment Submission
-  const handleOpenPaymentModal = async (member: ShodaqohMember) => {
+  const handleOpenPaymentModal = async (member: DueMember) => {
     setSelectedMember(member);
     setPaymentForm({
       payment_id: "",
@@ -180,10 +182,10 @@ export const ShodaqohPage: React.FC = () => {
 
     try {
       if (paymentForm.payment_id) {
-        await financeApi.updateShodaqohPayment(assignedGroup, payload);
+        await financeApi.updateDuePayment(assignedGroup, payload);
         showToast("Pembayaran shodaqoh berhasil diupdate", "success");
       } else {
-        await financeApi.createShodaqohPayment(assignedGroup, payload);
+        await financeApi.createDuePayment(assignedGroup, payload);
         showToast("Pembayaran shodaqoh berhasil disimpan", "success");
       }
       setIsPaymentModalOpen(false);
@@ -229,6 +231,12 @@ export const ShodaqohPage: React.FC = () => {
 
   const membersList = data?.members || [];
   const paymentsList = data?.payments || [];
+  const paidIds = new Set(paymentsList.filter((p) => p.total_amount > 0).map((p) => p.member_id));
+  const visibleMembers = membersList.filter((m) => {
+    if (statusFilter === "ALL") return true;
+    const paid = paidIds.has(m.member_id);
+    return statusFilter === "LUNAS" ? paid : !paid;
+  });
   const dashboard = data?.dashboard;
   const progressPct =
     dashboard && dashboard.target > 0
@@ -309,19 +317,43 @@ export const ShodaqohPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Title */}
+      <div>
+        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Infak Bulanan</p>
+        <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100">Monitoring &amp; Pembayaran</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Bulan {selectedMonth}</p>
+      </div>
+
+      {/* Status Filter */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {(["ALL", "LUNAS", "BELUM"] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setStatusFilter(s)}
+            className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              statusFilter === s
+                ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+            }`}
+          >
+            {s === "ALL" ? "Semua" : s === "LUNAS" ? "Lunas" : "Belum Lunas"}
+          </button>
+        ))}
+      </div>
+
       {/* Member Payment Cards Grid */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
         <h3 className="text-md font-bold text-slate-800 dark:text-slate-100">
-          Daftar Pembayaran Anggota Shodaqoh ({membersList.length} Jamaah)
+          Daftar Pembayaran Anggota Shodaqoh ({visibleMembers.length} Jamaah)
         </h3>
 
         {loading ? (
           <div className="p-12 text-center text-slate-400 text-sm">Memuat data shodaqoh...</div>
-        ) : membersList.length === 0 ? (
+        ) : visibleMembers.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-sm">Belum ada anggota shodaqoh terdaftar.</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {membersList.map((m) => {
+            {visibleMembers.map((m) => {
               const payment = paymentsList.find((p) => p.member_id === m.member_id);
               const hasPaid = Boolean(payment && payment.total_amount > 0);
 
@@ -636,7 +668,7 @@ export const ShodaqohPage: React.FC = () => {
       )}
 
       {/* Shodaqoh Print Modal */}
-      <ShodaqohPrintModal
+      <MonthlyDuesPrintModal
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
         members={membersList}

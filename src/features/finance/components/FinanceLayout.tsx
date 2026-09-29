@@ -7,7 +7,7 @@ export const FinanceLayout: React.FC = () => {
 
   const navItems = [
     { path: "/finance/ledger", label: "Kas Ledger", icon: "wallet" },
-    { path: "/finance/shodaqoh", label: "Shodaqoh & Infaq", icon: "hand-holding-heart" },
+    { path: "/finance/monthly-dues", label: "Shodaqoh & Infaq", icon: "hand-holding-heart" },
     { path: "/finance/zakat", label: "Zakat Fitrah & Mal", icon: "box-heart" },
     { path: "/finance/assistant", label: "AI Financial Assistant", icon: "sparkles" },
   ];
