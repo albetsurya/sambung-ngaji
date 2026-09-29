@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { usePermission } from "../../../hooks/usePermission";
 
 export const FinanceLayout: React.FC = () => {
-  const { isSuperAdmin, isTimKu } = usePermission();
+  const { isSuperAdmin, assignedGroup } = usePermission();
 
   const navItems = [
     { path: "/finance/ledger", label: "Kas Ledger", icon: "wallet" },
@@ -25,6 +25,9 @@ export const FinanceLayout: React.FC = () => {
               </span>
               <span className="text-xs text-emerald-200/80">
                 {isSuperAdmin ? "Akses Global (Super Admin)" : "Tim Keuangan Kelompok"}
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-white/10 text-emerald-100 border border-white/20">
+                {assignedGroup ? `Kelompok: ${assignedGroup}` : "Kelompok: belum dipilih"}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">

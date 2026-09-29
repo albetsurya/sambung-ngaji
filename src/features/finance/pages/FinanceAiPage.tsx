@@ -35,8 +35,8 @@ export const FinanceAiPage: React.FC = () => {
       }));
 
       const res = await financeApi.sendAiChatQuery(userText, historyPayload);
-      if (res && res.success && res.data) {
-        const reply = res.data.reply || "Maaf, saya tidak menemukan jawaban.";
+      const reply = res?.data?.reply || res?.data?.text || "";
+      if (res && res.success && reply) {
         setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
       } else {
         const errMsg = res?.message || "Gagal mendapatkan respon dari AI.";

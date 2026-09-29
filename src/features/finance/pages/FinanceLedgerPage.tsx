@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import { financeApi, type Transaction, type KasDataResponse } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
+import { usePermission } from "../../../hooks/usePermission";
 import { KasPrintModal } from "../components/KasPrintModal";
 
 export const FinanceLedgerPage: React.FC = () => {
   const { showToast } = useToast();
+  const { assignedGroup, isSuperAdmin } = usePermission();
 
   const [kasType, setKasType] = useState<"main" | "kas_amil">("main");
   const [loading, setLoading] = useState(true);
   const [kasData, setKasData] = useState<KasDataResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("all");
 
   // Modal States
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
@@ -33,9 +36,14 @@ export const FinanceLedgerPage: React.FC = () => {
   const [printMode, setPrintMode] = useState<"rincian" | "rekap">("rincian");
 
   const loadData = async () => {
+    if (!assignedGroup) {
+      setKasData(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await financeApi.getKasTransactions(kasType);
+      const res = await financeApi.getKasTransactions(assignedGroup, kasType);
       setKasData(res);
     } catch (err: any) {
       showToast(err.message || "Gagal memuat data kas", "error");
@@ -46,7 +54,7 @@ export const FinanceLedgerPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [kasType]);
+  }, [kasType, assignedGroup]);
 
   const handleOpenAddModal = () => {
     setEditingTx(null);
@@ -89,10 +97,11 @@ export const FinanceLedgerPage: React.FC = () => {
       const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
       const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
 
-      if (editingTx && editingTx.no) {
+      if (editingTx && editingTx.kas_id) {
         await financeApi.editTransaction(
+          assignedGroup,
           {
-            no: editingTx.no,
+            kas_id: editingTx.kas_id,
             transaction_date: txForm.transaction_date,
             account_name: txForm.account_name,
             description: txForm.description,
@@ -105,6 +114,7 @@ export const FinanceLedgerPage: React.FC = () => {
         showToast("Transaksi berhasil diperbarui", "success");
       } else {
         await financeApi.addTransaction(
+          assignedGroup,
           {
             transaction_date: txForm.transaction_date,
             account_name: txForm.account_name,
@@ -124,10 +134,11 @@ export const FinanceLedgerPage: React.FC = () => {
     }
   };
 
-  const handleDeleteTx = async (txNo: number) => {
+  const handleDeleteTx = async (tx: Transaction) => {
+    if (!tx.kas_id) return;
     if (!window.confirm("Yakin ingin menghapus transaksi ini?")) return;
     try {
-      await financeApi.deleteTransaction(txNo, kasType);
+      await financeApi.deleteTransaction(assignedGroup, tx.kas_id, kasType);
       showToast("Transaksi berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -141,7 +152,7 @@ export const FinanceLedgerPage: React.FC = () => {
       return;
     }
     try {
-      const res = await financeApi.carryForwardBalance(carryMonth, kasType);
+      const res = await financeApi.carryForwardBalance(assignedGroup, carryMonth, kasType);
       if (res.success) {
         showToast(res.message || "Saldo awal berhasil dibawa ke bulan berikutnya", "success");
         setIsCarryModalOpen(false);
@@ -154,7 +165,26 @@ export const FinanceLedgerPage: React.FC = () => {
     }
   };
 
+  const monthOptions = Array.from(
+    new Set(
+      (kasData?.transactions || [])
+        .map((t) => (t.transaction_date || "").slice(0, 7))
+        .filter(Boolean)
+    )
+  ).sort();
+
+  const monthLabel = (key: string) => {
+    if (key === "all") return "Semua";
+    const [y, m] = key.split("-");
+    return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("id-ID", {
+      month: "short",
+      year: "2-digit",
+    });
+  };
+
   const filteredTransactions = (kasData?.transactions || []).filter((t) => {
+    if (selectedMonth !== "all" && (t.transaction_date || "").slice(0, 7) !== selectedMonth)
+      return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -255,6 +285,32 @@ export const FinanceLedgerPage: React.FC = () => {
         </div>
       </div>
 
+      {!assignedGroup && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-sm text-amber-800 dark:text-amber-200">
+          {isSuperAdmin
+            ? "Pilih kelompok dulu (menu Lainnya → Kelompok Saya) untuk membuka kas kelompok."
+            : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."}
+        </div>
+      )}
+
+      {monthOptions.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          {["all", ...monthOptions].map((m) => (
+            <button
+              key={m}
+              onClick={() => setSelectedMonth(m)}
+              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                selectedMonth === m
+                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+              }`}
+            >
+              {monthLabel(m)}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Search & Transaction Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
@@ -313,9 +369,9 @@ export const FinanceLedgerPage: React.FC = () => {
                         >
                           Edit
                         </button>
-                        {t.no && (
+                        {t.kas_id && (
                           <button
-                            onClick={() => handleDeleteTx(t.no!)}
+                            onClick={() => handleDeleteTx(t)}
                             className="text-rose-600 hover:text-rose-700 font-medium text-xs"
                           >
                             Hapus
