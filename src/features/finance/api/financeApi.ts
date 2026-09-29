@@ -34,6 +34,11 @@ export interface DueMember {
   status: string;
 }
 
+export interface DuePaymentCarryoverItem {
+  month: string; // YYYY-MM
+  amount: number;
+}
+
 export interface DuePayment {
   payment_id: string;
   member_id: string;
@@ -41,7 +46,7 @@ export interface DuePayment {
   total_amount: number;
   carryover_ir: number;
   carryover_months: string[];
-  carryover_breakdown?: string;
+  carryover_items: DuePaymentCarryoverItem[];
   connecting_fund: number;
   community_dues: number;
   outreach_fund: number;
@@ -49,6 +54,7 @@ export interface DuePayment {
   funeral_fund: number;
   ukhro_mt: number;
   notes: string;
+  status?: string;
 }
 
 export interface DuesDashboard {
@@ -129,6 +135,16 @@ function toMonths(v: any): string[] {
   return [];
 }
 
+function toCarryoverItems(v: any): DuePaymentCarryoverItem[] {
+  const raw = Array.isArray(v) ? v : [];
+  return raw
+    .map((it: any) => ({
+      month: String(it?.month || ""),
+      amount: Number(it?.amount ?? 0),
+    }))
+    .filter((it) => it.month && it.amount > 0);
+}
+
 function toPayment(raw: any): DuePayment {
   return {
     payment_id: raw.payment_id || "",
@@ -137,7 +153,7 @@ function toPayment(raw: any): DuePayment {
     total_amount: Number(raw.total_amount ?? 0),
     carryover_ir: Number(raw.carryover_ir ?? 0),
     carryover_months: toMonths(raw.carryover_months),
-    carryover_breakdown: raw.carryover_breakdown || "",
+    carryover_items: toCarryoverItems(raw.carryover_items),
     connecting_fund: Number(raw.connecting_fund ?? 0),
     community_dues: Number(raw.community_dues ?? 0),
     outreach_fund: Number(raw.outreach_fund ?? 0),
@@ -145,6 +161,7 @@ function toPayment(raw: any): DuePayment {
     funeral_fund: Number(raw.funeral_fund ?? 0),
     ukhro_mt: Number(raw.ukhro_mt ?? 0),
     notes: raw.notes || "",
+    status: raw.status || "ACTIVE",
   };
 }
 

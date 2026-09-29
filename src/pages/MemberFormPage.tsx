@@ -35,6 +35,7 @@ const emptyForm: Partial<Member> = {
   jenis_kelamin: "L",
   tempat_lahir: "",
   tanggal_lahir: "",
+  group_id: "",
   kelompok: "",
   desa: "",
   daerah: "",
@@ -76,7 +77,7 @@ export default function MemberFormPage() {
             (g) => g.group_id === assignedGroup || g.group_name === assignedGroup
           );
           if (matched) {
-            setForm((f) => ({ ...f, kelompok: matched.group_name }));
+            setForm((f) => ({ ...f, group_id: matched.group_id, kelompok: matched.group_name }));
           }
         }
       })
@@ -92,6 +93,23 @@ export default function MemberFormPage() {
         .catch(() => setLoading(false));
     }
   }, [id, isEdit]);
+
+  // Backfill group_id untuk data lama yang hanya punya kelompok (nama).
+  useEffect(() => {
+    if (!groups.length) return;
+    setForm((f) => {
+      if (f.group_id) return f;
+      if (!f.kelompok && !f.group_name) return f;
+      const name = f.kelompok || f.group_name || "";
+      const matched =
+        groups.find((g) => g.group_name === name) ||
+        groups.find(
+          (g) => g.group_name.toLowerCase() === String(name).toLowerCase()
+        );
+      if (!matched) return f;
+      return { ...f, group_id: matched.group_id, kelompok: matched.group_name };
+    });
+  }, [groups]);
 
   const previewCategory = getMemberCategory(form);
 
@@ -148,8 +166,13 @@ export default function MemberFormPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
+      const matched = groups.find(
+        (g) => g.group_id === form.group_id || g.group_name === form.kelompok
+      );
       const payload = {
         ...form,
+        group_id: form.group_id || matched?.group_id || "",
+        kelompok: matched?.group_name || form.kelompok || "",
         no_wa: form.no_wa ? normalizePhoneNumber(form.no_wa) : "",
       };
       let memberId = id;
@@ -306,14 +329,18 @@ export default function MemberFormPage() {
         >
           <Select
             label="Kelompok"
-            value={form.kelompok || ""}
+            value={form.group_id || ""}
             disabled={!isSuperAdmin && !isEdit && !!assignedGroup}
-            onChange={(e) => update("kelompok", e.target.value)}
+            onChange={(e) => {
+              const gid = e.target.value;
+              const g = groups.find((x) => x.group_id === gid);
+              setForm((f) => ({ ...f, group_id: gid, kelompok: g?.group_name || "" }));
+            }}
             hint={!isSuperAdmin && !isEdit && !!assignedGroup ? "Otomatis diisi sesuai kelompok Anda" : undefined}
           >
             <option value="">Pilih kelompok</option>
             {groups.map((g) => (
-              <option key={g.group_id} value={g.group_name}>
+              <option key={g.group_id} value={g.group_id}>
                 {g.group_name}
               </option>
             ))}

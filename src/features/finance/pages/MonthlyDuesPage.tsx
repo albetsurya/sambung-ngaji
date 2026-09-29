@@ -32,7 +32,6 @@ import { MonthlyDuesPrintModal } from "../components/MonthlyDuesPrintModal";
 import { ApiError } from "../../../services/api";
 
 const PAYMENT_FIELDS = [
-  { key: "carryover_ir", label: "Susulan IR" },
   { key: "connecting_fund", label: "Uang Sambung" },
   { key: "community_dues", label: "Jimpitan" },
   { key: "outreach_fund", label: "Siar-Siar" },
@@ -40,6 +39,31 @@ const PAYMENT_FIELDS = [
   { key: "funeral_fund", label: "Kafan" },
   { key: "ukhro_mt", label: "Ukhro MT" },
 ] as const;
+
+interface CarryoverRow {
+  month: string; // YYYY-MM
+  amount: number;
+}
+
+function formatCarryMonth(ym: string): string {
+  const m = /^(\d{4})-(\d{2})$/.exec(ym || "");
+  if (!m) return ym;
+  try {
+    return new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleDateString("id-ID", {
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return ym;
+  }
+}
+
+function formatCarrySummary(items: { month: string; amount: number }[]): string {
+  if (!items.length) return "";
+  const months = items.map((it) => formatCarryMonth(it.month)).join(", ");
+  const total = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
+  return `Susulan ${months} · ${formatRp(total)}`;
+}
 
 export const MonthlyDuesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -70,7 +94,6 @@ export const MonthlyDuesPage: React.FC = () => {
   const [paymentForm, setPaymentForm] = useState({
     payment_id: "",
     payment_date: new Date().toISOString().slice(0, 10),
-    carryover_ir: 0,
     connecting_fund: 0,
     community_dues: 0,
     outreach_fund: 0,
@@ -79,6 +102,7 @@ export const MonthlyDuesPage: React.FC = () => {
     ukhro_mt: 0,
     notes: "",
   });
+  const [carryovers, setCarryovers] = useState<CarryoverRow[]>([]);
   const [savingPayment, setSavingPayment] = useState(false);
 
   const [isAiSheetOpen, setIsAiSheetOpen] = useState(false);
@@ -163,7 +187,6 @@ export const MonthlyDuesPage: React.FC = () => {
     setPaymentForm({
       payment_id: "",
       payment_date: new Date().toISOString().slice(0, 10),
-      carryover_ir: 0,
       connecting_fund: 0,
       community_dues: 0,
       outreach_fund: 0,
@@ -172,13 +195,13 @@ export const MonthlyDuesPage: React.FC = () => {
       ukhro_mt: 0,
       notes: "",
     });
+    setCarryovers([]);
     try {
       const lastRes = await financeApi.getShodaqohLastNominals(assignedGroup, member.member_id);
       if (lastRes && lastRes.success && lastRes.values) {
         const v = lastRes.values;
         setPaymentForm((prev) => ({
           ...prev,
-          carryover_ir: Number(v.carryover_ir) || 0,
           connecting_fund: Number(v.connecting_fund) || 0,
           community_dues: Number(v.community_dues) || 0,
           outreach_fund: Number(v.outreach_fund) || 0,
@@ -186,6 +209,12 @@ export const MonthlyDuesPage: React.FC = () => {
           funeral_fund: Number(v.funeral_fund) || 0,
           ukhro_mt: Number(v.ukhro_mt) || 0,
         }));
+        const items = Array.isArray(v.carryover_items) ? v.carryover_items : [];
+        if (items.length) {
+          setCarryovers(
+            items.map((it: any) => ({ month: String(it.month || ""), amount: Number(it.amount) || 0 }))
+          );
+        }
       }
     } catch {
       /* fallback empty */
@@ -193,8 +222,10 @@ export const MonthlyDuesPage: React.FC = () => {
     setIsPaymentSheetOpen(true);
   };
 
+  const carryoverTotal = carryovers.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+
   const paymentTotal =
-    paymentForm.carryover_ir +
+    carryoverTotal +
     paymentForm.connecting_fund +
     paymentForm.community_dues +
     paymentForm.outreach_fund +
@@ -205,6 +236,21 @@ export const MonthlyDuesPage: React.FC = () => {
   const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMember) return;
+    const cleanCarryovers = carryovers
+      .filter((r) => r.month && (Number(r.amount) || 0) > 0)
+      .map((r) => ({ month: r.month, amount: Number(r.amount) }));
+    const seen = new Set<string>();
+    for (const r of cleanCarryovers) {
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(r.month)) {
+        showToast(`Bulan susulan tidak valid: ${r.month}`, "error");
+        return;
+      }
+      if (seen.has(r.month)) {
+        showToast(`Bulan susulan duplikat: ${r.month}`, "error");
+        return;
+      }
+      seen.add(r.month);
+    }
     if (paymentTotal <= 0) {
       showToast("Total pembayaran shodaqoh harus lebih besar dari 0", "error");
       return;
@@ -214,7 +260,8 @@ export const MonthlyDuesPage: React.FC = () => {
       member_id: selectedMember.member_id,
       payment_date: paymentForm.payment_date,
       total_amount: paymentTotal,
-      carryover_ir: paymentForm.carryover_ir,
+      carryover_items: cleanCarryovers,
+      carryover_ir: carryoverTotal,
       connecting_fund: paymentForm.connecting_fund,
       community_dues: paymentForm.community_dues,
       outreach_fund: paymentForm.outreach_fund,
@@ -254,7 +301,6 @@ export const MonthlyDuesPage: React.FC = () => {
         showToast("Foto berhasil diekstraksi oleh AI!", "success");
         setPaymentForm((prev) => ({
           ...prev,
-          carryover_ir: Number(d.carryover_ir) || 0,
           connecting_fund: Number(d.connecting_fund) || 0,
           community_dues: Number(d.community_dues) || 0,
           outreach_fund: Number(d.outreach_fund) || 0,
@@ -263,6 +309,15 @@ export const MonthlyDuesPage: React.FC = () => {
           ukhro_mt: Number(d.ukhro_mt) || 0,
           notes: d.notes ?? prev.notes,
         }));
+        const aiIr = Number(d.carryover_ir) || 0;
+        if (aiIr > 0) {
+          setCarryovers((prev) =>
+            prev.length
+              ? prev
+              : [{ month: "", amount: aiIr }]
+          );
+          showToast("Nominal susulan terdeteksi — pilih bulannya manual", "warning");
+        }
         setIsAiSheetOpen(false);
       } else {
         showToast(res.message || "Gagal membaca foto", "error");
@@ -276,7 +331,11 @@ export const MonthlyDuesPage: React.FC = () => {
 
   const membersList = data?.members || [];
   const paymentsList = data?.payments || [];
-  const paidIds = new Set(paymentsList.filter((p) => p.total_amount > 0).map((p) => p.member_id));
+  const paidIds = new Set(
+    paymentsList
+      .filter((p) => p.status !== "INACTIVE" && p.total_amount > 0)
+      .map((p) => p.member_id)
+  );
   const statusVisible = membersList.filter((m) => {
     if (statusFilter === "ALL") return true;
     const paid = paidIds.has(m.member_id);
@@ -431,7 +490,9 @@ export const MonthlyDuesPage: React.FC = () => {
                 <GroupedList>
                   {visibleMembers.map((m, idx) => {
                     const payment = paymentsList.find((p) => p.member_id === m.member_id);
-                    const hasPaid = Boolean(payment && payment.total_amount > 0);
+                    const isInactive = payment?.status === "INACTIVE";
+                    const hasPaid = Boolean(payment && !isInactive && payment.total_amount > 0);
+                    const carrySummary = payment ? formatCarrySummary(payment.carryover_items || []) : "";
                     return (
                       <ListRow
                         key={m.member_id}
@@ -453,15 +514,22 @@ export const MonthlyDuesPage: React.FC = () => {
                                 Target {formatRp(m.monthly_target)}
                                 {hasPaid && payment ? ` · Terbayar ${formatRp(payment.total_amount)}` : ""}
                               </p>
+                              {carrySummary && (
+                                <p className="text-ios-caption text-accent truncate font-medium">
+                                  {carrySummary}
+                                </p>
+                              )}
                             </div>
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
-                                hasPaid
-                                  ? "bg-success-soft text-success"
-                                  : "bg-surface-card2 text-surface-muted"
+                                isInactive
+                                  ? "bg-surface-card2 text-surface-muted line-through"
+                                  : hasPaid
+                                    ? "bg-success-soft text-success"
+                                    : "bg-surface-card2 text-surface-muted"
                               }`}
                             >
-                              {hasPaid ? "Lunas" : "Belum"}
+                              {isInactive ? "Nonaktif" : hasPaid ? "Lunas" : "Belum"}
                             </span>
                           </div>
                         </ChevronRow>
@@ -529,6 +597,69 @@ export const MonthlyDuesPage: React.FC = () => {
               onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
               required
             />
+            <div className="mb-1">
+              <div className="flex items-center justify-between px-1 mb-2">
+                <span className="text-ios-footnote font-semibold text-surface-text">
+                  Susulan IR (per bulan)
+                </span>
+                <button
+                  type="button"
+                  className="text-ios-footnote font-bold text-accent"
+                  onClick={() => setCarryovers((prev) => [...prev, { month: "", amount: 0 }])}
+                >
+                  + Tambah bulan
+                </button>
+              </div>
+              {carryovers.length === 0 ? (
+                <p className="text-ios-caption text-surface-muted px-1 mb-2">
+                  Tidak ada susulan. Ketuk “Tambah bulan” bila ada tunggakan bulan lalu.
+                </p>
+              ) : (
+                <div className="space-y-2 mb-2">
+                  {carryovers.map((row, idx) => (
+                    <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
+                      <Input
+                        label={idx === 0 ? "Bulan" : undefined}
+                        type="month"
+                        value={row.month}
+                        onChange={(e) =>
+                          setCarryovers((prev) =>
+                            prev.map((r, i) => (i === idx ? { ...r, month: e.target.value } : r))
+                          )
+                        }
+                        aria-label={`Bulan susulan ${idx + 1}`}
+                      />
+                      <Input
+                        label={idx === 0 ? "Nominal (Rp)" : undefined}
+                        type="number"
+                        value={row.amount || ""}
+                        onChange={(e) =>
+                          setCarryovers((prev) =>
+                            prev.map((r, i) => (i === idx ? { ...r, amount: Number(e.target.value) } : r))
+                          )
+                        }
+                        aria-label={`Nominal susulan ${idx + 1}`}
+                      />
+                      <button
+                        type="button"
+                        className="h-11 px-3 rounded-xl bg-danger-soft text-danger text-ios-body font-bold"
+                        onClick={() => setCarryovers((prev) => prev.filter((_, i) => i !== idx))}
+                        aria-label={`Hapus susulan ${idx + 1}`}
+                        title="Hapus baris"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Card className="flex items-center justify-between !py-2.5 mb-1">
+                <span className="text-ios-caption font-semibold text-surface-muted">Total susulan (otomatis)</span>
+                <span className="font-display text-ios-body font-extrabold text-accent">
+                  {formatRp(carryoverTotal)}
+                </span>
+              </Card>
+            </div>
             <div className="grid grid-cols-2 gap-x-3">
               {PAYMENT_FIELDS.map((f) => (
                 <Input
