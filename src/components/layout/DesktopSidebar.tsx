@@ -18,6 +18,7 @@ import {
   Sparkles,
   Building2,
   User as UserIcon,
+  FileText,
 } from "../common/FontAwesomeIcons";
 import { RoleBadge } from "../common";
 

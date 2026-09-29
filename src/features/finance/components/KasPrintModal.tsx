@@ -6,10 +6,10 @@ interface KasPrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   transactions: Transaction[];
-  saldoAwal: number;
-  saldoAkhir: number;
-  periodLabel: string;
-  kasTypeLabel: string;
+  initial_balance: number;
+  ending_balance: number;
+  period_label: string;
+  kas_type_label: string;
   mode: "rincian" | "rekap";
 }
 
@@ -17,10 +17,10 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
   isOpen,
   onClose,
   transactions,
-  saldoAwal,
-  saldoAkhir,
-  periodLabel,
-  kasTypeLabel,
+  initial_balance,
+  ending_balance,
+  period_label,
+  kas_type_label,
   mode,
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
@@ -34,27 +34,27 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
   // Grouping for Rekap Mode
   const penerimaanGrouped: Record<string, number> = {};
   const pengeluaranGrouped: Record<string, number> = {};
-  let totalDebet = 0;
-  let totalKredit = 0;
+  let totalDebit = 0;
+  let totalCredit = 0;
 
   transactions.forEach((t) => {
     const isSaldoAwal =
-      (t.keterangan && t.keterangan.toUpperCase().includes("SALDO AWAL")) ||
-      (t.account && t.account.toUpperCase().includes("SALDO AWAL"));
+      (t.description && t.description.toUpperCase().includes("SALDO AWAL")) ||
+      (t.account_name && t.account_name.toUpperCase().includes("SALDO AWAL"));
 
-    const deb = Number(t.debet) || 0;
-    const kre = Number(t.kredit) || 0;
+    const deb = Number(t.debit) || 0;
+    const kre = Number(t.credit) || 0;
 
     if (!isSaldoAwal && deb > 0) {
-      const key = (t.account || t.keterangan || "LAINNYA").trim().toUpperCase();
+      const key = (t.account_name || t.description || "LAINNYA").trim().toUpperCase();
       penerimaanGrouped[key] = (penerimaanGrouped[key] || 0) + deb;
-      totalDebet += deb;
+      totalDebit += deb;
     }
 
     if (kre > 0) {
-      const key = (t.account || t.keterangan || "LAINNYA").trim().toUpperCase();
+      const key = (t.account_name || t.description || "LAINNYA").trim().toUpperCase();
       pengeluaranGrouped[key] = (pengeluaranGrouped[key] || 0) + kre;
-      totalKredit += kre;
+      totalCredit += kre;
     }
   });
 
@@ -68,7 +68,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
               Pratinjau Cetak: {mode === "rekap" ? "Laporan Rekapitulasi Kas" : "Rincian Transaksi Kas"}
             </h3>
             <p className="text-xs text-slate-500">
-              {kasTypeLabel} • {periodLabel}
+              {kas_type_label} • {period_label}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -100,10 +100,10 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                 {mode === "rekap" ? "LAPORAN REKAPITULASI KAS" : "LAPORAN TRANSAKSI KAS"}
               </h1>
               <h2 className="text-md font-semibold text-slate-700 uppercase mt-1">
-                {kasTypeLabel.toUpperCase()}
+                {kas_type_label.toUpperCase()}
               </h2>
               <p className="text-xs text-slate-600 mt-1 uppercase tracking-wider">
-                PERIODE: {periodLabel.toUpperCase()}
+                PERIODE: {period_label.toUpperCase()}
               </p>
             </div>
 
@@ -124,16 +124,16 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                   {transactions.map((t, idx) => (
                     <tr key={idx} className="border-b border-slate-300">
                       <td className="border border-slate-300 p-1.5 text-center">{idx + 1}</td>
-                      <td className="border border-slate-300 p-1.5 whitespace-nowrap">{t.tanggal}</td>
-                      <td className="border border-slate-300 p-1.5">{t.keterangan}</td>
+                      <td className="border border-slate-300 p-1.5 whitespace-nowrap">{t.transaction_date}</td>
+                      <td className="border border-slate-300 p-1.5">{t.description}</td>
                       <td className="border border-slate-300 p-1.5 text-right font-mono">
-                        {Number(t.debet) > 0 ? formatRp(Number(t.debet)) : "—"}
+                        {Number(t.debit) > 0 ? formatRp(Number(t.debit)) : "—"}
                       </td>
                       <td className="border border-slate-300 p-1.5 text-right font-mono">
-                        {Number(t.kredit) > 0 ? formatRp(Number(t.kredit)) : "—"}
+                        {Number(t.credit) > 0 ? formatRp(Number(t.credit)) : "—"}
                       </td>
                       <td className="border border-slate-300 p-1.5 text-right font-mono font-semibold">
-                        {formatRp(Number(t.saldo) || 0)}
+                        {formatRp(Number(t.balance) || 0)}
                       </td>
                     </tr>
                   ))}
@@ -144,13 +144,13 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                       TOTAL TRANSAKSI
                     </td>
                     <td className="border border-slate-400 p-2 text-right font-mono text-emerald-800">
-                      {formatRp(totalDebet)}
+                      {formatRp(totalDebit)}
                     </td>
                     <td className="border border-slate-400 p-2 text-right font-mono text-rose-800">
-                      {formatRp(totalKredit)}
+                      {formatRp(totalCredit)}
                     </td>
                     <td className="border border-slate-400 p-2 text-right font-mono">
-                      {formatRp(saldoAkhir)}
+                      {formatRp(ending_balance)}
                     </td>
                   </tr>
                 </tfoot>
@@ -172,7 +172,7 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                     <td className="border border-slate-300 p-2 text-right font-mono">—</td>
                     <td className="border border-slate-300 p-2 text-right font-mono">—</td>
                     <td className="border border-slate-300 p-2 text-right font-mono text-slate-900">
-                      {formatRp(saldoAwal)}
+                      {formatRp(initial_balance)}
                     </td>
                   </tr>
 
@@ -208,13 +208,13 @@ export const KasPrintModal: React.FC<KasPrintModalProps> = ({
                   <tr className="font-bold bg-slate-100 border-t-2 border-slate-400">
                     <td className="border border-slate-400 p-2 text-right uppercase">TOTAL & SALDO AKHIR</td>
                     <td className="border border-slate-400 p-2 text-right font-mono text-emerald-800">
-                      {formatRp(totalDebet)}
+                      {formatRp(totalDebit)}
                     </td>
                     <td className="border border-slate-400 p-2 text-right font-mono text-rose-800">
-                      {formatRp(totalKredit)}
+                      {formatRp(totalCredit)}
                     </td>
                     <td className="border border-slate-400 p-2 text-right font-mono text-slate-900 font-bold">
-                      {formatRp(saldoAkhir)}
+                      {formatRp(ending_balance)}
                     </td>
                   </tr>
                 </tfoot>

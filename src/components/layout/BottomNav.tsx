@@ -12,8 +12,8 @@ import {
   RefreshCw,
   User,
   Calendar,
+  FileText,
 } from "../common/FontAwesomeIcons";
-
 
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
