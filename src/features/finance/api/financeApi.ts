@@ -299,6 +299,19 @@ export const financeApi = {
     };
   },
 
+  syncFromSheet: async (
+    groupId?: string | null,
+  ): Promise<{ syncedGroup?: string; synced?: string }> => {
+    const res = await restPost<any>(
+      "/api/v1/finance/sync",
+      groupId ? { group_id: groupId } : {},
+    );
+    return {
+      syncedGroup: res.synced_group,
+      synced: res.synced,
+    };
+  },
+
   addDueMember: async (
     groupId: string | null | undefined,
     member_name: string,

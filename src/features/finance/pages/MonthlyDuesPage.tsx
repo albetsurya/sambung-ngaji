@@ -26,8 +26,10 @@ import { GroupedListSkeleton } from "../../../components/common/Skeleton";
 import {
   Heart,
   Printer,
+  RefreshCw,
   Sparkles,
 } from "../../../components/common/FontAwesomeIcons";
+import { useFinanceSync } from "../hooks/useFinanceSync";
 import { MonthlyDuesPrintModal } from "../components/MonthlyDuesPrintModal";
 import { ApiError } from "../../../services/api";
 
@@ -134,6 +136,8 @@ export const MonthlyDuesPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [selectedMonth, assignedGroup]);
+
+  const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
 
   const handleOpenAddMember = () => {
     setEditingMember(null);
@@ -371,16 +375,31 @@ export const MonthlyDuesPage: React.FC = () => {
         backLabel="Lainnya"
         showSyncButton={false}
         right={
-          <Button
-            variant="ghost"
-            size="xs"
-            iconOnly
-            onClick={() => setIsPrintModalOpen(true)}
-            aria-label="Cetak matriks"
-            title="Cetak matriks"
-          >
-            <Printer size={16} />
-          </Button>
+          <div className="flex items-center gap-1">
+            {isSuperAdmin && (
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={() => syncSheet(assignedGroup)}
+                disabled={syncingSheet}
+                aria-label="Sync dari spreadsheet"
+                title="Sync dari spreadsheet"
+              >
+                <RefreshCw size={16} className={syncingSheet ? "animate-spin" : ""} />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => setIsPrintModalOpen(true)}
+              aria-label="Cetak matriks"
+              title="Cetak matriks"
+            >
+              <Printer size={16} />
+            </Button>
+          </div>
         }
       />
 

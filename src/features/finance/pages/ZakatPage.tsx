@@ -21,7 +21,9 @@ import { GroupedListSkeleton } from "../../../components/common/Skeleton";
 import {
   ScrollText as Scroll,
   Printer,
+  RefreshCw,
 } from "../../../components/common/FontAwesomeIcons";
+import { useFinanceSync } from "../hooks/useFinanceSync";
 import { ZakatPrintModal } from "../components/ZakatPrintModal";
 import { ApiError } from "../../../services/api";
 
@@ -98,6 +100,8 @@ export const ZakatPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [assignedGroup]);
+
+  const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
 
   const handleOpenAddSheet = () => {
     setEditingZakat(null);
@@ -208,6 +212,21 @@ export const ZakatPage: React.FC = () => {
         onBack={() => navigate("/lainnya")}
         backLabel="Lainnya"
         showSyncButton={false}
+        right={
+          isSuperAdmin ? (
+            <Button
+              variant="ghost"
+              size="xs"
+              iconOnly
+              onClick={() => syncSheet(assignedGroup)}
+              disabled={syncingSheet}
+              aria-label="Sync dari spreadsheet"
+              title="Sync dari spreadsheet"
+            >
+              <RefreshCw size={16} className={syncingSheet ? "animate-spin" : ""} />
+            </Button>
+          ) : undefined
+        }
       />
 
       <div className="py-4">
