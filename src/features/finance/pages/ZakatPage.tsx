@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { financeApi, type ZakatItem } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
+import { usePermission } from "../../../hooks/usePermission";
 import { ZakatPrintModal } from "../components/ZakatPrintModal";
 
 export const ZakatPage: React.FC = () => {
   const { showToast } = useToast();
+  const { assignedGroup, isSuperAdmin } = usePermission();
 
   const [loading, setLoading] = useState(true);
   const [zakatList, setZakatList] = useState<ZakatItem[]>([]);
@@ -28,9 +30,14 @@ export const ZakatPage: React.FC = () => {
   const [selectedPrintZakat, setSelectedPrintZakat] = useState<ZakatItem | null>(null);
 
   const loadData = async () => {
+    if (!assignedGroup) {
+      setZakatList([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await financeApi.getZakatList();
+      const res = await financeApi.getZakatList(assignedGroup);
       if (res && res.data) {
         setZakatList(res.data);
       }
@@ -43,7 +50,7 @@ export const ZakatPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [assignedGroup]);
 
   const handleOpenAddModal = () => {
     setEditingZakat(null);
@@ -66,13 +73,13 @@ export const ZakatPage: React.FC = () => {
 
     try {
       if (editingZakat) {
-        await financeApi.manageZakat("updateZakat", {
+        await financeApi.manageZakat(assignedGroup, "updateZakat", {
           zakat_id: editingZakat.zakat_id,
           ...form,
         });
         showToast("Data zakat berhasil diperbarui", "success");
       } else {
-        await financeApi.manageZakat("createZakat", form);
+        await financeApi.manageZakat(assignedGroup, "createZakat", form);
         showToast("Data zakat baru berhasil dicatat", "success");
       }
       setIsModalOpen(false);
@@ -85,7 +92,7 @@ export const ZakatPage: React.FC = () => {
   const handleDeleteZakat = async (zakatId: string) => {
     if (!window.confirm("Yakin ingin menghapus catatan zakat ini?")) return;
     try {
-      await financeApi.manageZakat("deleteZakat", { zakat_id: zakatId });
+      await financeApi.manageZakat(assignedGroup, "deleteZakat", { zakat_id: zakatId });
       showToast("Catatan zakat berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -95,7 +102,7 @@ export const ZakatPage: React.FC = () => {
 
   const handleCompleteZakat = async (zakatId: string) => {
     try {
-      await financeApi.manageZakat("completeZakat", { zakat_id: zakatId });
+      await financeApi.manageZakat(assignedGroup, "completeZakat", { zakat_id: zakatId });
       showToast("Status zakat berhasil diset Selesai / Tuntas", "success");
       loadData();
     } catch (err: any) {
@@ -118,6 +125,13 @@ export const ZakatPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {!assignedGroup && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-sm text-amber-800 dark:text-amber-200">
+          {isSuperAdmin
+            ? "Pilih kelompok dulu (menu Lainnya → Kelompok Saya) untuk membuka zakat kelompok."
+            : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."}
+        </div>
+      )}
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">

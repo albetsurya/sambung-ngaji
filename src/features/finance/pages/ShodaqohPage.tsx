@@ -7,10 +7,12 @@ import {
 } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
+import { usePermission } from "../../../hooks/usePermission";
 import { ShodaqohPrintModal } from "../components/ShodaqohPrintModal";
 
 export const ShodaqohPage: React.FC = () => {
   const { showToast } = useToast();
+  const { assignedGroup, isSuperAdmin } = usePermission();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ShodaqohDataResponse | null>(null);
@@ -30,16 +32,16 @@ export const ShodaqohPage: React.FC = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<ShodaqohMember | null>(null);
   const [paymentForm, setPaymentForm] = useState({
-    paymentId: "",
-    tanggalPembayaran: new Date().toISOString().slice(0, 10),
-    susulan_ir: 0,
-    uang_sambung: 0,
-    jimpitan: 0,
-    siar_siar: 0,
-    seribuan: 0,
-    kafan: 0,
+    payment_id: "",
+    payment_date: new Date().toISOString().slice(0, 10),
+    carryover_ir: 0,
+    connecting_fund: 0,
+    community_dues: 0,
+    outreach_fund: 0,
+    thousand_fund: 0,
+    funeral_fund: 0,
     ukhro_mt: 0,
-    keterangan: "",
+    notes: "",
   });
 
   // AI Photo Modal
@@ -51,9 +53,14 @@ export const ShodaqohPage: React.FC = () => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   const loadData = async () => {
+    if (!assignedGroup) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const res = await financeApi.getShodaqohData(selectedMonth);
+      const res = await financeApi.getShodaqohData(assignedGroup, selectedMonth);
       setData(res);
     } catch (err: any) {
       showToast(err.message || "Gagal memuat data shodaqoh", "error");
@@ -64,7 +71,7 @@ export const ShodaqohPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [selectedMonth]);
+  }, [selectedMonth, assignedGroup]);
 
   // Member CRUD
   const handleSaveMember = async (e: React.FormEvent) => {
@@ -75,10 +82,10 @@ export const ShodaqohPage: React.FC = () => {
     }
     try {
       if (editingMember) {
-        await financeApi.updateShodaqohMember(editingMember.member_id, memberName, memberTarget);
+        await financeApi.updateShodaqohMember(assignedGroup, editingMember.member_id, memberName, memberTarget);
         showToast("Anggota shodaqoh berhasil diperbarui", "success");
       } else {
-        await financeApi.addShodaqohMember(memberName, memberTarget);
+        await financeApi.addShodaqohMember(assignedGroup, memberName, memberTarget);
         showToast("Anggota shodaqoh berhasil ditambahkan", "success");
       }
       setIsMemberModalOpen(false);
@@ -91,7 +98,7 @@ export const ShodaqohPage: React.FC = () => {
   const handleDeleteMember = async (memberId: string) => {
     if (!window.confirm("Yakin ingin menghapus anggota ini dari daftar shodaqoh?")) return;
     try {
-      await financeApi.deleteShodaqohMember(memberId);
+      await financeApi.deleteShodaqohMember(assignedGroup, memberId);
       showToast("Anggota shodaqoh berhasil dihapus", "success");
       loadData();
     } catch (err: any) {
@@ -103,31 +110,31 @@ export const ShodaqohPage: React.FC = () => {
   const handleOpenPaymentModal = async (member: ShodaqohMember) => {
     setSelectedMember(member);
     setPaymentForm({
-      paymentId: "",
-      tanggalPembayaran: new Date().toISOString().slice(0, 10),
-      susulan_ir: 0,
-      uang_sambung: 0,
-      jimpitan: 0,
-      siar_siar: 0,
-      seribuan: 0,
-      kafan: 0,
+      payment_id: "",
+      payment_date: new Date().toISOString().slice(0, 10),
+      carryover_ir: 0,
+      connecting_fund: 0,
+      community_dues: 0,
+      outreach_fund: 0,
+      thousand_fund: 0,
+      funeral_fund: 0,
       ukhro_mt: 0,
-      keterangan: "",
+      notes: "",
     });
 
     // Try pre-filling last nominals
     try {
-      const lastRes = await financeApi.getShodaqohLastNominals(member.member_id, selectedMonth);
+      const lastRes = await financeApi.getShodaqohLastNominals(assignedGroup, member.member_id);
       if (lastRes && lastRes.success && lastRes.values) {
         const v = lastRes.values;
         setPaymentForm((prev) => ({
           ...prev,
-          susulan_ir: Number(v.susulan_ir) || 0,
-          uang_sambung: Number(v.uang_sambung) || 0,
-          jimpitan: Number(v.jimpitan) || 0,
-          siar_siar: Number(v.siar_siar) || 0,
-          seribuan: Number(v.seribuan) || 0,
-          kafan: Number(v.kafan) || 0,
+          carryover_ir: Number(v.carryover_ir ?? v.susulan_ir) || 0,
+          connecting_fund: Number(v.connecting_fund ?? v.uang_sambung) || 0,
+          community_dues: Number(v.community_dues ?? v.jimpitan) || 0,
+          outreach_fund: Number(v.outreach_fund ?? v.siar_siar) || 0,
+          thousand_fund: Number(v.thousand_fund ?? v.seribuan) || 0,
+          funeral_fund: Number(v.funeral_fund ?? v.kafan) || 0,
           ukhro_mt: Number(v.ukhro_mt) || 0,
         }));
       }
@@ -143,12 +150,12 @@ export const ShodaqohPage: React.FC = () => {
     if (!selectedMember) return;
 
     const total =
-      paymentForm.susulan_ir +
-      paymentForm.uang_sambung +
-      paymentForm.jimpitan +
-      paymentForm.siar_siar +
-      paymentForm.seribuan +
-      paymentForm.kafan +
+      paymentForm.carryover_ir +
+      paymentForm.connecting_fund +
+      paymentForm.community_dues +
+      paymentForm.outreach_fund +
+      paymentForm.thousand_fund +
+      paymentForm.funeral_fund +
       paymentForm.ukhro_mt;
 
     if (total <= 0) {
@@ -157,26 +164,26 @@ export const ShodaqohPage: React.FC = () => {
     }
 
     const payload = {
-      paymentId: paymentForm.paymentId,
-      memberId: selectedMember.member_id,
-      tanggalPembayaran: paymentForm.tanggalPembayaran,
-      total,
-      susulan_ir: paymentForm.susulan_ir,
-      uang_sambung: paymentForm.uang_sambung,
-      jimpitan: paymentForm.jimpitan,
-      siar_siar: paymentForm.siar_siar,
-      seribuan: paymentForm.seribuan,
-      kafan: paymentForm.kafan,
+      payment_id: paymentForm.payment_id,
+      member_id: selectedMember.member_id,
+      payment_date: paymentForm.payment_date,
+      total_amount: total,
+      carryover_ir: paymentForm.carryover_ir,
+      connecting_fund: paymentForm.connecting_fund,
+      community_dues: paymentForm.community_dues,
+      outreach_fund: paymentForm.outreach_fund,
+      thousand_fund: paymentForm.thousand_fund,
+      funeral_fund: paymentForm.funeral_fund,
       ukhro_mt: paymentForm.ukhro_mt,
-      keterangan: paymentForm.keterangan,
+      notes: paymentForm.notes,
     };
 
     try {
-      if (paymentForm.paymentId) {
-        await financeApi.updateShodaqohPayment(payload);
+      if (paymentForm.payment_id) {
+        await financeApi.updateShodaqohPayment(assignedGroup, payload);
         showToast("Pembayaran shodaqoh berhasil diupdate", "success");
       } else {
-        await financeApi.createShodaqohPayment(payload);
+        await financeApi.createShodaqohPayment(assignedGroup, payload);
         showToast("Pembayaran shodaqoh berhasil disimpan", "success");
       }
       setIsPaymentModalOpen(false);
@@ -200,14 +207,14 @@ export const ShodaqohPage: React.FC = () => {
         showToast("Foto berhasil diekstraksi oleh AI!", "success");
         setPaymentForm((prev) => ({
           ...prev,
-          susulan_ir: Number(d.susulan_ir) || 0,
-          uang_sambung: Number(d.uang_sambung) || 0,
-          jimpitan: Number(d.jimpitan) || 0,
-          siar_siar: Number(d.siar_siar) || 0,
-          seribuan: Number(d.seribuan) || 0,
-          kafan: Number(d.kafan) || 0,
+          carryover_ir: Number(d.carryover_ir ?? d.susulan_ir) || 0,
+          connecting_fund: Number(d.connecting_fund ?? d.uang_sambung) || 0,
+          community_dues: Number(d.community_dues ?? d.jimpitan) || 0,
+          outreach_fund: Number(d.outreach_fund ?? d.siar_siar) || 0,
+          thousand_fund: Number(d.thousand_fund ?? d.seribuan) || 0,
+          funeral_fund: Number(d.funeral_fund ?? d.kafan) || 0,
           ukhro_mt: Number(d.ukhro_mt) || 0,
-          keterangan: d.keterangan || prev.keterangan,
+          notes: d.notes ?? d.keterangan ?? prev.notes,
         }));
         setIsAiModalOpen(false);
       } else {
@@ -220,27 +227,51 @@ export const ShodaqohPage: React.FC = () => {
     }
   };
 
-  // Post to Kas
-  const handlePostToKas = async () => {
-    if (!window.confirm(`Posting total shodaqoh bulan ${selectedMonth} ke Kas Utama?`)) return;
-    try {
-      const res = await financeApi.postShodaqohToKas(selectedMonth);
-      if (res.success) {
-        showToast(res.message || "Berhasil posting ke Kas Utama", "success");
-        loadData();
-      } else {
-        showToast(res.message || "Gagal posting ke Kas Utama", "error");
-      }
-    } catch (err: any) {
-      showToast(err.message || "Gagal posting ke Kas Utama", "error");
-    }
-  };
-
   const membersList = data?.members || [];
   const paymentsList = data?.payments || [];
+  const dashboard = data?.dashboard;
+  const progressPct =
+    dashboard && dashboard.target > 0
+      ? Math.min(100, Math.round((dashboard.received / dashboard.target) * 100))
+      : 0;
 
   return (
     <div className="space-y-6">
+      {!assignedGroup && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 text-sm text-amber-800 dark:text-amber-200">
+          {isSuperAdmin
+            ? "Pilih kelompok dulu (menu Lainnya → Kelompok Saya) untuk membuka shodaqoh kelompok."
+            : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."}
+        </div>
+      )}
+
+      {dashboard && (
+        <div className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 text-white rounded-2xl p-5 shadow-md">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-xs text-emerald-200">Target Bulan {selectedMonth}</p>
+              <h4 className="text-xl font-bold">{formatRp(dashboard.target)}</h4>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-emerald-200">Terkumpul</p>
+              <h4 className="text-xl font-bold">{formatRp(dashboard.received)}</h4>
+            </div>
+          </div>
+          <div className="mt-3 h-2 rounded-full bg-white/20 overflow-hidden">
+            <div
+              className="h-full bg-emerald-300 rounded-full transition-all"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <div className="mt-2 flex items-center gap-2 text-xs flex-wrap">
+            <span className="px-2 py-0.5 rounded-full bg-white/15 font-semibold">{progressPct}% tercapai</span>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 font-semibold">{dashboard.paidCount} lunas</span>
+            <span className="px-2 py-0.5 rounded-full bg-white/15 font-semibold">{dashboard.unpaidCount} belum</span>
+            <span className="text-emerald-200">{dashboard.memberCount} anggota</span>
+          </div>
+        </div>
+      )}
+
       {/* Top Controls */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         {/* Month Picker */}
@@ -268,12 +299,6 @@ export const ShodaqohPage: React.FC = () => {
             className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-semibold transition-colors"
           >
             + Anggota Baru
-          </button>
-          <button
-            onClick={handlePostToKas}
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-          >
-            Posting ke Kas Utama
           </button>
           <button
             onClick={() => setIsPrintModalOpen(true)}
@@ -450,8 +475,8 @@ export const ShodaqohPage: React.FC = () => {
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Tanggal Pembayaran</label>
                 <input
                   type="date"
-                  value={paymentForm.tanggalPembayaran}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, tanggalPembayaran: e.target.value })}
+                  value={paymentForm.payment_date}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0 font-mono"
                   required
                 />
@@ -463,8 +488,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Susulan IR (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.susulan_ir || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, susulan_ir: Number(e.target.value) })}
+                    value={paymentForm.carryover_ir || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, carryover_ir: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -472,8 +497,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Uang Sambung (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.uang_sambung || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, uang_sambung: Number(e.target.value) })}
+                    value={paymentForm.connecting_fund || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, connecting_fund: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -481,8 +506,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Jimpitan (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.jimpitan || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, jimpitan: Number(e.target.value) })}
+                    value={paymentForm.community_dues || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, community_dues: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -490,8 +515,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Siar-Siar (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.siar_siar || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, siar_siar: Number(e.target.value) })}
+                    value={paymentForm.outreach_fund || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, outreach_fund: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -499,8 +524,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Seribuan (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.seribuan || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, seribuan: Number(e.target.value) })}
+                    value={paymentForm.thousand_fund || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, thousand_fund: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -508,8 +533,8 @@ export const ShodaqohPage: React.FC = () => {
                   <label className="block text-[11px] font-semibold text-slate-500 mb-1">Kafan (Rp)</label>
                   <input
                     type="number"
-                    value={paymentForm.kafan || ""}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, kafan: Number(e.target.value) })}
+                    value={paymentForm.funeral_fund || ""}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, funeral_fund: Number(e.target.value) })}
                     className="w-full px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-mono"
                   />
                 </div>
@@ -530,8 +555,8 @@ export const ShodaqohPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Catatan tambahan..."
-                  value={paymentForm.keterangan}
-                  onChange={(e) => setPaymentForm({ ...paymentForm, keterangan: e.target.value })}
+                  value={paymentForm.notes}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm border-0"
                 />
               </div>
@@ -541,12 +566,12 @@ export const ShodaqohPage: React.FC = () => {
                 <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Total Realisasi:</span>
                 <span className="text-lg font-bold font-mono text-emerald-700 dark:text-emerald-400">
                   {formatRp(
-                    paymentForm.susulan_ir +
-                      paymentForm.uang_sambung +
-                      paymentForm.jimpitan +
-                      paymentForm.siar_siar +
-                      paymentForm.seribuan +
-                      paymentForm.kafan +
+                    paymentForm.carryover_ir +
+                      paymentForm.connecting_fund +
+                      paymentForm.community_dues +
+                      paymentForm.outreach_fund +
+                      paymentForm.thousand_fund +
+                      paymentForm.funeral_fund +
                       paymentForm.ukhro_mt
                   )}
                 </span>
