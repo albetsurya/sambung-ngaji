@@ -59,20 +59,47 @@ export const ZakatPage: React.FC = () => {
 
   const rincian = (z: ZakatItem | null) => {
     const total = Number(z?.total_money_rp) || 0;
-    const mustahik = total * 0.45;
-    const sabilillah = total * 0.4;
-    const amil = total * 0.15;
+    
+    // Cari alokasi yang sesuai dengan tipe zakat (FITRAH/MAL)
+    const isMaal = z?.zakat_type === "MAL";
+    const alloc = isMaal ? z?.allocations?.maal : z?.allocations?.fitrah;
+
+    if (!alloc) {
+      return {
+        total, mustahik: 0, mustahikKelompok: 0, mustahikDaerah: 0,
+        sabilillah: 0, amil: 0, amilKelompok: 0, amilDesa: 0, amilDaerah: 0,
+        pMustahik: 0, pSabilillah: 0, pAmil: 0
+      };
+    }
+
     return {
       total,
-      mustahik,
-      mustahikKelompok: mustahik * 0.8,
-      mustahikDaerah: mustahik * 0.2,
-      sabilillah,
-      amil,
-      amilKelompok: amil * 0.8,
-      amilDesa: amil * 0.1333,
-      amilDaerah: amil * 0.0667,
+      mustahik: alloc.recipient?.amount || 0,
+      mustahikKelompok: alloc.recipient?.group?.amount || 0,
+      mustahikDaerah: alloc.recipient?.region?.amount || 0,
+      sabilillah: alloc.sabilillah?.amount || 0,
+      amil: alloc.amil?.amount || 0,
+      amilKelompok: alloc.amil?.group?.amount || 0,
+      amilDesa: alloc.amil?.village?.amount || 0,
+      amilDaerah: alloc.amil?.region?.amount || 0,
+      // Persentase untuk progress bar
+      pMustahik: alloc.recipient?.percent || 0,
+      pSabilillah: alloc.sabilillah?.percent || 0,
+      pAmil: alloc.amil?.percent || 0
     };
+  };
+
+  const handleViewDetail = async (z: ZakatItem) => {
+    setDetailZakat(z);
+    setDetailTab("rincian");
+    try {
+      if (assignedGroup) {
+        const detail = await financeApi.getZakatDetail(assignedGroup, z.zakat_id);
+        setDetailZakat(detail);
+      }
+    } catch (e) {
+      console.error("Gagal load detail zakat", e);
+    }
   };
 
   const loadData = async () => {
@@ -465,6 +492,44 @@ export const ZakatPage: React.FC = () => {
 
             {detailTab === "rincian" && (() => {
               const r = rincian(detailZakat);
+              const isAllocZero = r.pMustahik === 0 && r.pSabilillah === 0 && r.pAmil === 0;
+              const totalPct = r.pMustahik + r.pSabilillah + r.pAmil;
+              
+              return (
+                <div className="px-1 mb-6">
+                  <div className="flex h-9 rounded-xl overflow-hidden bg-surface-alt mb-2 shadow-inner border border-surface-line">
+                    {isAllocZero ? (
+                       <div className="flex w-full items-center justify-center text-[10px] font-medium text-surface-muted italic">
+                          Belum ada data alokasi
+                       </div>
+                    ) : (
+                      <>
+                        <div className="bg-accent flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pMustahik}%` }}>
+                          {r.pMustahik > 10 && `Mustahik ${r.pMustahik}%`}
+                        </div>
+                        <div className="bg-warning flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pSabilillah}%` }}>
+                          {r.pSabilillah > 10 && `Sabilillah ${r.pSabilillah}%`}
+                        </div>
+                        <div className="bg-success flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pAmil}%` }}>
+                          {r.pAmil > 10 && `Amil ${r.pAmil}%`}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {!isAllocZero && (
+                    <div className="flex justify-between px-1">
+                      <span className="text-[10px] font-medium text-surface-muted">Total Alokasi: {totalPct}%</span>
+                      <span className={`text-[10px] font-bold ${totalPct === 100 ? 'text-success' : 'text-danger'}`}>
+                        {totalPct === 100 ? '✓ Valid' : '⚠ Harus 100%'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {detailTab === "rincian" && (() => {
+              const r = rincian(detailZakat);
               const rows: Array<[string, string, number, boolean]> = [
                 ["Total Dana", "", r.total, false],
                 ["Mustahik", "45%", r.mustahik, false],
@@ -496,12 +561,12 @@ export const ZakatPage: React.FC = () => {
             })()}
 
             {detailTab === "muzaki" && (
-              (detailZakat.muzakki_list || []).length === 0 ? (
+              (detailZakat.payer_list || detailZakat.muzakki_list || []).length === 0 ? (
                 <EmptyState title="Belum ada rincian muzakki" />
               ) : (
                 <GroupedList flush>
-                  {(detailZakat.muzakki_list || []).map((m: any, i: number) => (
-                    <ListRow key={i} insetDivider={i !== (detailZakat.muzakki_list || []).length - 1}>
+                  {(detailZakat.payer_list || detailZakat.muzakki_list || []).map((m: any, i: number) => (
+                    <ListRow key={i} insetDivider={i !== (detailZakat.payer_list || detailZakat.muzakki_list || []).length - 1}>
                       <div className="flex items-center justify-between gap-2 w-full">
                         <p className="text-ios-body font-medium text-surface-text truncate">
                           {m.nama || m.name || `Muzaki ${i + 1}`}
@@ -517,12 +582,12 @@ export const ZakatPage: React.FC = () => {
             )}
 
             {detailTab === "mustahik" && (
-              (detailZakat.mustahik_list || []).length === 0 ? (
+              (detailZakat.recipient_list || detailZakat.mustahik_list || []).length === 0 ? (
                 <EmptyState title="Belum ada penyaluran mustahik" />
               ) : (
                 <GroupedList flush>
-                  {(detailZakat.mustahik_list || []).map((m: any, i: number) => (
-                    <ListRow key={i} insetDivider={i !== (detailZakat.mustahik_list || []).length - 1}>
+                  {(detailZakat.recipient_list || detailZakat.mustahik_list || []).map((m: any, i: number) => (
+                    <ListRow key={i} insetDivider={i !== (detailZakat.recipient_list || detailZakat.mustahik_list || []).length - 1}>
                       <div className="flex items-center justify-between gap-2 w-full">
                         <p className="text-ios-body font-medium text-surface-text truncate">
                           {m.nama || m.name || `Mustahik ${i + 1}`}

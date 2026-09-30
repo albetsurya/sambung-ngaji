@@ -75,15 +75,66 @@ export interface DuesDataResponse {
   recap?: Record<string, any>;
 }
 
+export interface ZakatAllocGroup {
+  percent: number;
+  amount: number;
+  group?: ZakatAllocGroup;
+  region?: ZakatAllocGroup;
+  village?: ZakatAllocGroup;
+}
+
+export interface ZakatAllocCategory {
+  total: number;
+  recipient: ZakatAllocGroup;
+  sabilillah: ZakatAllocGroup;
+  amil: ZakatAllocGroup;
+}
+
+export interface ZakatAllocations {
+  fitrah?: ZakatAllocCategory | null;
+  maal?: ZakatAllocCategory | null;
+}
+
+export interface ZakatPayer {
+  payer_id: string;
+  master_id?: string;
+  name: string;
+  amount: number;
+  zakat_category?: string;
+  family_members_count?: number;
+  sort_order?: number;
+}
+
+export interface ZakatRecipient {
+  recipient_id: string;
+  master_id?: string;
+  name: string;
+  amount: number;
+  zakat_category?: string;
+  sort_order?: number;
+}
+
 export interface ZakatItem {
   zakat_id: string;
   zakat_type: "FITRAH" | "MAL";
+  zakat_category?: string;
+  title?: string;
+  description?: string;
+  location?: string;
   muzakki_name: string;
   soul_count: number;
   total_rice_kg: number;
   total_money_rp: number;
   status: string;
   transaction_date: string;
+  completed_at?: string;
+  version?: number;
+  payer_count?: number;
+  recipient_count?: number;
+  payer_list?: ZakatPayer[];
+  recipient_list?: ZakatRecipient[];
+  allocations?: ZakatAllocations | null;
+  // legacy compat
   muzakki_list?: any[];
   mustahik_list?: any[];
 }
@@ -169,12 +220,23 @@ function toZakat(raw: any): ZakatItem {
   return {
     zakat_id: raw.zakat_id || "",
     zakat_type: raw.zakat_type === "MAL" ? "MAL" : "FITRAH",
+    zakat_category: raw.zakat_category || "",
+    title: raw.title || "",
+    description: raw.description || "",
+    location: raw.location || "",
     muzakki_name: raw.muzakki_name || "",
     soul_count: Number(raw.soul_count ?? 1),
     total_rice_kg: Number(raw.total_rice_kg ?? 0),
     total_money_rp: Number(raw.total_money_rp ?? 0),
     status: raw.status || "PENDING",
     transaction_date: raw.transaction_date || "",
+    completed_at: raw.completed_at || "",
+    version: Number(raw.version ?? 1),
+    payer_count: Number(raw.payer_count ?? 0),
+    recipient_count: Number(raw.recipient_count ?? 0),
+    payer_list: raw.payer_list || [],
+    recipient_list: raw.recipient_list || [],
+    allocations: raw.allocations || null,
     muzakki_list: raw.muzakki_list || [],
     mustahik_list: raw.mustahik_list || [],
   };
@@ -422,6 +484,18 @@ export const financeApi = {
     const gid = requireGroup(groupId);
     const res = await restGet<any[]>("/api/v1/finance/zakat", { group_id: gid });
     return { success: true, data: (res || []).map(toZakat) };
+  },
+
+  getZakatDetail: async (
+    groupId: string | null | undefined,
+    zakatId: string,
+  ): Promise<ZakatItem> => {
+    const gid = requireGroup(groupId);
+    const res = await restGet<any>("/api/v1/finance/zakat/detail", {
+      group_id: gid,
+      zakat_id: zakatId,
+    });
+    return toZakat(res);
   },
 
   manageZakat: async (
