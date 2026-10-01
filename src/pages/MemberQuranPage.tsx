@@ -10,12 +10,12 @@ import {
   Bookmark,
   ChevronRight,
   BookOpen,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button, ErrorState } from "../components/common";
-import { fetchSurahList, type SurahSummary } from "../data/quran";
-import { useQuranBookmark } from "../hooks/useQuranBookmark";
+import { MasukButton } from "../components/ui";
+import { Button, ErrorState } from "../components/ui";
+import { fetchSurahList, type SurahSummary } from "../features/quran/data/quran";
+import { useQuranBookmark } from "../features/quran/hooks/useQuranBookmark";
 
 
 function toArabicNumber(n: number): string {

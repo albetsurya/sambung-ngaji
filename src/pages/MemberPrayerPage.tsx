@@ -12,10 +12,10 @@ import {
   Sun,
   Sparkles,
   Moon,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
 import { useToast } from "../contexts/ToastContext";
 import {
   getPrayerTimesForDate,
@@ -27,7 +27,7 @@ import {
   type PrayerDay,
   type PrayerKey,
   type SunnahTimeInfo,
-} from "../utils/prayerTimes";
+} from "../features/ibadah/utils/prayerTimes";
 
 
 export default function MemberPrayerPage() {

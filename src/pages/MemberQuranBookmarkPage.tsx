@@ -7,13 +7,13 @@ import {
   Trash2,
   X,
   Search,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ConfirmDialog, Button } from "../components/common";
-import { fetchSurahList, type SurahSummary } from "../data/quran";
-import { useQuranBookmark } from "../hooks/useQuranBookmark";
+import { ConfirmDialog, Button } from "../components/ui";
+import { fetchSurahList, type SurahSummary } from "../features/quran/data/quran";
+import { useQuranBookmark } from "../features/quran/hooks/useQuranBookmark";
 import { useIsMuballigh } from "../hooks/useIsMuballigh";
-import { TranslationLockedNote } from "../components/member/TranslationLockedNote";
+import { TranslationLockedNote } from "../features/member/components/TranslationLockedNote";
 import { useToast } from "../contexts/ToastContext";
 
 export default function MemberQuranBookmarkPage() {

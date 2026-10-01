@@ -13,13 +13,13 @@ import {
   Info,
   ArrowRight,
   ChevronRight,
-} from "../components/common/FontAwesomeIcons";
-import { Card } from "../components/common";
-import { MasukButton } from "../components/common";
-import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
+} from "../components/ui/FontAwesomeIcons";
+import { Card } from "../components/ui";
+import { MasukButton } from "../components/ui";
+import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
 import { meetingApi } from "../services/domainApi";
 import { formatDateLongText } from "../utils/format";
-import { MOOD_LIST } from "../data/mood";
+import { MOOD_LIST } from "../features/ai-chat/data/mood";
 
 const FEATURES = [
   { label: "Jadwal", desc: "Pengajian", Icon: Calendar, to: "/member/jadwal" },

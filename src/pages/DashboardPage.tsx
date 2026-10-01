@@ -21,10 +21,10 @@ import {
   User,
   X,
   type LucideIcon,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
-import { Card, Avatar, ErrorState, BottomSheet, Button } from "../components/common";
+import { Card, Avatar, ErrorState, BottomSheet, Button } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
@@ -36,7 +36,7 @@ import type {
   DashboardPNKB,
 } from "../types";
 import { ApiError } from "../services/api";
-import { DashboardSkeleton } from "../components/common/Skeleton";
+import { DashboardSkeleton } from "../components/ui/Skeleton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePermission } from "../hooks/usePermission";
 import { queryKeys } from "../lib/queryClient";

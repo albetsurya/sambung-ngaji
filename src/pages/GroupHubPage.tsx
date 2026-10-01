@@ -14,21 +14,21 @@ import {
   Mosque,
   QrCode,
   ScrollText as Scroll,
-  Sparkles,
   UserPlus,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
+  BottomSheet,
   ChevronRow,
   EmptyState,
   FilterChip,
   GroupedList,
   HubMenuGrid,
   ListRow,
-} from "../components/common";
+} from "../components/ui";
 import { usePermission, setSuperAdminFocusGroup } from "../hooks/usePermission";
 import { groupApi } from "../services/domainApi";
-import { pendingApi } from "../services/pendingApi";
+import { pendingApi } from "../features/admin/api/pendingApi";
 import { queryKeys } from "../lib/queryClient";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
@@ -42,6 +42,10 @@ export default function GroupHubPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editSheetOpen, setEditSheetOpen] = useState(false);
+  // Gate konteks: chip "Semua" tidak boleh langsung masuk modul per-grup.
+  // Ketuk Kas/Shodaqoh/Zakat saat global -> BottomSheet pilih 1 kelompok dulu.
+  const [groupPickerOpen, setGroupPickerOpen] = useState(false);
+  const [pendingFinanceTo, setPendingFinanceTo] = useState<string | null>(null);
 
   const urlGroupId = searchParams.get("group_id");
 
@@ -100,6 +104,7 @@ export default function GroupHubPage() {
     to: string;
     section: "jamaah" | "jadwal" | "keuangan";
     badge?: number;
+    needsGroup?: boolean;
   }[] = useMemo(() => {
     return [
       ...(canAccessFinance
@@ -108,40 +113,36 @@ export default function GroupHubPage() {
               key: "kas",
               label: "Kas",
               description: isGlobalMode
-                ? "Buku kas semua kelompok"
-                : "Buku kas kelompok ini",
+                ? "Pilih 1 kelompok untuk buka buku kas"
+                : `Buku kas ${myGroup?.group_name || "kelompok ini"}`,
               Icon: Landmark,
               to: "/finance/ledger",
               section: "keuangan" as const,
+              needsGroup: isGlobalMode,
             },
             {
               key: "shodaqoh",
               label: "Shodaqoh",
               description: isGlobalMode
-                ? "Iuran bulanan semua kelompok"
-                : "Iuran bulanan kelompok ini",
+                ? "Pilih 1 kelompok untuk buka iuran"
+                : `Iuran ${myGroup?.group_name || "kelompok ini"}`,
               Icon: Heart,
               to: "/finance/monthly-dues",
               section: "keuangan" as const,
+              needsGroup: isGlobalMode,
             },
             {
               key: "zakat",
               label: "Zakat",
               description: isGlobalMode
-                ? "Zakat fitrah & mal semua kelompok"
-                : "Zakat fitrah & mal kelompok ini",
+                ? "Pilih 1 kelompok untuk buka zakat"
+                : `Zakat ${myGroup?.group_name || "kelompok ini"}`,
               Icon: Scroll,
               to: "/finance/zakat",
               section: "keuangan" as const,
+              needsGroup: isGlobalMode,
             },
-            {
-              key: "ai-keuangan",
-              label: "Asisten AI",
-              description: "Tanya jawab keuangan",
-              Icon: Sparkles,
-              to: "/finance/assistant",
-              section: "keuangan" as const,
-            },
+            // Menu Asisten AI dihapus: sudah ada FAB chat AI global di AppLayout.
           ]
         : []),
       {
@@ -158,15 +159,13 @@ export default function GroupHubPage() {
         key: "pendaftar",
         label: "Pendaftar",
         description: isGlobalMode
-          ? "Verifikasi pendaftar baru semua kelompok"
-          : "Verifikasi pendaftar kelompok ini",
+          ? `Verifikasi pendaftar semua kelompok (${pendingCount} menunggu)`
+          : `Verifikasi pendaftar ${myGroup?.group_name || "kelompok ini"}`,
         Icon: ClipboardList,
         to: "/lainnya/pendaftar",
         section: "jamaah",
-        badge:
-          pendingCount > 0 && (!isSuperAdmin || isGlobalMode)
-            ? pendingCount
-            : undefined,
+        // Badge selalu tampil agar tidak miss verifikasi (perbaikan: dulu hilang saat fokus per-grup).
+        badge: pendingCount > 0 ? pendingCount : undefined,
       },
       {
         key: "permintaan-member",
@@ -231,7 +230,27 @@ export default function GroupHubPage() {
         section: "jadwal",
       },
     ];
-  }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance]);
+  }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance, myGroup?.group_name]);
+
+  /** Tap menu keuangan: gate bila masih mode Semua (tanpa fokus grup). */
+  function handleMenuTap(m: { key: string; to: string; needsGroup?: boolean }) {
+    if (m.needsGroup && isGlobalMode) {
+      setPendingFinanceTo(m.to);
+      setGroupPickerOpen(true);
+      return;
+    }
+    navigate(m.to);
+  }
+
+  function handlePickGroupForFinance(g: Group) {
+    setSuperAdminFocusGroup(g.group_id);
+    setGroupPickerOpen(false);
+    const dest = pendingFinanceTo || "/finance";
+    setPendingFinanceTo(null);
+    // Pertahankan konteks di URL agar back simetris; modul finance baca localStorage focus.
+    navigate(`/kelompok-saya?group_id=${g.group_id}`, { replace: true });
+    setTimeout(() => navigate(dest), 50);
+  }
 
   const headerTitle = isSuperAdmin ? "Kelola Kelompok" : "Kelompok Saya";
   const headerSubtitle = isSuperAdmin
@@ -332,7 +351,7 @@ export default function GroupHubPage() {
                       label: m.label,
                       Icon: m.Icon,
                       badge: m.badge,
-                      onClick: () => navigate(m.to),
+                      onClick: () => handleMenuTap(m),
                     }))}
                   />
                 </section>
@@ -341,6 +360,40 @@ export default function GroupHubPage() {
           </>
         )}
       </div>
+
+      <BottomSheet
+        open={groupPickerOpen}
+        onClose={() => { setGroupPickerOpen(false); setPendingFinanceTo(null); }}
+        title="Pilih Kelompok"
+      >
+        <p className="text-ios-footnote text-surface-muted mb-3 px-1">
+          Modul keuangan bersifat per-kelompok. Pilih 1 kelompok untuk melanjutkan — data tidak digabung antar kelompok agar tidak miss.
+        </p>
+        <GroupedList flush>
+          {allGroups.map((g, i) => (
+            <ListRow key={g.group_id} onClick={() => handlePickGroupForFinance(g)} insetDivider={i !== allGroups.length - 1}
+              leading={
+                <span className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold shrink-0">
+                  {(g.group_name || "?").charAt(0).toUpperCase()}
+                </span>
+              }>
+              <ChevronRow>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{g.group_name}</p>
+                  <p className="text-ios-caption text-surface-muted truncate">
+                    {g.pembina ? `Pembina: ${g.pembina}` : ""}
+                  </p>
+                </div>
+              </ChevronRow>
+            </ListRow>
+          ))}
+          {allGroups.length === 0 && (
+            <ListRow insetDivider={false}>
+              <p className="text-ios-footnote text-surface-muted">Belum ada kelompok.</p>
+            </ListRow>
+          )}
+        </GroupedList>
+      </BottomSheet>
 
       <GroupSheet
         open={editSheetOpen}

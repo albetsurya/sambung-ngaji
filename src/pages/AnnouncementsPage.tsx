@@ -8,7 +8,7 @@ import {
   ScrollText,
   Check,
   Plus,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -26,7 +26,7 @@ import {
   EmptyState,
   GroupedList,
   ListRow,
-} from "../components/common";
+} from "../components/ui";
 import {
   announcementApi,
   announcementTemplateApi,

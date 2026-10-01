@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, EmptyState } from "../components/common";
-import { MemberSelfSkeleton } from "../components/common/Skeleton";
-import { memberApi } from "../services/memberApi";
+import { Button, EmptyState } from "../components/ui";
+import { MemberSelfSkeleton } from "../components/ui/Skeleton";
+import { memberApi } from "../features/member/api/memberApi";
 import { usePermission } from "../hooks/usePermission";
 import { useAuth } from "../contexts/AuthContext";
 import { ApiError } from "../services/api";
@@ -11,8 +11,8 @@ import { queryKeys } from "../lib/queryClient";
 import {
   canViewTaarufCv,
   isTaarufEligible,
-} from "../lib/taarufAccess";
-import { TaarufCvEditor } from "../components/taaruf/TaarufCvSheet";
+} from "../features/taaruf/lib/taarufAccess";
+import { TaarufCvEditor } from "../features/taaruf/components/TaarufCvSheet";
 
 export default function TaarufCvPrintPage() {
   const { id } = useParams();

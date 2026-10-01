@@ -36,8 +36,10 @@ export const ROLE_LABEL: Record<Role, string> = {
 };
 
 const NAV_BY_ROLE: Record<Role, string[]> = {
-  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "keuangan", "lainnya"],
+  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
+  // Ringkas: 1 pintu Keuangan (hub Kas/Shodaqoh/Zakat) agar nav max 3 item, nyaman di mobile.
+  // Item lama kas/shodaqoh/zakat tetap didukung bila ingin mode detail.
   TIM_KU: ["beranda", "keuangan", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
   TIM_ABSENSI: ["beranda", "absensi", "lainnya"],

@@ -11,22 +11,22 @@ import {
   List,
   Bookmark,
   Type as TypeIcon,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button, ErrorState } from "../components/common";
+import { MasukButton } from "../components/ui";
+import { Button, ErrorState } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
-import { MushafPageSkeleton } from "../components/common/Skeleton";
-import { MushafPageView } from "../components/member/MushafPageView";
-import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
-import { fetchSurahList } from "../data/quran";
+import { MushafPageSkeleton } from "../components/ui/Skeleton";
+import { MushafPageView } from "../features/member/components/MushafPageView";
+import { QuranNavigationSheet } from "../features/member/components/QuranNavigationSheet";
+import { fetchSurahList } from "../features/quran/data/quran";
 import {
   fetchMushafPage,
   surahToStartPage,
   type MushafPage,
-} from "../data/quran-mushaf";
-import { useMushafBookmark } from "../hooks/useMushafBookmark";
-import { useDoaFontSize } from "../hooks/useDoaFontSize";
+} from "../features/quran/data/quran-mushaf";
+import { useMushafBookmark } from "../features/quran/hooks/useMushafBookmark";
+import { useDoaFontSize } from "../features/doa-dzikir/hooks/useDoaFontSize";
 
 const TOTAL_PAGES = 604;
 

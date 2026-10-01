@@ -13,18 +13,18 @@ import {
   Share2,
   RefreshCw,
   Trash2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
-import { BottomSheet, Button, LoadingOverlay } from "../components/common";
+import { BottomSheet, Button, LoadingOverlay } from "../components/ui";
 import { abortAllApiCalls } from "../services/api";
-import { aiApi } from "../services/aiApi";
+import { aiApi } from "../features/ai-chat/api/aiApi";
 import { useToast } from "../contexts/ToastContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useEnvironment } from "../hooks/useEnvironment";
-import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
+import { useAiChatHistory, type ChatMessage } from "../features/ai-chat/hooks/useAiChatHistory";
 
 
-const SUGGESTIONS = [
+const GENERAL_SUGGESTIONS = [
   "Berapa total jamaah aktif?",
   "Siapa saja yang perlu perhatian?",
   "Ringkasan kehadiran bulan ini",
@@ -32,9 +32,16 @@ const SUGGESTIONS = [
   "Daftar kelompok dan pembinanya",
 ];
 
+const FINANCE_SUGGESTIONS = [
+  "Berapa total saldo kas bulan ini?",
+  "Siapa saja yang belum bayar shodaqoh?",
+  "Berapa rekap zakat fitrah & mal?",
+];
+
 const PLACEHOLDER_BY_ROLE: Record<string, string> = {
-  SUPER_ADMIN: "Tanya data pengajian...",
+  SUPER_ADMIN: "Tanya data pengajian atau keuangan...",
   ADMIN: "Tanya data pengajian...",
+  TIM_KU: "Tanya laporan keuangan...",
   TIM_PNKB: "Tanya data pra nikah...",
   TIM_ABSENSI: "Tanya data absensi...",
 };
@@ -359,7 +366,7 @@ export default function AiChatPage() {
           )}
 
           {hydrated && messages.length === 0 && !loading && (
-            <EmptyChat onSuggest={handleSend} iconKey={effectiveKey} />
+            <EmptyChat onSuggest={handleSend} iconKey={effectiveKey} role={user?.role} />
           )}
 
           {hydrated &&
@@ -519,7 +526,21 @@ export default function AiChatPage() {
 }
 
 
-function EmptyChat({ onSuggest, iconKey }: { onSuggest: (text: string) => void; iconKey?: ProviderKey }) {
+function EmptyChat({ onSuggest, iconKey, role }: { onSuggest: (text: string) => void; iconKey?: ProviderKey; role?: string }) {
+  const suggestions =
+    role === "TIM_KU"
+      ? FINANCE_SUGGESTIONS
+      : role === "SUPER_ADMIN"
+        ? [...GENERAL_SUGGESTIONS.slice(0, 2), ...FINANCE_SUGGESTIONS, ...GENERAL_SUGGESTIONS.slice(3, 4)]
+        : GENERAL_SUGGESTIONS;
+
+  const introText =
+    role === "TIM_KU"
+      ? "Saya siap membantu menjawab pertanyaan tentang kas ledger, shodaqoh bulanan, dan zakat."
+      : role === "SUPER_ADMIN"
+        ? "Saya siap membantu menjawab pertanyaan tentang jamaah, absensi, kelompok, dan keuangan."
+        : "Saya siap membantu menjawab pertanyaan tentang jamaah, absensi, kelompok, dan pengumuman.";
+
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="mb-4">
@@ -529,11 +550,10 @@ function EmptyChat({ onSuggest, iconKey }: { onSuggest: (text: string) => void; 
         Assalamu'alaikum
       </h3>
       <p className="text-ios-footnote text-surface-muted max-w-xs leading-relaxed mb-6">
-        Saya siap membantu menjawab pertanyaan tentang jamaah, absensi,
-        kelompok, dan pengumuman.
+        {introText}
       </p>
       <div className="w-full max-w-sm space-y-2">
-        {SUGGESTIONS.map((s) => (
+        {suggestions.map((s) => (
           <button
             key={s}
             onClick={() => onSuggest(s)}

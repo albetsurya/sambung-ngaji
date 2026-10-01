@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Mosque } from "../components/common/FontAwesomeIcons";
+import { Mosque } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
+import { MasukButton } from "../components/ui";
 import {
   EmptyState,
   ErrorState,
   Badge,
-} from "../components/common";
-import { CalendarSkeleton } from "../components/common/Skeleton";
+} from "../components/ui";
+import { CalendarSkeleton } from "../components/ui/Skeleton";
 import { fridayApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
@@ -21,7 +21,7 @@ import {
   missingRoles,
   isFridayComplete,
   todayIso,
-} from "../utils/friday";
+} from "../features/friday/utils/friday";
 
 export default function MemberFridayPage() {
   const navigate = useNavigate();

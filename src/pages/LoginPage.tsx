@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, useLocation, Navigate, Link } from "react-router-dom";
+import { useLocation, Navigate, Link } from "react-router-dom";
 import {
   Sun,
   Moon,
@@ -8,10 +8,10 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { Button } from "../components/common";
+import { Button } from "../components/ui";
 import { ApiError } from "../services/api";
 import { useEnvironment } from "../hooks/useEnvironment";
 
@@ -85,7 +85,6 @@ function AppIcon({ size = 44 }: { size?: number }) {
 export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
   const location = useLocation();
   const { isDevelopment } = useEnvironment();
 
@@ -106,7 +105,9 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(username, password);
-      navigate("/", { replace: true });
+      setUsername("");
+      setPassword("");
+      window.location.replace("/");
     } catch (err) {
       setError(
         err instanceof ApiError

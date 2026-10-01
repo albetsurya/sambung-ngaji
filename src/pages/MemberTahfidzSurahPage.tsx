@@ -10,10 +10,10 @@ import {
   ChevronDown,
   Play,
   BookOpen,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, ErrorState, Segmented } from "../components/common";
-import { AudioPlayerMini, type AudioTrack } from "../components/member/AudioPlayerMini";
+import { Button, ErrorState, Segmented } from "../components/ui";
+import { AudioPlayerMini, type AudioTrack } from "../features/member/components/AudioPlayerMini";
 import {
   fetchSurahDetail,
   getAyatAudioUrl,
@@ -21,12 +21,12 @@ import {
   QARI_LIST,
   type SurahDetail,
   type Ayat,
-} from "../data/quran";
-import { getTargetBySurah } from "../data/tahfidz";
-import { useTahfidz } from "../hooks/useTahfidz";
-import { useDoaFontSize } from "../hooks/useDoaFontSize";
+} from "../features/quran/data/quran";
+import { getTargetBySurah } from "../features/tahfidz/data/tahfidz";
+import { useTahfidz } from "../features/tahfidz/hooks/useTahfidz";
+import { useDoaFontSize } from "../features/doa-dzikir/hooks/useDoaFontSize";
 import { useIsMuballigh } from "../hooks/useIsMuballigh";
-import { TranslationLockedNote } from "../components/member/TranslationLockedNote";
+import { TranslationLockedNote } from "../features/member/components/TranslationLockedNote";
 
 type Mode = "baca" | "uji";
 
@@ -444,7 +444,7 @@ function TahfidzAyatCard({
   revealed: boolean;
   hafal: boolean;
   isPlaying: boolean;
-  fontSize: import("../hooks/useDoaFontSize").DoaFontSize;
+  fontSize: import("../features/doa-dzikir/hooks/useDoaFontSize").DoaFontSize;
   lastReview?: number;
   onReveal: () => void;
   onToggleHafal: () => void;

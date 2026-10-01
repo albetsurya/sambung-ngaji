@@ -5,7 +5,7 @@ import {
   UserPlus,
   X,
   AlertTriangle,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Badge,
@@ -17,9 +17,9 @@ import {
   LoadingOverlay,
   ErrorState,
   Avatar,
-} from "../components/common";
-import { MemberSelfSkeleton } from "../components/common/Skeleton";
-import { pendingApi } from "../services/pendingApi";
+} from "../components/ui";
+import { MemberSelfSkeleton } from "../components/ui/Skeleton";
+import { pendingApi } from "../features/admin/api/pendingApi";
 import { groupApi } from "../services/domainApi";
 import type { PendingMember } from "../types";
 import { formatDateShort, normalizeGender } from "../utils/format";

@@ -6,21 +6,21 @@ import {
   Plus,
   ScrollText,
   Loader2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 
 
 const CalendarTab = lazy(() =>
-  import("../components/jadwal/CalendarTab").then((m) => ({
+  import("../features/jadwal/components/CalendarTab").then((m) => ({
     default: m.CalendarTab,
   })),
 );
 const BulkCreateTab = lazy(() =>
-  import("../components/jadwal/BulkCreateTab").then((m) => ({
+  import("../features/jadwal/components/BulkCreateTab").then((m) => ({
     default: m.BulkCreateTab,
   })),
 );
 const ImportTextTab = lazy(() =>
-  import("../components/jadwal/ImportTextTab").then((m) => ({
+  import("../features/jadwal/components/ImportTextTab").then((m) => ({
     default: m.ImportTextTab,
   })),
 );

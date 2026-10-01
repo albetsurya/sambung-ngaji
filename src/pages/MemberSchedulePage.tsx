@@ -8,14 +8,14 @@ import {
   Zap,
   Users,
   SlidersHorizontal,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { BottomSheet, Button, Card, ErrorState, Badge, Segmented } from "../components/common";
-import { MemberCalendarView } from "../components/member/MemberCalendarView";
-import { MemberScheduleListView } from "../components/member/MemberScheduleListView";
+import { MasukButton } from "../components/ui";
+import { BottomSheet, Button, Card, ErrorState, Badge, Segmented } from "../components/ui";
+import { MemberCalendarView } from "../features/member/components/MemberCalendarView";
+import { MemberScheduleListView } from "../features/member/components/MemberScheduleListView";
 import { meetingApi } from "../services/domainApi";
-import { memberSelfApi } from "../services/memberSelfApi";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { useAuth } from "../contexts/AuthContext";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
@@ -25,7 +25,7 @@ import { CATEGORY_LABEL } from "../utils/format";
 import {
   CalendarSkeleton,
   MeetingCardSkeleton,
-} from "../components/common/Skeleton";
+} from "../components/ui/Skeleton";
 import type { Meeting, MemberCategory } from "../types";
 
 

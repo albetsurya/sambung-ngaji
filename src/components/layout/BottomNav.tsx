@@ -10,10 +10,9 @@ import {
   MoreHorizontal,
   BookOpen,
   RefreshCw,
-  User,
   Calendar,
-  FileText,
-} from "../common/FontAwesomeIcons";
+  Wallet,
+} from "../ui/FontAwesomeIcons";
 
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
@@ -25,6 +24,9 @@ const ADMIN_ITEMS = [
     to: "/pengumuman",
     icon: Megaphone,
   },
+  // Hub keuangan ringkas: 1 pintu /finance (Kas/Shodaqoh/Zakat di dalam hub).
+  // Item kas/shodaqoh/zakat terpisah dihapus agar tidak duplikasi pintu + nav tetap max 5.
+  { key: "keuangan", label: "Keuangan", to: "/finance", icon: Wallet },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 

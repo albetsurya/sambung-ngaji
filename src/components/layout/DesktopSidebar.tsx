@@ -19,8 +19,11 @@ import {
   Building2,
   User as UserIcon,
   FileText,
-} from "../common/FontAwesomeIcons";
-import { RoleBadge } from "../common";
+  Landmark,
+  Heart,
+  ScrollText,
+} from "../ui/FontAwesomeIcons";
+import { RoleBadge } from "../ui";
 
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
@@ -32,6 +35,9 @@ const ADMIN_ITEMS = [
     to: "/pengumuman",
     icon: Megaphone,
   },
+  { key: "kas", label: "Kas", to: "/finance/ledger", icon: Landmark },
+  { key: "shodaqoh", label: "Shodaqoh", to: "/finance/monthly-dues", icon: Heart },
+  { key: "zakat", label: "Zakat", to: "/finance/zakat", icon: ScrollText },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 

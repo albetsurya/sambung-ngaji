@@ -6,10 +6,10 @@ import {
   Sparkles,
   RefreshCw,
   Heart,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 import {
   MOOD_LIST,
@@ -19,7 +19,7 @@ import {
   type MoodDoa,
   type MoodHadits,
   type MoodKey,
-} from "../data/mood";
+} from "../features/ai-chat/data/mood";
 import { moodApi } from "../services/domainApi";
 
 

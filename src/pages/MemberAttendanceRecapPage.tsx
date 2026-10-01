@@ -8,12 +8,12 @@ import {
   ChevronRight,
   Loader2,
   X,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, EmptyState } from "../components/common";
-import { RecapTableSkeleton } from "../components/common/Skeleton";
+import { Button, EmptyState } from "../components/ui";
+import { RecapTableSkeleton } from "../components/ui/Skeleton";
 import { meetingApi, attendanceApi } from "../services/domainApi";
-import { memberApi } from "../services/memberApi";
+import { memberApi } from "../features/member/api/memberApi";
 import type {
   Meeting,
   AttendanceRecord,
@@ -31,7 +31,7 @@ import { ApiError } from "../services/api";
 import {
   buildRecapMatrix,
   type RecapMatrix,
-} from "../lib/monthlyAttendanceExport";
+} from "../features/presensi/lib/monthlyAttendanceExport";
 
 
 function defaultMonth(): string {

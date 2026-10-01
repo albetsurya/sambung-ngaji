@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { financeApi, type ZakatItem } from "../api/financeApi";
+import { financeApi, type ZakatItem, ZAKAT_CATEGORIES, zakatCategoryLabel } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
@@ -8,7 +8,7 @@ import { AppLayout, Header, FloatingActionButton } from "../../../components/lay
 import {
   Button,
   Input,
-  Segmented,
+  FilterChip,
   GroupedList,
   ListRow,
   ChevronRow,
@@ -16,21 +16,31 @@ import {
   ConfirmDialog,
   EmptyState,
   ErrorState,
-} from "../../../components/common";
-import { GroupedListSkeleton } from "../../../components/common/Skeleton";
-import {
-  ScrollText as Scroll,
-  Printer,
-  RefreshCw,
-} from "../../../components/common/FontAwesomeIcons";
+} from "../../../components/ui";
+import { GroupedListSkeleton } from "../../../components/ui/Skeleton";
+import { ScrollText as Scroll } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
-import { ZakatPrintModal } from "../components/ZakatPrintModal";
+import { useFinanceBack } from "../hooks/useFinanceBack";
 import { ApiError } from "../../../services/api";
+import {
+  SectionTitle,
+  StatusPill,
+  HeaderActions,
+  SyncHeaderButton,
+  FilterHeaderButton,
+  NoGroupEmpty,
+  SheetFooter,
+} from "../components/FinanceShared";
 
+/**
+ * Zakat list ringkas -> detail penuh di /finance/zakat/:id.
+ * Detail berisi tab Muzaki/Rincian/Mustahik + sheet edit masing-masing + edit title.
+ */
 export const ZakatPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
+  const financeBack = useFinanceBack();
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -38,147 +48,58 @@ export const ZakatPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [editingZakat, setEditingZakat] = useState<ZakatItem | null>(null);
+  // Form buat spek #zakatFormOverlay: Judul/Tanggal/Tempat/Keterangan + data pokok.
+  // Record tak bertipe: tipe diisi per muzakki di halaman detail.
   const [form, setForm] = useState({
-    zakat_type: "FITRAH" as "FITRAH" | "MAL",
-    muzakki_name: "",
+    title: "",
     soul_count: 1,
-    total_rice_kg: 0,
+    total_rice_kg: 2.7,
     total_money_rp: 0,
+    transaction_date: new Date().toISOString().slice(0, 10),
+    location: "",
+    description: "",
   });
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ZakatItem | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const [completingId, setCompletingId] = useState<string | null>(null);
 
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [selectedPrintZakat, setSelectedPrintZakat] = useState<ZakatItem | null>(null);
-
-  const [detailZakat, setDetailZakat] = useState<ZakatItem | null>(null);
-  const [detailTab, setDetailTab] = useState<"muzaki" | "rincian" | "mustahik">("rincian");
-
-  const rincian = (z: ZakatItem | null) => {
-    const total = Number(z?.total_money_rp) || 0;
-    
-    // Cari alokasi yang sesuai dengan tipe zakat (FITRAH/MAL)
-    const isMaal = z?.zakat_type === "MAL";
-    const alloc = isMaal ? z?.allocations?.maal : z?.allocations?.fitrah;
-
-    if (!alloc) {
-      return {
-        total, mustahik: 0, mustahikKelompok: 0, mustahikDaerah: 0,
-        sabilillah: 0, amil: 0, amilKelompok: 0, amilDesa: 0, amilDaerah: 0,
-        pMustahik: 0, pSabilillah: 0, pAmil: 0
-      };
-    }
-
-    return {
-      total,
-      mustahik: alloc.recipient?.amount || 0,
-      mustahikKelompok: alloc.recipient?.group?.amount || 0,
-      mustahikDaerah: alloc.recipient?.region?.amount || 0,
-      sabilillah: alloc.sabilillah?.amount || 0,
-      amil: alloc.amil?.amount || 0,
-      amilKelompok: alloc.amil?.group?.amount || 0,
-      amilDesa: alloc.amil?.village?.amount || 0,
-      amilDaerah: alloc.amil?.region?.amount || 0,
-      // Persentase untuk progress bar
-      pMustahik: alloc.recipient?.percent || 0,
-      pSabilillah: alloc.sabilillah?.percent || 0,
-      pAmil: alloc.amil?.percent || 0
-    };
-  };
-
-  const handleViewDetail = async (z: ZakatItem) => {
-    setDetailZakat(z);
-    setDetailTab("rincian");
-    try {
-      if (assignedGroup) {
-        const detail = await financeApi.getZakatDetail(assignedGroup, z.zakat_id);
-        setDetailZakat(detail);
-      }
-    } catch (e) {
-      console.error("Gagal load detail zakat", e);
-    }
-  };
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
+  const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  // Filter tahun (2026/2025/2024/Semua) via filter sheet agar konsisten dengan Shodaqoh.
+  const [yearFilter, setYearFilter] = useState<string>("all");
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
+  const [draftType, setDraftType] = useState<string>("ALL");
+  const [draftYear, setDraftYear] = useState<string>("all");
+  const hasActiveFilter = statusFilter !== "ALL" || typeFilter !== "ALL" || yearFilter !== "all";
 
   const loadData = async () => {
-    if (!assignedGroup) {
-      setZakatList([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setLoadError(null);
+    if (!assignedGroup) { setZakatList([]); setLoading(false); return; }
+    setLoading(true); setLoadError(null);
     try {
       const res = await financeApi.getZakatList(assignedGroup);
-      if (res && res.data) {
-        setZakatList(res.data);
-      }
+      if (res?.data) setZakatList(res.data);
     } catch (err: any) {
       const msg = err instanceof ApiError ? err.message : "Gagal memuat data zakat";
-      setLoadError(msg);
-      showToast(msg, "error");
-    } finally {
-      setLoading(false);
-    }
+      setLoadError(msg); showToast(msg, "error");
+    } finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    loadData();
-  }, [assignedGroup]);
-
+  useEffect(() => { loadData(); }, [assignedGroup]);
   const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
-
-  const handleOpenAddSheet = () => {
-    setEditingZakat(null);
-    setForm({
-      zakat_type: "FITRAH",
-      muzakki_name: "",
-      soul_count: 1,
-      total_rice_kg: 2.7,
-      total_money_rp: 0,
-    });
-    setIsSheetOpen(true);
-  };
-
-  const handleOpenEditSheet = (z: ZakatItem) => {
-    setEditingZakat(z);
-    setForm({
-      zakat_type: z.zakat_type === "MAL" ? "MAL" : "FITRAH",
-      muzakki_name: z.muzakki_name,
-      soul_count: z.soul_count || 1,
-      total_rice_kg: Number(z.total_rice_kg) || 0,
-      total_money_rp: Number(z.total_money_rp) || 0,
-    });
-    setIsSheetOpen(true);
-  };
 
   const handleSaveZakat = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.muzakki_name.trim()) {
-      showToast("Nama Muzakki wajib diisi", "error");
-      return;
-    }
+    if (!form.title.trim()) { showToast("Judul zakat wajib diisi", "error"); return; }
+    const payload = { ...form };
     setSaving(true);
     try {
-      if (editingZakat) {
-        await financeApi.manageZakat(assignedGroup, "updateZakat", {
-          zakat_id: editingZakat.zakat_id,
-          ...form,
-        });
-        showToast("Data zakat berhasil diperbarui", "success");
-      } else {
-        await financeApi.manageZakat(assignedGroup, "createZakat", form);
-        showToast("Data zakat baru berhasil dicatat", "success");
-      }
-      setIsSheetOpen(false);
-      loadData();
+      await financeApi.manageZakat(assignedGroup, "createZakat", payload);
+      showToast("Data zakat baru berhasil dicatat", "success");
+      setIsSheetOpen(false); loadData();
     } catch (err: any) {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan zakat", "error");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
   const handleConfirmDelete = async () => {
@@ -187,477 +108,169 @@ export const ZakatPage: React.FC = () => {
     try {
       await financeApi.manageZakat(assignedGroup, "deleteZakat", { zakat_id: deleteTarget.zakat_id });
       showToast("Catatan zakat berhasil dihapus", "success");
-      setDeleteTarget(null);
-      setDetailZakat(null);
-      loadData();
+      setDeleteTarget(null); loadData();
     } catch (err: any) {
       showToast(err instanceof ApiError ? err.message : "Gagal menghapus zakat", "error");
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const handleCompleteZakat = async (zakatId: string) => {
-    setCompletingId(zakatId);
-    try {
-      await financeApi.manageZakat(assignedGroup, "completeZakat", { zakat_id: zakatId });
-      showToast("Status zakat berhasil diset Selesai / Tuntas", "success");
-      setDetailZakat((prev) => (prev ? { ...prev, status: "COMPLETED" } : prev));
-      loadData();
-    } catch (err: any) {
-      showToast(err instanceof ApiError ? err.message : "Gagal mengupdate status zakat", "error");
-    } finally {
-      setCompletingId(null);
-    }
+    } finally { setDeleting(false); }
   };
 
   const filteredZakat = zakatList.filter((z) => {
+    if (statusFilter !== "ALL" && (z.status || "ACTIVE").toUpperCase() !== statusFilter) return false;
+    if (typeFilter !== "ALL" && !(z.categories || []).includes(typeFilter)) return false;
+    if (yearFilter !== "all" && (z.transaction_date || "").slice(0, 4) !== yearFilter) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
-    return (
-      (z.muzakki_name || "").toLowerCase().includes(q) ||
-      (z.zakat_type || "").toLowerCase().includes(q)
-    );
+    return ((z.title || "") + " " + (z.categories || []).map((c) => zakatCategoryLabel(c)).join(" ")).toLowerCase().includes(q);
   });
 
-  const totalJiwa = zakatList.reduce((sum, z) => sum + (Number(z.soul_count) || 1), 0);
-  const totalBeras = zakatList.reduce((sum, z) => sum + (Number(z.total_rice_kg) || 0), 0);
-  const totalUang = zakatList.reduce((sum, z) => sum + (Number(z.total_money_rp) || 0), 0);
-
   return (
-    <AppLayout
-      fab={
-        <FloatingActionButton
-          onClick={handleOpenAddSheet}
-          label="Catat Zakat"
-        />
-      }
-    >
+    <AppLayout fab={<FloatingActionButton onClick={() => setIsSheetOpen(true)} label="Catat Zakat" />}>
       <Header
-        title="Zakat"
-        subtitle={`${zakatList.length} catatan`}
-        onBack={() => navigate("/lainnya")}
-        backLabel="Lainnya"
-        showSyncButton={false}
+        title="Zakat" subtitle={`${filteredZakat.length} catatan`}
+        onBack={() => navigate(financeBack.backTo)} backLabel={financeBack.backLabel} showSyncButton={false}
         right={
-          isSuperAdmin ? (
-            <Button
-              variant="ghost"
-              size="xs"
-              iconOnly
-              onClick={() => syncSheet(assignedGroup)}
-              disabled={syncingSheet}
-              aria-label="Sync dari spreadsheet"
-              title="Sync dari spreadsheet"
-            >
-              <RefreshCw size={16} className={syncingSheet ? "animate-spin" : ""} />
-            </Button>
-          ) : undefined
+          <HeaderActions>
+            {isSuperAdmin && (
+              <SyncHeaderButton syncing={syncingSheet} onSync={() => syncSheet(assignedGroup)} />
+            )}
+            <FilterHeaderButton
+              active={hasActiveFilter}
+              testId="btn-open-zakat-filter"
+              badgeTestId="zakat-filter-badge"
+              onClick={() => {
+                setDraftStatus(statusFilter);
+                setDraftType(typeFilter);
+                setDraftYear(yearFilter);
+                setFilterSheetOpen(true);
+              }}
+            />
+          </HeaderActions>
         }
       />
-
       <div className="py-4">
         {!assignedGroup ? (
-          <EmptyState
-            title="Kelompok belum dipilih"
-            description={
-              isSuperAdmin
-                ? "Pilih kelompok dulu di menu Kelompok Saya untuk membuka zakat kelompok."
-                : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."
-            }
+          <NoGroupEmpty
+            module="zakat"
             icon={<Scroll size={26} className="text-accent" />}
-            action={<Button size="sm" onClick={() => navigate("/lainnya")}>Ke Menu Lainnya</Button>}
+            isSuperAdmin={isSuperAdmin}
           />
         ) : loadError && zakatList.length === 0 ? (
           <ErrorState message={loadError} onRetry={loadData} />
         ) : (
           <>
             <section>
-              <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                Ringkasan
-              </p>
-              <GroupedList>
-                <ListRow>
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <p className="text-ios-body font-medium text-surface-text">Tanggungan Jiwa</p>
-                    <p className="font-display text-ios-nav font-extrabold text-surface-text shrink-0">
-                      {totalJiwa} <span className="text-ios-caption font-medium text-surface-muted">Orang</span>
-                    </p>
-                  </div>
-                </ListRow>
-                <ListRow>
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <p className="text-ios-body font-medium text-surface-text">Zakat Beras</p>
-                    <p className="font-display text-ios-nav font-extrabold text-success shrink-0">
-                      {totalBeras.toFixed(1)} <span className="text-ios-caption font-medium">Kg</span>
-                    </p>
-                  </div>
-                </ListRow>
-                <ListRow insetDivider={false}>
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <p className="text-ios-body font-medium text-surface-text">Zakat Uang</p>
-                    <p className="font-display text-ios-nav font-extrabold text-info shrink-0">
-                      {formatRp(totalUang)}
-                    </p>
-                  </div>
-                </ListRow>
-              </GroupedList>
-            </section>
-
-            <section>
-              <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                Catatan ({filteredZakat.length})
-              </p>
-              <div className="px-4 mb-2.5">
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cari nama muzakki…"
-                />
-              </div>
-              {loading ? (
-                <GroupedListSkeleton rows={5} />
-              ) : filteredZakat.length === 0 ? (
-                <EmptyState
-                  title="Belum ada catatan zakat"
-                  description="Catat penerimaan zakat memakai tombol + di bawah."
-                />
-              ) : (
-                <GroupedList>
-                  {filteredZakat.map((z, idx) => (
-                    <ListRow
-                      key={z.zakat_id || idx}
-                      onClick={() => {
-                        setDetailZakat(z);
-                        setDetailTab("rincian");
-                      }}
-                      insetDivider={idx !== filteredZakat.length - 1}
-                      leading={
-                        <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-bold text-ios-body">
-                          {(z.muzakki_name || "?").charAt(0).toUpperCase()}
-                        </span>
-                      }
-                    >
-                      <ChevronRow>
-                        <div className="flex items-center justify-between gap-2 w-full">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-ios-body font-medium text-surface-text truncate">
-                              {z.muzakki_name}
-                            </p>
-                            <p className="text-ios-caption text-surface-muted truncate">
-                              {z.zakat_type || "FITRAH"} · {z.soul_count || 1} jiwa
-                              {z.total_rice_kg ? ` · ${z.total_rice_kg} Kg` : ""}
-                              {z.total_money_rp ? ` · ${formatRp(z.total_money_rp)}` : ""}
-                            </p>
-                          </div>
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
-                              z.status === "COMPLETED"
-                                ? "bg-success-soft text-success"
-                                : "bg-warning-soft text-warning"
-                            }`}
-                          >
-                            {z.status === "COMPLETED" ? "Tuntas" : "Proses"}
-                          </span>
-                        </div>
-                      </ChevronRow>
-                    </ListRow>
-                  ))}
-                </GroupedList>
+              <SectionTitle first>Catatan ({filteredZakat.length})</SectionTitle>
+              <div className="px-4 mb-2.5"><Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari muzakki / judul…" /></div>
+              {hasActiveFilter && (
+                <div className="px-4 mt-2 flex gap-2 flex-wrap" data-testid="zakat-active-filters">
+                  <button
+                    className="px-2.5 py-1 rounded-full bg-surface-card2 text-surface-muted text-ios-caption font-bold"
+                    onClick={() => { setStatusFilter("ALL"); setTypeFilter("ALL"); setYearFilter("all"); }}
+                  >
+                    Reset filter ×
+                  </button>
+                </div>
               )}
+              {loading ? <GroupedListSkeleton rows={5} />
+                : filteredZakat.length === 0 ? <EmptyState title="Belum ada catatan zakat" description="Catat via tombol +." />
+                : (
+                  <GroupedList>
+                    {filteredZakat.map((z, idx) => (
+                      <ListRow key={z.zakat_id || idx} onClick={() => navigate(`/finance/zakat/${z.zakat_id}`)} insetDivider={idx !== filteredZakat.length - 1}
+                        leading={<span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent font-bold shrink-0">{(z.title || "?").charAt(0).toUpperCase()}</span>}>
+                        <ChevronRow>
+                          <div className="flex items-center justify-between gap-2 w-full">
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-medium">{z.title || "Tanpa judul"}</p>
+                              <p className="text-ios-caption text-surface-muted truncate">{(z.categories || []).map((c) => zakatCategoryLabel(c)).join(" + ") || "Belum ada tipe"}{(z.categories || []).includes("FITRAH") && z.soul_count > 0 ? ` · ${z.soul_count} jiwa` : ""}{z.total_money_rp ? ` · ${formatRp(z.total_money_rp)}` : ""}</p>
+                            </div>
+                            <StatusPill tone={z.status === "COMPLETED" ? "success" : "warning"}>
+                              {z.status === "COMPLETED" ? "Tuntas" : "Proses"}
+                            </StatusPill>
+                          </div>
+                        </ChevronRow>
+                      </ListRow>
+                    ))}
+                  </GroupedList>
+                )}
             </section>
           </>
         )}
       </div>
 
+      {/* Filter sheet — pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
       <BottomSheet
-        open={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        title={editingZakat ? "Edit Zakat" : "Catat Zakat"}
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        title="Filter Zakat"
       >
-        <form onSubmit={handleSaveZakat}>
-          <div className="mb-4">
-            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
-              Tipe Zakat
-            </p>
-            <Segmented<"FITRAH" | "MAL">
-              ariaLabel="Tipe zakat"
-              value={form.zakat_type}
-              onChange={(v) => setForm({ ...form, zakat_type: v })}
-              options={[
-                { value: "FITRAH", label: "Zakat Fitrah" },
-                { value: "MAL", label: "Zakat Mal" },
-              ]}
-            />
+        <div data-testid="zakat-filter-sheet">
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Status</p>
+          <div className="flex gap-2 flex-wrap mb-4">
+            {(["ALL", "ACTIVE", "COMPLETED"] as const).map((s) => (
+              <FilterChip key={s} active={draftStatus === s} label={s === "ALL" ? "Semua" : s === "ACTIVE" ? "Proses" : "Tuntas"} onClick={() => setDraftStatus(s)} />
+            ))}
           </div>
-          <Input
-            label="Nama Muzakki"
-            placeholder="Nama pembayar zakat"
-            value={form.muzakki_name}
-            onChange={(e) => setForm({ ...form, muzakki_name: e.target.value })}
-            required
-          />
-          <Input
-            label="Jumlah Tanggungan Jiwa"
-            type="number"
-            min={1}
-            value={form.soul_count}
-            onChange={(e) => setForm({ ...form, soul_count: Number(e.target.value) })}
-            required
-          />
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Tipe</p>
+          <div className="flex gap-2 flex-wrap mb-4">
+            {[{ value: "ALL", label: "Semua" }, ...ZAKAT_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))].map((t) => (
+              <FilterChip key={t.value} active={draftType === t.value} label={t.label} onClick={() => setDraftType(t.value)} />
+            ))}
+          </div>
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Tahun</p>
+          <div className="flex gap-2 flex-wrap mb-4" data-testid="zakat-year-filter">
+            {(["all", String(new Date().getFullYear()), String(new Date().getFullYear() - 1), String(new Date().getFullYear() - 2)] as const).map((y) => (
+              <FilterChip key={y} active={draftYear === y} label={y === "all" ? "Semua Tahun" : y} onClick={() => setDraftYear(y)} />
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button
+              variant="secondary"
+              onClick={() => { setDraftStatus("ALL"); setDraftType("ALL"); setDraftYear("all"); }}
+              data-testid="btn-reset-zakat-filter"
+            >
+              Reset
+            </Button>
+            <Button
+              onClick={() => {
+                setStatusFilter(draftStatus);
+                setTypeFilter(draftType);
+                setYearFilter(draftYear);
+                setFilterSheetOpen(false);
+              }}
+              data-testid="btn-apply-zakat-filter"
+            >
+              Terapkan
+            </Button>
+          </div>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet open={isSheetOpen} onClose={() => setIsSheetOpen(false)} title="Catat Zakat">
+        <form onSubmit={handleSaveZakat} data-testid="zakat-form-overlay">
+          <Input label="Judul Zakat" placeholder="Zakat Fitrah 1447 H" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="zakat-form-title-input" required />
           <div className="grid grid-cols-2 gap-x-3">
-            <Input
-              label="Beras (Kg)"
-              type="number"
-              step="0.1"
-              value={form.total_rice_kg || ""}
-              onChange={(e) => setForm({ ...form, total_rice_kg: Number(e.target.value) })}
-            />
-            <Input
-              label="Uang (Rp)"
-              type="number"
-              value={form.total_money_rp || ""}
-              onChange={(e) => setForm({ ...form, total_money_rp: Number(e.target.value) })}
-            />
+            <Input label="Tanggal" type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+            <Input label="Tempat" placeholder="Masjid / Musholla" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
           </div>
-          <Button type="submit" fullWidth disabled={saving}>
-            {saving ? "Menyimpan…" : editingZakat ? "Simpan Perubahan" : "Simpan Catatan"}
-          </Button>
-          {editingZakat && (
-            <div className="mt-2.5 grid grid-cols-2 gap-2.5">
-              {editingZakat.status !== "COMPLETED" && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={completingId === editingZakat.zakat_id}
-                  onClick={() => {
-                    handleCompleteZakat(editingZakat.zakat_id);
-                    setIsSheetOpen(false);
-                  }}
-                >
-                  {completingId ? "Memproses…" : "Set Tuntas"}
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="softDanger"
-                onClick={() => {
-                  setDeleteTarget(editingZakat);
-                  setIsSheetOpen(false);
-                }}
-              >
-                Hapus
-              </Button>
-            </div>
-          )}
+          <Input label="Keterangan" placeholder="Catatan tambahan…" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <div className="grid grid-cols-3 gap-x-3">
+            <Input label="Jiwa" type="number" min={0} value={form.soul_count} onChange={(e) => setForm({ ...form, soul_count: Number(e.target.value) })} />
+            <Input label="Beras Kg" type="number" step="0.1" value={form.total_rice_kg || ""} onChange={(e) => setForm({ ...form, total_rice_kg: Number(e.target.value) })} />
+            <Input label="Uang Rp" type="number" value={form.total_money_rp || ""} onChange={(e) => setForm({ ...form, total_money_rp: Number(e.target.value) })} />
+          </div>
+          <SheetFooter
+            onCancel={() => setIsSheetOpen(false)}
+            submitLabel="Simpan"
+            saving={saving}
+            cancelTestId="zakat-form-cancel"
+            submitTestId="zakat-form-submit"
+          />
         </form>
       </BottomSheet>
 
-      <BottomSheet
-        open={!!detailZakat}
-        onClose={() => setDetailZakat(null)}
-        title={detailZakat?.muzakki_name || "Detail Zakat"}
-      >
-        {detailZakat && (
-          <>
-            <div className="flex items-center justify-between gap-2 mb-4 px-1">
-              <p className="text-ios-footnote text-surface-muted">
-                {detailZakat.zakat_type === "MAL" ? "Zakat Mal" : "Zakat Fitrah"} · {detailZakat.soul_count} jiwa
-                {detailZakat.transaction_date ? ` · ${detailZakat.transaction_date}` : ""}
-              </p>
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
-                  detailZakat.status === "COMPLETED"
-                    ? "bg-success-soft text-success"
-                    : "bg-warning-soft text-warning"
-                }`}
-              >
-                {detailZakat.status === "COMPLETED" ? "Tuntas" : "Proses"}
-              </span>
-            </div>
-
-            <div className="mb-4">
-              <Segmented<"muzaki" | "rincian" | "mustahik">
-                ariaLabel="Tab detail zakat"
-                value={detailTab}
-                onChange={setDetailTab}
-                size="sm"
-                options={[
-                  { value: "muzaki", label: "Muzaki" },
-                  { value: "rincian", label: "Rincian" },
-                  { value: "mustahik", label: "Mustahik" },
-                ]}
-              />
-            </div>
-
-            {detailTab === "rincian" && (() => {
-              const r = rincian(detailZakat);
-              const isAllocZero = r.pMustahik === 0 && r.pSabilillah === 0 && r.pAmil === 0;
-              const totalPct = r.pMustahik + r.pSabilillah + r.pAmil;
-              
-              return (
-                <div className="px-1 mb-6">
-                  <div className="flex h-9 rounded-xl overflow-hidden bg-surface-alt mb-2 shadow-inner border border-surface-line">
-                    {isAllocZero ? (
-                       <div className="flex w-full items-center justify-center text-[10px] font-medium text-surface-muted italic">
-                          Belum ada data alokasi
-                       </div>
-                    ) : (
-                      <>
-                        <div className="bg-accent flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pMustahik}%` }}>
-                          {r.pMustahik > 10 && `Mustahik ${r.pMustahik}%`}
-                        </div>
-                        <div className="bg-warning flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pSabilillah}%` }}>
-                          {r.pSabilillah > 10 && `Sabilillah ${r.pSabilillah}%`}
-                        </div>
-                        <div className="bg-success flex items-center justify-center text-[10px] font-bold text-white transition-all duration-500" style={{ width: `${r.pAmil}%` }}>
-                          {r.pAmil > 10 && `Amil ${r.pAmil}%`}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  {!isAllocZero && (
-                    <div className="flex justify-between px-1">
-                      <span className="text-[10px] font-medium text-surface-muted">Total Alokasi: {totalPct}%</span>
-                      <span className={`text-[10px] font-bold ${totalPct === 100 ? 'text-success' : 'text-danger'}`}>
-                        {totalPct === 100 ? '✓ Valid' : '⚠ Harus 100%'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-            {detailTab === "rincian" && (() => {
-              const r = rincian(detailZakat);
-              const rows: Array<[string, string, number, boolean]> = [
-                ["Total Dana", "", r.total, false],
-                ["Mustahik", "45%", r.mustahik, false],
-                ["Kelompok", "80% dari mustahik", r.mustahikKelompok, true],
-                ["Daerah", "20% dari mustahik", r.mustahikDaerah, true],
-                ["Sabilillah", "40%", r.sabilillah, false],
-                ["Amil", "15%", r.amil, false],
-                ["Amil Kelompok", "12%", r.amilKelompok, true],
-                ["Amil Desa", "2%", r.amilDesa, true],
-                ["Amil Daerah", "1%", r.amilDaerah, true],
-              ];
-              return (
-                <GroupedList flush>
-                  {rows.map(([label, pct, val, indent], i) => (
-                    <ListRow key={label} insetDivider={i !== rows.length - 1}>
-                      <div className={`flex items-center justify-between gap-2 w-full ${indent ? "pl-4" : ""}`}>
-                        <p className="text-ios-body text-surface-text min-w-0">
-                          {label}{" "}
-                          {pct && <span className="text-ios-caption text-surface-muted font-medium">{pct}</span>}
-                        </p>
-                        <p className="font-mono text-ios-subhead font-bold text-surface-text shrink-0">
-                          {formatRp(val)}
-                        </p>
-                      </div>
-                    </ListRow>
-                  ))}
-                </GroupedList>
-              );
-            })()}
-
-            {detailTab === "muzaki" && (
-              (detailZakat.payer_list || detailZakat.muzakki_list || []).length === 0 ? (
-                <EmptyState title="Belum ada rincian muzakki" />
-              ) : (
-                <GroupedList flush>
-                  {(detailZakat.payer_list || detailZakat.muzakki_list || []).map((m: any, i: number) => (
-                    <ListRow key={i} insetDivider={i !== (detailZakat.payer_list || detailZakat.muzakki_list || []).length - 1}>
-                      <div className="flex items-center justify-between gap-2 w-full">
-                        <p className="text-ios-body font-medium text-surface-text truncate">
-                          {m.nama || m.name || `Muzaki ${i + 1}`}
-                        </p>
-                        <p className="font-mono text-ios-subhead shrink-0">
-                          {m.amount ? formatRp(m.amount) : ""}
-                        </p>
-                      </div>
-                    </ListRow>
-                  ))}
-                </GroupedList>
-              )
-            )}
-
-            {detailTab === "mustahik" && (
-              (detailZakat.recipient_list || detailZakat.mustahik_list || []).length === 0 ? (
-                <EmptyState title="Belum ada penyaluran mustahik" />
-              ) : (
-                <GroupedList flush>
-                  {(detailZakat.recipient_list || detailZakat.mustahik_list || []).map((m: any, i: number) => (
-                    <ListRow key={i} insetDivider={i !== (detailZakat.recipient_list || detailZakat.mustahik_list || []).length - 1}>
-                      <div className="flex items-center justify-between gap-2 w-full">
-                        <p className="text-ios-body font-medium text-surface-text truncate">
-                          {m.nama || m.name || `Mustahik ${i + 1}`}
-                        </p>
-                        <p className="font-mono text-ios-subhead shrink-0">
-                          {m.amount ? formatRp(m.amount) : ""}
-                        </p>
-                      </div>
-                    </ListRow>
-                  ))}
-                </GroupedList>
-              )
-            )}
-
-            <div className="mt-4 grid grid-cols-2 gap-2.5">
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  if (!detailZakat) return;
-                  setSelectedPrintZakat(detailZakat);
-                  setDetailZakat(null);
-                  setIsPrintModalOpen(true);
-                }}
-                leftIcon={<Printer size={14} />}
-              >
-                Kwitansi
-              </Button>
-              {detailZakat.status !== "COMPLETED" ? (
-                <Button
-                  disabled={completingId === detailZakat.zakat_id}
-                  onClick={() => {
-                    handleCompleteZakat(detailZakat.zakat_id);
-                    setDetailZakat(null);
-                  }}
-                >
-                  {completingId ? "Memproses…" : "Set Tuntas"}
-                </Button>
-              ) : (
-                <Button
-                  variant="softDanger"
-                  onClick={() => {
-                    setDeleteTarget(detailZakat);
-                    setDetailZakat(null);
-                  }}
-                >
-                  Hapus
-                </Button>
-              )}
-            </div>
-          </>
-        )}
-      </BottomSheet>
-
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Hapus catatan zakat?"
-        description={`“${deleteTarget?.muzakki_name}” akan dihapus permanen.`}
-        confirmLabel="Ya, hapus"
-        danger
-        loading={deleting}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
-
-      <ZakatPrintModal
-        isOpen={isPrintModalOpen}
-        onClose={() => setIsPrintModalOpen(false)}
-        zakat={selectedPrintZakat}
-        mode="kwitansi"
-      />
+      <ConfirmDialog open={!!deleteTarget} title="Hapus catatan zakat?" description={`"${deleteTarget?.title}" akan dihapus permanen.`}
+        confirmLabel="Ya, hapus" danger loading={deleting} onConfirm={handleConfirmDelete} onCancel={() => setDeleteTarget(null)} />
     </AppLayout>
   );
 };

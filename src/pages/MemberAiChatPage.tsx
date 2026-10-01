@@ -7,12 +7,12 @@ import {
   Check,
   Share2,
   RefreshCw,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button } from "../components/common";
-import { aiApi } from "../services/aiApi";
+import { Button } from "../components/ui";
+import { aiApi } from "../features/ai-chat/api/aiApi";
 import { useToast } from "../contexts/ToastContext";
-import { useAiChatHistory, type ChatMessage } from "../hooks/useAiChatHistory";
+import { useAiChatHistory, type ChatMessage } from "../features/ai-chat/hooks/useAiChatHistory";
 
 const SUGGESTIONS = [
   "Berapa persen kehadiran saya?",

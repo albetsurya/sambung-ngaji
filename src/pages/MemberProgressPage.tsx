@@ -8,18 +8,18 @@ import {
   RefreshCw,
   ScrollText,
   Calendar,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { useSholatJournal } from "../hooks/useSholatJournal";
-import { useDzikirStreak } from "../hooks/useDzikirStreak";
-import { useQuranStreak } from "../hooks/useQuranStreak";
-import { useTahfidz, getJuzHafal } from "../hooks/useTahfidz";
+import { useSholatJournal } from "../features/ibadah/hooks/useSholatJournal";
+import { useDzikirStreak } from "../features/doa-dzikir/hooks/useDzikirStreak";
+import { useQuranStreak } from "../features/quran/hooks/useQuranStreak";
+import { useTahfidz, getJuzHafal } from "../features/tahfidz/hooks/useTahfidz";
 import {
   useBadges,
   type BadgeCategory,
   type BadgeState,
   type BadgeTier,
-} from "../hooks/useBadges";
+} from "../features/member/hooks/useBadges";
 
 
 const CATEGORY_LABEL: Record<BadgeCategory, string> = {

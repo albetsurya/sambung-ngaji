@@ -9,9 +9,9 @@ import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { MemberRoute } from "./components/layout/MemberRoute";
 import { RoleRoute } from "./components/layout/RoleRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { LoadingScreen } from "./components/common";
-import { useBackgroundSync } from "./hooks/useBackgroundSync";
-import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
+import { LoadingScreen } from "./components/ui";
+import { useBackgroundSync } from "./features/member/hooks/useBackgroundSync";
+import { PwaUpdatePrompt } from "./components/ui/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
 
 function ApiRetryWire() {
@@ -69,9 +69,29 @@ const ZakatPage = lazy(() =>
     default: m.ZakatPage,
   })),
 );
-const FinanceAiPage = lazy(() =>
-  import("./features/finance/pages/FinanceAiPage").then((m) => ({
-    default: m.FinanceAiPage,
+const ZakatDetailPage = lazy(() =>
+  import("./features/finance/pages/ZakatDetailPage").then((m) => ({
+    default: m.ZakatDetailPage,
+  })),
+);
+const FinanceHubPage = lazy(() =>
+  import("./features/finance/pages/FinanceHubPage").then((m) => ({
+    default: m.FinanceHubPage,
+  })),
+);
+const KasPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/KasPrintPreviewPage").then((m) => ({
+    default: m.KasPrintPreviewPage,
+  })),
+);
+const ShodaqohPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/ShodaqohPrintPreviewPage").then((m) => ({
+    default: m.ShodaqohPrintPreviewPage,
+  })),
+);
+const ZakatPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/ZakatPrintPreviewPage").then((m) => ({
+    default: m.ZakatPrintPreviewPage,
   })),
 );
 const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
@@ -400,12 +420,15 @@ function AppRoutes() {
           {/* Finance Module (Accessible by SUPER_ADMIN & TIM_KU) */}
           <Route element={<FinanceGuard />}>
             <Route path="/finance" element={<FinanceLayout />}>
-              <Route index element={<Navigate to="/finance/ledger" replace />} />
+              <Route index element={<FinanceHubPage />} />
               <Route path="ledger" element={<FinanceLedgerPage />} />
               <Route path="shodaqoh" element={<Navigate to="/finance/monthly-dues" replace />} />
               <Route path="monthly-dues" element={<MonthlyDuesPage />} />
               <Route path="zakat" element={<ZakatPage />} />
-              <Route path="assistant" element={<FinanceAiPage />} />
+              <Route path="zakat/:id" element={<ZakatDetailPage />} />
+              <Route path="ledger/print" element={<KasPrintPreviewPage />} />
+              <Route path="monthly-dues/print" element={<ShodaqohPrintPreviewPage />} />
+              <Route path="zakat/:id/print" element={<ZakatPrintPreviewPage />} />
             </Route>
           </Route>
 

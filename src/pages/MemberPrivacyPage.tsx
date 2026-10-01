@@ -7,7 +7,7 @@ import {
   Eye,
   Users,
   Trash2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 
 export default function MemberPrivacyPage() {
   const navigate = useNavigate();

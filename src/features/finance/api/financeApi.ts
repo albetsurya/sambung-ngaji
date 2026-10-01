@@ -93,6 +93,55 @@ export interface ZakatAllocCategory {
 export interface ZakatAllocations {
   fitrah?: ZakatAllocCategory | null;
   maal?: ZakatAllocCategory | null;
+  by_category?: Record<string, ZakatAllocCategory | null>;
+}
+
+// Opsi tipe zakat (kanonis DB): Fitrah, Mal, Tijaroh, Zuru', Ternak, Lainnya.
+// Tipe kini milik tiap muzakki/mustahik/alokasi — record tidak punya tipe.
+export const ZAKAT_CATEGORIES = [
+  { value: "FITRAH", label: "Fitrah", needsSoul: true },
+  { value: "MAL", label: "Mal", needsSoul: false },
+  { value: "TIJAROH", label: "Tijaroh", needsSoul: false },
+  { value: "ZURU", label: "Zuru'", needsSoul: false },
+  { value: "LIVESTOCK", label: "Ternak", needsSoul: false },
+  { value: "OTHER", label: "Lainnya", needsSoul: false },
+] as const;
+
+export type ZakatCategory = (typeof ZAKAT_CATEGORIES)[number]["value"];
+
+export function normZakatCategory(v: unknown): string {
+  const s = String(v ?? "").toUpperCase().trim().replace(/^ZAKAT\s+/, "").replace(/^'+|'+$/g, "");
+  switch (s) {
+    case "FITRAH":
+    case "FITR":
+      return "FITRAH";
+    case "MAL":
+    case "MAAL":
+      return "MAL";
+    case "TIJAROH":
+    case "TIJARAH":
+    case "DAGANG":
+      return "TIJAROH";
+    case "ZURU":
+    case "ZIRA'AH":
+    case "ZIRAAH":
+    case "PERTANIAN":
+      return "ZURU";
+    case "LIVESTOCK":
+    case "TERNAK":
+      return "LIVESTOCK";
+    case "OTHER":
+    case "LAINNYA":
+    case "LAIN-LAIN":
+      return "OTHER";
+    default:
+      return "FITRAH";
+  }
+}
+
+export function zakatCategoryLabel(v: unknown): string {
+  const cat = normZakatCategory(v);
+  return ZAKAT_CATEGORIES.find((c) => c.value === cat)?.label ?? cat;
 }
 
 export interface ZakatPayer {
@@ -116,12 +165,11 @@ export interface ZakatRecipient {
 
 export interface ZakatItem {
   zakat_id: string;
-  zakat_type: "FITRAH" | "MAL";
-  zakat_category?: string;
   title?: string;
   description?: string;
   location?: string;
-  muzakki_name: string;
+  // Kategori yang hadir di record (dari muzakki/mustahik).
+  categories: string[];
   soul_count: number;
   total_rice_kg: number;
   total_money_rp: number;
@@ -217,15 +265,21 @@ function toPayment(raw: any): DuePayment {
 }
 
 function toZakat(raw: any): ZakatItem {
+  const normList = (arr: any): any[] =>
+    (Array.isArray(arr) ? arr : []).map((p: any) =>
+      p && typeof p === "object" && "zakat_category" in p
+        ? { ...p, zakat_category: normZakatCategory((p as any).zakat_category) }
+        : p,
+    );
   return {
     zakat_id: raw.zakat_id || "",
-    zakat_type: raw.zakat_type === "MAL" ? "MAL" : "FITRAH",
-    zakat_category: raw.zakat_category || "",
     title: raw.title || "",
     description: raw.description || "",
     location: raw.location || "",
-    muzakki_name: raw.muzakki_name || "",
-    soul_count: Number(raw.soul_count ?? 1),
+    categories: Array.isArray(raw.categories)
+      ? raw.categories.map((c: any) => normZakatCategory(c))
+      : [],
+    soul_count: Number(raw.soul_count ?? 0),
     total_rice_kg: Number(raw.total_rice_kg ?? 0),
     total_money_rp: Number(raw.total_money_rp ?? 0),
     status: raw.status || "PENDING",
@@ -234,8 +288,8 @@ function toZakat(raw: any): ZakatItem {
     version: Number(raw.version ?? 1),
     payer_count: Number(raw.payer_count ?? 0),
     recipient_count: Number(raw.recipient_count ?? 0),
-    payer_list: raw.payer_list || [],
-    recipient_list: raw.recipient_list || [],
+    payer_list: normList(raw.payer_list),
+    recipient_list: normList(raw.recipient_list),
     allocations: raw.allocations || null,
     muzakki_list: raw.muzakki_list || [],
     mustahik_list: raw.mustahik_list || [],
@@ -361,6 +415,22 @@ export const financeApi = {
     };
   },
 
+  /**
+   * Rekap 1 tahun penuh (Jan–Des) untuk tabel rincian 12 bulan.
+   * Tanpa filter bulan -> backend mengembalikan semua payments + members,
+   * diagregat per bulan di client. Dipakai halaman Shodaqoh.
+   */
+  getShodaqohYearly: async (
+    groupId: string | null | undefined,
+  ): Promise<{ members: DueMember[]; payments: DuePayment[] }> => {
+    const gid = requireGroup(groupId);
+    const res = await restGet<any>("/api/v1/finance/monthly-dues", { group_id: gid });
+    return {
+      members: (res.members || []).map(toMember),
+      payments: (res.payments || []).map(toPayment),
+    };
+  },
+
   syncFromSheet: async (
     groupId?: string | null,
   ): Promise<{ syncedGroup?: string; synced?: string }> => {
@@ -460,22 +530,63 @@ export const financeApi = {
 
   postShodaqohToKas: async (
     groupId: string | null | undefined,
-    _monthKey: string,
+    monthKey: string,
   ) => {
-    requireGroup(groupId);
-    throw new Error("Posting otomatis ke kas belum tersedia di backend baru.");
+    const gid = requireGroup(groupId);
+    // Port Post_Shodaqoh.js kas-latukan-web: agregat 7 pos -> jurnal kas utama.
+    return restPost("/api/v1/finance/monthly-dues/post-to-kas", {
+      group_id: gid,
+      month: monthKey,
+    });
   },
 
   cancelPostShodaqohToKas: async (
     groupId: string | null | undefined,
-    _monthKey: string,
+    monthKey: string,
   ) => {
-    requireGroup(groupId);
-    throw new Error("Pembatalan posting belum tersedia di backend baru.");
+    const gid = requireGroup(groupId);
+    return restPost("/api/v1/finance/monthly-dues/cancel-post-to-kas", {
+      group_id: gid,
+      month: monthKey,
+    });
   },
 
   extractShodaqohAi: async (_data_url: string): Promise<any> => {
+    // OCR struk ala Prompt_Ai.js kas-latukan-web belum ada di backend Go.
+    // Biarkan error yang jelas agar UI menampilkan fallback manual.
     throw new Error("Ekstraksi foto AI belum tersedia di backend baru.");
+  },
+
+  getZakatMasters: async (groupId: string | null | undefined) => {
+    const gid = requireGroup(groupId);
+    return restGet<any>("/api/v1/finance/zakat/masters", { group_id: gid });
+  },
+
+  saveZakatPayers: async (
+    groupId: string | null | undefined,
+    zakat_id: string,
+    payers: Array<Record<string, any>>,
+  ) => {
+    const gid = requireGroup(groupId);
+    return restPost("/api/v1/finance/zakat/payers", { group_id: gid, zakat_id, payers });
+  },
+
+  saveZakatRecipients: async (
+    groupId: string | null | undefined,
+    zakat_id: string,
+    recipients: Array<Record<string, any>>,
+  ) => {
+    const gid = requireGroup(groupId);
+    return restPost("/api/v1/finance/zakat/recipients", { group_id: gid, zakat_id, recipients });
+  },
+
+  saveZakatAllocations: async (
+    groupId: string | null | undefined,
+    zakat_id: string,
+    allocations: Array<Record<string, any>>,
+  ) => {
+    const gid = requireGroup(groupId);
+    return restPost("/api/v1/finance/zakat/allocations", { group_id: gid, zakat_id, allocations });
   },
 
   getZakatList: async (
@@ -525,9 +636,10 @@ export const financeApi = {
     return restPost("/api/v1/finance/zakat", {
       group_id: gid,
       zakat_id,
-      zakat_type: data.zakat_type || data.tipeZakat || "FITRAH",
-      muzakki_name: data.muzakki_name || data.namaMuzaki || "",
-      soul_count: data.soul_count ?? data.jumlahJiwa ?? 1,
+      title: data.title || "",
+      description: data.description || data.keterangan || "",
+      location: data.location || data.tempat || "",
+      soul_count: data.soul_count ?? data.jumlahJiwa ?? 0,
       total_rice_kg: data.total_rice_kg ?? data.totalBerasKg ?? 0,
       total_money_rp: data.total_money_rp ?? data.totalUangRp ?? 0,
       transaction_date: data.transaction_date || data.tanggal || "",

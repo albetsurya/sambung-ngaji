@@ -11,7 +11,7 @@ import {
   List,
   Loader2,
   KeyRound,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -29,8 +29,8 @@ import {
   Button,
   Segmented,
   Select,
-} from "../components/common";
-import { memberApi, type MemberFilters } from "../services/memberApi";
+} from "../components/ui";
+import { memberApi, type MemberFilters } from "../features/member/api/memberApi";
 import { groupApi, userApi } from "../services/domainApi";
 import type { Member, MemberCategory, Role } from "../types";
 import {
@@ -45,7 +45,7 @@ import {
   JamaahGridSkeleton,
   JamaahListSkeleton,
   JamaahRowSkeleton,
-} from "../components/common/Skeleton";
+} from "../components/ui/Skeleton";
 import { exportMembersToCsv } from "../utils/exportCsv";
 import { useToast } from "../contexts/ToastContext";
 import { queryKeys } from "../lib/queryClient";

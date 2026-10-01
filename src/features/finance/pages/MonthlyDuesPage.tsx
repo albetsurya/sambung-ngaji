@@ -13,6 +13,7 @@ import {
   Button,
   Input,
   FilterChip,
+  Segmented,
   GroupedList,
   ListRow,
   ChevronRow,
@@ -21,16 +22,25 @@ import {
   EmptyState,
   ErrorState,
   Card,
-} from "../../../components/common";
-import { GroupedListSkeleton } from "../../../components/common/Skeleton";
+} from "../../../components/ui";
+import { GroupedListSkeleton } from "../../../components/ui/Skeleton";
 import {
   Heart,
   Printer,
-  RefreshCw,
   Sparkles,
-} from "../../../components/common/FontAwesomeIcons";
+} from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
-import { MonthlyDuesPrintModal } from "../components/MonthlyDuesPrintModal";
+import { useFinanceBack } from "../hooks/useFinanceBack";
+import {
+  SectionTitle,
+  StatusPill,
+  HeaderActions,
+  HeaderIconButton,
+  SyncHeaderButton,
+  FilterHeaderButton,
+  NoGroupEmpty,
+  SheetFooter,
+} from "../components/FinanceShared";
 import { ApiError } from "../../../services/api";
 
 const PAYMENT_FIELDS = [
@@ -71,6 +81,7 @@ export const MonthlyDuesPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
+  const financeBack = useFinanceBack();
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -111,7 +122,32 @@ export const MonthlyDuesPage: React.FC = () => {
   const [aiPhotoUrl, setAiPhotoUrl] = useState("");
   const [aiExtracting, setAiExtracting] = useState(false);
 
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  // Rekap 12 bulan (Jan–Des tahun berjalan) spek rincian pembayaran bulanan.
+  const [yearlyMembers, setYearlyMembers] = useState<DueMember[]>([]);
+  const [yearlyPayments, setYearlyPayments] = useState<any[]>([]);
+  const [yearlyLoading, setYearlyLoading] = useState(false);
+  const [printMenuOpen, setPrintMenuOpen] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [postStatus, setPostStatus] = useState<"unknown" | "posted" | "not-posted">("unknown");
+  // Tabview spek .shod-tabs-container: Overview | Anggota | Riwayat.
+  // Monitoring+Anggota digabung di tab Anggota (1 baris = status lunas bulan ini).
+  const [shodTab, setShodTab] = useState<"overview" | "members" | "payments">("overview");
+  // Recap tahunan default hanya 3 bulan terakhir agar halaman tidak memanjang;
+  // pola "Lihat semua/Tutup" sama dengan Riwayat Transaksi di Kas.
+  const [showAllMonths, setShowAllMonths] = useState(false);
+  // Filter sheet spek #shodaqohFilterSheet (Tahun/Bulan/Status + Reset/Terapkan).
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [draftMonth, setDraftMonth] = useState("");
+  const [draftStatus, setDraftStatus] = useState<"ALL" | "LUNAS" | "BELUM">("ALL");
+  const [draftYear, setDraftYear] = useState<string>("all");
+  // Member action overlay spek #shodMemberActionOverlay + detail + payment detail.
+  const [memberActionTarget, setMemberActionTarget] = useState<DueMember | null>(null);
+  const [memberDetailTarget, setMemberDetailTarget] = useState<DueMember | null>(null);
+  const [paymentDetail, setPaymentDetail] = useState<any | null>(null);
+  const [reversing, setReversing] = useState(false);
+  // Payment sheet: seg Manual/Upload + member dropdown.
+  const [payMethod, setPayMethod] = useState<"manual" | "upload">("manual");
 
   const loadData = async () => {
     if (!assignedGroup) {
@@ -124,6 +160,15 @@ export const MonthlyDuesPage: React.FC = () => {
     try {
       const res = await financeApi.getShodaqohData(assignedGroup, selectedMonth);
       setData(res);
+      // Deteksi status POST spek #shodPostStatus via marker POSTED_SHODAQOH_YYYY-MM di kas utama.
+      try {
+        const kas = await financeApi.getKasTransactions(assignedGroup, "main");
+        const marker = `POSTED_SHODAQOH_${selectedMonth}`;
+        const posted = (kas.transactions || []).some((t) => (t.description || "").includes(marker));
+        setPostStatus(posted ? "posted" : "not-posted");
+      } catch {
+        setPostStatus("unknown");
+      }
     } catch (err: any) {
       const msg = err instanceof ApiError ? err.message : "Gagal memuat data shodaqoh";
       setLoadError(msg);
@@ -136,6 +181,18 @@ export const MonthlyDuesPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [selectedMonth, assignedGroup]);
+
+  // Muat sekali per kelompok untuk tabel 12 bulan (tidak ikut ganti bulan).
+  useEffect(() => {
+    if (!assignedGroup) { setYearlyMembers([]); setYearlyPayments([]); return; }
+    let cancelled = false;
+    setYearlyLoading(true);
+    financeApi.getShodaqohYearly(assignedGroup)
+      .then((r) => { if (!cancelled) { setYearlyMembers(r.members); setYearlyPayments(r.payments); } })
+      .catch(() => { if (!cancelled) { setYearlyMembers([]); setYearlyPayments([]); } })
+      .finally(() => { if (!cancelled) setYearlyLoading(false); });
+    return () => { cancelled = true; };
+  }, [assignedGroup]);
 
   const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
 
@@ -186,8 +243,26 @@ export const MonthlyDuesPage: React.FC = () => {
     }
   };
 
-  const handleOpenPaymentSheet = async (member: DueMember) => {
+  // existing: pembayaran periode berjalan bila ada (untuk mode Edit).
+  const handleOpenPaymentSheet = async (member: DueMember, existing?: any) => {
     setSelectedMember(member);
+    setPayMethod("manual");
+    if (existing) {
+      setPaymentForm({
+        payment_id: existing.payment_id || "",
+        payment_date: existing.payment_date || new Date().toISOString().slice(0, 10),
+        connecting_fund: Number(existing.connecting_fund) || 0,
+        community_dues: Number(existing.community_dues) || 0,
+        outreach_fund: Number(existing.outreach_fund) || 0,
+        thousand_fund: Number(existing.thousand_fund) || 0,
+        funeral_fund: Number(existing.funeral_fund) || 0,
+        ukhro_mt: Number(existing.ukhro_mt) || 0,
+        notes: existing.notes || "",
+      });
+      setCarryovers((existing.carryover_items || []).map((it: any) => ({ month: String(it.month || ""), amount: Number(it.amount) || 0 })));
+      setIsPaymentSheetOpen(true);
+      return;
+    }
     setPaymentForm({
       payment_id: "",
       payment_date: new Date().toISOString().slice(0, 10),
@@ -240,6 +315,18 @@ export const MonthlyDuesPage: React.FC = () => {
   const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMember) return;
+    // Validasi ala kas-latukan-web: susulan > 0 wajib ada bulan (validateShodaqohPayment).
+    for (const r of carryovers) {
+      const amt = Number(r.amount) || 0;
+      if (amt > 0 && !r.month) {
+        showToast("Bulan susulan wajib diisi bila nominal > 0", "error");
+        return;
+      }
+      if (r.month && amt <= 0) {
+        showToast(`Nominal susulan bulan ${r.month} harus lebih besar dari 0`, "error");
+        return;
+      }
+    }
     const cleanCarryovers = carryovers
       .filter((r) => r.month && (Number(r.amount) || 0) > 0)
       .map((r) => ({ month: r.month, amount: Number(r.amount) }));
@@ -359,6 +446,110 @@ export const MonthlyDuesPage: React.FC = () => {
     ? new Date(Number(selectedMonth.slice(0, 4)), Number(selectedMonth.slice(5, 7)) - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
     : "";
 
+  // Agregat 7 pos ala dashboard alokasi kas-latukan-web (shodaqoh.js renderShodaqohDashboard).
+  const allocationTotals = (() => {
+    const t = { ir: 0, sambung: 0, jimpitan: 0, siar: 0, seribu: 0, kafan: 0, ukhro: 0 };
+    for (const p of paymentsList) {
+      if (p.status === "REVERSED" || p.status === "INACTIVE") continue;
+      t.ir += Number(p.carryover_ir) || 0;
+      t.sambung += Number(p.connecting_fund) || 0;
+      t.jimpitan += Number(p.community_dues) || 0;
+      t.siar += Number(p.outreach_fund) || 0;
+      t.seribu += Number(p.thousand_fund) || 0;
+      t.kafan += Number(p.funeral_fund) || 0;
+      t.ukhro += Number(p.ukhro_mt) || 0;
+    }
+    return t;
+  })();
+
+  // Tabel rincian bulanan: Januari s.d. bulan sekarang (tahun periode aktif).
+  // Tahun berjalan -> Jan s.d. bulan ini. Tahun lampau -> Jan–Des. Tahun depan -> kosong.
+  const yearlyYear = (selectedMonth || "").slice(0, 4);
+  const yearlyMaxMonth = (() => {
+    if (!yearlyYear) return 0;
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth() + 1;
+    const y = Number(yearlyYear);
+    if (y < curYear) return 12;
+    if (y === curYear) return curMonth;
+    return 0;
+  })();
+  const monthlyRecap = (() => {
+    if (!yearlyYear || yearlyMaxMonth < 1) return [];
+    const activeTarget = yearlyMembers.filter((m) => m.status === "ACTIVE")
+      .reduce((s, m) => s + (Number(m.monthly_target) || 0), 0);
+    const rows: Array<{ key: string; label: string; target: number; received: number; paid: number; future: boolean }> = [];
+    for (let m = 1; m <= yearlyMaxMonth; m++) {
+      const key = `${yearlyYear}-${String(m).padStart(2, "0")}`;
+      const label = new Date(Number(yearlyYear), m - 1, 1).toLocaleDateString("id-ID", { month: "short" });
+      const mp = yearlyPayments.filter(
+        (p: any) => (p.payment_date || "").slice(0, 7) === key && p.status !== "REVERSED" && p.status !== "INACTIVE",
+      );
+      rows.push({
+        key, label,
+        target: activeTarget,
+        received: mp.reduce((s: number, p: any) => s + (Number(p.total_amount) || 0), 0),
+        paid: new Set(mp.map((p: any) => p.member_id)).size,
+        future: false,
+      });
+    }
+    return rows;
+  })();
+
+  // Teks rekap ala shodaqoh-rekap.js kas-latukan-web untuk copy WA.
+  const buildRekapText = () => {
+    const lines = [
+      `*Rekap Shodaqoh ${monthLabel}*`,
+      `Target: ${formatRp(dashboard?.target || 0)}`,
+      `Terkumpul: ${formatRp(dashboard?.received || 0)} (${dashboard?.paidCount || 0} lunas / ${dashboard?.unpaidCount || 0} belum)`,
+      `— Rincian —`,
+      `Susulan IR: ${formatRp(allocationTotals.ir)}`,
+      `Uang Sambung: ${formatRp(allocationTotals.sambung)}`,
+      `Jimpitan: ${formatRp(allocationTotals.jimpitan)}`,
+      `Siar-Siar: ${formatRp(allocationTotals.siar)}`,
+      `Seribuan: ${formatRp(allocationTotals.seribu)}`,
+      `Kafan: ${formatRp(allocationTotals.kafan)}`,
+      `Ukhro MT: ${formatRp(allocationTotals.ukhro)}`,
+    ];
+    return lines.join("\n");
+  };
+
+  const handleCopyRekap = async () => {
+    try {
+      await navigator.clipboard.writeText(buildRekapText());
+      showToast("Rekap berhasil disalin", "success");
+    } catch {
+      showToast("Gagal menyalin rekap", "error");
+    }
+  };
+
+  const handlePostToKas = async () => {
+    setPosting(true);
+    try {
+      await financeApi.postShodaqohToKas(assignedGroup, selectedMonth);
+      setPostStatus("posted");
+      showToast(`Shodaqoh ${monthLabel} berhasil diposting ke kas`, "success");
+    } catch (err: any) {
+      showToast(err instanceof ApiError ? err.message : "Gagal posting ke kas", "error");
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const handleCancelPost = async () => {
+    setCancelling(true);
+    try {
+      await financeApi.cancelPostShodaqohToKas(assignedGroup, selectedMonth);
+      setPostStatus("not-posted");
+      showToast(`Posting ${monthLabel} berhasil dibatalkan`, "success");
+    } catch (err: any) {
+      showToast(err instanceof ApiError ? err.message : "Gagal membatalkan posting", "error");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   return (
     <AppLayout
       fab={
@@ -371,59 +562,100 @@ export const MonthlyDuesPage: React.FC = () => {
       <Header
         title="Shodaqoh & Infaq"
         subtitle={monthLabel}
-        onBack={() => navigate("/lainnya")}
-        backLabel="Lainnya"
+        onBack={() => navigate(financeBack.backTo)}
+        backLabel={financeBack.backLabel}
         showSyncButton={false}
         right={
-          <div className="flex items-center gap-1">
+          <HeaderActions>
             {isSuperAdmin && (
-              <Button
-                variant="ghost"
-                size="xs"
-                iconOnly
-                onClick={() => syncSheet(assignedGroup)}
-                disabled={syncingSheet}
-                aria-label="Sync dari spreadsheet"
-                title="Sync dari spreadsheet"
-              >
-                <RefreshCw size={16} className={syncingSheet ? "animate-spin" : ""} />
-              </Button>
+              <SyncHeaderButton syncing={syncingSheet} onSync={() => syncSheet(assignedGroup)} />
             )}
-            <Button
-              variant="ghost"
-              size="xs"
-              iconOnly
-              onClick={() => setIsPrintModalOpen(true)}
-              aria-label="Cetak matriks"
-              title="Cetak matriks"
-            >
-              <Printer size={16} />
-            </Button>
-          </div>
+            {/* Filter spek #btnOpenShodaqohFilter + badge */}
+            <FilterHeaderButton
+              active={statusFilter !== "ALL" || draftYear !== "all"}
+              onClick={() => {
+                setDraftMonth(selectedMonth);
+                setDraftStatus(statusFilter);
+                setDraftYear(selectedMonth.slice(0, 4));
+                setFilterSheetOpen(true);
+              }}
+            />
+            {/* Dropdown cetak spek #shodPrintDropdownWrapper */}
+            <span className="relative">
+              <HeaderIconButton
+                onClick={() => setPrintMenuOpen((v) => !v)}
+                label="Cetak rekap"
+                testId="shod-btn-print-dropdown"
+              >
+                <Printer size={16} />
+              </HeaderIconButton>
+              {printMenuOpen && (
+                <div className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5" data-testid="shod-print-dropdown">
+                  <button
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                    onClick={() => {
+                      navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
+                      setPrintMenuOpen(false);
+                    }}
+                    data-testid="btn-print-shodaqoh"
+                  >
+                    Cetak Rekap Shodaqoh
+                  </button>
+                  <button
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                    onClick={() => {
+                      navigate(`/finance/monthly-dues/print?variant=infak-ir`);
+                      setPrintMenuOpen(false);
+                    }}
+                    data-testid="btn-print-infak-ir"
+                  >
+                    Cetak Rekap Infak IR
+                  </button>
+                  <button
+                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                    onClick={() => { handleCopyRekap(); setPrintMenuOpen(false); }}
+                    data-testid="btn-copy-shodaqoh-rekap"
+                  >
+                    Salin Rekap (WA)
+                  </button>
+                </div>
+              )}
+            </span>
+          </HeaderActions>
         }
       />
 
       <div className="py-4">
         {!assignedGroup ? (
-          <EmptyState
-            title="Kelompok belum dipilih"
-            description={
-              isSuperAdmin
-                ? "Pilih kelompok dulu di menu Kelompok Saya untuk membuka shodaqoh kelompok."
-                : "Akun Anda belum dipetakan ke kelompok. Hubungi admin."
-            }
+          <NoGroupEmpty
+            module="shodaqoh"
             icon={<Heart size={26} className="text-accent" />}
-            action={<Button size="sm" onClick={() => navigate("/lainnya")}>Ke Menu Lainnya</Button>}
+            isSuperAdmin={isSuperAdmin}
           />
         ) : loadError && !data ? (
           <ErrorState message={loadError} onRetry={loadData} />
         ) : (
           <>
+            {/* Tabview: Overview | Anggota | Riwayat */}
+            <div className="px-4" data-testid="shod-tabs-container">
+              <Segmented<"overview" | "members" | "payments">
+                ariaLabel="Tab shodaqoh"
+                value={shodTab}
+                onChange={setShodTab}
+                size="sm"
+                options={[
+                  { value: "overview", label: "Overview" },
+                  { value: "members", label: "Anggota" },
+                  { value: "payments", label: "Riwayat" },
+                ]}
+              />
+            </div>
+
+            {shodTab === "overview" && (
+            <div data-testid="shod-tab-overview" className="contents">
             {dashboard && (
               <section>
-                <p className="px-4 mb-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                  Capaian Bulan Ini
-                </p>
+                <SectionTitle>Capaian Bulan Ini</SectionTitle>
                 <Card className="mx-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -446,15 +678,15 @@ export const MonthlyDuesPage: React.FC = () => {
                     />
                   </div>
                   <div className="mt-2.5 flex items-center gap-2 text-ios-caption flex-wrap">
-                    <span className="px-2 py-0.5 rounded-full bg-accent-soft text-accent font-bold">
+                    <StatusPill tone="accent">
                       {progressPct}% tercapai
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-success-soft text-success font-bold">
+                    </StatusPill>
+                    <StatusPill tone="success">
                       {dashboard.paidCount} lunas
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-surface-card2 text-surface-muted font-bold">
+                    </StatusPill>
+                    <StatusPill tone="muted">
                       {dashboard.unpaidCount} belum
-                    </span>
+                    </StatusPill>
                     <span className="text-surface-muted font-medium ml-auto">
                       {dashboard.memberCount} anggota
                     </span>
@@ -464,40 +696,141 @@ export const MonthlyDuesPage: React.FC = () => {
             )}
 
             <section>
-              <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                Periode & Status
-              </p>
-              <div className="px-4 mb-2.5">
-                <Input
-                  type="month"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  aria-label="Periode bulan"
-                />
-              </div>
-              <div className="px-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                {(["ALL", "LUNAS", "BELUM"] as const).map((s) => (
-                  <FilterChip
-                    key={s}
-                    active={statusFilter === s}
-                    label={s === "ALL" ? "Semua" : s === "LUNAS" ? "Lunas" : "Belum Lunas"}
-                    onClick={() => setStatusFilter(s)}
-                  />
+              <SectionTitle>Alokasi Dana</SectionTitle>
+              <GroupedList>
+                {[
+                  { label: "Susulan IR", value: allocationTotals.ir },
+                  { label: "Uang Sambung", value: allocationTotals.sambung },
+                  { label: "Jimpitan", value: allocationTotals.jimpitan },
+                  { label: "Siar-Siar", value: allocationTotals.siar },
+                  { label: "Seribuan", value: allocationTotals.seribu },
+                  { label: "Kafan", value: allocationTotals.kafan },
+                  { label: "Ukhro MT", value: allocationTotals.ukhro },
+                ].map((a, idx, arr) => (
+                  <ListRow key={a.label} insetDivider={idx !== arr.length - 1}>
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <p className="text-ios-body text-surface-text">{a.label}</p>
+                      <p className="font-mono font-bold text-surface-text shrink-0">{formatRp(a.value)}</p>
+                    </div>
+                  </ListRow>
                 ))}
+              </GroupedList>
+              {/* Status posting spek #shodPostStatus: cegah double-post */}
+              <Card className="mx-4 mt-2.5 flex items-center gap-2" data-testid="shod-post-status">
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${postStatus === "posted" ? "bg-success" : postStatus === "not-posted" ? "bg-warning" : "bg-surface-muted"}`} />
+                <p className="text-ios-footnote font-medium flex-1">
+                  {postStatus === "posted" ? `Sudah diposting ke Kas (${monthLabel})`
+                    : postStatus === "not-posted" ? `Belum diposting ke Kas (${monthLabel})`
+                    : "Status posting belum diketahui"}
+                </p>
+              </Card>
+              <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
+                {postStatus === "posted" ? (
+                  <Button variant="secondary" size="sm" disabled={cancelling} onClick={handleCancelPost} data-testid="btn-shod-cancel-post-to-kas">
+                    {cancelling ? "Membatalkan…" : "Batalkan Posting"}
+                  </Button>
+                ) : (
+                  <Button variant="secondary" size="sm" disabled={posting} onClick={handlePostToKas} data-testid="btn-shod-post-to-kas">
+                    {posting ? "Posting…" : "Post ke Kas"}
+                  </Button>
+                )}
+                <Button variant="secondary" size="sm" onClick={handleCopyRekap}>
+                  Salin Rekap
+                </Button>
               </div>
+            </section>
+
+            {/* Rincian pembayaran bulanan Jan s.d. bulan sekarang */}
+            <section>
+              <SectionTitle>
+                Rincian {yearlyYear} (Jan–{monthlyRecap.length > 0 ? monthlyRecap[monthlyRecap.length - 1].label : "–"}, {monthlyRecap.length} Bulan)
+              </SectionTitle>
+              <div data-testid="shodaqoh-yearly-table">
+                {yearlyLoading ? (
+                  <GroupedListSkeleton rows={5} />
+                ) : (
+                  <GroupedList>
+                    {(showAllMonths ? monthlyRecap : monthlyRecap.slice(-3)).map((r, idx, arr) => {
+                      const done = !r.future && r.received >= r.target && r.target > 0;
+                      const active = r.key === selectedMonth;
+                      return (
+                        <ListRow
+                          key={r.key}
+                          onClick={() => { if (!r.future) setSelectedMonth(r.key); }}
+                          insetDivider={idx !== arr.length - 1}
+                          className={active ? "bg-accent-soft/40" : ""}
+                        >
+                          <ChevronRow>
+                            <div className="flex items-center justify-between gap-2 w-full">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-ios-body font-semibold text-surface-text truncate">
+                                  {r.label} {yearlyYear}
+                                </p>
+                                <p className="text-ios-caption text-surface-muted truncate">
+                                  Target {formatRp(r.target)} · {r.paid} lunas
+                                </p>
+                              </div>
+                              <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                                <p className="font-mono text-ios-subhead font-bold text-accent">
+                                  {formatRp(r.received)}
+                                </p>
+                                {done ? <StatusPill tone="success">LUNAS</StatusPill>
+                                  : r.received > 0 ? <StatusPill tone="warning">SEBAGIAN</StatusPill>
+                                  : <StatusPill tone="muted">BELUM</StatusPill>}
+                              </div>
+                            </div>
+                          </ChevronRow>
+                        </ListRow>
+                      );
+                    })}
+                  </GroupedList>
+                )}
+                <div className="px-4 py-2 flex items-center justify-between gap-2">
+                  <p className="text-ios-caption text-surface-muted">
+                    Ketuk baris bulan untuk melihat rinciannya.
+                  </p>
+                  {monthlyRecap.length > 3 && (
+                    <button
+                      onClick={() => setShowAllMonths((v) => !v)}
+                      className="text-ios-footnote font-semibold text-accent active:scale-[0.97] shrink-0"
+                    >
+                      {showAllMonths ? "Tutup" : `Lihat semua (${monthlyRecap.length})`}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
+            </div>
+            )}
+
+            {shodTab === "members" && (
+            <div data-testid="shod-tab-members" className="contents">
+            <section>
+              {/* Chip filter aktif spek #shodaqohActiveFilters */}
+              {(statusFilter !== "ALL") && (
+                <div className="px-4 mt-4 flex gap-2 flex-wrap" data-testid="shodaqoh-active-filters">
+                  <button
+                    className="px-2.5 py-1 rounded-full bg-accent-soft text-accent text-ios-caption font-bold"
+                    onClick={() => setStatusFilter("ALL")}
+                  >
+                    {statusFilter === "LUNAS" ? "Lunas ×" : "Belum ×"}
+                  </button>
+                </div>
+              )}
+              <SectionTitle>
+                Anggota · {monthLabel} ({visibleMembers.length})
+              </SectionTitle>
               <div className="px-4 mt-2.5">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari nama anggota…"
+                  data-testid="shodaqoh-search"
                 />
               </div>
             </section>
 
             <section>
-              <p className="px-4 mb-2.5 mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                Anggota ({visibleMembers.length})
-              </p>
               {loading ? (
                 <GroupedListSkeleton rows={5} />
               ) : visibleMembers.length === 0 ? (
@@ -506,16 +839,17 @@ export const MonthlyDuesPage: React.FC = () => {
                   description="Tambahkan anggota shodaqoh memakai tombol + di bawah."
                 />
               ) : (
+                // 1 baris = status lunas bulan berjalan (gabungan Monitoring × Anggota).
                 <GroupedList>
                   {visibleMembers.map((m, idx) => {
                     const payment = paymentsList.find((p) => p.member_id === m.member_id);
-                    const isInactive = payment?.status === "INACTIVE";
-                    const hasPaid = Boolean(payment && !isInactive && payment.total_amount > 0);
+                    const hasPaid = Boolean(payment && payment.status !== "INACTIVE" && (Number(payment.total_amount) || 0) > 0);
                     const carrySummary = payment ? formatCarrySummary(payment.carryover_items || []) : "";
+                    const memberActive = (m.status || "ACTIVE") === "ACTIVE";
                     return (
                       <ListRow
                         key={m.member_id}
-                        onClick={() => handleOpenPaymentSheet(m)}
+                        onClick={() => setMemberActionTarget(m)}
                         insetDivider={idx !== visibleMembers.length - 1}
                         leading={
                           <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-bold text-ios-body">
@@ -530,8 +864,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                 {m.member_name}
                               </p>
                               <p className="text-ios-caption text-surface-muted truncate">
-                                Target {formatRp(m.monthly_target)}
-                                {hasPaid && payment ? ` · Terbayar ${formatRp(payment.total_amount)}` : ""}
+                                {hasPaid && payment ? `Terbayar ${formatRp(payment.total_amount)}` : `Target ${formatRp(m.monthly_target)}`}{memberActive ? "" : " · Nonaktif"}
                               </p>
                               {carrySummary && (
                                 <p className="text-ios-caption text-accent truncate font-medium">
@@ -539,17 +872,9 @@ export const MonthlyDuesPage: React.FC = () => {
                                 </p>
                               )}
                             </div>
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shrink-0 ${
-                                isInactive
-                                  ? "bg-surface-card2 text-surface-muted line-through"
-                                  : hasPaid
-                                    ? "bg-success-soft text-success"
-                                    : "bg-surface-card2 text-surface-muted"
-                              }`}
-                            >
-                              {isInactive ? "Nonaktif" : hasPaid ? "Lunas" : "Belum"}
-                            </span>
+                            <StatusPill tone={hasPaid ? "success" : "muted"}>
+                              {hasPaid ? "Lunas" : "Belum"}
+                            </StatusPill>
                           </div>
                         </ChevronRow>
                       </ListRow>
@@ -558,6 +883,42 @@ export const MonthlyDuesPage: React.FC = () => {
                 </GroupedList>
               )}
             </section>
+            </div>
+            )}
+
+            {shodTab === "payments" && (
+            <div data-testid="shod-tab-payments" className="contents">
+            <section>
+              <SectionTitle>
+                Riwayat Pembayaran ({paymentsList.length})
+              </SectionTitle>
+              {loading ? <GroupedListSkeleton rows={5} />
+              : paymentsList.length === 0 ? (
+                <EmptyState title="Belum ada pembayaran" description="Riwayat pembayaran bulan ini akan tampil di sini." />
+              ) : (
+                <GroupedList>
+                  {paymentsList.map((p, idx) => {
+                    const m = membersList.find((x) => x.member_id === p.member_id);
+                    return (
+                      <ListRow key={p.payment_id || idx} onClick={() => setPaymentDetail(p)} insetDivider={idx !== paymentsList.length - 1}>
+                        <ChevronRow>
+                          <div className="flex items-center justify-between gap-2 w-full">
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-medium">{m?.member_name || p.member_id}</p>
+                              <p className="text-ios-caption text-surface-muted truncate">{p.payment_date}{p.notes ? ` · ${p.notes}` : ""}</p>
+                            </div>
+                            <p className="font-mono font-bold shrink-0">{formatRp(p.total_amount)}</p>
+                          </div>
+                        </ChevronRow>
+                      </ListRow>
+                    );
+                  })}
+                </GroupedList>
+              )}
+            </section>
+            </div>
+            )}
+
           </>
         )}
       </div>
@@ -602,19 +963,57 @@ export const MonthlyDuesPage: React.FC = () => {
       <BottomSheet
         open={isPaymentSheetOpen}
         onClose={() => setIsPaymentSheetOpen(false)}
-        title="Input Pembayaran"
+        title={paymentForm.payment_id ? "Edit Pembayaran" : "Input Pembayaran"}
       >
         {selectedMember && (
-          <form onSubmit={handleSubmitPayment}>
-            <p className="text-ios-footnote font-semibold text-accent mb-4 px-1">
-              {selectedMember.member_name}
-            </p>
+          <form onSubmit={handleSubmitPayment} data-testid="shodaqoh-payment-overlay">
+            {/* Toggle method spek #shodMethodManual / Upload */}
+            <div className="mb-4">
+              <Segmented<"manual" | "upload">
+                ariaLabel="Metode input"
+                value={payMethod}
+                onChange={setPayMethod}
+                size="sm"
+                options={[
+                  { value: "manual", label: "Manual" },
+                  { value: "upload", label: "Upload Bukti" },
+                ]}
+              />
+            </div>
+            {payMethod === "upload" && (
+              <Card className="flex items-center justify-between !py-3 mb-3">
+                <span className="text-ios-footnote text-surface-muted">Punya foto bukti transfer?</span>
+                <Button
+                  type="button" size="sm" variant="secondary"
+                  onClick={() => setIsAiSheetOpen(true)}
+                >
+                  Scan AI
+                </Button>
+              </Card>
+            )}
+            {/* Dropdown anggota spek: bisa pindah member dalam sheet */}
+            <div className="mb-4">
+              <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">Anggota</p>
+              <div className="max-h-36 overflow-y-auto rounded-2xl border border-surface-border">
+                {membersList.map((m) => (
+                  <button
+                    key={m.member_id}
+                    type="button"
+                    onClick={() => handleOpenPaymentSheet(m)}
+                    className={`w-full text-left px-3.5 py-2.5 text-ios-body active:bg-surface-card2 ${m.member_id === selectedMember.member_id ? "font-bold text-accent" : ""}`}
+                  >
+                    {m.member_id === selectedMember.member_id ? "● " : ""}{m.member_name}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Input
               label="Tanggal Pembayaran"
               type="date"
               value={paymentForm.payment_date}
               onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
               required
+              data-testid="shod-payment-date"
             />
             <div className="mb-1">
               <div className="flex items-center justify-between px-1 mb-2">
@@ -704,9 +1103,13 @@ export const MonthlyDuesPage: React.FC = () => {
                 {formatRp(paymentTotal)}
               </span>
             </Card>
-            <Button type="submit" fullWidth disabled={savingPayment}>
-              {savingPayment ? "Menyimpan…" : "Simpan Pembayaran"}
-            </Button>
+            <SheetFooter
+              onCancel={() => setIsPaymentSheetOpen(false)}
+              submitLabel="Simpan"
+              saving={savingPayment}
+              cancelTestId="btn-cancel-shodaqoh-payment"
+              submitTestId="btn-submit-shodaqoh-payment"
+            />
             <Button
               type="button"
               variant="secondary"
@@ -741,6 +1144,348 @@ export const MonthlyDuesPage: React.FC = () => {
         </Button>
       </BottomSheet>
 
+      {/* Filter sheet spek #shodaqohFilterSheet */}
+      <BottomSheet
+        open={filterSheetOpen}
+        onClose={() => setFilterSheetOpen(false)}
+        title="Filter Shodaqoh"
+      >
+        <div data-testid="shodaqoh-filter-sheet">
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Tahun</p>
+          <div className="flex gap-2 flex-wrap mb-4">
+            {["all", String(new Date().getFullYear()), String(new Date().getFullYear() - 1), String(new Date().getFullYear() - 2)].map((y) => (
+              <FilterChip key={y} active={draftYear === y} label={y === "all" ? "Semua" : y} onClick={() => setDraftYear(y)} />
+            ))}
+          </div>
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Bulan periode</p>
+          <div className="mb-4 px-1">
+            <Input type="month" value={draftMonth} onChange={(e) => setDraftMonth(e.target.value)} aria-label="Bulan periode" />
+          </div>
+          <p className="text-ios-footnote font-semibold px-1 mb-2">Status</p>
+          <div className="flex gap-2 flex-wrap mb-4">
+            {(["ALL", "LUNAS", "BELUM"] as const).map((s) => (
+              <FilterChip key={s} active={draftStatus === s} label={s === "ALL" ? "Semua" : s === "LUNAS" ? "Lunas" : "Belum"} onClick={() => setDraftStatus(s)} />
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const d = new Date();
+                const cur = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                setDraftMonth(cur); setDraftStatus("ALL"); setDraftYear("all");
+              }}
+              data-testid="btn-reset-shodaqoh-filter"
+            >
+              Reset
+            </Button>
+            <Button
+              onClick={() => {
+                if (draftMonth) {
+                  if (draftYear !== "all" && !draftMonth.startsWith(draftYear)) {
+                    showToast(`Bulan harus di tahun ${draftYear}`, "error");
+                    return;
+                  }
+                  setSelectedMonth(draftMonth);
+                }
+                setStatusFilter(draftStatus);
+                setFilterSheetOpen(false);
+              }}
+              data-testid="btn-apply-shodaqoh-filter"
+            >
+              Terapkan
+            </Button>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* Member action overlay spek #shodMemberActionOverlay */}
+      <BottomSheet
+        open={!!memberActionTarget}
+        onClose={() => setMemberActionTarget(null)}
+        title={memberActionTarget?.member_name || "Anggota"}
+      >
+        {memberActionTarget && (
+          <div className="grid gap-2.5" data-testid="shod-member-action-overlay">
+            {(() => {
+              const existingPay = paymentsList.find(
+                (p) => p.member_id === memberActionTarget.member_id && p.status !== "INACTIVE" && (Number(p.total_amount) || 0) > 0,
+              );
+              return (
+                <Button
+                  variant="secondary" fullWidth data-testid="btn-member-action-pay"
+                  onClick={() => { const m = memberActionTarget; setMemberActionTarget(null); handleOpenPaymentSheet(m, existingPay); }}
+                >
+                  {existingPay ? "Edit Pembayaran" : "Input Pembayaran"}
+                </Button>
+              );
+            })()}
+            <Button
+              variant="secondary" fullWidth data-testid="btn-member-action-detail"
+              onClick={() => { setMemberDetailTarget(memberActionTarget); setMemberActionTarget(null); }}
+            >
+              Detail Anggota
+            </Button>
+            <Button
+              variant="secondary" fullWidth data-testid="btn-member-action-edit"
+              onClick={() => {
+                const m = memberActionTarget;
+                setEditingMember(m); setMemberName(m.member_name); setMemberTarget(m.monthly_target);
+                setMemberActionTarget(null); setIsMemberSheetOpen(true);
+              }}
+            >
+              Edit Anggota
+            </Button>
+            <Button
+              variant="softDanger" fullWidth data-testid="btn-member-action-delete"
+              onClick={() => { setDeleteMemberTarget(memberActionTarget); setMemberActionTarget(null); }}
+            >
+              Hapus Anggota
+            </Button>
+            <Button variant="ghost" fullWidth onClick={() => setMemberActionTarget(null)} data-testid="btn-member-action-cancel">
+              Batal
+            </Button>
+          </div>
+        )}
+      </BottomSheet>
+
+      {/* Member detail overlay spek #shodMemberDetailOverlay */}
+      <BottomSheet
+        open={!!memberDetailTarget}
+        onClose={() => setMemberDetailTarget(null)}
+        title={memberDetailTarget?.member_name || "Detail Anggota"}
+      >
+        {memberDetailTarget && (
+          <div data-testid="shod-member-detail-overlay">
+            {(() => {
+              // Rincian per orang: Januari s.d. bulan sekarang (tahun periode aktif), per pos + susulan bulan IR.
+              const lastKey = yearlyMaxMonth > 0
+                ? `${yearlyYear}-${String(yearlyMaxMonth).padStart(2, "0")}`
+                : selectedMonth;
+              const src = yearlyPayments.length > 0 ? yearlyPayments : paymentsList;
+              const mine = src.filter(
+                (p: any) => p.member_id === memberDetailTarget.member_id
+                  && p.status !== "REVERSED" && p.status !== "INACTIVE"
+                  && (p.payment_date || "").slice(0, 4) === yearlyYear
+                  && (p.payment_date || "").slice(0, 7) <= lastKey,
+              );
+              const byMonth = new Map<string, any[]>();
+              for (const p of mine) {
+                const k = (p.payment_date || "").slice(0, 7);
+                if (!byMonth.has(k)) byMonth.set(k, []);
+                byMonth.get(k)!.push(p);
+              }
+              const sum = (arr: any[], f: (p: any) => number) => arr.reduce((s, p) => s + (Number(f(p)) || 0), 0);
+              const months: string[] = [];
+              {
+                const maxM = yearlyMaxMonth > 0 ? yearlyMaxMonth : Number((selectedMonth || "").slice(5, 7)) || 12;
+                for (let i = 1; i <= maxM; i++) months.push(`${yearlyYear}-${String(i).padStart(2, "0")}`);
+              }
+              const grand = { ir: 0, sambung: 0, jimpitan: 0, siar: 0, seribu: 0, kafan: 0, ukhro: 0, total: 0 };
+              const mLabel = (k: string) => new Date(Number(k.slice(0, 4)), Number(k.slice(5, 7)) - 1, 1)
+                .toLocaleDateString("id-ID", { month: "short" });
+              return (
+                <>
+                  <div className="grid grid-cols-2 gap-2.5 mb-3">
+                    <Card className="!p-3">
+                      <p className="text-ios-caption text-surface-muted">Target / bln</p>
+                      <p className="font-extrabold">{formatRp(memberDetailTarget.monthly_target)}</p>
+                    </Card>
+                    <Card className="!p-3">
+                      <p className="text-ios-caption text-surface-muted">Total Jan–{months.length > 0 ? mLabel(months[months.length - 1]) : "–"}</p>
+                      <p className="font-extrabold text-accent">{formatRp(sum(mine, (p) => p.total_amount))}</p>
+                    </Card>
+                  </div>
+                  <GroupedList>
+                    {months.map((k, idx) => {
+                      const arr = byMonth.get(k) || [];
+                      const v = {
+                        ir: sum(arr, (p) => p.carryover_ir),
+                        sambung: sum(arr, (p) => p.connecting_fund),
+                        jimpitan: sum(arr, (p) => p.community_dues),
+                        siar: sum(arr, (p) => p.outreach_fund),
+                        seribu: sum(arr, (p) => p.thousand_fund),
+                        kafan: sum(arr, (p) => p.funeral_fund),
+                        ukhro: sum(arr, (p) => p.ukhro_mt),
+                        total: sum(arr, (p) => p.total_amount),
+                      };
+                      grand.ir += v.ir; grand.sambung += v.sambung; grand.jimpitan += v.jimpitan;
+                      grand.siar += v.siar; grand.seribu += v.seribu; grand.kafan += v.kafan;
+                      grand.ukhro += v.ukhro; grand.total += v.total;
+                      const irMonths = [...new Set(arr.flatMap((p: any) => (p.carryover_items || []).map((it: any) => String(it.month || "")) ).filter(Boolean))]
+                        .map((mm) => formatCarryMonth(mm)).join(", ");
+                      const empty = arr.length === 0;
+                      const parts = [
+                        v.ir > 0 ? `IR ${formatRp(v.ir)}` : "",
+                        v.sambung > 0 ? `Sambung ${formatRp(v.sambung)}` : "",
+                        v.jimpitan > 0 ? `Jimpitan ${formatRp(v.jimpitan)}` : "",
+                        v.siar > 0 ? `Siar ${formatRp(v.siar)}` : "",
+                        v.seribu > 0 ? `Seribu ${formatRp(v.seribu)}` : "",
+                        v.kafan > 0 ? `Kafan ${formatRp(v.kafan)}` : "",
+                        v.ukhro > 0 ? `Ukhro ${formatRp(v.ukhro)}` : "",
+                      ].filter(Boolean);
+                      return (
+                        <ListRow
+                          key={k}
+                          onClick={() => {
+                            if (arr.length > 0) {
+                              // Bulan terbayar → buka sheet rincian pembayaran (sama seperti Riwayat).
+                              setMemberDetailTarget(null);
+                              setPaymentDetail(arr[arr.length - 1]);
+                            } else {
+                              setSelectedMonth(k);
+                              setMemberDetailTarget(null);
+                            }
+                          }}
+                          insetDivider={idx !== months.length - 1}
+                          className={`${k === selectedMonth ? "bg-accent-soft/40" : ""} ${empty ? "opacity-50" : ""}`}
+                        >
+                          <ChevronRow>
+                            <div className="flex items-center justify-between gap-2 w-full">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-ios-body font-semibold text-surface-text truncate">
+                                  {mLabel(k)} {yearlyYear}
+                                </p>
+                                {empty ? (
+                                  <p className="text-ios-caption text-surface-muted truncate">Belum ada pembayaran</p>
+                                ) : (
+                                  <>
+                                    <p className="text-ios-caption text-surface-muted truncate">{parts.join(" · ")}</p>
+                                    {irMonths ? (
+                                      <p className="text-ios-caption text-accent truncate font-medium">Susulan: {irMonths}</p>
+                                    ) : null}
+                                  </>
+                                )}
+                              </div>
+                              <p className="font-mono font-bold text-accent shrink-0">
+                                {v.total > 0 ? formatRp(v.total) : "–"}
+                              </p>
+                            </div>
+                          </ChevronRow>
+                        </ListRow>
+                      );
+                    })}
+                    <ListRow insetDivider={false} className="bg-surface-card2/60">
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-ios-body font-bold text-surface-text truncate">
+                            Total Jan–{months.length > 0 ? mLabel(months[months.length - 1]) : "–"}
+                          </p>
+                          <p className="text-ios-caption text-surface-muted truncate">
+                            IR {formatRp(grand.ir)} · Sambung {formatRp(grand.sambung)} · Jimpitan {formatRp(grand.jimpitan)}
+                          </p>
+                        </div>
+                        <p className="font-mono font-extrabold text-accent shrink-0">{formatRp(grand.total)}</p>
+                      </div>
+                    </ListRow>
+                  </GroupedList>
+                  <p className="px-1 py-2 text-ios-caption text-surface-muted">
+                    Ketuk bulan yang sudah bayar untuk melihat rinciannya. Baris IR mencantumkan bulan susulan yang dibayar.
+                  </p>
+                  <Button fullWidth variant="secondary" className="mt-3" onClick={() => setMemberDetailTarget(null)} data-testid="btn-close-shod-member-detail">
+                    Tutup
+                  </Button>
+                </>
+              );
+            })()}
+          </div>
+        )}
+      </BottomSheet>
+
+      {/* Payment detail overlay spek #shodPaymentDetailOverlay */}
+      <BottomSheet
+        open={!!paymentDetail}
+        onClose={() => setPaymentDetail(null)}
+        title="Rincian Pembayaran"
+      >
+        {paymentDetail && (
+          <div data-testid="shod-payment-detail-overlay">
+            {(() => {
+              const m = membersList.find((x) => x.member_id === paymentDetail.member_id);
+              const rows: Array<[string, number]> = [
+                ["Susulan IR", Number(paymentDetail.carryover_ir) || 0],
+                ["Uang Sambung", Number(paymentDetail.connecting_fund) || 0],
+                ["Jimpitan", Number(paymentDetail.community_dues) || 0],
+                ["Siar-Siar", Number(paymentDetail.outreach_fund) || 0],
+                ["Seribuan", Number(paymentDetail.thousand_fund) || 0],
+                ["Kafan", Number(paymentDetail.funeral_fund) || 0],
+                ["Ukhro MT", Number(paymentDetail.ukhro_mt) || 0],
+              ];
+              return (
+                <>
+                  <p className="text-ios-footnote font-semibold px-1 mb-2">{m?.member_name || paymentDetail.member_id} · {paymentDetail.payment_date}</p>
+                  <GroupedList flush>
+                    {rows.map(([l, v]) => (
+                      <ListRow key={l} insetDivider>
+                        <div className="flex items-center justify-between w-full">
+                          <p className="text-ios-body">{l}</p>
+                          <p className="font-mono font-bold">{formatRp(v)}</p>
+                        </div>
+                      </ListRow>
+                    ))}
+                    <ListRow insetDivider={false}>
+                      <div className="flex items-center justify-between w-full">
+                        <p className="font-bold">Total</p>
+                        <p className="font-mono font-extrabold text-accent">{formatRp(paymentDetail.total_amount)}</p>
+                      </div>
+                    </ListRow>
+                  </GroupedList>
+                  {paymentDetail.notes && <p className="text-ios-caption text-surface-muted px-1 mt-2">Catatan: {paymentDetail.notes}</p>}
+                  <div className="grid grid-cols-2 gap-2.5 mt-3">
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        const pay = paymentDetail;
+                        setPaymentDetail(null);
+                        if (m) {
+                          setSelectedMember(m);
+                          setPaymentForm({
+                            payment_id: pay.payment_id || "",
+                            payment_date: pay.payment_date || new Date().toISOString().slice(0, 10),
+                            connecting_fund: Number(pay.connecting_fund) || 0,
+                            community_dues: Number(pay.community_dues) || 0,
+                            outreach_fund: Number(pay.outreach_fund) || 0,
+                            thousand_fund: Number(pay.thousand_fund) || 0,
+                            funeral_fund: Number(pay.funeral_fund) || 0,
+                            ukhro_mt: Number(pay.ukhro_mt) || 0,
+                            notes: pay.notes || "",
+                          });
+                          setCarryovers((pay.carryover_items || []).map((it: any) => ({ month: String(it.month || ""), amount: Number(it.amount) || 0 })));
+                          setIsPaymentSheetOpen(true);
+                        }
+                      }}
+                      data-testid="btn-shod-edit-payment"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="softDanger"
+                      disabled={reversing}
+                      onClick={async () => {
+                        setReversing(true);
+                        try {
+                          await financeApi.reverseDuePayment(assignedGroup, paymentDetail.payment_id);
+                          showToast("Pembayaran dibatalkan (reverse)", "success");
+                          setPaymentDetail(null); loadData();
+                        } catch (err: any) {
+                          showToast(err instanceof ApiError ? err.message : "Gagal membatalkan", "error");
+                        } finally { setReversing(false); }
+                      }}
+                      data-testid="btn-shod-reverse-payment"
+                    >
+                      {reversing ? "Proses…" : "Batalkan"}
+                    </Button>
+                  </div>
+                  <Button fullWidth variant="ghost" className="mt-2.5" onClick={() => setPaymentDetail(null)} data-testid="btn-close-shod-payment-detail">
+                    Tutup
+                  </Button>
+                </>
+              );
+            })()}
+          </div>
+        )}
+      </BottomSheet>
+
       <ConfirmDialog
         open={!!deleteMemberTarget}
         title="Hapus anggota?"
@@ -750,14 +1495,6 @@ export const MonthlyDuesPage: React.FC = () => {
         loading={deletingMember}
         onConfirm={handleConfirmDeleteMember}
         onCancel={() => setDeleteMemberTarget(null)}
-      />
-
-      <MonthlyDuesPrintModal
-        isOpen={isPrintModalOpen}
-        onClose={() => setIsPrintModalOpen(false)}
-        members={membersList}
-        payments={paymentsList}
-        periodLabel={selectedMonth}
       />
     </AppLayout>
   );

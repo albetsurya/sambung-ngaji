@@ -7,33 +7,33 @@ import {
   AlignLeft,
   Play,
   Bookmark,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button, ErrorState, Segmented } from "../components/common";
+import { MasukButton } from "../components/ui";
+import { Button, ErrorState, Segmented } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
-import { QuranAyatCard } from "../components/member/QuranAyatCard";
+import { QuranAyatCard } from "../features/member/components/QuranAyatCard";
 import {
   AudioPlayerMini,
   type AudioTrack,
-} from "../components/member/AudioPlayerMini";
-import { QuranNavigationSheet } from "../components/member/QuranNavigationSheet";
+} from "../features/member/components/AudioPlayerMini";
+import { QuranNavigationSheet } from "../features/member/components/QuranNavigationSheet";
 import {
   PerAyatView,
   SurahHeaderCard,
   BismillahBlock,
   SurahNavFooter,
   SurahSkeleton,
-} from "../components/member/QuranSurahParts";
+} from "../features/member/components/QuranSurahParts";
 import {
   fetchSurahDetail,
   getAyatAudioUrl,
   getQariName,
   QARI_LIST,
   type SurahDetail,
-} from "../data/quran";
-import { useQuranBookmark } from "../hooks/useQuranBookmark";
-import { useDoaFontSize } from "../hooks/useDoaFontSize";
+} from "../features/quran/data/quran";
+import { useQuranBookmark } from "../features/quran/hooks/useQuranBookmark";
+import { useDoaFontSize } from "../features/doa-dzikir/hooks/useDoaFontSize";
 import { useIsMuballigh } from "../hooks/useIsMuballigh";
 
 type BacaMode = "scroll" | "ayat";

@@ -5,14 +5,14 @@ import {
   RefreshCw,
   Calendar,
   TrendingUp,
-} from "../components/common/FontAwesomeIcons";
-import { BadgeCollection } from "../components/member/BadgeCollection";
-import { useBadges } from "../hooks/useBadges";
-import { useDzikirStreak } from "../hooks/useDzikirStreak";
-import { useQuranStreak } from "../hooks/useQuranStreak";
+} from "../components/ui/FontAwesomeIcons";
+import { BadgeCollection } from "../features/member/components/BadgeCollection";
+import { useBadges } from "../features/member/hooks/useBadges";
+import { useDzikirStreak } from "../features/doa-dzikir/hooks/useDzikirStreak";
+import { useQuranStreak } from "../features/quran/hooks/useQuranStreak";
 import type { Streaks } from "../types";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button } from "../components/common";
+import { Button } from "../components/ui";
 import {
   WAKTU_LIST,
   STATUS_LIST,
@@ -21,14 +21,14 @@ import {
   formatDateShort,
   type WaktuSholat,
   type StatusSholat,
-} from "../data/sholat";
+} from "../features/ibadah/data/sholat";
 import {
   useSholatJournal,
   countRecorded,
   countTepat,
   isComplete,
   WAKTU_ORDER,
-} from "../hooks/useSholatJournal";
+} from "../features/ibadah/hooks/useSholatJournal";
 
 
 const TONE_BG: Record<string, string> = {
