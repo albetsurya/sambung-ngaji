@@ -10,7 +10,7 @@ output harus bisa diverifikasi langsung.
 
 ```
 PROJECT_NAME      = SambungNgaji
-FRONTEND_DIR      = sambung-ngaji-frontend
+FRONTEND_DIR      = frontend
 BACKEND_DIR       = backend/go
 STACK_FRONTEND    = React 18 + TS 5 + Vite 5 + Tailwind 3 + TanStack Query 5 + PWA (vite-plugin-pwa)
 STACK_BACKEND     = Go 1.26 + Fiber v2 + PostgreSQL (pgx) + Supabase Storage
@@ -26,7 +26,7 @@ ENV_FE            = VITE_API_BASE_URL   (dev: http://127.0.0.1:8080/api)
 DEV_HOST          = 127.0.0.1  ← WAJIB, bukan localhost (macOS IPv6 issue)
 DOCKER            = docker compose (postgres:5433, adminer:8091, api:8080)
 USER_DEV          = albetsurya / albetsurya123
-ICON_LIB          = FontAwesome (BUKAN Lucide) — src/components/common/FontAwesomeIcons
+ICON_LIB          = FontAwesome (BUKAN Lucide) — src/components/ui/FontAwesomeIcons
 DESIGN_SYSTEM     = surface-*, ios-*, accent, warning, success, danger, info (Tailwind tokens)
 STATE             = TanStack Query v5 + Context (Auth/Theme/Toast)
 ```
@@ -137,9 +137,47 @@ docker compose logs --tail=20 api  # cek startup
 docker compose exec -T postgres psql -U pengajian -d pengajian -c "..."  # -T WAJIB untuk heredoc
 ```
 
-### Migrasi Go
-Selalu 2 file: `db/migrations/000XXX_name.up.sql` + `.down.sql`.
+### Migrasi Go (Local Docker)
+Selalu 2 file: `db/migrations/000XXX_name.up.sql` + `.down.sql` (format 6-digit, e.g. `000013`).
 Apply: `./docker-dev.sh migrate`. Kalau dirty → fix manual via psql.
+
+### Migrasi Supabase (Production/Deploy)
+File migrasi Supabase ada di `supabase/migrations/` — BEDA folder dari `db/migrations/`.
+`supabase db push` dijalankan otomatis oleh `start.sh` saat container API naik di Render.
+
+ATURAN PENAMAAN — WAJIB DIPATUHI:
+- Folder `db/migrations/`      → format 6-digit: `000001`, `000002`, ..., `000013`
+- Folder `supabase/migrations/` → format 3-digit: `002`, `003`, ..., `013`
+- Ekstensi di `supabase/migrations/` → `.up.sql` saja (tanpa `.down.sql`)
+  Supabase tidak memproses `.down.sql` via `db push`.
+
+ATURAN KRITIS — JANGAN DILANGGAR:
+Prefix migrasi baru di `supabase/migrations/` HARUS konsisten dengan konvensi
+3-digit yang sudah ada. Jangan pakai format `000013` di folder ini.
+
+Kenapa: `supabase db push` mengurutkan file secara LEXICOGRAPHIC STRING SORT,
+bukan numeric. `"000013"` secara abjad berada SEBELUM `"002"`, sehingga Supabase
+mengira file itu adalah migrasi sangat lama yang belum pernah dijalankan.
+Akibatnya push ditolak (LegacyDbPushMissingRemoteError) dan migrasi tidak
+ter-apply saat deploy.
+
+Contoh urutan BENAR di `supabase/migrations/`:
+  002_add_gender_target.up.sql
+  003_titlecase_names.up.sql
+  ...
+  012_friday_seed.up.sql
+  013_group_role_assignment.up.sql   ← BENAR (lanjut setelah 012)
+
+Contoh urutan SALAH (jangan lakukan ini):
+  000013_group_role_assignment.up.sql  ← SALAH (secara sort berada sebelum 002)
+
+CHECKLIST setiap kali buat migrasi baru:
+1. Buat `db/migrations/000XXX_name.up.sql` + `.down.sql` (6-digit, untuk golang-migrate lokal)
+2. Buat `supabase/migrations/XXX_name.up.sql` (3-digit, tanpa .down.sql, untuk Supabase)
+3. Pastikan konten `.up.sql` idempoten: pakai `IF NOT EXISTS` / `DO $$ BEGIN...END$$`
+4. Jalankan `ls -1 supabase/migrations/*.sql | sort` dan verifikasi urutannya
+   sebelum commit — migrasi baru harus muncul PALING BAWAH.
+5. Commit kedua file sekaligus: `git add db/migrations/000XXX_* supabase/migrations/XXX_*`
 
 ---
 
