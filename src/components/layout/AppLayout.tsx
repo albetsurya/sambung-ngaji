@@ -9,10 +9,10 @@ import {
   Moon,
   Sparkles,
   RefreshCw,
-} from "../common/FontAwesomeIcons";
+} from "../ui/FontAwesomeIcons";
 import { BottomNav } from "./BottomNav";
 import { DesktopSidebar } from "./DesktopSidebar";
-import { Button } from "../common/Button";
+import { Button } from "../ui/Button";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useEnvironment } from "../../hooks/useEnvironment";

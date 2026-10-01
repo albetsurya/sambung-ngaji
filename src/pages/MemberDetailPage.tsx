@@ -15,7 +15,7 @@ import {
   Trash2,
   Download,
   KeyRound,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   Button,
   Input,
@@ -26,7 +26,7 @@ import {
   MemberSelfSkeleton,
   RoleBadge,
   AccountBadge,
-} from "../components/common";
+} from "../components/ui";
 import { userApi, meetingApi, moodApi } from "../services/domainApi";
 import type { Role } from "../types";
 import { useToast } from "../contexts/ToastContext";
@@ -36,8 +36,8 @@ import {
   Header,
   FloatingActionButton,
 } from "../components/layout/AppLayout";
-import { Avatar, ErrorState } from "../components/common";
-import { memberApi } from "../services/memberApi";
+import { Avatar, ErrorState } from "../components/ui";
+import { memberApi } from "../features/member/api/memberApi";
 import { attendanceApi, monitoringApi } from "../services/domainApi";
 import type { Member } from "../types";
 import { CATEGORY_LABEL, normalizeGender, getDisplayName } from "../utils/format";
@@ -49,13 +49,13 @@ import {
   CategoryHeaderBadge,
   MemberStatusChips,
   type AttendanceItem,
-} from "../components/member/MemberTabs";
+} from "../features/member/components/MemberTabs";
 import { usePermission } from "../hooks/usePermission";
 import { useAuth } from "../contexts/AuthContext";
-import { canViewTaarufCv, isTaarufEligible } from "../lib/taarufAccess";
+import { canViewTaarufCv, isTaarufEligible } from "../features/taaruf/lib/taarufAccess";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
-import { MonitoringTab } from "../components/monitoring/MonitoringTab";
+import { MonitoringTab } from "../features/monitoring/components/MonitoringTab";
 
 
 function generateUsernameFromMember(member: Member): string {

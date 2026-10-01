@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   User as UserIcon,
   RefreshCw,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Badge,
@@ -14,9 +14,9 @@ import {
   ListRow,
   ChevronRow,
   Button,
-} from "../components/common";
-import { PendingMembersSkeleton } from "../components/common/Skeleton";
-import { pendingApi } from "../services/pendingApi";
+} from "../components/ui";
+import { PendingMembersSkeleton } from "../components/ui/Skeleton";
+import { pendingApi } from "../features/admin/api/pendingApi";
 import { usePermission } from "../hooks/usePermission";
 import type { PendingMember, PendingStatus } from "../types";
 import { formatDateShort } from "../utils/format";

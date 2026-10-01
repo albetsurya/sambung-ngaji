@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
+import { MasukButton } from "../components/ui";
 import {
   User,
   Calendar,
@@ -10,7 +10,7 @@ import {
   Sparkles,
   Pencil,
   Check,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 
 export default function MemberGuidePage() {
   const navigate = useNavigate();

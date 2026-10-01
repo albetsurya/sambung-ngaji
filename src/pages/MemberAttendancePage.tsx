@@ -2,13 +2,13 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { ErrorState } from "../components/common";
-import { AttendanceListSkeleton } from "../components/common/Skeleton";
+import { ErrorState } from "../components/ui";
+import { AttendanceListSkeleton } from "../components/ui/Skeleton";
 import {
   AttendanceTab,
   type AttendanceItem,
-} from "../components/member/MemberTabs";
-import { memberSelfApi } from "../services/memberSelfApi";
+} from "../features/member/components/MemberTabs";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { useAuth } from "../contexts/AuthContext";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";

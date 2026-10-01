@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "../types";
-import { authApi } from "../services/authApi";
+import { authApi } from "../features/auth/api/authApi";
 import { getToken, clearToken, ApiError, setGroupId } from "../services/api";
 import { migrateAnonDataToUser } from "../lib/scopedStorage";
 import { useQueryClient } from "@tanstack/react-query";

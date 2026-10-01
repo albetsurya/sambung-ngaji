@@ -10,7 +10,7 @@ import {
   EyeOff,
   Copy,
   AlertTriangle,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -28,8 +28,8 @@ import {
   GroupedList,
   ListRow,
   Modal,
-} from "../components/common";
-import { AnnouncementListSkeleton } from "../components/common/Skeleton";
+} from "../components/ui";
+import { AnnouncementListSkeleton } from "../components/ui/Skeleton";
 import { announcementTemplateApi } from "../services/domainApi";
 import type { AnnouncementTemplate } from "../types";
 import { useToast } from "../contexts/ToastContext";

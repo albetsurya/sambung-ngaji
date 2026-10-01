@@ -4,7 +4,7 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Card,
@@ -12,11 +12,11 @@ import {
   EmptyState,
   GroupedList,
   ListRow,
-} from "../components/common";
+} from "../components/ui";
 import {
   StatTileSkeleton,
   GroupedListSkeleton,
-} from "../components/common/Skeleton";
+} from "../components/ui/Skeleton";
 import { aiUsageApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";

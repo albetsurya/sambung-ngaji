@@ -19,7 +19,7 @@ import {
   UserPlus,
   Search,
   ChevronRight,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Avatar,
@@ -29,18 +29,18 @@ import {
   ListRow,
   ChevronRow,
   ChangePasswordSheet,
-} from "../components/common";
+} from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
-import { AppMaintenanceSection } from "../components/common/AppMaintenanceSection";
+import { AppMaintenanceSection } from "../components/ui/AppMaintenanceSection";
 import { usePermission, setSuperAdminFocusGroup } from "../hooks/usePermission";
 import { normalizeGender } from "../utils/format";
-import { pendingApi } from "../services/pendingApi";
+import { pendingApi } from "../features/admin/api/pendingApi";
 import { groupApi } from "../services/domainApi";
 import { useDelayedLoading } from "../hooks/useDelayedLoading";
-import { ThemePickerSheet } from "../components/common/ThemePickerSheet";
+import { ThemePickerSheet } from "../components/ui/ThemePickerSheet";
 import { queryKeys } from "../lib/queryClient";
 import type { Group } from "../types";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { GroupedListSkeleton } from "../components/ui/Skeleton";
 
 type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "sistem" | "akun";
 
@@ -233,8 +233,10 @@ export default function OthersPage() {
 
       {
         key: "finance",
-        label: "Keuangan (SabilKas)",
-        description: "Kas utama/amil, shodaqoh, zakat & AI",
+        label: "Keuangan",
+        description: assignedGroup
+          ? "Kas, shodaqoh & zakat kelompok terpilih"
+          : "Pilih kelompok dulu, lalu buka kas / shodaqoh / zakat",
         Icon: FileText,
         to: "/finance",
         show: canAccessFinance,
@@ -300,6 +302,7 @@ export default function OthersPage() {
 
   const SUPER_SETTING_KEYS = [
     "theme",
+    "finance",
     "ai-usage",
     "audit",
     "tampilan-jamaah",

@@ -9,18 +9,18 @@ import {
   GraduationCap,
   Eye,
   EyeOff,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   Button,
   Input,
   Select,
   Textarea,
   LoadingOverlay,
-} from "../components/common";
-import { publicApi } from "../services/publicApi";
+} from "../components/ui";
+import { publicApi } from "../features/auth/api/publicApi";
 import { normalizePhoneNumber } from "../utils/format";
 import { ApiError, abortAllApiCalls } from "../services/api";
-import { DateInput } from "../components/common/DateInput";
+import { DateInput } from "../components/ui/DateInput";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 

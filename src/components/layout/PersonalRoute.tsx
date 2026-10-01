@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { LoadingScreen } from "../common";
-import { User } from "../common/FontAwesomeIcons";
+import { LoadingScreen } from "../ui";
+import { User } from "../ui/FontAwesomeIcons";
 
 export function PersonalRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();

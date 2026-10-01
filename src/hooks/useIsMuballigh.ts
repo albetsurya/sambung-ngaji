@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
-import { memberSelfApi } from "../services/memberSelfApi";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
 
 export function useIsMuballigh(): boolean {

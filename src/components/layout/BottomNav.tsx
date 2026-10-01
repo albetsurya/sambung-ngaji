@@ -10,11 +10,9 @@ import {
   MoreHorizontal,
   BookOpen,
   RefreshCw,
-  User,
   Calendar,
-  FileText,
-} from "../common/FontAwesomeIcons";
-
+  Wallet,
+} from "../ui/FontAwesomeIcons";
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
@@ -25,9 +23,9 @@ const ADMIN_ITEMS = [
     to: "/pengumuman",
     icon: Megaphone,
   },
+  { key: "keuangan", label: "Keuangan", to: "/finance", icon: Wallet },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
-
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },
   { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
@@ -35,21 +33,15 @@ const MEMBER_ITEMS = [
   { key: "dzikir", label: "Dzikir", to: "/member/dzikir", icon: RefreshCw },
   { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
 ];
-
-
 export function BottomNav() {
   const location = useLocation();
   const { isDevelopment } = useEnvironment();
   const { canSeeNav } = usePermission();
-
   const isMemberContext = location.pathname.startsWith("/member");
-
   const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
-
   const visible = isMemberContext
     ? items
     : items.filter((i) => canSeeNav(i.key));
-
   return (
     <div className="relative w-full">
       {isDevelopment && (
@@ -58,7 +50,6 @@ export function BottomNav() {
           DEV Server
         </div>
       )}
-
       <nav
         className={`w-full flex items-center gap-1 p-1.5 rounded-3xl bg-surface-card/90 backdrop-blur-xl shadow-lg shadow-black/5 ${
           isDevelopment

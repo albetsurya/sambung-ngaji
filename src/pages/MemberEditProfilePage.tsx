@@ -8,7 +8,7 @@ import {
   Check,
   Trash2,
   Loader2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Button,
@@ -17,9 +17,9 @@ import {
   Textarea,
   LoadingOverlay,
   ConfirmDialog,
-} from "../components/common";
-import { MemberFormSkeleton } from "../components/common/Skeleton";
-import { memberSelfApi } from "../services/memberSelfApi";
+} from "../components/ui";
+import { MemberFormSkeleton } from "../components/ui/Skeleton";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { uploadApi } from "../services/domainApi";
 import type { Member } from "../types";
 import { normalizePhoneNumber, formatDateShort } from "../utils/format";

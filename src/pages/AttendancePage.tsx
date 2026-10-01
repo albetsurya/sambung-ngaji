@@ -22,7 +22,7 @@ import {
   MoreVertical,
   Pencil,
   AlertTriangle,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -36,9 +36,9 @@ import {
   Input,
   ConfirmDialog,
   Segmented,
-} from "../components/common";
+} from "../components/ui";
 import { meetingApi, attendanceApi, groupApi } from "../services/domainApi";
-import { memberApi } from "../services/memberApi";
+import { memberApi } from "../features/member/api/memberApi";
 import type {
   Meeting,
   Member,
@@ -56,15 +56,15 @@ import { CATEGORY_LABEL } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { AttendancePageSkeleton } from "../components/common/Skeleton";
+import { AttendancePageSkeleton } from "../components/ui/Skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys, invalidateRecap } from "../lib/queryClient";
-import { DateInput } from "../components/common/DateInput";
+import { DateInput } from "../components/ui/DateInput";
 import {
   GenderTargetPicker,
   getGenderTarget,
-} from "../components/jadwal/GenderTargetPicker";
-import type { GenderTarget } from "../components/jadwal/GenderTargetPicker";
+} from "../features/jadwal/components/GenderTargetPicker";
+import type { GenderTarget } from "../features/jadwal/components/GenderTargetPicker";
 
 
 const STATUS_CONFIG: Record<

@@ -9,8 +9,8 @@ import {
   LogOut,
   User,
   Home,
-} from "../common/FontAwesomeIcons";
-import { Avatar, BottomSheet } from "../common";
+} from "../ui/FontAwesomeIcons";
+import { Avatar, BottomSheet } from "../ui";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useToast } from "../../contexts/ToastContext";

@@ -2,8 +2,8 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { usePermission } from "../../../hooks/usePermission";
 import { AppLayout } from "../../../components/layout/AppLayout";
-import { Button, EmptyState } from "../../../components/common";
-import { Lock } from "../../../components/common/FontAwesomeIcons";
+import { Button, EmptyState } from "../../../components/ui";
+import { Lock } from "../../../components/ui/FontAwesomeIcons";
 
 export const FinanceGuard: React.FC = () => {
   const { canAccessFinance, role } = usePermission();

@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Pencil,
   Download,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Avatar,
@@ -26,12 +26,12 @@ import {
   ChangeUsernameSheet,
   BackupDataSheet,
   Segmented,
-} from "../components/common";
+} from "../components/ui";
 import {
   ThemePickerRow,
   ThemePickerSheet,
-} from "../components/common/ThemePickerSheet";
-import { AboutAppModal } from "../components/member/AboutAppModal";
+} from "../components/ui/ThemePickerSheet";
+import { AboutAppModal } from "../features/member/components/AboutAppModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme, type ThemeMode } from "../contexts/ThemeContext";
 import { usePermission } from "../hooks/usePermission";

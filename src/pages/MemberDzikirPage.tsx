@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { goBack } from "../utils/navigation";
 import { useAuth } from "../contexts/AuthContext";
-import { RefreshCw } from "../components/common/FontAwesomeIcons";
+import { RefreshCw } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
-import { DZIKIR_PRESETS } from "../data/dzikir";
-import { useDzikirCounters } from "../hooks/useDzikirCounters";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
+import { DZIKIR_PRESETS } from "../features/doa-dzikir/data/dzikir";
+import { useDzikirCounters } from "../features/doa-dzikir/hooks/useDzikirCounters";
 
 export default function MemberDzikirPage() {
   const navigate = useNavigate();

@@ -17,9 +17,9 @@ import {
   Badge,
   LoadingOverlay,
   Segmented,
-} from "../components/common";
-import { DateInput } from "../components/common/DateInput";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
+} from "../components/ui";
+import { DateInput } from "../components/ui/DateInput";
+import { GroupedListSkeleton } from "../components/ui/Skeleton";
 import {
   Mosque,
   Pencil,
@@ -31,7 +31,7 @@ import {
   Plus,
   Loader2,
   Download,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { fridayApi } from "../services/domainApi";
 import type { FridaySchedule } from "../types";
 import { useToast } from "../contexts/ToastContext";
@@ -46,7 +46,7 @@ import {
   todayIso,
   isFridayDate,
   buildFridayMessage,
-} from "../utils/friday";
+} from "../features/friday/utils/friday";
 
 type Tab = "upcoming" | "history";
 

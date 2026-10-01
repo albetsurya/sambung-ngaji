@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Check, Home, Calendar } from "../components/common/FontAwesomeIcons";
-import { Button } from "../components/common";
+import { Check, Home, Calendar } from "../components/ui/FontAwesomeIcons";
+import { Button } from "../components/ui";
 
 interface SuccessState {
   nama?: string;

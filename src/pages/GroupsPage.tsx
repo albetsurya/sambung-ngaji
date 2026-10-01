@@ -14,13 +14,13 @@ import {
   ListRow,
   ChevronRow,
   ErrorState,
-} from "../components/common";
+} from "../components/ui";
 import { groupApi } from "../services/domainApi";
 import type { Group } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { GroupedListSkeleton } from "../components/ui/Skeleton";
 import { queryKeys } from "../lib/queryClient";
 
 export default function GroupsPage() {

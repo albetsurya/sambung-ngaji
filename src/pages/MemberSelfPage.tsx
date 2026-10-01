@@ -11,7 +11,7 @@ import {
   Sparkles,
   Pencil,
   Download,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -23,9 +23,9 @@ import {
   Card,
   ErrorState,
   Button,
-} from "../components/common";
-import { MemberSelfSkeleton } from "../components/common/Skeleton";
-import { memberSelfApi } from "../services/memberSelfApi";
+} from "../components/ui";
+import { MemberSelfSkeleton } from "../components/ui/Skeleton";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { memberRequestApi } from "../services/domainApi";
 import type { Member, MonitoringEntry, Meeting, Education } from "../types";
 import {
@@ -41,10 +41,10 @@ import {
   BiodataTab,
   EducationTab,
   MemberStatusChips,
-} from "../components/member/MemberTabs";
-import { TaarufCvSheet } from "../components/taaruf/TaarufCvSheet";
-import { isTaarufEligible } from "../lib/taarufAccess";
-import { MonitoringTab } from "../components/monitoring/MonitoringTab";
+} from "../features/member/components/MemberTabs";
+import { TaarufCvSheet } from "../features/taaruf/components/TaarufCvSheet";
+import { isTaarufEligible } from "../features/taaruf/lib/taarufAccess";
+import { MonitoringTab } from "../features/monitoring/components/MonitoringTab";
 
 const TABS = [
   { key: "profil", label: "Profil", Icon: User },

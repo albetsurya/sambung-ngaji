@@ -7,16 +7,16 @@ import {
   EmptyState,
   ErrorState,
   Segmented,
-} from "../components/common";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
-import { Download, Loader2, Share2 } from "../components/common/FontAwesomeIcons";
+} from "../components/ui";
+import { GroupedListSkeleton } from "../components/ui/Skeleton";
+import { Download, Loader2, Share2 } from "../components/ui/FontAwesomeIcons";
 import { fridayApi } from "../services/domainApi";
-import { FridaySchedulePrint } from "../components/friday/FridaySchedulePrint";
-import { exportTaarufPdf, exportTaarufPng } from "../components/taaruf/taarufExport";
+import { FridaySchedulePrint } from "../features/friday/components/FridaySchedulePrint";
+import { exportTaarufPdf, exportTaarufPng } from "../features/taaruf/components/taarufExport";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { queryKeys } from "../lib/queryClient";
-import { todayIso } from "../utils/friday";
+import { todayIso } from "../features/friday/utils/friday";
 
 export default function FridayPrintPage() {
   const navigate = useNavigate();

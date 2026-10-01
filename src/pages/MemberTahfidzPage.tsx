@@ -12,22 +12,22 @@ import {
   Seedling,
   Sprout,
   Star,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button } from "../components/common";
+import { Button } from "../components/ui";
 import {
   TAHFIDZ_KATEGORI,
   TAHFIDZ_TARGETS,
   getTargetsByKategori,
   type TahfidzKategori,
-} from "../data/tahfidz";
-import { fetchSurahList } from "../data/quran";
+} from "../features/tahfidz/data/tahfidz";
+import { fetchSurahList } from "../features/quran/data/quran";
 import {
   useTahfidz,
   getSurahProgress,
   getOverallStats,
   getReviewQueue,
-} from "../hooks/useTahfidz";
+} from "../features/tahfidz/hooks/useTahfidz";
 
 type Tab = TahfidzKategori;
 

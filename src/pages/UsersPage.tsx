@@ -11,7 +11,7 @@ import {
   Search,
   SlidersHorizontal,
   X,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -32,17 +32,17 @@ import {
   ConfirmDialog,
   Segmented,
   FilterChip,
-} from "../components/common";
-import { ResetPasswordSheet } from "../components/common/ChangePasswordSheet";
+} from "../components/ui";
+import { ResetPasswordSheet } from "../components/ui/ChangePasswordSheet";
 import { userApi } from "../services/domainApi";
-import { memberApi } from "../services/memberApi";
+import { memberApi } from "../features/member/api/memberApi";
 import type { Member, MemberCategory, Role, User } from "../types";
 import { CATEGORY_LABEL } from "../utils/format";
 import { MEMBER_CATEGORIES } from "../constants";
 import { useToast } from "../contexts/ToastContext";
 import { usePermission, ROLE_LABEL } from "../hooks/usePermission";
 import { ApiError, abortAllApiCalls } from "../services/api";
-import { UsersSkeleton } from "../components/common/Skeleton";
+import { UsersSkeleton } from "../components/ui/Skeleton";
 import { queryKeys } from "../lib/queryClient";
 
 const ROLE_DESCRIPTION: Record<Role, string> = {

@@ -10,10 +10,10 @@ import {
   Briefcase,
   Check,
   Loader2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Button, Input, Select, Textarea } from "../components/common";
-import { memberApi } from "../services/memberApi";
+import { Button, Input, Select, Textarea } from "../components/ui";
+import { memberApi } from "../features/member/api/memberApi";
 import { uploadApi, groupApi } from "../services/domainApi";
 import type { Group, Member } from "../types";
 import {
@@ -24,7 +24,7 @@ import {
 import { useToast } from "../contexts/ToastContext";
 import { usePermission } from "../hooks/usePermission";
 import { ApiError } from "../services/api";
-import { DateInput } from "../components/common/DateInput";
+import { DateInput } from "../components/ui/DateInput";
 import { queryKeys } from "../lib/queryClient";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 

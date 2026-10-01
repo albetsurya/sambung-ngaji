@@ -4,11 +4,11 @@ import {
   Check,
   RefreshCw,
   ChevronLeft,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout } from "../components/layout/AppLayout";
-import { Button } from "../components/common";
-import { getDzikirPreset } from "../data/dzikir";
-import { useDzikirCounters, vibrate } from "../hooks/useDzikirCounters";
+import { Button } from "../components/ui";
+import { getDzikirPreset } from "../features/doa-dzikir/data/dzikir";
+import { useDzikirCounters, vibrate } from "../features/doa-dzikir/hooks/useDzikirCounters";
 import { useToast } from "../contexts/ToastContext";
 
 export default function MemberDzikirCounterPage() {

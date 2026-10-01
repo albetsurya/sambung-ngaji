@@ -5,7 +5,7 @@ import {
   RefreshCw,
   Check,
   X,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Badge,
@@ -15,8 +15,8 @@ import {
   ListRow,
   Button,
   ConfirmDialog,
-} from "../components/common";
-import { PendingMembersSkeleton } from "../components/common/Skeleton";
+} from "../components/ui";
+import { PendingMembersSkeleton } from "../components/ui/Skeleton";
 import { memberRequestApi } from "../services/domainApi";
 import type { MemberRequestEntry } from "../services/domainApi";
 import { usePermission } from "../hooks/usePermission";

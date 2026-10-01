@@ -18,9 +18,9 @@ import {
   Mosque,
   Moon,
   ChevronRight,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { InstallAppCard } from "../components/member/InstallAppCard";
+import { InstallAppCard } from "../features/member/components/InstallAppCard";
 import {
   Avatar,
   ConfirmDialog,
@@ -30,13 +30,13 @@ import {
   ChangePasswordSheet,
   ChangeUsernameSheet,
   BackupDataSheet,
-} from "../components/common";
+} from "../components/ui";
 import {
   ThemePickerRow,
   ThemePickerSheet,
-} from "../components/common/ThemePickerSheet";
-import { AboutAppModal } from "../components/member/AboutAppModal";
-import { AppMaintenanceSection } from "../components/common/AppMaintenanceSection";
+} from "../components/ui/ThemePickerSheet";
+import { AboutAppModal } from "../features/member/components/AboutAppModal";
+import { AppMaintenanceSection } from "../components/ui/AppMaintenanceSection";
 import { useAuth } from "../contexts/AuthContext";
 import { normalizeGender } from "../utils/format";
 

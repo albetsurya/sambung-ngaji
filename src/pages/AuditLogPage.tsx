@@ -4,7 +4,7 @@ import {
   Search,
   X,
   SlidersHorizontal,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   EmptyState,
@@ -14,10 +14,10 @@ import {
   Badge,
   BottomSheet,
   Button,
-} from "../components/common";
+} from "../components/ui";
 import { auditApi } from "../services/domainApi";
 import { ApiError } from "../services/api";
-import { GroupedListSkeleton } from "../components/common/Skeleton";
+import { GroupedListSkeleton } from "../components/ui/Skeleton";
 import { queryKeys } from "../lib/queryClient";
 
 type TimeFilter = "" | "today" | "7d" | "30d";

@@ -11,7 +11,7 @@ import {
   BookOpen,
   ChevronRight,
   Trophy,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
   Header,
@@ -19,13 +19,13 @@ import {
   FloatingActionGroup,
 } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
-import { Avatar } from "../components/common";
-import { MeetingCardSkeleton } from "../components/common/Skeleton";
-import { PrayerTimesCard } from "../components/member/PrayerTimesCard";
+import { Avatar } from "../components/ui";
+import { MeetingCardSkeleton } from "../components/ui/Skeleton";
+import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { meetingApi } from "../services/domainApi";
-import { memberSelfApi } from "../services/memberSelfApi";
+import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
 import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";

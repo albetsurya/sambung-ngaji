@@ -5,9 +5,9 @@ import {
   Check,
   Download,
   Share2,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { Card, Button } from "../components/common";
+import { Card, Button } from "../components/ui";
 import { useToast } from "../contexts/ToastContext";
 import { useState } from "react";
 

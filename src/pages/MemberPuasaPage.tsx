@@ -7,18 +7,18 @@ import {
   Sparkles,
   ChevronDown,
   Info,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
 import {
   formatDateShort,
   formatDayName,
   formatRelative,
   type PuasaDay,
   type PuasaInfo,
-} from "../data/puasa";
-import { usePuasaSchedule } from "../hooks/usePuasaSchedule";
+} from "../features/ibadah/data/puasa";
+import { usePuasaSchedule } from "../features/ibadah/hooks/usePuasaSchedule";
 
 const TONE_STYLE: Record<
   string,

@@ -9,15 +9,15 @@ import {
   ChevronDown,
   Loader2,
   FileText,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
   Button,
   Card,
   Badge,
   ConfirmDialog,
-} from "../components/common";
-import { memberApi } from "../services/memberApi";
+} from "../components/ui";
+import { memberApi } from "../features/member/api/memberApi";
 import type { Member } from "../types";
 import { useToast } from "../contexts/ToastContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,7 +26,7 @@ import { ApiError } from "../services/api";
 import {
   parseMemberText,
   type ParsedMember,
-} from "../lib/parseMember";
+} from "../features/member/lib/parseMember";
 
 type Phase = "input" | "preview" | "saving" | "done";
 

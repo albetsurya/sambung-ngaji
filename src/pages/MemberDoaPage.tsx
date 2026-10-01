@@ -16,17 +16,17 @@ import {
   Mosque,
   Shirt,
   CloudRain,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
-import { DoaCard } from "../components/member/DoaCard";
-import { DoaFontSizeSheet } from "../components/member/DoaFontSizeSheet";
-import { useDoaProgress } from "../hooks/useDoaProgress";
-import { useDoaFontSize } from "../hooks/useDoaFontSize";
-import { useDoaFavorites } from "../hooks/useDoaFavorites";
-import { DOA_KATEGORI, getDoaKategori, type DoaWaktu } from "../data/doa";
-import { DOA_HARIAN, getDoaHarianKategori } from "../data/doa-harian";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
+import { DoaCard } from "../features/member/components/DoaCard";
+import { DoaFontSizeSheet } from "../features/member/components/DoaFontSizeSheet";
+import { useDoaProgress } from "../features/doa-dzikir/hooks/useDoaProgress";
+import { useDoaFontSize } from "../features/doa-dzikir/hooks/useDoaFontSize";
+import { useDoaFavorites } from "../features/doa-dzikir/hooks/useDoaFavorites";
+import { DOA_KATEGORI, getDoaKategori, type DoaWaktu } from "../features/doa-dzikir/data/doa";
+import { DOA_HARIAN, getDoaHarianKategori } from "../features/doa-dzikir/data/doa-harian";
 
 type Tab = "pagi" | "sore" | "harian";
 type FilterMode = "all" | "favorites";

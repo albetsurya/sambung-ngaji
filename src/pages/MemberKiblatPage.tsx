@@ -9,11 +9,11 @@ import {
   RefreshCw,
   AlertTriangle,
   Check,
-} from "../components/common/FontAwesomeIcons";
+} from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
-import { MasukButton } from "../components/common";
-import { Button } from "../components/common";
-import { useQiblaDirection } from "../hooks/useQiblaDirection";
+import { MasukButton } from "../components/ui";
+import { Button } from "../components/ui";
+import { useQiblaDirection } from "../features/ibadah/hooks/useQiblaDirection";
 
 const LATUKAN = { lat: -6.9879, lng: 112.3729 };
 

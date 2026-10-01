@@ -9,11 +9,10 @@ import { PersonalRoute } from "./components/layout/PersonalRoute";
 import { MemberRoute } from "./components/layout/MemberRoute";
 import { RoleRoute } from "./components/layout/RoleRoute";
 import { useAuth } from "./contexts/AuthContext";
-import { LoadingScreen } from "./components/common";
-import { useBackgroundSync } from "./hooks/useBackgroundSync";
-import { PwaUpdatePrompt } from "./components/common/PwaUpdatePrompt";
+import { LoadingScreen } from "./components/ui";
+import { useBackgroundSync } from "./features/member/hooks/useBackgroundSync";
+import { PwaUpdatePrompt } from "./components/ui/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
-
 function ApiRetryWire() {
   const { showToast } = useToast();
   useEffect(() => {
@@ -24,7 +23,6 @@ function ApiRetryWire() {
   }, [showToast]);
   return null;
 }
-
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const MembersListPage = lazy(() => import("./pages/MembersListPage"));
@@ -43,7 +41,6 @@ const AnnouncementTemplatesPage = lazy(
 );
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
-
 const FinanceGuard = lazy(() =>
   import("./features/finance/components/FinanceGuard").then((m) => ({
     default: m.FinanceGuard,
@@ -69,9 +66,29 @@ const ZakatPage = lazy(() =>
     default: m.ZakatPage,
   })),
 );
-const FinanceAiPage = lazy(() =>
-  import("./features/finance/pages/FinanceAiPage").then((m) => ({
-    default: m.FinanceAiPage,
+const ZakatDetailPage = lazy(() =>
+  import("./features/finance/pages/ZakatDetailPage").then((m) => ({
+    default: m.ZakatDetailPage,
+  })),
+);
+const FinanceHubPage = lazy(() =>
+  import("./features/finance/pages/FinanceHubPage").then((m) => ({
+    default: m.FinanceHubPage,
+  })),
+);
+const KasPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/KasPrintPreviewPage").then((m) => ({
+    default: m.KasPrintPreviewPage,
+  })),
+);
+const ShodaqohPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/ShodaqohPrintPreviewPage").then((m) => ({
+    default: m.ShodaqohPrintPreviewPage,
+  })),
+);
+const ZakatPrintPreviewPage = lazy(() =>
+  import("./features/finance/pages/ZakatPrintPreviewPage").then((m) => ({
+    default: m.ZakatPrintPreviewPage,
   })),
 );
 const MemberPrayerPage = lazy(() => import("./pages/MemberPrayerPage"));
@@ -126,13 +143,11 @@ const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
   () => import("./pages/MemberEditProfilePage"),
 );
-
 const PendingMembersPage = lazy(() => import("./pages/PendingMembersPage"));
 const PendingMemberDetailPage = lazy(
   () => import("./pages/PendingMemberDetailPage"),
 );
 const MemberRequestsPage = lazy(() => import("./pages/MemberRequestsPage"));
-
 const PublicRegistrationPage = lazy(
   () => import("./pages/PublicRegistrationPage"),
 );
@@ -151,7 +166,6 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
-
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -165,7 +179,6 @@ function PageFallback() {
     </div>
   );
 }
-
 function HomeRoute() {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen label="Memuat..." />;
@@ -173,11 +186,9 @@ function HomeRoute() {
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
   return <DashboardPage />;
 }
-
 function AppRoutes() {
   useBackgroundSync();
   const location = useLocation();
-
   return (
     <Suspense fallback={<PageFallback />}>
       <div key={location.pathname} className="page-enter">
@@ -186,7 +197,6 @@ function AppRoutes() {
         <Route path="/daftar" element={<PublicRegistrationPage />} />
         <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
         <Route path="/" element={<HomeRoute />} />
-
         <Route
           path="/member"
           element={
@@ -395,20 +405,21 @@ function AppRoutes() {
             </PersonalRoute>
           }
         />
-
         <Route element={<ProtectedRoute />}>
           {/* Finance Module (Accessible by SUPER_ADMIN & TIM_KU) */}
           <Route element={<FinanceGuard />}>
             <Route path="/finance" element={<FinanceLayout />}>
-              <Route index element={<Navigate to="/finance/ledger" replace />} />
+              <Route index element={<FinanceHubPage />} />
               <Route path="ledger" element={<FinanceLedgerPage />} />
               <Route path="shodaqoh" element={<Navigate to="/finance/monthly-dues" replace />} />
               <Route path="monthly-dues" element={<MonthlyDuesPage />} />
               <Route path="zakat" element={<ZakatPage />} />
-              <Route path="assistant" element={<FinanceAiPage />} />
+              <Route path="zakat/:id" element={<ZakatDetailPage />} />
+              <Route path="ledger/print" element={<KasPrintPreviewPage />} />
+              <Route path="monthly-dues/print" element={<ShodaqohPrintPreviewPage />} />
+              <Route path="zakat/:id/print" element={<ZakatPrintPreviewPage />} />
             </Route>
           </Route>
-
           <Route
             path="/jamaah"
             element={
@@ -487,7 +498,6 @@ function AppRoutes() {
           />
           <Route path="/profil-saya" element={<MemberSelfPage />} />
           <Route path="/profil-saya/edit" element={<MemberEditProfilePage />} />
-
           <Route path="/lainnya">
             <Route index element={<OthersPage />} />
             <Route
@@ -603,17 +613,14 @@ function AppRoutes() {
               }
             />
           </Route>
-
           <Route path="/ai-chat" element={<AiChatPage />} />
         </Route>
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </div>
     </Suspense>
   );
 }
-
 export default function App() {
   return (
     <BrowserRouter>

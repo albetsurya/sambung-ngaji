@@ -189,3 +189,4 @@ private/
 .env.staging
 .env.*.localpackage-lock.json
 EternalTerminal/
+.env*
