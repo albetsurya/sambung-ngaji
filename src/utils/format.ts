@@ -125,9 +125,8 @@ export function formatDateCustom(
 
   switch (format) {
     case "dd-mm-yyyy":
-      return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
     case "dd/mm/yyyy":
-      return `${pad(p.day)}/${pad(p.month)}/${p.year}`;
+      return `${pad(p.day)}-${pad(p.month)}-${p.year}`;
     case "yyyy-mm-dd":
       return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
     case "dd MMM yyyy":

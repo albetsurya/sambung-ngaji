@@ -16,6 +16,7 @@ import {
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   Segmented,
   GroupedList,
@@ -1256,14 +1257,13 @@ export const MonthlyDuesPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <Input
+                  <DateInput
                     label="Tanggal Pembayaran"
-                    type="date"
                     value={paymentForm.payment_date}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setPaymentForm({
                         ...paymentForm,
-                        payment_date: e.target.value,
+                        payment_date: val,
                       })
                     }
                     required

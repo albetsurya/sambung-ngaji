@@ -8,6 +8,7 @@ import { AppLayout, Header, FloatingActionButton } from "../../../components/lay
 import {
   Button,
   Input,
+  DateInput,
   Segmented,
   FilterChip,
   GroupedList,
@@ -569,8 +570,8 @@ const saveRincian = async (e: React.FormEvent) => {
                 </section>
               )}
               <div className="px-4 mt-4 grid grid-cols-2 gap-2.5">
-                <Button variant="secondary" onClick={() => (isDone ? setConfirmCancelOpen(true) : setConfirmCompleteOpen(true))} disabled={completing} data-testid="btn-toggle-complete-zakat-bottom">
-                  {completing ? "Memproses…" : isDone ? "Batal Tuntas" : "Set Tuntas"}
+                <Button variant="secondary" onClick={() => (isDone ? setConfirmCancelOpen(true) : setConfirmCompleteOpen(true))} loading={completing} data-testid="btn-toggle-complete-zakat-bottom">
+                  {isDone ? "Batal Tuntas" : "Set Tuntas"}
                 </Button>
                 <Button variant="softDanger" onClick={() => setDeleteTarget({ kind: "record", label: data.title || data.categories?.join(" + ") || "" })}>
                   Hapus
@@ -583,9 +584,9 @@ const saveRincian = async (e: React.FormEvent) => {
         <form onSubmit={saveHeader}>
           <Input label="Judul" value={headerForm.title} onChange={(e) => setHeaderForm({ ...headerForm, title: e.target.value })} placeholder="Zakat Fitrah 1447 H" required />
           <Input label="Lokasi" value={headerForm.location} onChange={(e) => setHeaderForm({ ...headerForm, location: e.target.value })} />
-          <Input label="Tanggal" type="date" value={headerForm.transaction_date} onChange={(e) => setHeaderForm({ ...headerForm, transaction_date: e.target.value })} />
+          <DateInput label="Tanggal" value={headerForm.transaction_date} onChange={(val) => setHeaderForm({ ...headerForm, transaction_date: val })} />
           <Input label="Keterangan" value={headerForm.description} onChange={(e) => setHeaderForm({ ...headerForm, description: e.target.value })} />
-          <Button type="submit" fullWidth disabled={savingHeader}>{savingHeader ? "Menyimpan…" : "Simpan"}</Button>
+          <Button type="submit" fullWidth loading={savingHeader}>Simpan</Button>
         </form>
       </BottomSheet>
       <BottomSheet open={muzakiOpen} onClose={() => setMuzakiOpen(false)} title={editingPayer ? "Edit Muzaki" : "Tambah Muzaki"}>
