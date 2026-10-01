@@ -325,39 +325,9 @@ const saveRincian = async (e: React.FormEvent) => {
             <HeaderIconButton onClick={openHeader} label="Edit data zakat" testId="btn-edit-zakat-header">
               <Pencil size={15} />
             </HeaderIconButton>
-            <span className="relative">
-              <HeaderIconButton onClick={() => setMoreOpen((v) => !v)} label="Aksi lainnya" testId="btn-more-actions">
-                <MoreVertical size={15} />
-              </HeaderIconButton>
-              {moreOpen && data && (
-                <div className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5" data-testid="zakat-actions-dropdown">
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => { setMoreOpen(false); if (isDone) setConfirmCancelOpen(true); else setConfirmCompleteOpen(true); }}
-                    data-testid="btn-toggle-complete-zakat"
-                  >
-                    {isDone ? "Batalkan Selesai" : "Tandai Selesai"}
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      setMoreOpen(false);
-                      navigate(`/finance/zakat/${id}/print?mode=kwitansi`);
-                    }}
-                    data-testid="btn-print-zakat"
-                  >
-                    Cetak Laporan
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body text-danger active:bg-danger-soft"
-                    onClick={() => { setMoreOpen(false); setDeleteTarget({ kind: "record", label: data.title || data.categories?.join(" + ") || "" }); }}
-                    data-testid="btn-delete-zakat"
-                  >
-                    Hapus Zakat
-                  </button>
-                </div>
-              )}
-            </span>
+            <HeaderIconButton onClick={() => navigate(`/finance/zakat/${id}/print?mode=kwitansi`)} label="Cetak laporan" testId="btn-print-zakat-header">
+              <Printer size={15} />
+            </HeaderIconButton>
           </HeaderActions>
         }
       />
@@ -383,6 +353,24 @@ const saveRincian = async (e: React.FormEvent) => {
                   {data.description && (
                     <p className="text-ios-footnote text-surface-muted mt-1.5" data-testid="zakat-detail-keterangan">{data.description}</p>
                   )}
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => { if (isDone) setConfirmCancelOpen(true); else setConfirmCompleteOpen(true); }}
+                      data-testid="btn-toggle-complete-card"
+                    >
+                      {isDone ? "Batalkan Selesai" : "Tandai Selesai"}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => setDeleteTarget({ kind: "record", label: data.title || data.categories?.join(" + ") || "" })}
+                      data-testid="btn-delete-card"
+                    >
+                      Hapus Zakat
+                    </Button>
+                  </div>
                 </Card>
                 {/* Banner total spek #zakatDetailTotal */}
                 <Card className="mt-2.5 !bg-accent-soft !border-accent/20">

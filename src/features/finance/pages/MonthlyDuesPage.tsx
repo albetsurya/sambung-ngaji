@@ -681,52 +681,13 @@ export const MonthlyDuesPage: React.FC = () => {
                 setFilterSheetOpen(true);
               }}
             />
-            <span className="relative">
-              <HeaderIconButton
-                onClick={() => setPrintMenuOpen((v) => !v)}
-                label="Cetak rekap"
-                testId="shod-btn-print-dropdown"
-              >
-                <Printer size={16} />
-              </HeaderIconButton>
-              {printMenuOpen && (
-                <div
-                  className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5"
-                  data-testid="shod-print-dropdown"
-                >
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-print-shodaqoh"
-                  >
-                    Cetak Rekap Shodaqoh
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      navigate(`/finance/monthly-dues/print?variant=infak-ir`);
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-print-infak-ir"
-                  >
-                    Cetak Rekap Infak IR
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      handleCopyRekap();
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-copy-shodaqoh-rekap"
-                  >
-                    Salin Rekap (WA)
-                  </button>
-                </div>
-              )}
-            </span>
+            <HeaderIconButton
+              onClick={() => navigate(`/finance/monthly-dues/print?variant=shodaqoh`)}
+              label="Cetak rekap"
+              testId="shod-btn-print"
+            >
+              <Printer size={16} />
+            </HeaderIconButton>
           </HeaderActions>
         }
       />
@@ -813,6 +774,31 @@ export const MonthlyDuesPage: React.FC = () => {
                         <span className="text-surface-muted font-medium ml-auto">
                           {dashboard.memberCount} anggota
                         </span>
+                      </div>
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={async () => {
+                            await handleCopyRekap();
+                            showToast("Rekap disalin");
+                          }}
+                          data-testid="btn-copy-rekap-card"
+                        >
+                          Salin Rekap
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            await handleCopyRekap();
+                            // Trigger WA share
+                            const text = `Rekap Shodaqoh ${monthLabel}\nTarget: ${formatRp(dashboard.target)}\nTerkumpul: ${formatRp(dashboard.received)}\n${progressPct}% tercapai`;
+                            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                          }}
+                          data-testid="btn-share-wa-card"
+                        >
+                          Kirim WA
+                        </Button>
                       </div>
                     </Card>
                   </section>
