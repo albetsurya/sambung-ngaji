@@ -13,7 +13,6 @@ import { LoadingScreen } from "./components/ui";
 import { useBackgroundSync } from "./features/member/hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/ui/PwaUpdatePrompt";
 import { setRetryNotifier } from "./services/api";
-
 function ApiRetryWire() {
   const { showToast } = useToast();
   useEffect(() => {
@@ -24,7 +23,6 @@ function ApiRetryWire() {
   }, [showToast]);
   return null;
 }
-
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const MembersListPage = lazy(() => import("./pages/MembersListPage"));
@@ -43,7 +41,6 @@ const AnnouncementTemplatesPage = lazy(
 );
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
-
 const FinanceGuard = lazy(() =>
   import("./features/finance/components/FinanceGuard").then((m) => ({
     default: m.FinanceGuard,
@@ -146,13 +143,11 @@ const MemberSelfPage = lazy(() => import("./pages/MemberSelfPage"));
 const MemberEditProfilePage = lazy(
   () => import("./pages/MemberEditProfilePage"),
 );
-
 const PendingMembersPage = lazy(() => import("./pages/PendingMembersPage"));
 const PendingMemberDetailPage = lazy(
   () => import("./pages/PendingMemberDetailPage"),
 );
 const MemberRequestsPage = lazy(() => import("./pages/MemberRequestsPage"));
-
 const PublicRegistrationPage = lazy(
   () => import("./pages/PublicRegistrationPage"),
 );
@@ -171,7 +166,6 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
-
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -185,7 +179,6 @@ function PageFallback() {
     </div>
   );
 }
-
 function HomeRoute() {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen label="Memuat..." />;
@@ -193,11 +186,9 @@ function HomeRoute() {
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
   return <DashboardPage />;
 }
-
 function AppRoutes() {
   useBackgroundSync();
   const location = useLocation();
-
   return (
     <Suspense fallback={<PageFallback />}>
       <div key={location.pathname} className="page-enter">
@@ -206,7 +197,6 @@ function AppRoutes() {
         <Route path="/daftar" element={<PublicRegistrationPage />} />
         <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
         <Route path="/" element={<HomeRoute />} />
-
         <Route
           path="/member"
           element={
@@ -415,7 +405,6 @@ function AppRoutes() {
             </PersonalRoute>
           }
         />
-
         <Route element={<ProtectedRoute />}>
           {/* Finance Module (Accessible by SUPER_ADMIN & TIM_KU) */}
           <Route element={<FinanceGuard />}>
@@ -431,7 +420,6 @@ function AppRoutes() {
               <Route path="zakat/:id/print" element={<ZakatPrintPreviewPage />} />
             </Route>
           </Route>
-
           <Route
             path="/jamaah"
             element={
@@ -510,7 +498,6 @@ function AppRoutes() {
           />
           <Route path="/profil-saya" element={<MemberSelfPage />} />
           <Route path="/profil-saya/edit" element={<MemberEditProfilePage />} />
-
           <Route path="/lainnya">
             <Route index element={<OthersPage />} />
             <Route
@@ -626,17 +613,14 @@ function AppRoutes() {
               }
             />
           </Route>
-
           <Route path="/ai-chat" element={<AiChatPage />} />
         </Route>
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </div>
     </Suspense>
   );
 }
-
 export default function App() {
   return (
     <BrowserRouter>

@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import type { DueMember, DuePayment } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
-
 interface ShodaqohPrintContentProps {
   members: DueMember[];
   payments: DuePayment[];
@@ -9,7 +8,6 @@ interface ShodaqohPrintContentProps {
   selectedMonth?: string;
   variant?: "shodaqoh" | "infak-ir";
 }
-
 export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
   members,
   payments,
@@ -18,12 +16,10 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
   variant = "shodaqoh",
 }) => {
   const isInfakIr = variant === "infak-ir";
-
   const paymentMap = new Map<string, DuePayment>();
   payments.forEach((p) => {
     paymentMap.set(p.member_id, p);
   });
-
   const monthLabelShort = (m: string) => {
     const mm = /^(\d{4})-(\d{2})$/.exec(m);
     if (!mm) return m;
@@ -32,7 +28,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
       { month: "short", year: "2-digit" },
     );
   };
-
   const susulanMonths = useMemo(() => {
     const sumByMonth = new Map<string, number>();
     payments.forEach((p) => {
@@ -43,18 +38,14 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
         sumByMonth.set(it.month, (sumByMonth.get(it.month) || 0) + amt);
       });
     });
-
     const sorted = Array.from(sumByMonth.entries())
       .filter(([, total]) => total > 0)
       .map(([month]) => month)
       .sort();
-
     return sorted.slice(-3);
   }, [payments, selectedMonth]);
-
   const hasSub = susulanMonths.length > 0;
   const rowSpan = hasSub ? 2 : 1;
-
   let sumIr = 0;
   const sumSusulanByMonth: Record<string, number> = {};
   susulanMonths.forEach((m) => {
@@ -67,7 +58,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
   let sumKafan = 0;
   let sumUkhro = 0;
   let sumTotal = 0;
-
   const rows = useMemo(() => {
     return members.map((m, idx) => {
       const p = paymentMap.get(m.member_id);
@@ -81,7 +71,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
       const total =
         Number(p?.total_amount) ||
         ir + sambung + jimpitan + siar + seribuan + kafan + ukhro;
-
       const susulanMap: Record<string, number> = {};
       (p?.carryover_items || []).forEach((it) => {
         const amt = Number(it.amount) || 0;
@@ -89,7 +78,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
         if (selectedMonth && it.month > selectedMonth) return;
         susulanMap[it.month] = (susulanMap[it.month] || 0) + amt;
       });
-
       sumIr += ir;
       susulanMonths.forEach((mm) => {
         sumSusulanByMonth[mm] += susulanMap[mm] || 0;
@@ -101,7 +89,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
       sumKafan += kafan;
       sumUkhro += ukhro;
       sumTotal += total;
-
       return {
         idx,
         m,
@@ -118,7 +105,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
       };
     });
   }, [members, payments, susulanMonths, selectedMonth]);
-
   return (
     <>
       <div className="text-center border-b-2 border-slate-800 pb-3 mb-4">
@@ -131,7 +117,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
           PERIODE: {periodLabel.toUpperCase()}
         </p>
       </div>
-
       <table className="w-full text-[0.9em] border-collapse border border-slate-400">
         <thead>
           <tr className="bg-slate-100 text-slate-900 font-bold border-b border-slate-400 text-center">
@@ -229,7 +214,7 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
                 return (
                   <td
                     key={m}
-                    className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap"
+                    className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap"
                   >
                     {v > 0 ? formatRp(v) : "—"}
                   </td>
@@ -237,27 +222,27 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
               })}
               {!isInfakIr && (
                 <>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.sambung > 0 ? formatRp(r.sambung) : "—"}
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.jimpitan > 0 ? formatRp(r.jimpitan) : "—"}
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.siar > 0 ? formatRp(r.siar) : "—"}
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.seribuan > 0 ? formatRp(r.seribuan) : "—"}
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.kafan > 0 ? formatRp(r.kafan) : "—"}
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
                     {r.ukhro > 0 ? formatRp(r.ukhro) : "—"}
                   </td>
                 </>
               )}
-              <td className="border border-slate-300 p-1 text-right font-mono font-bold text-slate-900 tabular-nums whitespace-nowrap">
+              <td className="border border-slate-300 p-1 text-right  font-bold text-slate-900 tabular-nums whitespace-nowrap">
                 {(isInfakIr ? r.ir : r.total) > 0
                   ? formatRp(isInfakIr ? r.ir : r.total)
                   : "—"}
@@ -276,40 +261,39 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
             {susulanMonths.map((m) => (
               <td
                 key={m}
-                className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap"
+                className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap"
               >
                 {formatRp(sumSusulanByMonth[m] || 0)}
               </td>
             ))}
             {!isInfakIr && (
               <>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumSambung)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumJimpitan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumSiar)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumSeribuan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumKafan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right font-mono tabular-nums whitespace-nowrap">
+                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(sumUkhro)}
                 </td>
               </>
             )}
-            <td className="border border-slate-400 p-1 text-right font-mono text-emerald-800 font-bold tabular-nums whitespace-nowrap">
+            <td className="border border-slate-400 p-1 text-right  text-emerald-800 font-bold tabular-nums whitespace-nowrap">
               {formatRp(isInfakIr ? sumIr : sumTotal)}
             </td>
           </tr>
         </tfoot>
       </table>
-
       <div className="mt-8 flex justify-between text-center text-[1em]">
         <div>
           <p className="text-slate-600 mb-10">Penerima / Tim KU</p>
@@ -327,5 +311,4 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
     </>
   );
 };
-
 export default ShodaqohPrintContent;

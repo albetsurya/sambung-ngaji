@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import type { Role } from "../types";
-
 export const FOCUS_GROUP_KEY = "superadmin_focus_group";
-
 export function getSuperAdminFocusGroup(): string | null {
   try {
     return localStorage.getItem(FOCUS_GROUP_KEY);
@@ -11,7 +9,6 @@ export function getSuperAdminFocusGroup(): string | null {
     return null;
   }
 }
-
 export function setSuperAdminFocusGroup(groupId: string | null) {
   try {
     if (groupId) {
@@ -24,7 +21,6 @@ export function setSuperAdminFocusGroup(groupId: string | null) {
   }
   window.dispatchEvent(new Event("focusgroupchange"));
 }
-
 export const ROLE_LABEL: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
   ADMIN: "Admin",
@@ -34,28 +30,22 @@ export const ROLE_LABEL: Record<Role, string> = {
   PENGAWAS: "Pengawas",
   MEMBER: "Member",
 };
-
 const NAV_BY_ROLE: Record<Role, string[]> = {
   SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
-  // Ringkas: 1 pintu Keuangan (hub Kas/Shodaqoh/Zakat) agar nav max 3 item, nyaman di mobile.
-  // Item lama kas/shodaqoh/zakat tetap didukung bila ingin mode detail.
   TIM_KU: ["beranda", "keuangan", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
   TIM_ABSENSI: ["beranda", "absensi", "lainnya"],
   PENGAWAS: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   MEMBER: [],
 };
-
 export function usePermission() {
   const { user } = useAuth();
   const role = user?.role as Role | undefined;
   const groupId = user?.group_id ?? null;
-
   const [focusGroupId, setFocusGroupId] = useState<string | null>(
     getSuperAdminFocusGroup,
   );
-
   useEffect(() => {
     const handleGroupChange = () => {
       setFocusGroupId(getSuperAdminFocusGroup());
@@ -67,28 +57,23 @@ export function usePermission() {
       window.removeEventListener("storage", handleGroupChange);
     };
   }, []);
-
   function canSeeNav(key: string) {
     if (!role) return false;
     return NAV_BY_ROLE[role]?.includes(key) || false;
   }
-
   const isSuperAdmin = role === "SUPER_ADMIN";
   const isAdminLike = role === "SUPER_ADMIN" || role === "ADMIN";
   const isTimKu = role === "TIM_KU";
   const isPengawas = role === "PENGAWAS";
   const isMember = role === "MEMBER";
-
   const assignedGroup = isSuperAdmin ? focusGroupId : groupId;
   const isGlobal = isSuperAdmin && !focusGroupId;
-
   const canViewAllMembers = isGlobal || role === "ADMIN" || role === "PENGAWAS";
   const canEditMembers = isGlobal || role === "ADMIN";
   const canWriteMonitoring =
     isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
   const canManageUsers = isGlobal || isSuperAdmin;
   const canAccessFinance = isSuperAdmin || role === "TIM_KU";
-
   return {
     role,
     groupId,

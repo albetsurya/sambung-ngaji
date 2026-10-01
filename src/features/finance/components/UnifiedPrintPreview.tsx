@@ -13,30 +13,34 @@ import {
 } from "../../../components/ui/FontAwesomeIcons";
 import { Button } from "../../../components/ui";
 import { FinancePrintActions } from "./FinancePrintActions";
-
 export type PrintOrientation = "portrait" | "landscape";
 export type PrintFontSize = "7" | "9" | "11";
-
 const PRINT_STYLE_OVERRIDES = `
 [data-print-root="true"] {
   font-size: var(--print-fs, 9pt);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-
+[data-print-root="true"] .,
+[data-print-root="true"] [class*=""] {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
 [data-print-root="true"] th,
 [data-print-root="true"] td {
   vertical-align: middle !important;
 }
-
-[data-print-root="true"] tbody td:not(.font-mono):not([class*="text-center"]):not([class*="text-right"]) {
+[data-print-root="true"] tbody td:not(.):not([class*="text-center"]):not([class*="text-right"]) {
   text-align: left !important;
 }
-
-[data-print-root="true"] td.font-mono,
-[data-print-root="true"] th.font-mono {
+[data-print-root="true"] td.,
+[data-print-root="true"] th. {
   text-align: right !important;
 }
-
+[data-print-root="true"] thead {
+  display: table-header-group;
+}
+[data-print-root="true"] tr {
+  break-inside: avoid;
+}
 [data-print-root="true"] [class~="text-[9px]"],
 [data-print-root="true"] [class~="text-[10px]"] {
   font-size: calc(var(--print-fs) * 0.833) !important;
@@ -68,7 +72,6 @@ const PRINT_STYLE_OVERRIDES = `
   font-size: calc(var(--print-fs) * 1.667) !important;
 }
 `;
-
 export interface UnifiedPrintPreviewProps {
   filename: string;
   children: React.ReactNode;
@@ -77,7 +80,6 @@ export interface UnifiedPrintPreviewProps {
   exportFilename?: string;
   className?: string;
 }
-
 export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
   filename,
   children,
@@ -95,10 +97,8 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
       ? 1
       : 0.5,
   );
-
   const printRef = useRef<HTMLDivElement>(null);
   const [baseSize, setBaseSize] = useState({ w: 794, h: 1123 });
-
   useLayoutEffect(() => {
     const el = printRef.current;
     if (!el) return;
@@ -111,19 +111,15 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
     ro.observe(el);
     return () => ro.disconnect();
   }, [fontSize, orientation, children]);
-
   const printArea = useCallback(() => {
     const area = printRef.current;
     if (!area) {
       window.print();
       return;
     }
-
     document.body.classList.add("printing-finance");
-
     const prevTransform = area.style.transform;
     const prevOrigin = area.style.transformOrigin;
-
     const restore = () => {
       document.body.classList.remove("printing-finance");
       area.style.display = "";
@@ -137,7 +133,6 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
       area.style.transform = prevTransform;
       area.style.transformOrigin = prevOrigin;
     };
-
     area.style.display = "block";
     area.style.position = "fixed";
     area.style.left = "-9999px";
@@ -147,27 +142,21 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
     area.style.width = "100%";
     area.style.height = "100%";
     area.style.transform = "none";
-
     void area.offsetHeight;
-
     window.addEventListener("afterprint", restore, { once: true });
     window.print();
-
     setTimeout(restore, 2000);
   }, []);
-
-  const sheetWidthMm = useMemo(() => {
-    const widths: Record<PrintOrientation, number> = {
-      portrait: 210,
-      landscape: 297,
+  const sheetSizeMm = useMemo(() => {
+    const sizes: Record<PrintOrientation, { w: number; h: number }> = {
+      portrait: { w: 210, h: 297 },
+      landscape: { w: 297, h: 210 },
     };
-    return widths[orientation];
+    return sizes[orientation];
   }, [orientation]);
-
   return (
     <div className="px-4 space-y-3 pb-8">
       <style>{PRINT_STYLE_OVERRIDES}</style>
-
       <section className="rounded-2xl border border-surface-border bg-surface-card p-3 space-y-2.5">
         {showExport && (
           <FinancePrintActions
@@ -176,7 +165,6 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
           />
         )}
       </section>
-
       <section className="rounded-2xl border border-surface-border bg-surface-card p-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="min-w-0">
@@ -250,7 +238,6 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
           </div>
         </div>
       </section>
-
       <div className="overflow-auto rounded-xl border border-surface-border bg-slate-100 p-4">
         <div className="flex min-h-[70vh] min-w-max items-center justify-center">
           <div
@@ -267,8 +254,9 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
               style={
                 {
                   fontSize: `${fontSize}pt`,
-                  width: `${sheetWidthMm}mm`,
-                  minWidth: `${sheetWidthMm}mm`,
+                  width: `${sheetSizeMm.w}mm`,
+                  minWidth: `${sheetSizeMm.w}mm`,
+                  minHeight: `${sheetSizeMm.h}mm`,
                   transform: `scale(${zoom})`,
                   transformOrigin: "top left",
                   border: "none",
@@ -283,7 +271,6 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
           </div>
         </div>
       </div>
-
       <div className="flex items-center justify-between gap-2">
         <Button
           variant="ghost"
@@ -313,5 +300,4 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
     </div>
   );
 };
-
 export default UnifiedPrintPreview;

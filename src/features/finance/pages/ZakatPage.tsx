@@ -31,7 +31,6 @@ import {
   NoGroupEmpty,
   SheetFooter,
 } from "../components/FinanceShared";
-
 /**
  * Zakat list ringkas -> detail penuh di /finance/zakat/:id.
  * Detail berisi tab Muzaki/Rincian/Mustahik + sheet edit masing-masing + edit title.
@@ -41,15 +40,11 @@ export const ZakatPage: React.FC = () => {
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
   const financeBack = useFinanceBack();
-
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [zakatList, setZakatList] = useState<ZakatItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  // Form buat spek #zakatFormOverlay: Judul/Tanggal/Tempat/Keterangan + data pokok.
-  // Record tak bertipe: tipe diisi per muzakki di halaman detail.
   const [form, setForm] = useState({
     title: "",
     soul_count: 1,
@@ -62,17 +57,14 @@ export const ZakatPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ZakatItem | null>(null);
   const [deleting, setDeleting] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
-  // Filter tahun (2026/2025/2024/Semua) via filter sheet agar konsisten dengan Shodaqoh.
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [draftStatus, setDraftStatus] = useState<"ALL" | "ACTIVE" | "COMPLETED">("ALL");
   const [draftType, setDraftType] = useState<string>("ALL");
   const [draftYear, setDraftYear] = useState<string>("all");
   const hasActiveFilter = statusFilter !== "ALL" || typeFilter !== "ALL" || yearFilter !== "all";
-
   const loadData = async () => {
     if (!assignedGroup) { setZakatList([]); setLoading(false); return; }
     setLoading(true); setLoadError(null);
@@ -84,10 +76,8 @@ export const ZakatPage: React.FC = () => {
       setLoadError(msg); showToast(msg, "error");
     } finally { setLoading(false); }
   };
-
   useEffect(() => { loadData(); }, [assignedGroup]);
   const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
-
   const handleSaveZakat = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) { showToast("Judul zakat wajib diisi", "error"); return; }
@@ -101,7 +91,6 @@ export const ZakatPage: React.FC = () => {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan zakat", "error");
     } finally { setSaving(false); }
   };
-
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -113,7 +102,6 @@ export const ZakatPage: React.FC = () => {
       showToast(err instanceof ApiError ? err.message : "Gagal menghapus zakat", "error");
     } finally { setDeleting(false); }
   };
-
   const filteredZakat = zakatList.filter((z) => {
     if (statusFilter !== "ALL" && (z.status || "ACTIVE").toUpperCase() !== statusFilter) return false;
     if (typeFilter !== "ALL" && !(z.categories || []).includes(typeFilter)) return false;
@@ -122,7 +110,6 @@ export const ZakatPage: React.FC = () => {
     const q = searchQuery.toLowerCase();
     return ((z.title || "") + " " + (z.categories || []).map((c) => zakatCategoryLabel(c)).join(" ")).toLowerCase().includes(q);
   });
-
   return (
     <AppLayout fab={<FloatingActionButton onClick={() => setIsSheetOpen(true)} label="Catat Zakat" />}>
       <Header
@@ -197,7 +184,6 @@ export const ZakatPage: React.FC = () => {
           </>
         )}
       </div>
-
       {/* Filter sheet — pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
       <BottomSheet
         open={filterSheetOpen}
@@ -245,7 +231,6 @@ export const ZakatPage: React.FC = () => {
           </div>
         </div>
       </BottomSheet>
-
       <BottomSheet open={isSheetOpen} onClose={() => setIsSheetOpen(false)} title="Catat Zakat">
         <form onSubmit={handleSaveZakat} data-testid="zakat-form-overlay">
           <Input label="Judul Zakat" placeholder="Zakat Fitrah 1447 H" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="zakat-form-title-input" required />
@@ -268,7 +253,6 @@ export const ZakatPage: React.FC = () => {
           />
         </form>
       </BottomSheet>
-
       <ConfirmDialog open={!!deleteTarget} title="Hapus catatan zakat?" description={`"${deleteTarget?.title}" akan dihapus permanen.`}
         confirmLabel="Ya, hapus" danger loading={deleting} onConfirm={handleConfirmDelete} onCancel={() => setDeleteTarget(null)} />
     </AppLayout>

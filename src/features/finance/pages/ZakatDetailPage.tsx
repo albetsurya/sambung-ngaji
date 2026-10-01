@@ -32,9 +32,7 @@ import {
   HeaderIconButton,
 } from "../components/FinanceShared";
 import { ApiError } from "../../../services/api";
-
 type Tab = "muzaki" | "rincian" | "mustahik";
-
 /**
  * Hitung tampilan rincian ala kas-latukan-web (mustahik 45 / sabilillah 40 / amil 15).
  * Tahan terhadap 2 kondisi kosong yang bikin tab Rincian tampak tidak tampil:
@@ -51,10 +49,8 @@ function calcRincian(z: ZakatItem | null, category: string) {
   const alloc = z?.allocations?.by_category?.[category]
     ?? (category === "FITRAH" ? z?.allocations?.fitrah : z?.allocations?.maal);
   const hasAlloc = Boolean(alloc) && ((alloc?.recipient?.percent || 0) + (alloc?.sabilillah?.percent || 0) + (alloc?.amil?.percent || 0) > 0);
-
   const pct = (v: number | undefined, d: number) => (typeof v === "number" && v > 0 ? v : d);
   const amt = (v: number | undefined, p: number) => (typeof v === "number" && v > 0 ? v : Math.round((total * p) / 100));
-
   if (!hasAlloc) {
     const pM = 45, pS = 40, pA = 15;
     const mustahik = Math.round((total * pM) / 100);
@@ -88,50 +84,39 @@ function calcRincian(z: ZakatItem | null, category: string) {
     isPreview: false,
   };
 }
-
 export const ZakatDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { assignedGroup } = usePermission();
-
   const [data, setData] = useState<ZakatItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("rincian");
-
   const [headerOpen, setHeaderOpen] = useState(false);
   const [headerForm, setHeaderForm] = useState({ title: "", location: "", transaction_date: "", description: "" });
   const [savingHeader, setSavingHeader] = useState(false);
-
   const [muzakiOpen, setMuzakiOpen] = useState(false);
   const [editingPayer, setEditingPayer] = useState<any | null>(null);
-  // 1 record bisa menampung >1 tipe: tiap muzakki punya zakat_category sendiri.
-  // Jiwa/jamaah hanya untuk FITRAH; lainnya tidak pakai (disimpan 0).
   const [payerForm, setPayerForm] = useState({
     name: "", amount: 0, family_members_count: 1,
     zakat_category: "FITRAH" as "FITRAH" | "MAL" | "TIJAROH" | "ZURU" | "LIVESTOCK" | "OTHER",
   });
   const [savingPayer, setSavingPayer] = useState(false);
-
   const [mustahikOpen, setMustahikOpen] = useState(false);
   const [editingRecipient, setEditingRecipient] = useState<any | null>(null);
   const [recipientForm, setRecipientForm] = useState({ name: "", amount: 0 });
   const [savingRecipient, setSavingRecipient] = useState(false);
-
   const [rincianOpen, setRincianOpen] = useState(false);
   const [rincianCategory, setRincianCategory] = useState<string>("FITRAH");
   const [rincianForm, setRincianForm] = useState({ pMustahik: 45, pSabilillah: 40, pAmil: 15 });
   const [savingRincian, setSavingRincian] = useState(false);
-
   const [deleteTarget, setDeleteTarget] = useState<{ kind: string; id?: string; label: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [completing, setCompleting] = useState(false);
-  // More-actions dropdown spek #btnMoreActions + confirm overlay complete/batal.
   const [moreOpen, setMoreOpen] = useState(false);
   const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
-
   const load = async () => {
     if (!assignedGroup || !id) { setLoading(false); return; }
     setLoading(true); setLoadError(null);
@@ -142,9 +127,7 @@ export const ZakatDetailPage: React.FC = () => {
       setLoadError(err instanceof ApiError ? err.message : "Gagal memuat detail zakat");
     } finally { setLoading(false); }
   };
-
   useEffect(() => { load(); }, [assignedGroup, id]);
-
   const openHeader = () => {
     if (!data) return;
     setHeaderForm({
@@ -154,7 +137,6 @@ export const ZakatDetailPage: React.FC = () => {
     });
     setHeaderOpen(true);
   };
-
   const saveHeader = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data) return;
@@ -167,7 +149,6 @@ export const ZakatDetailPage: React.FC = () => {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan", "error");
     } finally { setSavingHeader(false); }
   };
-
   const openPayer = (p?: any) => {
     const cat = (p?.zakat_category ? normZakatCategory(p.zakat_category) : "FITRAH") as "FITRAH" | "MAL" | "TIJAROH" | "ZURU" | "LIVESTOCK" | "OTHER";
     setEditingPayer(p || null);
@@ -176,7 +157,6 @@ export const ZakatDetailPage: React.FC = () => {
       : { name: "", amount: 0, family_members_count: 1, zakat_category: cat });
     setMuzakiOpen(true);
   };
-
   const savePayer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data || !payerForm.name.trim()) { showToast("Nama muzakki wajib diisi", "error"); return; }
@@ -200,13 +180,11 @@ export const ZakatDetailPage: React.FC = () => {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan muzakki", "error");
     } finally { setSavingPayer(false); }
   };
-
   const openRecipient = (r?: any) => {
     setEditingRecipient(r || null);
     setRecipientForm(r ? { name: r.name || "", amount: Number(r.amount) || 0 } : { name: "", amount: 0 });
     setMustahikOpen(true);
   };
-
   const saveRecipient = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data || !recipientForm.name.trim()) { showToast("Nama mustahik wajib diisi", "error"); return; }
@@ -226,7 +204,6 @@ export const ZakatDetailPage: React.FC = () => {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan mustahik", "error");
     } finally { setSavingRecipient(false); }
   };
-
   const openRincian = (cat?: string) => {
     if (cat) setRincianCategory(cat);
     const r = calcRincian(data, rincianCategory);
@@ -235,13 +212,11 @@ export const ZakatDetailPage: React.FC = () => {
     });
     setRincianOpen(true);
   };
-
 const saveRincian = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data) return;
     const { pMustahik, pSabilillah, pAmil } = rincianForm;
     if (pMustahik + pSabilillah + pAmil !== 100) { showToast("Total persen harus 100%", "error"); return; }
-    // Total efektif: nominal muzaki kategori ini, fallback ke total header.
     const payers = data.payer_list || [];
     const catPayers = payers.filter((p: any) => normZakatCategory(p.zakat_category) === rincianCategory);
     const catSum = catPayers.reduce((s: number, p: any) => s + (Number(p.amount) || 0), 0);
@@ -272,7 +247,6 @@ const saveRincian = async (e: React.FormEvent) => {
       showToast(err instanceof ApiError ? err.message : "Gagal menyimpan rincian", "error");
     } finally { setSavingRincian(false); }
   };
-
   const confirmDelete = async () => {
     if (!data || !deleteTarget) return;
     setDeleting(true);
@@ -297,7 +271,6 @@ const saveRincian = async (e: React.FormEvent) => {
       showToast(err instanceof ApiError ? err.message : "Gagal menghapus", "error");
     } finally { setDeleting(false); }
   };
-
   const toggleComplete = async () => {
     if (!data) return;
     setCompleting(true);
@@ -310,15 +283,12 @@ const saveRincian = async (e: React.FormEvent) => {
       showToast(err instanceof ApiError ? err.message : "Gagal mengubah status", "error");
     } finally { setCompleting(false); }
   };
-
   const r = calcRincian(data, rincianCategory);
   const payers = data?.payer_list || (data?.muzakki_list as any[]) || [];
   const recipients = data?.recipient_list || (data?.mustahik_list as any[]) || [];
   const isDone = data?.status === "COMPLETED";
-  // Kelompok muzakki per kategori (menggunakan normZakatCategory untuk konsistensi).
   const payerCategoryOf = (p: any): string =>
     p?.zakat_category ? normZakatCategory(p.zakat_category) : "FITRAH";
-  // Buat grup unik berdasarkan kategori yang ada di data.
   const categoryGroups = (() => {
     const groups = new Map<string, any[]>();
     for (const p of payers) {
@@ -329,12 +299,10 @@ const saveRincian = async (e: React.FormEvent) => {
     return groups;
   })();
   const categoriesPresent = Array.from(categoryGroups.keys()).sort((a, b) => {
-    // Urutkan: FITRAH dulu, lalu sisanya alfabetis
     if (a === "FITRAH") return -1;
     if (b === "FITRAH") return 1;
     return a.localeCompare(b);
   });
-
   return (
     <AppLayout
       fab={
@@ -437,7 +405,6 @@ const saveRincian = async (e: React.FormEvent) => {
                   ]}
                 />
               </div>
-
               {tab === "rincian" && (
                 <section>
                   <SectionTitle>Kategori Rincian</SectionTitle>
@@ -494,7 +461,7 @@ const saveRincian = async (e: React.FormEvent) => {
                             {label}{" "}
                             {pct ? <span className="text-ios-caption text-surface-muted font-medium">{pct}</span> : null}
                           </p>
-                          <p className="font-mono text-ios-subhead font-bold text-surface-text shrink-0">
+                          <p className=" text-ios-subhead font-bold text-surface-text shrink-0">
                             {formatRp(val as number)}
                           </p>
                         </div>
@@ -503,7 +470,6 @@ const saveRincian = async (e: React.FormEvent) => {
                   </GroupedList>
                 </section>
               )}
-
               {tab === "muzaki" && (
                 <section>
                   <SectionTitle testId="zakat-muzaki-count-display">
@@ -531,7 +497,7 @@ const saveRincian = async (e: React.FormEvent) => {
                                         {showJiwa && Number(m.family_members_count) > 0 ? (
                                           <p className="text-ios-caption text-surface-muted">{m.family_members_count} jiwa</p>
                                         ) : null}</div>
-                                      <p className="font-mono font-bold shrink-0">{m.amount ? formatRp(m.amount) : ""}</p>
+                                      <p className=" font-bold shrink-0">{m.amount ? formatRp(m.amount) : ""}</p>
                                     </div>
                                   </ListRow>
                                 ))}
@@ -550,7 +516,6 @@ const saveRincian = async (e: React.FormEvent) => {
                   )}
                 </section>
               )}
-
               {tab === "mustahik" && (
                 <section>
                   <SectionTitle testId="zakat-mustahik-count-display">
@@ -588,7 +553,7 @@ const saveRincian = async (e: React.FormEvent) => {
                           <ListRow key={m.recipient_id || i} onClick={() => openRecipient(m)} insetDivider={i !== recipients.length - 1}>
                             <div className="flex items-center justify-between w-full gap-2">
                               <p className="truncate font-medium">{m.name || m.nama}</p>
-                              <p className="font-mono font-bold shrink-0">{m.amount ? formatRp(m.amount) : ""}</p>
+                              <p className=" font-bold shrink-0">{m.amount ? formatRp(m.amount) : ""}</p>
                             </div>
                           </ListRow>
                         ))}
@@ -603,7 +568,6 @@ const saveRincian = async (e: React.FormEvent) => {
                   )}
                 </section>
               )}
-
               <div className="px-4 mt-4 grid grid-cols-2 gap-2.5">
                 <Button variant="secondary" onClick={() => (isDone ? setConfirmCancelOpen(true) : setConfirmCompleteOpen(true))} disabled={completing} data-testid="btn-toggle-complete-zakat-bottom">
                   {completing ? "Memproses…" : isDone ? "Batal Tuntas" : "Set Tuntas"}
@@ -615,7 +579,6 @@ const saveRincian = async (e: React.FormEvent) => {
             </>
           )}
       </div>
-
       <BottomSheet open={headerOpen} onClose={() => setHeaderOpen(false)} title="Edit Data Zakat">
         <form onSubmit={saveHeader}>
           <Input label="Judul" value={headerForm.title} onChange={(e) => setHeaderForm({ ...headerForm, title: e.target.value })} placeholder="Zakat Fitrah 1447 H" required />
@@ -625,7 +588,6 @@ const saveRincian = async (e: React.FormEvent) => {
           <Button type="submit" fullWidth disabled={savingHeader}>{savingHeader ? "Menyimpan…" : "Simpan"}</Button>
         </form>
       </BottomSheet>
-
       <BottomSheet open={muzakiOpen} onClose={() => setMuzakiOpen(false)} title={editingPayer ? "Edit Muzaki" : "Tambah Muzaki"}>
         <form onSubmit={savePayer}>
 <div className="mb-4">
@@ -649,7 +611,6 @@ const saveRincian = async (e: React.FormEvent) => {
           )}
         </form>
       </BottomSheet>
-
       <BottomSheet open={mustahikOpen} onClose={() => setMustahikOpen(false)} title={editingRecipient ? "Edit Mustahik" : "Tambah Mustahik"}>
         <form onSubmit={saveRecipient}>
           <Input label="Nama" value={recipientForm.name} onChange={(e) => setRecipientForm({ ...recipientForm, name: e.target.value })} required />
@@ -660,7 +621,6 @@ const saveRincian = async (e: React.FormEvent) => {
           )}
         </form>
       </BottomSheet>
-
       <BottomSheet open={rincianOpen} onClose={() => setRincianOpen(false)} title="Edit Rincian (%)">
         <form onSubmit={saveRincian}>
           <div className="grid grid-cols-3 gap-x-3">
@@ -674,7 +634,6 @@ const saveRincian = async (e: React.FormEvent) => {
           <Button type="submit" fullWidth disabled={savingRincian}>{savingRincian ? "Menyimpan…" : "Simpan Rincian"}</Button>
         </form>
       </BottomSheet>
-
       {/* Modal konfirmasi spek #completeZakatConfirmOverlay */}
       <ConfirmDialog
         open={confirmCompleteOpen}

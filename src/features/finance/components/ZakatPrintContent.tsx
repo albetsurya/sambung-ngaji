@@ -1,39 +1,32 @@
 import React from "react";
 import type { ZakatItem } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
-
 interface ZakatPrintContentProps {
   zakat: ZakatItem | null;
   mode: "kwitansi" | "rekap";
 }
-
 function toNum(v: number | undefined, def = 0): number {
   const n = Number(v);
   return isNaN(n) ? def : n;
 }
-
 function alloc(zakat: ZakatItem | null, category: string) {
   const r = zakat?.allocations || {};
   return (
     r.by_category?.[category] ?? (category === "FITRAH" ? r.fitrah : r.maal)
   );
 }
-
 const fmt = (v: number | undefined) => {
   const n = Number(v ?? 0);
   if (!n) return "Rp -";
   return formatRp(n);
 };
-
 export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
   zakat,
   mode,
 }) => {
   if (!zakat) return null;
-
   const fitrahAlloc = alloc(zakat, "FITRAH");
   const maalAlloc = alloc(zakat, "MAL");
-
   const fitrahPenerimaan = toNum(
     fitrahAlloc?.recipient?.amount,
     toNum(zakat.total_money_rp, 0),
@@ -44,7 +37,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
   const fitrahAmilKelompokPersen = toNum(fitrahAlloc?.amil?.group?.percent, 12);
   const fitrahAmilDesaPersen = toNum(fitrahAlloc?.amil?.village?.percent, 2);
   const fitrahAmilDaerahPersen = toNum(fitrahAlloc?.amil?.region?.percent, 1);
-
   const fitrahMustahiqNominal = toNum(
     fitrahAlloc?.recipient?.amount,
     Math.round((fitrahPenerimaan * fitrahMustahiqPersen) / 100),
@@ -69,7 +61,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
     fitrahAlloc?.amil?.region?.amount,
     Math.round((fitrahPenerimaan * fitrahAmilDaerahPersen) / 100),
   );
-
   const maalPenerimaan = toNum(
     maalAlloc?.recipient?.amount,
     toNum(zakat.total_money_rp, 0),
@@ -88,7 +79,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
   const maalAmilKelompokPersen = toNum(maalAlloc?.amil?.group?.percent, 12);
   const maalAmilDesaPersen = toNum(maalAlloc?.amil?.village?.percent, 2);
   const maalAmilDaerahPersen = toNum(maalAlloc?.amil?.region?.percent, 1);
-
   const maalMustahiqNominal = toNum(
     maalAlloc?.recipient?.amount,
     Math.round((maalPenerimaan * maalMustahiqPersen) / 100),
@@ -121,11 +111,9 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
     maalAlloc?.amil?.region?.amount,
     Math.round((maalPenerimaan * maalAmilDaerahPersen) / 100),
   );
-
   const totalSetorDesa = fitrahAmilDesaNominal + maalAmilDesaNominal;
   const totalSetorDaerah =
     maalMustahiqDaerahNominal + maalSabilillahNominal + maalAmilDaerahNominal;
-
   const categories = zakat.categories || [];
   const hasMaal =
     categories.includes("MAL") ||
@@ -133,7 +121,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
     categories.includes("ZURU") ||
     categories.includes("LIVESTOCK");
   const hasFitrah = categories.includes("FITRAH");
-
   const kategoriLabel =
     categories
       .map((c) =>
@@ -150,12 +137,10 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   : c,
       )
       .join(" + ") || "Belum ada tipe";
-
   const sectionTitleClass = "print-rincian-section-title border rounded-t";
   const titleAmber = `${sectionTitleClass} bg-amber-100 text-amber-900 border-amber-200`;
   const titleLime = `${sectionTitleClass} bg-lime-100 text-lime-900 border-lime-200`;
   const titleSky = `${sectionTitleClass} bg-sky-100 text-sky-900 border-sky-200`;
-
   return (
     <>
       <div className="text-left mb-4">
@@ -169,8 +154,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
           {zakat.title || kategoriLabel}
         </p>
       </div>
-
-      <div className="space-y-3 text-[11px]">
+      <div className="space-y-3 text-[11px] [&_td]:!align-middle [&_th]:!align-middle [&_td]:!leading-snug [&_th]:!leading-snug">
         {hasFitrah && (
           <div className="print-rincian-section">
             <h4 className={titleAmber}>ZAKAT FITRAH</h4>
@@ -183,7 +167,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-40">
+                  <th className="border border-slate-300 p-1.5 text-center w-64">
                     JUMLAH
                   </th>
                 </tr>
@@ -194,7 +178,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     JUMLAH PENERIMAAN ZAKAT FITRAH (100%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono bg-amber-50 font-bold">
+                  <td className="border border-slate-300 p-1 text-right  bg-amber-50 font-bold">
                     {fmt(fitrahPenerimaan)}
                   </td>
                 </tr>
@@ -203,7 +187,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     MUSTAHIQ ({fitrahMustahiqPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahMustahiqNominal)}
                   </td>
                 </tr>
@@ -212,7 +196,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     SABILILLAH ({fitrahSabilillahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahSabilillahNominal)}
                   </td>
                 </tr>
@@ -221,7 +205,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     AMIL ({fitrahAmilPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahAmilNominal)}
                   </td>
                 </tr>
@@ -230,7 +214,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL KELOMPOK ({fitrahAmilKelompokPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahAmilKelompokNominal)}
                   </td>
                 </tr>
@@ -239,7 +223,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL DESA ({fitrahAmilDesaPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahAmilDesaNominal)}
                   </td>
                 </tr>
@@ -248,7 +232,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL DAERAH ({fitrahAmilDaerahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(fitrahAmilDaerahNominal)}
                   </td>
                 </tr>
@@ -256,7 +240,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
             </table>
           </div>
         )}
-
         {hasMaal && (
           <div className="print-rincian-section mt-3">
             <h4 className={titleAmber}>
@@ -271,7 +254,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-40">
+                  <th className="border border-slate-300 p-1.5 text-center w-64">
                     JUMLAH
                   </th>
                 </tr>
@@ -283,7 +266,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                     JUMLAH PENERIMAAN ZAKAT MAAL &amp; TIJAROH, ZURU' DAN TERNAK
                     (100%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono bg-amber-50 font-bold">
+                  <td className="border border-slate-300 p-1 text-right  bg-amber-50 font-bold">
                     {fmt(maalPenerimaan)}
                   </td>
                 </tr>
@@ -292,7 +275,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     MUSTAHIQ ({maalMustahiqPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalMustahiqNominal)}
                   </td>
                 </tr>
@@ -302,7 +285,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                     * MUSTAHIQ KELOMPOK ({maalMustahiqKelompokPersen}% dari
                     MUSTAHIQ)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalMustahiqKelompokNominal)}
                   </td>
                 </tr>
@@ -312,7 +295,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                     * MUSTAHIQ SE-DAERAH ({maalMustahiqDaerahPersen}% dari
                     MUSTAHIQ)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalMustahiqDaerahNominal)}
                   </td>
                 </tr>
@@ -321,7 +304,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     SABILILLAH ({maalSabilillahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalSabilillahNominal)}
                   </td>
                 </tr>
@@ -330,7 +313,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     AMIL ({maalAmilPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalAmilNominal)}
                   </td>
                 </tr>
@@ -339,7 +322,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL KELOMPOK ({maalAmilKelompokPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalAmilKelompokNominal)}
                   </td>
                 </tr>
@@ -348,7 +331,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL DESA ({maalAmilDesaPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalAmilDesaNominal)}
                   </td>
                 </tr>
@@ -357,7 +340,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 pl-6">
                     * AMIL DAERAH ({maalAmilDaerahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalAmilDaerahNominal)}
                   </td>
                 </tr>
@@ -365,7 +348,6 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
             </table>
           </div>
         )}
-
         <div className="print-rincian-section mt-3">
           <h4 className={titleLime}>SETOR KE DESA</h4>
           <table className="print-rincian-table w-full border-collapse">
@@ -388,14 +370,14 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                 <td className="border border-slate-300 p-1">
                   AMIL DESA ({maalAmilDesaPersen}%)
                 </td>
-                <td className="border border-slate-300 p-1 text-right font-mono"></td>
+                <td className="border border-slate-300 p-1 text-right "></td>
               </tr>
               <tr>
                 <td className="border border-slate-300 p-1 text-center"></td>
                 <td className="border border-slate-300 p-1 pl-6">
                   * % AMIL ZAKAT FITRAH
                 </td>
-                <td className="border border-slate-300 p-1 text-right font-mono">
+                <td className="border border-slate-300 p-1 text-right ">
                   {fmt(fitrahAmilDesaNominal)}
                 </td>
               </tr>
@@ -404,7 +386,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                 <td className="border border-slate-300 p-1 pl-6">
                   * % AMIL ZAKAT MAAL &amp; TIJAROH, ZURU' DAN TERNAK
                 </td>
-                <td className="border border-slate-300 p-1 text-right font-mono">
+                <td className="border border-slate-300 p-1 text-right ">
                   {fmt(maalAmilDesaNominal)}
                 </td>
               </tr>
@@ -413,14 +395,13 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                 <td className="border border-slate-300 p-1 text-center font-bold">
                   JUMLAH
                 </td>
-                <td className="border border-slate-300 p-1 text-right font-mono font-bold">
+                <td className="border border-slate-300 p-1 text-right  font-bold">
                   {fmt(totalSetorDesa)}
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
         {hasMaal && (
           <div className="print-rincian-section mt-3">
             <h4 className={titleSky}>SETOR KE DAERAH</h4>
@@ -433,7 +414,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-40">
+                  <th className="border border-slate-300 p-1.5 text-center w-64">
                     JUMLAH
                   </th>
                 </tr>
@@ -445,7 +426,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                     MUSTAHIQ SE-DAERAH ({maalMustahiqDaerahPersen}% dari
                     MUSTAHIQ)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalMustahiqDaerahNominal)}
                   </td>
                 </tr>
@@ -454,7 +435,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     SABILILLAH ({maalSabilillahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalSabilillahNominal)}
                   </td>
                 </tr>
@@ -463,7 +444,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1">
                     AMIL DAERAH ({maalAmilDaerahPersen}%)
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono">
+                  <td className="border border-slate-300 p-1 text-right ">
                     {fmt(maalAmilDaerahNominal)}
                   </td>
                 </tr>
@@ -472,7 +453,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <td className="border border-slate-300 p-1 text-center font-bold">
                     JUMLAH
                   </td>
-                  <td className="border border-slate-300 p-1 text-right font-mono font-bold">
+                  <td className="border border-slate-300 p-1 text-right  font-bold">
                     {fmt(totalSetorDaerah)}
                   </td>
                 </tr>
@@ -480,19 +461,22 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
             </table>
           </div>
         )}
-
         <div className="print-rincian-signature mt-10">
           <div className="text-right mb-4 pr-4">
             <p className="text-[11px]">……………………………., …………………………</p>
           </div>
           <div className="flex justify-between px-2">
             <div className="w-1/2 text-center">
-              <p className="mb-12 text-[11px]">KYAI KELOMPOK</p>
-              <p className="text-[11px]">( ......................... )</p>
+              <p className="mb-16 text-[11px]">KYAI KELOMPOK</p>
+              <p className="text-[11px]">
+                ( .................................................. )
+              </p>
             </div>
             <div className="w-1/2 text-center">
-              <p className="mb-12 text-[11px]">KU KELOMPOK</p>
-              <p className="text-[11px]">( ......................... )</p>
+              <p className="mb-16 text-[11px]">KU KELOMPOK</p>
+              <p className="text-[11px]">
+                ( .................................................. )
+              </p>
             </div>
           </div>
         </div>
@@ -500,5 +484,4 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
     </>
   );
 };
-
 export default ZakatPrintContent;

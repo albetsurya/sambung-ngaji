@@ -14,8 +14,6 @@ import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/ui";
 import { ApiError } from "../services/api";
 import { useEnvironment } from "../hooks/useEnvironment";
-
-
 function AppIcon({ size = 44 }: { size?: number }) {
   return (
     <svg
@@ -37,10 +35,8 @@ function AppIcon({ size = 44 }: { size?: number }) {
           <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
       </defs>
-
       <rect width="512" height="512" rx="120" fill="url(#appicon-bg)" />
       <rect width="512" height="256" rx="120" fill="url(#appicon-shine)" />
-
       <g transform="translate(0, 8)">
         <rect
           x="128"
@@ -53,13 +49,11 @@ function AppIcon({ size = 44 }: { size?: number }) {
         />
         <rect x="148" y="100" width="216" height="288" rx="24" fill="#ffffff" />
       </g>
-
       <g fill="url(#appicon-bg)">
         <circle cx="192" cy="176" r="18" />
         <circle cx="192" cy="240" r="18" />
         <circle cx="192" cy="304" r="18" />
       </g>
-
       <g
         stroke="#ffffff"
         strokeWidth="10"
@@ -71,7 +65,6 @@ function AppIcon({ size = 44 }: { size?: number }) {
         <path d="M186 240 l5 5 l10 -12" />
         <path d="M186 304 l5 5 l10 -12" />
       </g>
-
       <g fill="#CBD5E1">
         <rect x="232" y="168" width="108" height="16" rx="8" />
         <rect x="232" y="232" width="88" height="16" rx="8" />
@@ -80,25 +73,20 @@ function AppIcon({ size = 44 }: { size?: number }) {
     </svg>
   );
 }
-
-
 export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const { isDevelopment } = useEnvironment();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
   if (!loading && user) {
     const from = (location.state as { from?: string })?.from || "/";
     return <Navigate to={from} replace />;
   }
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
@@ -118,7 +106,6 @@ export default function LoginPage() {
       setSubmitting(false);
     }
   }
-
   return (
     <div className="app-shell min-h-screen flex flex-col bg-surface-bg relative overflow-hidden">
       <div
@@ -129,7 +116,6 @@ export default function LoginPage() {
         className="absolute -bottom-40 -left-32 w-96 h-96 rounded-full pointer-events-none blur-3xl"
         style={{ background: "rgb(var(--c-accent) / 0.18)" }}
       />
-
       <button
         onClick={toggleTheme}
         aria-label="Ganti mode tampilan"
@@ -137,7 +123,6 @@ export default function LoginPage() {
       >
         {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
       </button>
-
       <div className="relative flex-1 flex flex-col justify-center px-6 py-12">
         <div className="mb-8 text-center">
           <div className="relative inline-block mb-5">
@@ -152,14 +137,12 @@ export default function LoginPage() {
             <div className="relative w-20 h-20 rounded-[26px] overflow-hidden shadow-xl">
               <AppIcon size={80} />
             </div>
-
             {isDevelopment && (
               <div className="absolute -top-1.5 -right-1.5 z-10 px-2 py-0.5 rounded-full bg-danger text-white text-[10px] font-bold uppercase tracking-wider shadow-md ring-2 ring-surface-bg">
                 DEV
               </div>
             )}
           </div>
-
           <h1 className="text-[26px] font-bold text-surface-text tracking-[-0.02em] leading-tight">
             Sambung Ngaji
           </h1>
@@ -167,7 +150,6 @@ export default function LoginPage() {
             Assalamu&apos;alaikum, silakan masuk.
           </p>
         </div>
-
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-sm mx-auto bg-surface-card/80 backdrop-blur-xl rounded-3xl border border-surface-border shadow-lg shadow-black/[0.03] p-6"
@@ -199,7 +181,6 @@ export default function LoginPage() {
               />
             </div>
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="password"
@@ -237,7 +218,6 @@ export default function LoginPage() {
               </Button>
             </div>
           </div>
-
           {error && (
             <div className="mb-4 px-3 py-2.5 rounded-xl bg-danger-soft border border-danger/20">
               <p className="text-ios-footnote text-danger leading-relaxed">
@@ -245,7 +225,6 @@ export default function LoginPage() {
               </p>
             </div>
           )}
-
           <Button
             type="submit"
             fullWidth
@@ -255,7 +234,6 @@ export default function LoginPage() {
             {submitting ? "Memproses..." : "Masuk"}
           </Button>
         </form>
-
         <div className="mt-6 text-center">
           <p className="text-ios-footnote text-surface-muted mb-3">
             Belum punya akun?
@@ -276,7 +254,6 @@ export default function LoginPage() {
             </Link>
           </div>
         </div>
-
         <p className="text-center text-ios-caption text-surface-muted/70 mt-6">
           Sambung Ngaji · v1.0.0
         </p>

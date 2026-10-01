@@ -34,7 +34,6 @@ import { useToast } from "../contexts/ToastContext";
 import { ApiError } from "../services/api";
 import { GroupSheet } from "./GroupsPage";
 import type { Group } from "../types";
-
 export default function GroupHubPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -42,35 +41,27 @@ export default function GroupHubPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editSheetOpen, setEditSheetOpen] = useState(false);
-  // Gate konteks: chip "Semua" tidak boleh langsung masuk modul per-grup.
-  // Ketuk Kas/Shodaqoh/Zakat saat global -> BottomSheet pilih 1 kelompok dulu.
   const [groupPickerOpen, setGroupPickerOpen] = useState(false);
   const [pendingFinanceTo, setPendingFinanceTo] = useState<string | null>(null);
-
   const urlGroupId = searchParams.get("group_id");
-
   useEffect(() => {
     if (isSuperAdmin && urlGroupId) {
       setSuperAdminFocusGroup(urlGroupId);
     }
   }, [isSuperAdmin, urlGroupId]);
-
   const groupsQuery = useQuery({
     queryKey: queryKeys.groups(),
     queryFn: () => groupApi.list(),
     staleTime: 5 * 60_000,
   });
-
   const allGroups = useMemo(
     () => groupsQuery.data ?? [],
     [groupsQuery.data],
   );
-
   const activeFocusGroupId = isSuperAdmin ? (urlGroupId || focusGroupId) : null;
   const effectiveGroupId = isSuperAdmin ? activeFocusGroupId : assignedGroup;
   const myGroup = allGroups.find((g) => g.group_id === effectiveGroupId);
   const isGlobalMode = isSuperAdmin && !activeFocusGroupId;
-
   const saveMutation = useMutation({
     mutationFn: (payload: Partial<Group>) => groupApi.save(payload),
     onSuccess: () => {
@@ -88,14 +79,12 @@ export default function GroupHubPage() {
       );
     },
   });
-
   const pendingQuery = useQuery({
     queryKey: queryKeys.pendingMembers("PENDING"),
     queryFn: () => pendingApi.list({ status: "PENDING" }),
     staleTime: 60_000,
   });
   const pendingCount = (pendingQuery.data ?? []).length;
-
   const menu: {
     key: string;
     label: string;
@@ -142,7 +131,6 @@ export default function GroupHubPage() {
               section: "keuangan" as const,
               needsGroup: isGlobalMode,
             },
-            // Menu Asisten AI dihapus: sudah ada FAB chat AI global di AppLayout.
           ]
         : []),
       {
@@ -164,7 +152,6 @@ export default function GroupHubPage() {
         Icon: ClipboardList,
         to: "/lainnya/pendaftar",
         section: "jamaah",
-        // Badge selalu tampil agar tidak miss verifikasi (perbaikan: dulu hilang saat fokus per-grup).
         badge: pendingCount > 0 ? pendingCount : undefined,
       },
       {
@@ -231,7 +218,6 @@ export default function GroupHubPage() {
       },
     ];
   }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance, myGroup?.group_name]);
-
   /** Tap menu keuangan: gate bila masih mode Semua (tanpa fokus grup). */
   function handleMenuTap(m: { key: string; to: string; needsGroup?: boolean }) {
     if (m.needsGroup && isGlobalMode) {
@@ -241,24 +227,20 @@ export default function GroupHubPage() {
     }
     navigate(m.to);
   }
-
   function handlePickGroupForFinance(g: Group) {
     setSuperAdminFocusGroup(g.group_id);
     setGroupPickerOpen(false);
     const dest = pendingFinanceTo || "/finance";
     setPendingFinanceTo(null);
-    // Pertahankan konteks di URL agar back simetris; modul finance baca localStorage focus.
     navigate(`/kelompok-saya?group_id=${g.group_id}`, { replace: true });
     setTimeout(() => navigate(dest), 50);
   }
-
   const headerTitle = isSuperAdmin ? "Kelola Kelompok" : "Kelompok Saya";
   const headerSubtitle = isSuperAdmin
     ? isGlobalMode
       ? "Semua Kelompok · mode super admin"
       : `${myGroup?.group_name || ""} · mode super admin`
     : myGroup?.group_name;
-
   return (
     <AppLayout>
       <Header
@@ -267,7 +249,6 @@ export default function GroupHubPage() {
         onBack={() => navigate("/lainnya")}
         backLabel="Lainnya"
       />
-
       <div className="py-4">
         {isSuperAdmin && (
           <div className="px-4 mb-2.5 flex gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -292,7 +273,6 @@ export default function GroupHubPage() {
             ))}
           </div>
         )}
-
         {!isSuperAdmin && !effectiveGroupId ? (
           <EmptyState
             title="Tanpa kelompok"
@@ -332,7 +312,6 @@ export default function GroupHubPage() {
                 </GroupedList>
               </section>
             )}
-
             {[
               { key: "keuangan" as const, label: "Keuangan & SabilKas" },
               { key: "jamaah" as const, label: "Jamaah & Keanggotaan" },
@@ -360,7 +339,6 @@ export default function GroupHubPage() {
           </>
         )}
       </div>
-
       <BottomSheet
         open={groupPickerOpen}
         onClose={() => { setGroupPickerOpen(false); setPendingFinanceTo(null); }}
@@ -394,7 +372,6 @@ export default function GroupHubPage() {
           )}
         </GroupedList>
       </BottomSheet>
-
       <GroupSheet
         open={editSheetOpen}
         group={myGroup ?? null}

@@ -7,20 +7,21 @@ import { AppLayout, Header } from "../../../components/layout/AppLayout";
 import { UnifiedPrintPreview } from "../components/UnifiedPrintPreview";
 import { ZakatPrintContent } from "../components/ZakatPrintContent";
 import { ApiError } from "../../../services/api";
-
 export const ZakatPrintPreviewPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const { assignedGroup } = usePermission();
-
   const [data, setData] = useState<ZakatItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-
   const mode = (searchParams.get("mode") as "kwitansi" | "rekap") || "kwitansi";
-
+  const detailPath = id ? `/finance/zakat/${id}` : "/finance/zakat";
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate(detailPath, { replace: true });
+  };
   const load = async () => {
     if (!assignedGroup || !id) {
       setLoading(false);
@@ -43,18 +44,16 @@ export const ZakatPrintPreviewPage: React.FC = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     load();
   }, [assignedGroup, id]);
-
   if (!assignedGroup) {
     return (
       <AppLayout>
         <Header
           title="Detail Zakat"
           subtitle="Memuat…"
-          onBack={() => navigate("/finance/zakat")}
+          onBack={goBack}
           backLabel="Zakat"
           showSyncButton={false}
         />
@@ -70,7 +69,6 @@ export const ZakatPrintPreviewPage: React.FC = () => {
       </AppLayout>
     );
   }
-
   return (
     <AppLayout>
       <Header
@@ -90,7 +88,7 @@ export const ZakatPrintPreviewPage: React.FC = () => {
               } · ${data.status === "COMPLETED" ? "Tuntas" : "Proses"}`
             : "Memuat…"
         }
-        onBack={() => navigate("/finance/zakat")}
+        onBack={goBack}
         backLabel="Zakat"
         showSyncButton={false}
       />
@@ -114,7 +112,7 @@ export const ZakatPrintPreviewPage: React.FC = () => {
           </div>
         ) : (
           <UnifiedPrintPreview
-            onClose={() => navigate("/finance/zakat")}
+            onClose={goBack}
             filename={`Kwitansi-Zakat-${
               data?.title || data?.categories?.join("-") || "zakat"
             }`}
@@ -127,5 +125,4 @@ export const ZakatPrintPreviewPage: React.FC = () => {
     </AppLayout>
   );
 };
-
 export default ZakatPrintPreviewPage;

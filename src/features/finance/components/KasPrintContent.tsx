@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import type { Transaction } from "../api/financeApi";
 import { formatRp } from "../../../utils/format";
-
 interface KasPrintContentProps {
   transactions: Transaction[];
   initial_balance: number;
@@ -10,7 +9,6 @@ interface KasPrintContentProps {
   cash_type_label: string;
   mode: "rincian" | "rekap";
 }
-
 function formatDateDMY(input?: string | null): string {
   if (!input) return "—";
   const s = String(input).trim();
@@ -23,7 +21,6 @@ function formatDateDMY(input?: string | null): string {
   const yyyy = d.getFullYear();
   return `${dd}-${mm}-${yyyy}`;
 }
-
 export const KasPrintContent: React.FC<KasPrintContentProps> = ({
   transactions,
   initial_balance,
@@ -36,16 +33,13 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
   const pengeluaranGrouped: Record<string, number> = {};
   let totalDebit = 0;
   let totalCredit = 0;
-
   transactions.forEach((t) => {
     const isSaldoAwal =
       String(t.account_name || "")
         .trim()
         .toUpperCase() === "SALDO AWAL";
-
     const deb = Number(t.debit) || 0;
     const kre = Number(t.credit) || 0;
-
     if (!isSaldoAwal && deb > 0) {
       const key = (t.account_name || t.description || "LAINNYA")
         .trim()
@@ -53,7 +47,6 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
       penerimaanGrouped[key] = (penerimaanGrouped[key] || 0) + deb;
       totalDebit += deb;
     }
-
     if (!isSaldoAwal && kre > 0) {
       const key = (t.account_name || t.description || "LAINNYA")
         .trim()
@@ -62,7 +55,6 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
       totalCredit += kre;
     }
   });
-
   const rows = useMemo(() => {
     return transactions.map((t, idx) => ({
       idx,
@@ -77,10 +69,8 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
       tanggal: formatDateDMY(t.transaction_date),
     }));
   }, [transactions]);
-
   const printTitle =
     mode === "rekap" ? "Laporan Rekapitulasi Kas" : "Rincian Transaksi Kas";
-
   return (
     <>
       <div className="text-center border-b-2 border-slate-800 pb-4 mb-6">
@@ -96,7 +86,6 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
           PERIODE: {period_label.toUpperCase()}
         </p>
       </div>
-
       {mode === "rincian" ? (
         <table className="w-full text-xs border-collapse border border-slate-400">
           <thead>
@@ -133,13 +122,13 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                 <td className="border border-slate-300 p-1.5">
                   {r.t.description}
                 </td>
-                <td className="border border-slate-300 p-1.5 text-right font-mono">
+                <td className="border border-slate-300 p-1.5 text-right ">
                   {r.deb > 0 ? formatRp(r.deb) : "—"}
                 </td>
-                <td className="border border-slate-300 p-1.5 text-right font-mono">
+                <td className="border border-slate-300 p-1.5 text-right ">
                   {r.kre > 0 ? formatRp(r.kre) : "—"}
                 </td>
-                <td className="border border-slate-300 p-1.5 text-right font-mono font-semibold">
+                <td className="border border-slate-300 p-1.5 text-right  font-semibold">
                   {formatRp(r.saldo)}
                 </td>
               </tr>
@@ -153,17 +142,17 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
               >
                 TOTAL TRANSAKSI
               </td>
-              <td className="border border-slate-400 p-2 text-right font-mono text-emerald-800">
+              <td className="border border-slate-400 p-2 text-right  text-emerald-800">
                 {formatRp(
                   rows.reduce((sum, r) => sum + (Number(r.t.debit) || 0), 0),
                 )}
               </td>
-              <td className="border border-slate-400 p-2 text-right font-mono text-rose-800">
+              <td className="border border-slate-400 p-2 text-right  text-rose-800">
                 {formatRp(
                   rows.reduce((sum, r) => sum + (Number(r.t.credit) || 0), 0),
                 )}
               </td>
-              <td className="border border-slate-400 p-2 text-right font-mono">
+              <td className="border border-slate-400 p-2 text-right ">
                 {formatRp(rows[rows.length - 1]?.saldo ?? 0)}
               </td>
             </tr>
@@ -193,17 +182,16 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                 <td className="border border-slate-300 p-2">
                   SALDO AWAL PERIODE
                 </td>
-                <td className="border border-slate-300 p-2 text-right font-mono">
+                <td className="border border-slate-300 p-2 text-right ">
                   —
                 </td>
-                <td className="border border-slate-300 p-2 text-right font-mono">
+                <td className="border border-slate-300 p-2 text-right ">
                   —
                 </td>
-                <td className="border border-slate-300 p-2 text-right font-mono text-slate-900">
+                <td className="border border-slate-300 p-2 text-right  text-slate-900">
                   {formatRp(initial_balance)}
                 </td>
               </tr>
-
               <tr className="bg-emerald-50/50 font-bold">
                 <td
                   colSpan={4}
@@ -234,13 +222,13 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
               ).map(([acc, val]) => (
                 <tr key={acc} className="border-b border-slate-200">
                   <td className="border border-slate-300 p-1.5 pl-6">{acc}</td>
-                  <td className="border border-slate-300 p-1.5 text-right font-mono">
+                  <td className="border border-slate-300 p-1.5 text-right ">
                     {formatRp(val)}
                   </td>
-                  <td className="border border-slate-300 p-1.5 text-right font-mono">
+                  <td className="border border-slate-300 p-1.5 text-right ">
                     —
                   </td>
-                  <td className="border border-slate-300 p-1.5 text-right font-mono">
+                  <td className="border border-slate-300 p-1.5 text-right ">
                     —
                   </td>
                 </tr>
@@ -251,7 +239,7 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                 <td className="border border-slate-400 p-2 text-right uppercase">
                   TOTAL &amp; SALDO AKHIR
                 </td>
-                <td className="border border-slate-400 p-2 text-right font-mono text-emerald-800">
+                <td className="border border-slate-400 p-2 text-right  text-emerald-800">
                   {formatRp(
                     transactions
                       .filter(
@@ -264,7 +252,7 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                       .reduce((sum, t) => sum + (Number(t.debit) || 0), 0),
                   )}
                 </td>
-                <td className="border border-slate-400 p-2 text-right font-mono text-rose-800">
+                <td className="border border-slate-400 p-2 text-right  text-rose-800">
                   {formatRp(
                     transactions
                       .filter(
@@ -277,7 +265,7 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                       .reduce((sum, t) => sum + (Number(t.credit) || 0), 0),
                   )}
                 </td>
-                <td className="border border-slate-400 p-2 text-right font-mono text-slate-900 font-bold">
+                <td className="border border-slate-400 p-2 text-right  text-slate-900 font-bold">
                   {formatRp(ending_balance)}
                 </td>
               </tr>
@@ -302,5 +290,4 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
     </>
   );
 };
-
 export default KasPrintContent;

@@ -24,7 +24,6 @@ import {
   ScrollText,
 } from "../ui/FontAwesomeIcons";
 import { RoleBadge } from "../ui";
-
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
@@ -40,11 +39,9 @@ const ADMIN_ITEMS = [
   { key: "zakat", label: "Zakat", to: "/finance/zakat", icon: ScrollText },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
-
 const KELOLA_ITEMS = [
   { label: "Kelola Kelompok", to: "/kelompok-saya", icon: Building2 },
 ];
-
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },
   { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
@@ -53,7 +50,6 @@ const MEMBER_ITEMS = [
   { key: "progres", label: "Progres Saya", to: "/member/progres", icon: Sparkles },
   { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
 ];
-
 export function DesktopSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -61,13 +57,11 @@ export function DesktopSidebar() {
   const { canSeeNav, isGlobal, isSuperAdmin, role, groupId } = usePermission();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-
   const isMemberContext = location.pathname.startsWith("/member");
   const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
   const visible = isMemberContext
     ? items
     : items.filter((i) => canSeeNav(i.key));
-
   /* Admin ber-kelompok: hub Kelompok Saya tepat di bawah Beranda. */
   const isHubUser =
     !isMemberContext &&
@@ -86,12 +80,9 @@ export function DesktopSidebar() {
           ...visible.slice(1),
         ]
       : visible;
-
   const isAdmin = role && role !== "MEMBER";
-
   return (
     <aside className="hidden md:flex flex-col fixed top-0 bottom-0 left-0 w-64 border-r border-surface-border bg-surface-card z-30 select-none">
-      
       <div className="flex items-center justify-between h-16 px-5 border-b border-surface-border">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(isMemberContext ? "/member" : "/")}>
           <div className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm shadow-accent/30">
@@ -106,15 +97,12 @@ export function DesktopSidebar() {
             </span>
           </div>
         </div>
-
         {isDevelopment && (
           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide bg-warning-soft text-warning border border-warning/20">
             DEV
           </span>
         )}
       </div>
-
-      
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6 no-scrollbar">
         <div>
           <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
@@ -153,7 +141,6 @@ export function DesktopSidebar() {
             })}
           </nav>
         </div>
-
         {isSuperAdmin && !isMemberContext && (
           <div>
             <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
@@ -192,8 +179,6 @@ export function DesktopSidebar() {
             </nav>
           </div>
         )}
-
-        
         {isAdmin && (
           <div>
             <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-surface-muted/70">
@@ -211,8 +196,6 @@ export function DesktopSidebar() {
           </div>
         )}
       </div>
-
-      
       <div className="p-3 border-t border-surface-border bg-surface-card2/50 space-y-2">
         {user ? (
           <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-card border border-surface-border">
@@ -227,7 +210,6 @@ export function DesktopSidebar() {
                 <RoleBadge role={user.role} />
               </div>
             </div>
-
             <button
               onClick={toggleTheme}
               aria-label="Toggle Theme"

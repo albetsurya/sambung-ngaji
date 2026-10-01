@@ -47,14 +47,12 @@ import {
   SheetFooter,
 } from "../components/FinanceShared";
 import { ApiError } from "../../../services/api";
-
 const KasArusChart: React.FC<{
   data: Array<[string, { debet: number; kredit: number; count: number }]>;
   max: number;
   monthShort: (k: string) => string;
 }> = ({ data, max, monthShort }) => {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
-
   const W = 600;
   const H = 180;
   const padL = 8;
@@ -66,7 +64,6 @@ const KasArusChart: React.FC<{
   const step = innerW / Math.max(data.length, 1);
   const barW = Math.max(6, Math.min(14, step * 0.28));
   const baseY = padT + innerH;
-
   const maxV = Math.max(
     max,
     ...data.map(([, v]) => Math.max(v.debet, v.kredit)),
@@ -75,18 +72,15 @@ const KasArusChart: React.FC<{
   const minNet = Math.min(0, ...data.map(([, v]) => v.debet - v.kredit));
   const maxNet = Math.max(0, ...data.map(([, v]) => v.debet - v.kredit));
   const netSpan = Math.max(maxNet - minNet, 1);
-
   const cx = (i: number) => padL + step * i + step / 2;
   const yBar = (v: number) => padT + innerH - (v / maxV) * innerH;
   const yNet = (v: number) => padT + innerH - ((v - minNet) / netSpan) * innerH;
-
   const netPts = data.map(
     ([, v], i) => [cx(i), yNet(v.debet - v.kredit)] as const,
   );
   const netPath = netPts
     .map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`)
     .join(" ");
-
   const handleMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const px = ((e.clientX - rect.left) / rect.width) * W;
@@ -96,13 +90,11 @@ const KasArusChart: React.FC<{
     );
     setHoverIdx(i);
   };
-
   const hovered = hoverIdx !== null ? data[hoverIdx] : null;
   const hoveredNet = hovered ? hovered[1].debet - hovered[1].kredit : 0;
   const tooltipLeftPct = hovered
     ? Math.max(12, Math.min(88, (cx(hoverIdx!) / W) * 100))
     : 50;
-
   return (
     <div className="relative pt-14">
       <svg
@@ -122,7 +114,6 @@ const KasArusChart: React.FC<{
             <stop offset="100%" stopColor="rgb(239 68 68)" stopOpacity="0.5" />
           </linearGradient>
         </defs>
-
         {/* Grid horizontal */}
         {[0, 0.25, 0.5, 0.75, 1].map((g, i) => {
           const gy = padT + innerH * (1 - g);
@@ -141,7 +132,6 @@ const KasArusChart: React.FC<{
             />
           );
         })}
-
         {/* Grid vertikal */}
         {data.map((_, i) => (
           <line
@@ -158,7 +148,6 @@ const KasArusChart: React.FC<{
             vectorEffect="non-scaling-stroke"
           />
         ))}
-
         {/* Bars */}
         {data.map(([k, v], i) => {
           const c = cx(i);
@@ -195,7 +184,6 @@ const KasArusChart: React.FC<{
             </g>
           );
         })}
-
         {/* Zero net line */}
         <line
           x1={padL}
@@ -209,7 +197,6 @@ const KasArusChart: React.FC<{
           opacity="0.5"
           vectorEffect="non-scaling-stroke"
         />
-
         {/* Net line */}
         <path
           d={netPath}
@@ -220,7 +207,6 @@ const KasArusChart: React.FC<{
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
         />
-
         {/* Net dots */}
         {netPts.map(([px, py], i) => (
           <circle
@@ -235,7 +221,6 @@ const KasArusChart: React.FC<{
             vectorEffect="non-scaling-stroke"
           />
         ))}
-
         {/* Hover vertical line */}
         {hoverIdx !== null && (
           <line
@@ -251,7 +236,6 @@ const KasArusChart: React.FC<{
           />
         )}
       </svg>
-
       {/* Month labels */}
       <div className="flex mt-0.5">
         {data.map(([k], i) => (
@@ -265,7 +249,6 @@ const KasArusChart: React.FC<{
           </span>
         ))}
       </div>
-
       {/* Tooltip */}
       {hovered && (
         <div
@@ -280,27 +263,25 @@ const KasArusChart: React.FC<{
           </p>
           <p className="text-success font-medium">
             Masuk{" "}
-            <span className="font-mono">{formatRp(hovered[1].debet)}</span>
+            <span className="">{formatRp(hovered[1].debet)}</span>
           </p>
           <p className="text-danger font-medium">
             Keluar{" "}
-            <span className="font-mono">{formatRp(hovered[1].kredit)}</span>
+            <span className="">{formatRp(hovered[1].kredit)}</span>
           </p>
           <p className="text-blue-500 font-medium">
-            Net <span className="font-mono">{formatRp(hoveredNet)}</span>
+            Net <span className="">{formatRp(hoveredNet)}</span>
           </p>
         </div>
       )}
     </div>
   );
 };
-
 export const FinanceLedgerPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
   const financeBack = useFinanceBack();
-
   const [cashType, setCashType] = useState<CashType>("main");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -308,7 +289,6 @@ export const FinanceLedgerPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [showAllTx, setShowAllTx] = useState(false);
-
   const [isTxSheetOpen, setIsTxSheetOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [txForm, setTxForm] = useState({
@@ -319,16 +299,12 @@ export const FinanceLedgerPage: React.FC = () => {
     amount: 0,
   });
   const [savingTx, setSavingTx] = useState(false);
-
   const [isCarrySheetOpen, setIsCarrySheetOpen] = useState(false);
   const [carryMonth, setCarryMonth] = useState("");
   const [carryingOver, setCarryingOver] = useState(false);
-
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
   const [deleting, setDeleting] = useState(false);
-  // Action overlay spek SabilKas (#txActionOverlay): klik row -> menu Edit/Duplikat/Hapus/Batal.
   const [actionTx, setActionTx] = useState<Transaction | null>(null);
-
   const loadData = async () => {
     if (!assignedGroup) {
       setKasData(null);
@@ -349,13 +325,10 @@ export const FinanceLedgerPage: React.FC = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     loadData();
   }, [cashType, assignedGroup]);
-
   const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
-
   const handleOpenAddSheet = () => {
     setEditingTx(null);
     setTxForm({
@@ -367,7 +340,6 @@ export const FinanceLedgerPage: React.FC = () => {
     });
     setIsTxSheetOpen(true);
   };
-
   const handleOpenEditSheet = (tx: Transaction) => {
     setEditingTx(tx);
     const deb = Number(tx.debit) || 0;
@@ -382,7 +354,6 @@ export const FinanceLedgerPage: React.FC = () => {
     });
     setIsTxSheetOpen(true);
   };
-
   const handleSubmitTx = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!txForm.description.trim()) {
@@ -438,7 +409,6 @@ export const FinanceLedgerPage: React.FC = () => {
       setSavingTx(false);
     }
   };
-
   const handleConfirmDelete = async () => {
     if (!deleteTarget?.cash_id) return;
     setDeleting(true);
@@ -461,8 +431,6 @@ export const FinanceLedgerPage: React.FC = () => {
       setDeleting(false);
     }
   };
-
-  // Duplikat ala kas-latukan-web (duplicateTransaction): salin baris by cash_id.
   const [duplicating, setDuplicating] = useState(false);
   const handleDuplicateTx = async (tx?: Transaction) => {
     const target = tx || editingTx;
@@ -482,7 +450,6 @@ export const FinanceLedgerPage: React.FC = () => {
       setDuplicating(false);
     }
   };
-
   const handleCarryForward = async () => {
     if (!carryMonth) {
       showToast("Pilih bulan target terlebih dahulu", "error");
@@ -514,7 +481,6 @@ export const FinanceLedgerPage: React.FC = () => {
       setCarryingOver(false);
     }
   };
-
   const monthOptions = Array.from(
     new Set(
       (kasData?.transactions || [])
@@ -522,7 +488,6 @@ export const FinanceLedgerPage: React.FC = () => {
         .filter(Boolean),
     ),
   ).sort();
-
   const monthLabel = (key: string) => {
     if (key === "all") return "Semua Periode";
     const [y, m] = key.split("-");
@@ -539,9 +504,7 @@ export const FinanceLedgerPage: React.FC = () => {
       year: "2-digit",
     });
   };
-
   const allTx = kasData?.transactions || [];
-
   const scopeData = useMemo(() => {
     if (selectedMonth === "all") {
       return {
@@ -554,19 +517,16 @@ export const FinanceLedgerPage: React.FC = () => {
     }
     const isSaldoAwalRow = (t: Transaction) =>
       (t.account_name || "").trim().toUpperCase() === "SALDO AWAL";
-
     const monthTx = allTx.filter(
       (t) => (t.transaction_date || "").slice(0, 7) === selectedMonth,
     );
     const before = allTx.filter(
       (t) => (t.transaction_date || "").slice(0, 7) < selectedMonth,
     );
-
     const awal =
       before.length > 0
         ? Number(before[before.length - 1].balance) || 0
         : kasData?.initial_balance || 0;
-
     let debet = 0;
     let kredit = 0;
     monthTx.forEach((t) => {
@@ -575,12 +535,10 @@ export const FinanceLedgerPage: React.FC = () => {
         kredit += Number(t.credit) || 0;
       }
     });
-
     const akhir =
       monthTx.length > 0
         ? Number(monthTx[monthTx.length - 1].balance) || awal
         : awal;
-
     return {
       awal,
       debet,
@@ -589,15 +547,12 @@ export const FinanceLedgerPage: React.FC = () => {
       list: monthTx,
     };
   }, [selectedMonth, allTx, kasData]);
-
   const sumDebit = scopeData.debet;
   const sumCredit = scopeData.kredit;
   const openingBalance = scopeData.awal;
   const heroBalance = scopeData.akhir;
   const surplus = sumDebit - sumCredit;
   const periodTx = scopeData.list;
-
-  // Rekap per bulan ala renderRecapList kas-latukan-web + mini chart 6 bulan terakhir.
   const recapByMonth = useMemo(() => {
     const map = new Map<
       string,
@@ -618,7 +573,6 @@ export const FinanceLedgerPage: React.FC = () => {
     }
     return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
   }, [allTx]);
-
   const chartMonths = useMemo(
     () => recapByMonth.slice(0, 6).reverse(),
     [recapByMonth],
@@ -628,7 +582,6 @@ export const FinanceLedgerPage: React.FC = () => {
       Math.max(1, ...chartMonths.map(([, v]) => Math.max(v.debet, v.kredit))),
     [chartMonths],
   );
-
   const filteredTransactions = periodTx.filter((t) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -641,7 +594,6 @@ export const FinanceLedgerPage: React.FC = () => {
   const visibleTx = showAllTx
     ? filteredTransactions
     : [...filteredTransactions].slice(-5).reverse();
-
   return (
     <AppLayout
       fab={
@@ -673,7 +625,6 @@ export const FinanceLedgerPage: React.FC = () => {
           </HeaderActions>
         }
       />
-
       <div className="py-4">
         {!assignedGroup ? (
           <NoGroupEmpty
@@ -699,7 +650,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 ]}
               />
             </div>
-
             <section>
               <SectionTitle first>Periode</SectionTitle>
               <div className="px-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -713,7 +663,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 ))}
               </div>
             </section>
-
             <section>
               <SectionTitle>Ringkasan</SectionTitle>
               <Card className="mx-4" data-testid="hero-card">
@@ -757,7 +706,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   </span>
                 </div>
               </Card>
-
               <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
                 <Card className="!p-3.5">
                   <p className="text-ios-caption font-semibold uppercase tracking-wider text-success">
@@ -782,7 +730,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   </p>
                 </Card>
               </div>
-
               <GroupedList>
                 <ListRow insetDivider={false}>
                   <div className="flex items-center justify-between gap-2 w-full">
@@ -807,7 +754,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 </ListRow>
               </GroupedList>
             </section>
-
             {chartMonths.length > 0 && (
               <section>
                 <SectionTitle>Grafik Arus Kas (6 Bulan)</SectionTitle>
@@ -837,7 +783,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 </Card>
               </section>
             )}
-
             {recapByMonth.length > 0 && (
               <section>
                 <SectionTitle>Rekap Bulanan</SectionTitle>
@@ -855,7 +800,7 @@ export const FinanceLedgerPage: React.FC = () => {
                               {monthLabel(k)}
                             </p>
                             <p
-                              className={`font-mono text-ios-subhead font-bold ${v.debet - v.kredit >= 0 ? "text-success" : "text-danger"}`}
+                              className={` text-ios-subhead font-bold ${v.debet - v.kredit >= 0 ? "text-success" : "text-danger"}`}
                             >
                               {formatRp(v.debet - v.kredit)}
                             </p>
@@ -871,7 +816,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 </GroupedList>
               </section>
             )}
-
             <section>
               <div className="px-4 mb-2.5 mt-5 flex items-center justify-between">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
@@ -884,7 +828,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   {showAllTx ? "Tutup" : "Lihat semua"}
                 </button>
               </div>
-
               {showAllTx && (
                 <div className="px-4 mb-2.5">
                   <Input
@@ -895,7 +838,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   />
                 </div>
               )}
-
               {loading ? (
                 <GroupedListSkeleton rows={5} />
               ) : visibleTx.length === 0 ? (
@@ -941,7 +883,7 @@ export const FinanceLedgerPage: React.FC = () => {
                               </p>
                             </div>
                             <p
-                              className={`font-mono text-ios-subhead font-bold shrink-0 ${
+                              className={` text-ios-subhead font-bold shrink-0 ${
                                 isIn ? "text-success" : "text-danger"
                               }`}
                             >
@@ -957,7 +899,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   })}
                 </GroupedList>
               )}
-
               <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
                 <Button
                   variant="secondary"
@@ -980,7 +921,6 @@ export const FinanceLedgerPage: React.FC = () => {
           </>
         )}
       </div>
-
       <BottomSheet
         open={isTxSheetOpen}
         onClose={() => setIsTxSheetOpen(false)}
@@ -1046,7 +986,6 @@ export const FinanceLedgerPage: React.FC = () => {
           />
         </form>
       </BottomSheet>
-
       {/* Action overlay spek #txActionOverlay: Edit / Duplikat / Hapus / Batal */}
       <BottomSheet
         open={!!actionTx}
@@ -1097,7 +1036,6 @@ export const FinanceLedgerPage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
-
       <BottomSheet
         open={isCarrySheetOpen}
         onClose={() => setIsCarrySheetOpen(false)}
@@ -1125,7 +1063,6 @@ export const FinanceLedgerPage: React.FC = () => {
           </Button>
         </form>
       </BottomSheet>
-
       <ConfirmDialog
         open={!!deleteTarget}
         title="Hapus transaksi?"
