@@ -845,7 +845,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <code
           key={i}
-          className="px-1.5 py-0.5 rounded-md text-[0.9em] font-mono"
+          className="px-1.5 py-0.5 rounded-md text-[0.9em] "
           style={{
             backgroundColor: "rgba(0,0,0,0.1)",
           }}
@@ -896,7 +896,7 @@ function CodeBlock({
         className="flex items-center justify-between px-3 py-1.5 border-b"
         style={{ borderColor: "rgba(0,0,0,0.08)" }}
       >
-        <span className="text-[10px] font-mono opacity-70 uppercase tracking-wide">
+        <span className="text-[10px]  opacity-70 uppercase tracking-wide">
           {language || "code"}
         </span>
         <Button onClick={handleCopy} variant="ghost" size="xs">
@@ -904,7 +904,7 @@ function CodeBlock({
         </Button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
-        <code className="font-mono whitespace-pre">{content}</code>
+        <code className=" whitespace-pre">{content}</code>
       </pre>
     </div>
   );

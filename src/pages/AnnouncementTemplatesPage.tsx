@@ -418,7 +418,7 @@ function TemplateEditorSheet({
               key={v}
               type="button"
               onClick={() => insertVariable(v)}
-              className="px-2 py-1 rounded-md text-[11px] font-mono bg-surface-card2 text-surface-muted border border-surface-border hover:bg-accent-soft hover:text-accent transition-colors active:scale-[0.97]"
+              className="px-2 py-1 rounded-md text-[11px]  bg-surface-card2 text-surface-muted border border-surface-border hover:bg-accent-soft hover:text-accent transition-colors active:scale-[0.97]"
             >
               {v}
             </button>
@@ -507,7 +507,7 @@ function TemplatePreviewModal({
         <Badge color={template.status_aktif !== false ? "emerald" : "ink"}>
           {template.status_aktif !== false ? "Aktif" : "Nonaktif"}
         </Badge>
-        <span className="text-ios-caption font-mono text-surface-muted">
+        <span className="text-ios-caption  text-surface-muted">
           {template.kode}
         </span>
       </div>

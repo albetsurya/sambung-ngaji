@@ -840,7 +840,7 @@ export const MonthlyDuesPage: React.FC = () => {
                           <p className="text-ios-body text-surface-text">
                             {a.label}
                           </p>
-                          <p className="font-mono font-bold text-surface-text shrink-0">
+                          <p className=" font-bold text-surface-text shrink-0">
                             {formatRp(a.value)}
                           </p>
                         </div>
@@ -1123,7 +1123,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                     {p.notes ? ` · ${p.notes}` : ""}
                                   </p>
                                 </div>
-                                <p className="font-mono font-bold shrink-0">
+                                <p className=" font-bold shrink-0">
                                   {formatRp(p.total_amount)}
                                 </p>
                               </div>
@@ -1784,7 +1784,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                   </>
                                 )}
                               </div>
-                              <p className="font-mono font-bold text-accent shrink-0">
+                              <p className=" font-bold text-accent shrink-0">
                                 {v.total > 0 ? formatRp(v.total) : "–"}
                               </p>
                             </div>
@@ -1810,7 +1810,7 @@ export const MonthlyDuesPage: React.FC = () => {
                             {formatRp(grand.jimpitan)}
                           </p>
                         </div>
-                        <p className="font-mono font-extrabold text-accent shrink-0">
+                        <p className=" font-extrabold text-accent shrink-0">
                           {formatRp(grand.total)}
                         </p>
                       </div>
@@ -1866,14 +1866,14 @@ export const MonthlyDuesPage: React.FC = () => {
                       <ListRow key={l} insetDivider>
                         <div className="flex items-center justify-between w-full">
                           <p className="text-ios-body">{l}</p>
-                          <p className="font-mono font-bold">{formatRp(v)}</p>
+                          <p className=" font-bold">{formatRp(v)}</p>
                         </div>
                       </ListRow>
                     ))}
                     <ListRow insetDivider={false}>
                       <div className="flex items-center justify-between w-full">
                         <p className="font-bold">Total</p>
-                        <p className="font-mono font-extrabold text-accent">
+                        <p className=" font-extrabold text-accent">
                           {formatRp(paymentDetail.total_amount)}
                         </p>
                       </div>

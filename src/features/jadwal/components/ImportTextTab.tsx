@@ -171,7 +171,7 @@ export function ImportTextTab() {
               setRawText(v);
             }}
             rows={12}
-            className="min-h-[260px] font-mono text-[14px]"
+            className="min-h-[260px]  text-[14px]"
             placeholder={EXAMPLE_TEXT}
           />
 
