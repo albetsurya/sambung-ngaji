@@ -46,8 +46,6 @@ export default function MemberPrayerPage() {
   const [copied, setCopied] = useState(false);
   const [showMonthly, setShowMonthly] = useState(false);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
-  const [showMapPicker, setShowMapPicker] = useState(false);
-  const [mapPickerCoords, setMapPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const {
     location,
@@ -64,17 +62,6 @@ export default function MemberPrayerPage() {
     searchCities,
     searchPlaces,
   } = usePrayerLocation();
-
-  const openMapPicker = () => {
-    const coords = getEffectiveCoords();
-    setMapPickerCoords(coords ? { lat: coords.lat, lng: coords.lng } : null);
-    setShowMapPicker(true);
-  };
-
-  const handleMapPick = (lat: number, lng: number) => {
-    setPlace(lat, lng, `Titik peta (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
-    setShowMapPicker(false);
-  };
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -384,14 +371,6 @@ export default function MemberPrayerPage() {
         setCustom={setCustom}
         searchCities={searchCities}
         searchPlaces={searchPlaces}
-        onOpenMapPicker={openMapPicker}
-      />
-      <MapPicker
-        isOpen={showMapPicker}
-        onClose={() => setShowMapPicker(false)}
-        initialLat={mapPickerCoords?.lat}
-        initialLng={mapPickerCoords?.lng}
-        onPick={handleMapPick}
       />
     </AppLayout>
   );
@@ -455,7 +434,6 @@ function LocationSettingsBottomSheet({
   setPlace,
   searchCities,
   searchPlaces,
-  onOpenMapPicker,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -470,7 +448,6 @@ function LocationSettingsBottomSheet({
   setCustom: ReturnType<typeof usePrayerLocation>["setCustom"];
   searchCities: ReturnType<typeof usePrayerLocation>["searchCities"];
   searchPlaces: ReturnType<typeof usePrayerLocation>["searchPlaces"];
-  onOpenMapPicker: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [customLat, setCustomLat] = useState("");
@@ -479,6 +456,7 @@ function LocationSettingsBottomSheet({
   const [placeResults, setPlaceResults] = useState<Awaited<ReturnType<typeof searchPlaces>>>([]);
   const [placeLoading, setPlaceLoading] = useState(false);
   const [placeError, setPlaceError] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const offlineCities = useMemo(() => searchCities(query), [query, searchCities]);
 
@@ -523,9 +501,32 @@ function LocationSettingsBottomSheet({
     onClose();
   };
 
-  const handlePlaceClick = (lat: number, lng: number, label: string) => {
-    setPlace(lat, lng, label);
-    onClose();
+  const handlePlaceClick = (lat: number, lng: number, label: string, name: string) => {
+    setCustomLat(lat.toFixed(6));
+    setCustomLng(lng.toFixed(6));
+    setCustomLabel(name);
+    setQuery(name);
+    setPlaceResults([]);
+  };
+
+  const draftLat = parseFloat(customLat);
+  const draftLng = parseFloat(customLng);
+  const hasDraft = !isNaN(draftLat) && !isNaN(draftLng);
+  const mapInitial = hasDraft
+    ? { lat: draftLat, lng: draftLng }
+    : location.place
+      ? { lat: location.place.lat, lng: location.place.lng }
+      : location.customCoords
+        ? { lat: location.customCoords.lat, lng: location.customCoords.lng }
+        : autoCoords
+          ? { lat: autoCoords.lat, lng: autoCoords.lng }
+          : undefined;
+
+  const handleMapPick = (lat: number, lng: number) => {
+    setCustomLat(lat.toFixed(6));
+    setCustomLng(lng.toFixed(6));
+    setCustomLabel((prev) => prev || `Titik peta (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    setShowMap(false);
   };
 
   const handleCustomSubmit = (e: React.FormEvent) => {
@@ -654,7 +655,7 @@ function LocationSettingsBottomSheet({
                     <button
                       key={p.id}
                       type="button"
-                      onClick={() => handlePlaceClick(p.lat, p.lng, `${p.name} - ${p.address.split(",").slice(0, 3).join(",")}`)}
+                      onClick={() => handlePlaceClick(p.lat, p.lng, `${p.name} - ${p.address.split(",").slice(0, 3).join(",")}`, p.name)}
                       className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-surface-card2 transition-colors flex items-center gap-3"
                     >
                       <div className="w-8 h-8 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
@@ -711,7 +712,7 @@ function LocationSettingsBottomSheet({
             <Button
               type="button"
               variant="secondary"
-              onClick={onOpenMapPicker}
+              onClick={() => setShowMap(true)}
               className="mt-3 w-full"
               leftIcon={<MapPinSolid size={14} />}
             >
@@ -752,6 +753,13 @@ function LocationSettingsBottomSheet({
           </div>
         )}
       </div>
+      <MapPicker
+        isOpen={showMap}
+        onClose={() => setShowMap(false)}
+        initialLat={mapInitial?.lat}
+        initialLng={mapInitial?.lng}
+        onPick={handleMapPick}
+      />
     </BottomSheet>
   );
 }
