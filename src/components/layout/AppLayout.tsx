@@ -205,6 +205,8 @@ export function AppLayout({
   const showFloating = showAiChatFab || !!fab || !hideNav;
   const containerPadding = hideNav ? "pb-[68px] md:pb-0" : "pb-2 md:pb-0";
 
+  const softEase = "cubic-bezier(0.22, 1, 0.36, 1)";
+
   useEffect(() => {
     setFabExpanded(false);
   }, [location.pathname]);
@@ -258,15 +260,23 @@ export function AppLayout({
       {showFloating &&
         createPortal(
           <div
-            className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out"
+            className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none motion-safe:transition-all motion-safe:duration-[900ms]"
             style={{
               opacity: entranceReady ? 1 : 0,
-              transform: entranceReady ? "translateY(0)" : "translateY(16px)",
+              transform: entranceReady ? "translateY(0)" : "translateY(6px)",
+              transitionTimingFunction: softEase,
             }}
           >
-            {bothFabs && fabExpanded && (
+            {bothFabs && (
               <div
-                className="fixed inset-0 bg-surface-bg/40 backdrop-blur-[2px] pointer-events-auto md:hidden motion-safe:animate-[fadeIn_180ms_ease-out]"
+                className="fixed inset-0 pointer-events-auto md:hidden motion-safe:transition-opacity motion-safe:duration-[600ms]"
+                style={{
+                  backgroundColor: fabExpanded
+                    ? "rgba(0, 0, 0, 0.18)"
+                    : "rgba(0, 0, 0, 0)",
+                  pointerEvents: fabExpanded ? "auto" : "none",
+                  transitionTimingFunction: softEase,
+                }}
                 onClick={() => setFabExpanded(false)}
                 aria-hidden="true"
               />
@@ -285,15 +295,16 @@ export function AppLayout({
                       aria-hidden={!fabExpanded}
                     >
                       <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out"
+                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[700ms]"
                         style={{
                           opacity: fabExpanded ? 1 : 0,
                           transform: fabExpanded
-                            ? "translateY(0) scale(1)"
-                            : "translateY(12px) scale(0.85)",
-                          transitionDelay: fabExpanded ? "60ms" : "0ms",
-                          transitionTimingFunction:
-                            "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            ? "translateY(0)"
+                            : "translateY(10px)",
+                          filter: fabExpanded ? "blur(0px)" : "blur(3px)",
+                          transitionDelay: fabExpanded ? "120ms" : "0ms",
+                          transitionTimingFunction: softEase,
+                          willChange: "opacity, transform, filter",
                         }}
                       >
                         <FloatingActionButton
@@ -307,15 +318,16 @@ export function AppLayout({
                         />
                       </div>
                       <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out"
+                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[700ms]"
                         style={{
                           opacity: fabExpanded ? 1 : 0,
                           transform: fabExpanded
-                            ? "translateY(0) scale(1)"
-                            : "translateY(12px) scale(0.85)",
-                          transitionDelay: fabExpanded ? "30ms" : "0ms",
-                          transitionTimingFunction:
-                            "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                            ? "translateY(0)"
+                            : "translateY(10px)",
+                          filter: fabExpanded ? "blur(0px)" : "blur(3px)",
+                          transitionDelay: fabExpanded ? "60ms" : "0ms",
+                          transitionTimingFunction: softEase,
+                          willChange: "opacity, transform, filter",
                         }}
                       >
                         {fab}
@@ -330,12 +342,11 @@ export function AppLayout({
                           <Plus
                             size={26}
                             strokeWidth={2.5}
-                            className={`motion-safe:transition-transform motion-safe:duration-300 ${
+                            className={`motion-safe:transition-transform motion-safe:duration-[700ms] ${
                               fabExpanded ? "rotate-45" : ""
                             }`}
                             style={{
-                              transitionTimingFunction:
-                                "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                              transitionTimingFunction: softEase,
                             }}
                           />
                         }
@@ -346,13 +357,16 @@ export function AppLayout({
                   <>
                     {showAiChatFab && (
                       <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out"
+                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
                         style={{
                           opacity: entranceReady ? 1 : 0,
                           transform: entranceReady
-                            ? "translateY(0) scale(1)"
-                            : "translateY(12px) scale(0.9)",
-                          transitionDelay: entranceReady ? "60ms" : "0ms",
+                            ? "translateY(0)"
+                            : "translateY(10px)",
+                          filter: entranceReady ? "blur(0px)" : "blur(3px)",
+                          transitionDelay: entranceReady ? "160ms" : "0ms",
+                          transitionTimingFunction: softEase,
+                          willChange: "opacity, transform, filter",
                         }}
                       >
                         <FloatingActionButton
@@ -365,13 +379,16 @@ export function AppLayout({
                     )}
                     {fab && (
                       <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out"
+                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
                         style={{
                           opacity: entranceReady ? 1 : 0,
                           transform: entranceReady
-                            ? "translateY(0) scale(1)"
-                            : "translateY(12px) scale(0.9)",
-                          transitionDelay: entranceReady ? "30ms" : "0ms",
+                            ? "translateY(0)"
+                            : "translateY(10px)",
+                          filter: entranceReady ? "blur(0px)" : "blur(3px)",
+                          transitionDelay: entranceReady ? "80ms" : "0ms",
+                          transitionTimingFunction: softEase,
+                          willChange: "opacity, transform, filter",
                         }}
                       >
                         {fab}
@@ -389,7 +406,7 @@ export function AppLayout({
                       navigate("/ai-chat");
                     }}
                     aria-label="Tanya AI"
-                    className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary fab-glow-secondary text-ios-footnote font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95"
+                    className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary text-ios-footnote font-semibold transition-all duration-300 ease-out hover:-translate-y-0.5 active:scale-95"
                   >
                     <Sparkles size={18} strokeWidth={2.2} />
                     Tanya AI
@@ -459,7 +476,8 @@ export function FloatingActionButton({
         onClick();
       }}
       aria-label={label}
-      className={`relative ${sizeClass} rounded-2xl flex items-center justify-center transition-all duration-200 ease-out hover:-translate-y-0.5 active:scale-95 active:translate-y-0 ${variantClass} ${className}`}
+      className={`relative ${sizeClass} rounded-2xl flex items-center justify-center motion-safe:transition-all motion-safe:duration-[500ms] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 ${variantClass} ${className}`}
+      style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
     >
       <span className="relative z-10 flex items-center justify-center">
         {content}
