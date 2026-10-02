@@ -7,7 +7,7 @@ export interface PrayerLocation {
   mode: LocationMode;
   cityId?: string;
   customCoords?: { lat: number; lng: number; label: string };
-  lastAutoCoords?: { lat: number; lng: number; accuracy: number; timestamp: number };
+  lastAutoCoords?: { lat: number; lng: number; accuracy: number; timestamp: number; address?: string | null };
 }
 
 const STORAGE_KEY = "prayer-location-prefs";
@@ -33,9 +33,27 @@ function saveStored(loc: PrayerLocation) {
   }
 }
 
+async function reverseGeocode(lat: number, lng: number): Promise<string | undefined> {
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=id`);
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    const addr = data.address || {};
+    const parts = [
+      addr.village || addr.hamlet || addr.suburb || addr.neighbourhood,
+      addr.city_district || addr.district || addr.county,
+      addr.city || addr.regency || addr.municipality,
+      addr.state || addr.province,
+    ].filter(Boolean);
+    return parts.join(", ") || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function usePrayerLocation() {
   const [location, setLocation] = useState<PrayerLocation>(DEFAULT_LOCATION);
-  const [autoCoords, setAutoCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
+  const [autoCoords, setAutoCoords] = useState<{ lat: number; lng: number; accuracy: number; address?: string } | null>(null);
   const [autoLoading, setAutoLoading] = useState(false);
   const [autoError, setAutoError] = useState<string | null>(null);
 
@@ -47,11 +65,12 @@ export function usePrayerLocation() {
         lat: stored.lastAutoCoords.lat,
         lng: stored.lastAutoCoords.lng,
         accuracy: stored.lastAutoCoords.accuracy,
+        address: stored.lastAutoCoords.address ?? undefined,
       });
     }
   }, []);
 
-  const requestAutoLocation = useCallback(() => {
+  const requestAutoLocation = useCallback(async () => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setAutoError("Browser tidak mendukung geolokasi");
       return;
@@ -60,18 +79,19 @@ export function usePrayerLocation() {
     setAutoError(null);
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const coords = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
           accuracy: pos.coords.accuracy,
         };
-        setAutoCoords(coords);
+        const address = await reverseGeocode(coords.lat, coords.lng);
+        setAutoCoords({ ...coords, address });
         setAutoLoading(false);
         if (location.mode === "auto") {
           const updated: PrayerLocation = {
             ...location,
-            lastAutoCoords: { ...coords, timestamp: Date.now() },
+            lastAutoCoords: { ...coords, address, timestamp: Date.now() },
           };
           setLocation(updated);
           saveStored(updated);
@@ -142,6 +162,8 @@ export function usePrayerLocation() {
   const getDisplayLabel = useCallback((): string => {
     switch (location.mode) {
       case "auto":
+        if (autoCoords?.address) return autoCoords.address;
+        if (location.lastAutoCoords?.address) return location.lastAutoCoords.address;
         return autoCoords ? "Lokasi GPS (Otomatis)" : "Mendeteksi lokasi...";
       case "city": {
         const city = location.cityId ? getCityById(location.cityId) : undefined;

@@ -16,6 +16,7 @@ import {
   Search,
   MapPin as MapPinIcon,
   Pencil,
+  MapPin as MapPinSolid,
 } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { MasukButton } from "../components/ui";
@@ -34,6 +35,7 @@ import {
   type SunnahTimeInfo,
 } from "../features/ibadah/utils/prayerTimes";
 import { usePrayerLocation } from "../features/ibadah/hooks/usePrayerLocation";
+import { MapPicker } from "../features/ibadah/components/MapPicker";
 
 
 export default function MemberPrayerPage() {
@@ -44,6 +46,8 @@ export default function MemberPrayerPage() {
   const [copied, setCopied] = useState(false);
   const [showMonthly, setShowMonthly] = useState(false);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [mapPickerCoords, setMapPickerCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const {
     location,
@@ -58,6 +62,17 @@ export default function MemberPrayerPage() {
     getDisplayLabel,
     searchCities,
   } = usePrayerLocation();
+
+  const openMapPicker = () => {
+    const coords = getEffectiveCoords();
+    setMapPickerCoords(coords ? { lat: coords.lat, lng: coords.lng } : null);
+    setShowMapPicker(true);
+  };
+
+  const handleMapPick = (lat: number, lng: number) => {
+    setCustom(lat, lng, `Titik dipilih (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
+    setShowMapPicker(false);
+  };
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -365,6 +380,14 @@ export default function MemberPrayerPage() {
         setCity={setCity}
         setCustom={setCustom}
         searchCities={searchCities}
+        onOpenMapPicker={openMapPicker}
+      />
+      <MapPicker
+        isOpen={showMapPicker}
+        onClose={() => setShowMapPicker(false)}
+        initialLat={mapPickerCoords?.lat}
+        initialLng={mapPickerCoords?.lng}
+        onPick={handleMapPick}
       />
     </AppLayout>
   );
@@ -427,6 +450,7 @@ function LocationSettingsBottomSheet({
   setCity,
   setCustom,
   searchCities,
+  onOpenMapPicker,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -439,6 +463,7 @@ function LocationSettingsBottomSheet({
   setCity: ReturnType<typeof usePrayerLocation>["setCity"];
   setCustom: ReturnType<typeof usePrayerLocation>["setCustom"];
   searchCities: ReturnType<typeof usePrayerLocation>["searchCities"];
+  onOpenMapPicker: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [customLat, setCustomLat] = useState("");
@@ -620,10 +645,13 @@ function LocationSettingsBottomSheet({
                 placeholder="Misal: Rumah, Kantor, Masjid"
               />
               <div className="flex gap-2 mt-3">
+                <Button type="button" variant="secondary" onClick={onOpenMapPicker} className="flex-1" leftIcon={<MapPinSolid size={14} />}>
+                  Pilih di Peta
+                </Button>
                 <Button type="submit" className="flex-1">
                   Simpan Lokasi
                 </Button>
-                <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+                <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
                   Batal
                 </Button>
               </div>
