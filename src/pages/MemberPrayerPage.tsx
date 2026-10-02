@@ -72,7 +72,7 @@ export default function MemberPrayerPage() {
   };
 
   const handleMapPick = (lat: number, lng: number) => {
-    setCustom(lat, lng, `Titik dipilih (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
+    setPlace(lat, lng, `Titik peta (${lat.toFixed(6)}, ${lng.toFixed(6)})`);
     setShowMapPicker(false);
   };
 
@@ -453,7 +453,6 @@ function LocationSettingsBottomSheet({
   setMode,
   setCity,
   setPlace,
-  setCustom,
   searchCities,
   searchPlaces,
   onOpenMapPicker,
@@ -484,7 +483,7 @@ function LocationSettingsBottomSheet({
   const offlineCities = useMemo(() => searchCities(query), [query, searchCities]);
 
   useEffect(() => {
-    if (!isOpen || location.mode !== "city") return;
+    if (!isOpen || (location.mode !== "city" && location.mode !== "custom")) return;
     const q = query.trim();
     if (q.length < 3) {
       setPlaceResults([]);
@@ -535,7 +534,7 @@ function LocationSettingsBottomSheet({
     const lng = parseFloat(customLng);
     if (isNaN(lat) || isNaN(lng)) return;
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
-    setCustom(lat, lng, customLabel || `Custom (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    setPlace(lat, lng, customLabel || `Titik manual (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
     onClose();
   };
 
@@ -550,7 +549,7 @@ function LocationSettingsBottomSheet({
           <label className="block text-ios-caption font-medium text-surface-muted mb-2">
             Mode Lokasi
           </label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={handleAutoClick}
@@ -575,7 +574,7 @@ function LocationSettingsBottomSheet({
               type="button"
               onClick={() => setMode("city")}
               className={`p-3 rounded-xl border-2 transition-all text-left ${
-                location.mode === "city"
+                location.mode === "city" || location.mode === "custom"
                   ? "border-accent bg-accent-soft text-accent"
                   : "border-surface-border text-surface-text hover:bg-surface-card2"
               }`}
@@ -584,25 +583,7 @@ function LocationSettingsBottomSheet({
                 <MapPinIcon size={18} className="flex-shrink-0" />
                 <div>
                   <p className="text-ios-body font-medium">Cari Tempat</p>
-                  <p className="text-ios-caption text-surface-muted">Dusun, desa, kota, masjid</p>
-                </div>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setMode("custom")}
-              className={`p-3 rounded-xl border-2 transition-all text-left ${
-                location.mode === "custom"
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-surface-border text-surface-text hover:bg-surface-card2"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <MapPinSolid size={18} className="flex-shrink-0" />
-                <div>
-                  <p className="text-ios-body font-medium">Koordinat Manual</p>
-                  <p className="text-ios-caption text-surface-muted">Input / Pilih di Peta</p>
+                  <p className="text-ios-caption text-surface-muted">Search, peta, atau koordinat</p>
                 </div>
               </div>
             </button>
@@ -635,13 +616,13 @@ function LocationSettingsBottomSheet({
           </div>
         )}
 
-        {location.mode === "city" && (
+        {(location.mode === "city" || location.mode === "custom") && (
           <div className="px-4 border-t pt-4">
-            {location.place && (
+            {(location.place || location.customCoords) && (
               <div className="mb-2 flex items-center gap-2 rounded-xl border border-accent/25 bg-accent-soft px-3 py-2.5">
                 <MapPinIcon size={14} className="text-accent flex-shrink-0" />
                 <p className="text-ios-footnote font-medium text-accent truncate flex-1">
-                  {location.place.label}
+                  {location.place?.label || location.customCoords?.label}
                 </p>
               </div>
             )}
@@ -720,12 +701,24 @@ function LocationSettingsBottomSheet({
                 ))
               )}
             </div>
-          </div>
-        )}
 
-        {location.mode === "custom" && (
-          <div className="px-4 border-t pt-4">
-            <form onSubmit={handleCustomSubmit}>
+            <div className="mt-3 flex items-center gap-2">
+              <div className="h-px flex-1 bg-surface-border" />
+              <p className="text-ios-caption text-surface-muted">atau tentukan titik sendiri</p>
+              <div className="h-px flex-1 bg-surface-border" />
+            </div>
+
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onOpenMapPicker}
+              className="mt-3 w-full"
+              leftIcon={<MapPinSolid size={14} />}
+            >
+              Pilih di Peta
+            </Button>
+
+            <form onSubmit={handleCustomSubmit} className="mt-3">
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <Input
                   label="Latitude"
@@ -752,20 +745,9 @@ function LocationSettingsBottomSheet({
                 onChange={(e) => setCustomLabel(e.target.value)}
                 placeholder="Misal: Rumah, Kantor, Masjid"
               />
-              <div className="flex gap-2 mt-3">
-                <Button type="button" variant="secondary" onClick={onOpenMapPicker} className="flex-1" leftIcon={<MapPinSolid size={14} />}>
-                  Pilih di Peta
-                </Button>
-                <Button type="submit" className="flex-1">
-                  Simpan Lokasi
-                </Button>
-                <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
-                  Batal
-                </Button>
-              </div>
-              <p className="text-ios-caption text-surface-muted mt-2 text-center">
-                Gunakan format desimal (contoh: -6.1754, 106.8272 untuk Jakarta)
-              </p>
+              <Button type="submit" className="mt-3 w-full">
+                Simpan Koordinat
+              </Button>
             </form>
           </div>
         )}
