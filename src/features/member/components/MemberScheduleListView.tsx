@@ -121,7 +121,7 @@ export function MemberScheduleListView({
                       )}
                     </div>
                     <p className="text-ios-caption text-surface-muted truncate">
-                      {m.jam || "—"}
+                      {m.jam || "-"}
                     </p>
                     {targets.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">

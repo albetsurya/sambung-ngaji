@@ -130,7 +130,7 @@ export default function MemberFridayPage() {
                           {r.label}
                         </span>
                         <span className="text-ios-footnote font-medium text-surface-text text-right truncate">
-                          {name || "—"}
+                          {name || "-"}
                         </span>
                       </div>
                     );

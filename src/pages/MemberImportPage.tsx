@@ -497,7 +497,7 @@ function Field({ label, value }: { label: string; value: string }) {
           (value ? "text-surface-text" : "text-surface-muted italic")
         }
       >
-        {value || "—"}
+        {value || "-"}
       </span>
     </div>
   );

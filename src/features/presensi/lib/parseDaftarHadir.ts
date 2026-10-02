@@ -114,7 +114,7 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
 
   let m = text.match(
     new RegExp(
-      `(\\d{1,2})(?:\\s*[-–]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
+      `(\\d{1,2})(?:\\s*[--]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
       "i",
     ),
   );
@@ -138,7 +138,7 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
   if (!result.iso) {
     m = text.match(
       new RegExp(
-        `TGL\\s+(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s*\\/?\\s*[A-Z]*[-\\s]*(${BULAN_ALT})\\s+(\\d{4})`,
+        `TGL\\s+(\\d{1,2})(?:\\s*[--]\\s*\\d{1,2})?\\s*\\/?\\s*[A-Z]*[-\\s]*(${BULAN_ALT})\\s+(\\d{4})`,
         "i",
       ),
     );
