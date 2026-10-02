@@ -615,7 +615,7 @@ export default function MembersListPage() {
       </div>
 
       {selectMode && (
-        <div className="fixed bottom-[calc(76px+var(--safe-bottom,0px))] md:bottom-6 left-0 right-0 z-30 px-4 pointer-events-none">
+        <div className="fixed bottom-[calc(90px+var(--safe-bottom,0px))] md:bottom-6 left-0 right-0 z-30 px-4 pointer-events-none">
           <div className="app-shell pointer-events-auto mx-auto rounded-2xl border border-surface-border bg-surface-card shadow-lg p-3 flex items-center gap-2 anim-slide-up">
             <button
               onClick={selectAllVisible}
