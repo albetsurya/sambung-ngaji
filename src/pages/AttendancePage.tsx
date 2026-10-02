@@ -752,7 +752,7 @@ export default function AttendancePage() {
                       {selectedMeeting && (
                         <p className="text-ios-footnote text-surface-muted truncate">
                           {formatDateLongText(selectedMeeting.tanggal)} ·{" "}
-                          {selectedMeeting.jam || "—"}
+                          {selectedMeeting.jam || "-"}
                         </p>
                       )}
                       {selectedMeeting &&
@@ -1662,7 +1662,7 @@ function MeetingPickerContent({
                         )}
                       </div>
                       <p className="text-ios-caption text-surface-muted truncate">
-                        {m.jam || "—"}
+                        {m.jam || "-"}
                         {targets.length > 0 &&
                           " · " +
                             targets
@@ -1804,7 +1804,7 @@ function MeetingActionContent({
             )}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
-            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "—"}
+            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "-"}
           </p>
         </div>
       </div>

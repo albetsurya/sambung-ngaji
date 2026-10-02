@@ -660,7 +660,7 @@ export const TaarufCvPreview = forwardRef<
                   className="text-slate-400 tabular-nums shrink-0"
                   style={{ fontSize: px(12, opts.fontSize.pendidikan) }}
                 >
-                  {[e.tahun_mulai, e.tahun_selesai].filter(Boolean).join("–")}
+                  {[e.tahun_mulai, e.tahun_selesai].filter(Boolean).join("-")}
                 </p>
               )}
             </div>

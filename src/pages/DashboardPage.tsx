@@ -646,7 +646,7 @@ function AbsensiDashboard({
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
                   <Calendar size={12} className="text-accent" />
                   <span className="text-[10px] font-bold text-accent leading-none mt-0.5">
-                    {m.jam || "—"}
+                    {m.jam || "-"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
