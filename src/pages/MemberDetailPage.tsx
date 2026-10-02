@@ -395,6 +395,12 @@ export default function MemberDetailPage() {
           member={member}
           onClose={() => setCreateUserOpen(false)}
           onCreated={() => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.members() });
+            queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+            queryClient.invalidateQueries({ queryKey: queryKeys.users() });
+            queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+            queryClient.invalidateQueries({ queryKey: queryKeys.memberDetail(id || "") });
+            queryClient.invalidateQueries({ queryKey: queryKeys.memberUserStatus(id || "") });
             refetchUserStatus();
             refetch();
             setCreateUserOpen(false);

@@ -106,26 +106,15 @@ export default function DashboardPage() {
           />
         )}
 
-        {!loading && !error && data && user?.role === "TIM_PNKB" && (
-          <PNKBDashboard
-            data={data as unknown as DashboardPNKB}
-            greeting={greeting}
-            userName={user?.nama || ""}
-          />
-        )}
-        {!loading && !error && data && user?.role === "TIM_ABSENSI" && (
-          <AbsensiDashboard
-            data={data as unknown as DashboardAbsensi}
-            greeting={greeting}
-            userName={user?.nama || ""}
-          />
-        )}
         {!loading &&
           !error &&
           data &&
           (user?.role === "SUPER_ADMIN" ||
             user?.role === "ADMIN" ||
-            user?.role === "PENGAWAS") && (
+            user?.role === "PENGAWAS" ||
+            user?.role === "TIM_KU" ||
+            user?.role === "TIM_PNKB" ||
+            user?.role === "TIM_ABSENSI") && (
             <GeneralDashboard
               data={data as DashboardGeneral}
               isSuperAdmin={user.role === "SUPER_ADMIN"}

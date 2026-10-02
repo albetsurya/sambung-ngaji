@@ -569,7 +569,7 @@ function AppRoutes() {
             <Route
               path="jadwal"
               element={
-                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI"]}>
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <JadwalPage />
                 </RoleRoute>
               }
