@@ -33,6 +33,10 @@ import {
   Heart,
   Printer,
   Sparkles,
+  Copy,
+  Send,
+  CheckCircle,
+  XCircle,
 } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
 import { useFinanceBack } from "../hooks/useFinanceBack";
@@ -682,12 +686,39 @@ export const MonthlyDuesPage: React.FC = () => {
               }}
             />
             <HeaderIconButton
-              onClick={() => navigate(`/finance/monthly-dues/print?variant=shodaqoh`)}
+              onClick={() => setPrintMenuOpen((v) => !v)}
               label="Cetak rekap"
               testId="shod-btn-print"
             >
               <Printer size={16} />
             </HeaderIconButton>
+            {printMenuOpen && (
+              <div
+                className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5"
+                data-testid="shod-print-dropdown"
+              >
+                <button
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                  onClick={() => {
+                    navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
+                    setPrintMenuOpen(false);
+                  }}
+                  data-testid="btn-print-shodaqoh"
+                >
+                  Cetak Rekap Shodaqoh
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                  onClick={() => {
+                    navigate(`/finance/monthly-dues/print?variant=infak-ir`);
+                    setPrintMenuOpen(false);
+                  }}
+                  data-testid="btn-print-infak-ir"
+                >
+                  Cetak Rekap Infak IR
+                </button>
+              </div>
+            )}
           </HeaderActions>
         }
       />
@@ -775,29 +806,53 @@ export const MonthlyDuesPage: React.FC = () => {
                           {dashboard.memberCount} anggota
                         </span>
                       </div>
-                      <div className="mt-4 grid grid-cols-2 gap-2">
+                      <div className="mt-4 grid grid-cols-3 gap-2">
+                        {postStatus === "posted" ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<XCircle size={14} />}
+                            disabled={cancelling}
+                            onClick={handleCancelPost}
+                            data-testid="btn-cancel-post-card"
+                          >
+                            {cancelling ? "Membatalkan…" : "Batal Posting"}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<CheckCircle size={14} />}
+                            disabled={posting}
+                            onClick={handlePostToKas}
+                            data-testid="btn-post-kas-card"
+                          >
+                            {posting ? "Posting…" : "Post ke Kas"}
+                          </Button>
+                        )}
                         <Button
                           variant="secondary"
                           size="sm"
+                          leftIcon={<Copy size={14} />}
                           onClick={async () => {
                             await handleCopyRekap();
                             showToast("Rekap disalin");
                           }}
                           data-testid="btn-copy-rekap-card"
                         >
-                          Salin Rekap
+                          Salin
                         </Button>
                         <Button
                           size="sm"
+                          leftIcon={<Send size={14} />}
                           onClick={async () => {
                             await handleCopyRekap();
-                            // Trigger WA share
                             const text = `Rekap Shodaqoh ${monthLabel}\nTarget: ${formatRp(dashboard.target)}\nTerkumpul: ${formatRp(dashboard.received)}\n${progressPct}% tercapai`;
                             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
                           }}
                           data-testid="btn-share-wa-card"
                         >
-                          Kirim WA
+                          WA
                         </Button>
                       </div>
                     </Card>
@@ -848,36 +903,6 @@ export const MonthlyDuesPage: React.FC = () => {
                           : "Status posting belum diketahui"}
                     </p>
                   </Card>
-                  <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
-                    {postStatus === "posted" ? (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={cancelling}
-                        onClick={handleCancelPost}
-                        data-testid="btn-shod-cancel-post-to-kas"
-                      >
-                        {cancelling ? "Membatalkan…" : "Batalkan Posting"}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={posting}
-                        onClick={handlePostToKas}
-                        data-testid="btn-shod-post-to-kas"
-                      >
-                        {posting ? "Posting…" : "Post ke Kas"}
-                      </Button>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={handleCopyRekap}
-                    >
-                      Salin Rekap
-                    </Button>
-                  </div>
                 </section>
                 <section>
                   <SectionTitle>

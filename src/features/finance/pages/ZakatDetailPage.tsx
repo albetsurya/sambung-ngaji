@@ -25,7 +25,7 @@ import {
   zakatCategoryLabel,
 } from "../api/financeApi";
 import { GroupedListSkeleton } from "../../../components/ui/Skeleton";
-import { Pencil, MoreVertical } from "../../../components/ui/FontAwesomeIcons";
+import { Pencil, Printer, CheckCircle, Trash2 } from "../../../components/ui/FontAwesomeIcons";
 import {
   SectionTitle,
   StatusPill,
@@ -357,18 +357,20 @@ const saveRincian = async (e: React.FormEvent) => {
                     <Button
                       variant="secondary"
                       size="sm"
+                      leftIcon={<CheckCircle size={14} />}
                       onClick={() => { if (isDone) setConfirmCancelOpen(true); else setConfirmCompleteOpen(true); }}
                       data-testid="btn-toggle-complete-card"
                     >
-                      {isDone ? "Batalkan Selesai" : "Tandai Selesai"}
+                      {isDone ? "Batalkan" : "Selesai"}
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
+                      leftIcon={<Trash2 size={14} />}
                       onClick={() => setDeleteTarget({ kind: "record", label: data.title || data.categories?.join(" + ") || "" })}
                       data-testid="btn-delete-card"
                     >
-                      Hapus Zakat
+                      Hapus
                     </Button>
                   </div>
                 </Card>
