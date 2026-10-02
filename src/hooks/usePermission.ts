@@ -77,8 +77,7 @@ export function usePermission() {
   const canEditMembers =
     isGlobal ||
     role === "ADMIN" ||
-    role === "TIM_PNKB" ||
-    role === "TIM_ABSENSI";
+    role === "TIM_PNKB";
   const canWriteMonitoring =
     isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
   const canManageUsers = isGlobal || isSuperAdmin;

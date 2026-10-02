@@ -187,7 +187,9 @@ export default function MembersListPage() {
     return m;
   }, [users]);
 
-  const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
+  const canCreate = role === "SUPER_ADMIN" || role === "ADMIN" || role === "TIM_PNKB";
+  const showAccountBadges = role === "SUPER_ADMIN" || role === "ADMIN" || role === "PENGAWAS";
+  const isTimAbsensi = role === "TIM_ABSENSI";
 
   const activeFilterCount = useMemo(
     () => (jenisKelamin ? 1 : 0) + (kategori ? 1 : 0) + (assignedGroup ? 1 : 0),
@@ -288,7 +290,6 @@ export default function MembersListPage() {
         return;
       }
       if (role === "TIM_ABSENSI") {
-        navigate(`/jamaah/${id}/edit`);
         return;
       }
       navigate(`/jamaah/${id}`);
@@ -343,6 +344,8 @@ export default function MembersListPage() {
             onPress={handlePress}
             selectMode={selectMode}
             selected={selectedIds.includes(m.member_id)}
+            showAccountBadges={showAccountBadges}
+            disabledPress={isTimAbsensi}
           />
         );
       }
@@ -356,6 +359,8 @@ export default function MembersListPage() {
             onPress={handlePress}
             selectMode={selectMode}
             selected={selectedIds.includes(m.member_id)}
+            showAccountBadges={showAccountBadges}
+            disabledPress={isTimAbsensi}
           />
         );
       }
@@ -372,6 +377,8 @@ export default function MembersListPage() {
               onPress={handlePress}
               selectMode={selectMode}
               selected={selectedIds.includes(m.member_id)}
+              showAccountBadges={showAccountBadges}
+              disabledPress={isTimAbsensi}
             />
           ))}
         </div>
@@ -386,6 +393,8 @@ export default function MembersListPage() {
       roleByMemberId,
       selectMode,
       selectedIds,
+      showAccountBadges,
+      isTimAbsensi,
     ],
   );
 
@@ -945,18 +954,27 @@ const JamaahRow = memo(function JamaahRow({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   return (
     <button
       onClick={() => onPress(member.member_id)}
+      disabled={disabledPress && !selectMode}
       className={`w-full flex items-center gap-3 h-16 px-4 text-left transition-colors ${
-        selected ? "bg-accent-soft" : "bg-transparent active:bg-surface-card2"
+        selected
+          ? "bg-accent-soft"
+          : disabledPress && !selectMode
+            ? "cursor-default"
+            : "bg-transparent active:bg-surface-card2"
       }`}
     >
       {selectMode ? (
@@ -978,8 +996,12 @@ const JamaahRow = memo(function JamaahRow({
       </div>
       {!selectMode && (
         <>
-          <AccountBadge hasAccount={member.has_user} compact />
-          {role && <RoleBadge role={role} />}
+          {showAccountBadges && (
+            <>
+              <AccountBadge hasAccount={member.has_user} compact />
+              {role && <RoleBadge role={role} />}
+            </>
+          )}
           {member.kategori && (
             <span className="text-ios-footnote text-surface-muted flex-shrink-0">
               {CATEGORY_LABEL[member.kategori]}
@@ -997,12 +1019,16 @@ const JamaahCard = memo(function JamaahCard({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   return (
     <div className="px-4 pb-2">
@@ -1010,7 +1036,7 @@ const JamaahCard = memo(function JamaahCard({
         onClick={() => onPress(member.member_id)}
         className={`flex items-center gap-3 h-[68px] ${
           selected ? "!bg-accent-soft !border-accent/40" : ""
-        }`}
+        } ${disabledPress && !selectMode ? "!cursor-default" : ""}`}
       >
         {selectMode ? (
           <SelectCheckbox selected={selected} />
@@ -1031,8 +1057,12 @@ const JamaahCard = memo(function JamaahCard({
         </div>
         {!selectMode && (
           <>
-            <AccountBadge hasAccount={member.has_user} compact />
-            {role && <RoleBadge role={role} />}
+            {showAccountBadges && (
+              <>
+                <AccountBadge hasAccount={member.has_user} compact />
+                {role && <RoleBadge role={role} />}
+              </>
+            )}
             {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
           </>
         )}
@@ -1048,6 +1078,8 @@ const JamaahGridCard = memo(function JamaahGridCard({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
@@ -1055,6 +1087,8 @@ const JamaahGridCard = memo(function JamaahGridCard({
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
   const padding =
@@ -1067,7 +1101,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
       onClick={() => onPress(member.member_id)}
       className={`relative flex flex-col items-center text-center gap-1.5 ${padding} ${
         selected ? "!bg-accent-soft !border-accent/40" : ""
-      }`}
+      } ${disabledPress && !selectMode ? "!cursor-default" : ""}`}
     >
       {selectMode && (
         <span className="absolute top-1.5 right-1.5">
@@ -1097,7 +1131,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
-      {!selectMode && (
+      {!selectMode && showAccountBadges && (
         <div className="min-h-[26px] flex items-center justify-center gap-1">
           <AccountBadge hasAccount={member.has_user} compact />
           {role && <RoleBadge role={role} />}

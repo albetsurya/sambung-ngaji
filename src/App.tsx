@@ -186,6 +186,7 @@ function HomeRoute() {
   // yang lain menghandle loading di route dalam (jika perlu).
   if (!user) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
+  if (user.role === "TIM_KU") return <Navigate to="/finance/ledger" replace />;
   return <DashboardPage />;
 }
 function AppRoutes() {
@@ -445,7 +446,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/baru"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
@@ -453,7 +454,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/:id"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MemberDetailPage />
               </RoleRoute>
             }
@@ -461,7 +462,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/:id/cv-taaruf"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <TaarufCvPrintPage />
               </RoleRoute>
             }
@@ -469,7 +470,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/:id/edit"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
