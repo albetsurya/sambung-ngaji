@@ -36,7 +36,7 @@ import {
   Copy,
   Send,
   CheckCircle2,
-  XCircle,
+  X,
 } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
 import { useFinanceBack } from "../hooks/useFinanceBack";
@@ -811,7 +811,7 @@ export const MonthlyDuesPage: React.FC = () => {
                           <Button
                             variant="secondary"
                             size="sm"
-                            leftIcon={<XCircle size={14} />}
+                            leftIcon={<X size={14} />}
                             disabled={cancelling}
                             onClick={handleCancelPost}
                             data-testid="btn-cancel-post-card"
