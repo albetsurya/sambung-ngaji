@@ -25,7 +25,7 @@ import {
   zakatCategoryLabel,
 } from "../api/financeApi";
 import { GroupedListSkeleton } from "../../../components/ui/Skeleton";
-import { Pencil, Printer, CheckCircle, Trash2 } from "../../../components/ui/FontAwesomeIcons";
+import { Pencil, Printer, CheckCircle2, Trash2 } from "../../../components/ui/FontAwesomeIcons";
 import {
   SectionTitle,
   StatusPill,
@@ -357,7 +357,7 @@ const saveRincian = async (e: React.FormEvent) => {
                     <Button
                       variant="secondary"
                       size="sm"
-                      leftIcon={<CheckCircle size={14} />}
+                      leftIcon={<CheckCircle2 size={14} />}
                       onClick={() => { if (isDone) setConfirmCancelOpen(true); else setConfirmCompleteOpen(true); }}
                       data-testid="btn-toggle-complete-card"
                     >

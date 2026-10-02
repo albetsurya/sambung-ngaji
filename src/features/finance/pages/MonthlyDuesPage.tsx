@@ -35,7 +35,7 @@ import {
   Sparkles,
   Copy,
   Send,
-  CheckCircle,
+  CheckCircle2,
   XCircle,
 } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
@@ -822,7 +822,7 @@ export const MonthlyDuesPage: React.FC = () => {
                           <Button
                             variant="secondary"
                             size="sm"
-                            leftIcon={<CheckCircle size={14} />}
+                            leftIcon={<CheckCircle2 size={14} />}
                             disabled={posting}
                             onClick={handlePostToKas}
                             data-testid="btn-post-kas-card"
