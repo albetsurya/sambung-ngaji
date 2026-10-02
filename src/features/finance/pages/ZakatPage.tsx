@@ -8,6 +8,7 @@ import { AppLayout, Header, FloatingActionButton } from "../../../components/lay
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   GroupedList,
   ListRow,
@@ -184,7 +185,7 @@ export const ZakatPage: React.FC = () => {
           </>
         )}
       </div>
-      {/* Filter sheet — pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
+      {/* Filter sheet - pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
       <BottomSheet
         open={filterSheetOpen}
         onClose={() => setFilterSheetOpen(false)}
@@ -235,7 +236,7 @@ export const ZakatPage: React.FC = () => {
         <form onSubmit={handleSaveZakat} data-testid="zakat-form-overlay">
           <Input label="Judul Zakat" placeholder="Zakat Fitrah 1447 H" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="zakat-form-title-input" required />
           <div className="grid grid-cols-2 gap-x-3">
-            <Input label="Tanggal" type="date" value={form.transaction_date} onChange={(e) => setForm({ ...form, transaction_date: e.target.value })} />
+            <DateInput label="Tanggal" value={form.transaction_date} onChange={(val) => setForm({ ...form, transaction_date: val })} />
             <Input label="Tempat" placeholder="Masjid / Musholla" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
           </div>
           <Input label="Keterangan" placeholder="Catatan tambahan…" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />

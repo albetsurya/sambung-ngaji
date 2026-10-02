@@ -548,7 +548,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <code
           key={i}
-          className="px-1.5 py-0.5 rounded-md bg-surface-card2 text-[13px] font-mono text-accent"
+          className="px-1.5 py-0.5 rounded-md bg-surface-card2 text-[13px]  text-accent"
         >
           {part.slice(1, -1)}
         </code>
@@ -592,7 +592,7 @@ function CodeBlock({
   return (
     <div className="relative rounded-xl bg-surface-card2 border border-surface-border overflow-hidden">
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-border bg-surface-card">
-        <span className="text-[10px] font-mono text-surface-muted uppercase tracking-wide">
+        <span className="text-[10px]  text-surface-muted uppercase tracking-wide">
           {language || "code"}
         </span>
         <Button onClick={handleCopy} variant="ghost" size="xs">
@@ -600,7 +600,7 @@ function CodeBlock({
         </Button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
-        <code className="font-mono text-surface-text whitespace-pre">
+        <code className=" text-surface-text whitespace-pre">
           {content}
         </code>
       </pre>

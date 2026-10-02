@@ -376,7 +376,7 @@ export const financeApi = {
     };
   },
   /**
-   * Rekap 1 tahun penuh (Jan–Des) untuk tabel rincian 12 bulan.
+   * Rekap 1 tahun penuh (Jan-Des) untuk tabel rincian 12 bulan.
    * Tanpa filter bulan -> backend mengembalikan semua payments + members,
    * diagregat per bulan di client. Dipakai halaman Shodaqoh.
    */

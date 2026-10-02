@@ -99,7 +99,7 @@ export default function QrCodePage() {
             Link Pendaftaran
           </p>
           <div className="rounded-xl bg-surface-card2 px-3 py-2.5 mb-3">
-            <code className="text-ios-caption text-accent font-mono break-all">
+            <code className="text-ios-caption text-accent  break-all">
               {registrationUrl}
             </code>
           </div>

@@ -61,7 +61,8 @@ interface MenuEntry {
 
 export default function OthersPage() {
   const { user, logout } = useAuth();
-  const { isAdminLike, isSuperAdmin, role, assignedGroup, canAccessFinance } = usePermission();
+  const { isAdminLike, isSuperAdmin, role, assignedGroup, canAccessFinance } =
+    usePermission();
   const navigate = useNavigate();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -251,16 +252,6 @@ export default function OthersPage() {
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "sistem",
       },
-
-      {
-        key: "tampilan-jamaah",
-        label: "Tampilan Jamaah",
-        description: "Mode personal: waktu sholat, doa, data pribadi",
-        Icon: Home,
-        to: "/member",
-        show: !!user?.member_id,
-        group: "akun",
-      },
       {
         key: "change-password",
         label: "Ganti Password",
@@ -287,6 +278,15 @@ export default function OthersPage() {
         to: "/lainnya/audit-log",
         show: isSuperAdmin,
         group: "sistem",
+      },
+      {
+        key: "tampilan-jamaah",
+        label: "Tampilan Jamaah",
+        description: "Mode personal: waktu sholat, doa, data pribadi",
+        Icon: Home,
+        to: "/member",
+        show: !!user?.member_id,
+        group: "akun",
       },
     ] satisfies MenuEntry[]
   ).filter((m) => m.show);

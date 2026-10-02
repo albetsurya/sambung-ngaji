@@ -226,7 +226,7 @@ function tryParseField(
   const rawKey = clean.slice(0, sepIdx).trim();
   const rawValue = clean
     .slice(sepIdx + 1)
-    .replace(/^[\s\-–—:]+/, "")
+    .replace(/^[\s\---:]+/, "")
     .trim();
 
   const target = matchFieldKey(rawKey);
@@ -242,7 +242,7 @@ function findSeparator(s: string): number {
   const eqIdx = s.indexOf("=");
   if (eqIdx > 0) return eqIdx;
 
-  const dashRegex = /\s[-–—]\s/;
+  const dashRegex = /\s[---]\s/;
   const dashMatch = s.match(dashRegex);
   if (dashMatch && dashMatch.index !== undefined && dashMatch.index > 0) {
     return dashMatch.index;

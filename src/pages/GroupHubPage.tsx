@@ -345,7 +345,7 @@ export default function GroupHubPage() {
         title="Pilih Kelompok"
       >
         <p className="text-ios-footnote text-surface-muted mb-3 px-1">
-          Modul keuangan bersifat per-kelompok. Pilih 1 kelompok untuk melanjutkan — data tidak digabung antar kelompok agar tidak miss.
+          Modul keuangan bersifat per-kelompok. Pilih 1 kelompok untuk melanjutkan - data tidak digabung antar kelompok agar tidak miss.
         </p>
         <GroupedList flush>
           {allGroups.map((g, i) => (

@@ -254,7 +254,7 @@ function InputPhase({
           onChange={(e) => onChange(e.target.value)}
           placeholder="Paste text biodata di sini..."
           rows={16}
-          className="w-full rounded-2xl border border-surface-border bg-surface-card px-4 py-3 text-[14px] text-surface-text placeholder:text-surface-muted/60 shadow-sm transition-all resize-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 font-mono"
+          className="w-full rounded-2xl border border-surface-border bg-surface-card px-4 py-3 text-[14px] text-surface-text placeholder:text-surface-muted/60 shadow-sm transition-all resize-none focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 "
         />
       </div>
 
@@ -293,7 +293,7 @@ function InputPhase({
               Salin
             </Button>
           </div>
-          <pre className="px-4 py-3 text-[12px] leading-relaxed text-surface-text font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
+          <pre className="px-4 py-3 text-[12px] leading-relaxed text-surface-text  whitespace-pre-wrap max-h-64 overflow-y-auto">
             {SAMPLE}
           </pre>
         </div>
@@ -497,7 +497,7 @@ function Field({ label, value }: { label: string; value: string }) {
           (value ? "text-surface-text" : "text-surface-muted italic")
         }
       >
-        {value || "—"}
+        {value || "-"}
       </span>
     </div>
   );

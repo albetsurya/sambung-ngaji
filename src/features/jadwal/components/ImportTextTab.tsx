@@ -171,7 +171,7 @@ export function ImportTextTab() {
               setRawText(v);
             }}
             rows={12}
-            className="min-h-[260px] font-mono text-[14px]"
+            className="min-h-[260px]  text-[14px]"
             placeholder={EXAMPLE_TEXT}
           />
 
@@ -343,7 +343,7 @@ function DraftCard({
                   {draft.hari && `${draft.hari}, `}
                   {formatDateShort(draft.tanggal)}
                   {draft.tanggalSelesai && (
-                    <> – {formatDateShort(draft.tanggalSelesai)}</>
+                    <> - {formatDateShort(draft.tanggalSelesai)}</>
                   )}
                 </span>
                 {draft.jam && <span>· {draft.jam}</span>}

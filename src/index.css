@@ -108,6 +108,77 @@ html.dark {
   animation: slideUp 0.2s ease-out;
 }
 
+/* Motion */
+.anim-stagger {
+  animation: slideUpStagger 0.28s ease-out both;
+  animation-delay: var(--stagger-delay, 0ms);
+}
+.anim-dropdown {
+  animation: dropdownIn 0.18s ease-out both;
+  transform-origin: top right;
+}
+.anim-message-in {
+  animation: messageIn 0.22s ease-out both;
+}
+.anim-float-soft {
+  animation: floatSoft 3s ease-in-out infinite;
+}
+.anim-success-pop {
+  animation: successPop 0.3s ease-out both;
+}
+
+/* Progress bar halus + shine */
+.progress-track {
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.progress-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: progressShine 1.8s ease-in-out infinite;
+}
+
+/* Typing dots AI chat */
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.typing-dots > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(var(--c-muted));
+  animation: typingDot 1.2s ease-in-out infinite;
+}
+.typing-dots > span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots > span:nth-child(3) { animation-delay: 0.3s; }
+
+/* Success morph button */
+.btn-success-morph {
+  background: rgb(var(--c-success)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* SVG check draw */
+.draw-check-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawCheck 0.6s ease-out 0.1s forwards;
+}
+
+/* FAB lembut - gantikan glow agresif */
+.fab-soft {
+  animation: fabGlowSecondary 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .surface-shift {
   transition:
     background-color 0.3s ease-out,
@@ -161,10 +232,7 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* ── App-feel: seperti aplikasi native di layar sentuh.
-   - Teks UI tidak terseleksi saat tap/sentuh (tetap bisa di input & zona .selectable).
-   - Tanpa menu long-press iOS & tanpa jeda/zoom double-tap (touch-action).
-   - Tanpa efek karet/pull-to-refresh browser (overscroll). ── */
+/* App feel: no select, no callout, no overscroll */
 html,
 body {
   overscroll-behavior-y: none;
@@ -186,7 +254,7 @@ select,
 img {
   -webkit-user-drag: none;
 }
-/* Zona yang tetap bisa diseleksi/dicopy (chat, artikel, ayat). */
+/* Selectable zone */
 .selectable,
 .selectable * {
   -webkit-user-select: text !important;
@@ -235,7 +303,7 @@ img {
   width: 100%;
 }
 
-/* ── Desktop shell: Vercel-style wide workspace ── */
+/* Desktop shell */
 @media (min-width: 768px) {
   body {
     background-color: rgb(var(--c-bg));
@@ -249,10 +317,7 @@ img {
     min-height: 100vh;
   }
 
-  /* Lebar pasti elemen shell di desktop.
-     Utilities md:max-w-* kalah prioritas melawan .app-shell
-     (CSS tak-berlapis menang atas utilities berlapis), jadi atur di sini.
-     Mobile tidak tersentuh: tetap mengikuti max-width 480px di atas. */
+  /* Desktop shell widths */
   .sheet-narrow {
     max-width: 32rem;
   }
@@ -260,9 +325,6 @@ img {
     max-width: 42rem;
   }
 
-  /* Dock FAB: lepas dari batas 1280px agar menempel pojok viewport.
-     min-height:0 WAJIB agar min-height:100vh dari .app-shell tidak
-     bocor ke dock (kalau bocor, FAB akan muncul di tengah layar). */
   .floating-dock {
     max-width: none;
     min-height: 0;
@@ -276,9 +338,6 @@ img {
   padding-bottom: calc(0.75rem + var(--safe-bottom));
 }
 
-/* ── Sticky bar tepat di bawah header.
-   Header mobile 52px, header desktop h-16 (64px). Satu sumber agar
-   search/tab/filter tidak terselip di bawah header saat scroll. ── */
 .sticky-below-header {
   top: calc(52px + var(--safe-top, 0px));
 }
@@ -295,8 +354,6 @@ img {
   }
 }
 
-/* ── Titik acuan zoom lembar preview: kiri-atas di mobile (geser
-   horizontal), tengah-atas di desktop (lembar tampil simetris). ── */
 .sheet-scale {
   transform-origin: top left;
 }
@@ -368,6 +425,40 @@ img {
   }
 }
 
+@keyframes slideUpStagger {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dropdownIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes drawCheck {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes successPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -393,14 +484,7 @@ img {
   }
 }
 
-/* ========================================================================
-   FAB Glow Animations
-   ======================================================================== */
 
-/**
- * Glow primary — shadow accent yang membesar-mengecil.
- * Cocok untuk aksi utama (create, add).
- */
 @keyframes fabGlowPrimary {
   0%,
   100% {
@@ -419,10 +503,6 @@ img {
   animation: fabGlowPrimary 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/**
- * Pulse ring — ring cahaya yang membesar & memudar di belakang FAB.
- * Memberi efek "denyut" tanpa mengubah ukuran tombol.
- */
 @keyframes fabPulseRing {
   0% {
     box-shadow: 0 0 0 0 rgb(var(--c-accent-2) / 0.5);
@@ -439,10 +519,6 @@ img {
   animation: fabPulseRing 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/**
- * Glow secondary — shadow lembut yang berdenyut halus.
- * Lebih subtle dari primary.
- */
 @keyframes fabGlowSecondary {
   0%,
   100% {
@@ -467,7 +543,7 @@ img {
   animation-play-state: paused;
 }
 
-/* Reduced motion — matikan animasi glow */
+/* Reduced motion - matikan animasi glow */
 @media (prefers-reduced-motion: reduce) {
   .fab-glow-primary,
   .fab-glow-secondary,
@@ -477,14 +553,7 @@ img {
   }
 }
 
-/* ========================================================================
-   Input Reset — Hilangkan Semua Icon & Style Bawaan Browser
-   ======================================================================== */
 
-/**
- * Reset appearance bawaan browser (search decoration, spinner, dsb).
- * Ini memastikan input kita hanya pakai style dari Tailwind + custom CSS.
- */
 input,
 textarea,
 select {
@@ -552,11 +621,6 @@ input::-ms-clear {
 
 /* ---------- Autofill Background Fix ---------- */
 
-/**
- * Chrome mengubah background input jadi kuning saat autofill.
- * Trik: tutupi dengan box-shadow inset seukuran background.
- * Ini membuat input tetap terlihat normal saat autofill.
- */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -569,10 +633,6 @@ input:-webkit-autofill:active {
 
 /* ---------- Fix untuk iOS Safari ---------- */
 
-/**
- * iOS Safari menambahkan style bawaan ke input.
- * Reset agar konsisten dengan Chrome/Android.
- */
 input,
 textarea,
 select {
@@ -593,9 +653,6 @@ select {
 
 /* ---------- Fix untuk Autofill Dark Mode ---------- */
 
-/**
- * Dark mode: pastikan autofill background tetap gelap, bukan putih.
- */
 .dark input:-webkit-autofill,
 .dark input:-webkit-autofill:hover,
 .dark input:-webkit-autofill:focus,
@@ -605,9 +662,6 @@ select {
   caret-color: rgb(var(--c-text)) !important;
 }
 
-/* ========================================================================
-   FullCalendar override — match Tailwind theme
-   ======================================================================== */
 
 .fc {
   --fc-border-color: rgb(var(--c-border));

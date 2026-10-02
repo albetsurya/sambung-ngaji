@@ -676,7 +676,10 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton onClick={() => setSheet({ view: "create-picker" })} label="Tambah Jadwal" />
+          <FloatingActionButton
+            onClick={() => setSheet({ view: "create-picker" })}
+            label="Tambah Jadwal"
+          />
         ) : undefined
       }
     >
@@ -700,9 +703,7 @@ export default function AttendancePage() {
       />
 
       {isReadonly && (
-        <div
-          className="sticky sticky-below-header z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20"
-        >
+        <div className="sticky sticky-below-header z-30 backdrop-blur-xl bg-info-soft/95 border-b border-info/20">
           <div className="px-4 py-2">
             <p className="text-ios-caption text-info leading-relaxed">
               Anda masuk sebagai pengawas. Hanya bisa melihat data absensi.
@@ -751,7 +752,7 @@ export default function AttendancePage() {
                       {selectedMeeting && (
                         <p className="text-ios-footnote text-surface-muted truncate">
                           {formatDateLongText(selectedMeeting.tanggal)} ·{" "}
-                          {selectedMeeting.jam || "—"}
+                          {selectedMeeting.jam || "-"}
                         </p>
                       )}
                       {selectedMeeting &&
@@ -881,7 +882,6 @@ export default function AttendancePage() {
                 </div>
               </div>
 
-              
               {!isReadonly && (
                 <div className="flex gap-3 px-4 py-2 border-t border-surface-border bg-surface-card/50 justify-end">
                   {ATTENDANCE_STATUSES.map((s) => {
@@ -892,7 +892,11 @@ export default function AttendancePage() {
                         key={s}
                         className="flex items-center gap-1 text-ios-caption text-surface-muted"
                       >
-                        <Icon size={13} strokeWidth={2.2} className={cfg.dotClass} />
+                        <Icon
+                          size={13}
+                          strokeWidth={2.2}
+                          className={cfg.dotClass}
+                        />
                         <span>{cfg.shortLabel}</span>
                       </span>
                     );
@@ -937,7 +941,7 @@ export default function AttendancePage() {
                   />
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 border-t border-surface-border">
+                <div className="grid grid-cols-1 md:grid-cols-2 border-t border-surface-border">
                   {filteredMembers.map((m, i) => (
                     <CompactAttendanceRow
                       key={m.member_id}
@@ -946,7 +950,9 @@ export default function AttendancePage() {
                       onStatus={handleStatusChange}
                       onRequestDelete={handleRequestDelete}
                       divider={i !== filteredMembers.length - 1}
-                      readonly={isReadonly || selectedMeeting.status === "LIBUR"}
+                      readonly={
+                        isReadonly || selectedMeeting.status === "LIBUR"
+                      }
                     />
                   ))}
                 </div>
@@ -956,7 +962,6 @@ export default function AttendancePage() {
         </>
       )}
 
-      
       <BottomSheet
         open={sheet.view !== "closed"}
         onClose={handleSheetClose}
@@ -1009,7 +1014,6 @@ export default function AttendancePage() {
         )}
       </BottomSheet>
 
-      
       <ConfirmDialog
         open={!!deleteMeetingTarget}
         title="Hapus jadwal pengajian?"
@@ -1658,7 +1662,7 @@ function MeetingPickerContent({
                         )}
                       </div>
                       <p className="text-ios-caption text-surface-muted truncate">
-                        {m.jam || "—"}
+                        {m.jam || "-"}
                         {targets.length > 0 &&
                           " · " +
                             targets
@@ -1800,7 +1804,7 @@ function MeetingActionContent({
             )}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
-            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "—"}
+            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "-"}
           </p>
         </div>
       </div>

@@ -346,7 +346,7 @@ function ApproveSheet({
               <>
                 {" "}
                 Akun login dengan username{" "}
-                <span className="font-mono font-medium">
+                <span className=" font-medium">
                   {data.username}
                 </span>{" "}
                 akan langsung aktif.

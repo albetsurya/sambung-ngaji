@@ -16,6 +16,7 @@ import {
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   Segmented,
   GroupedList,
@@ -28,10 +29,15 @@ import {
   Card,
 } from "../../../components/ui";
 import { GroupedListSkeleton } from "../../../components/ui/Skeleton";
+import { AnimatedNumber, AnimatedProgress, staggerStyle } from "../../../components/ui/Motion";
 import {
   Heart,
   Printer,
   Sparkles,
+  Copy,
+  Send,
+  CheckCircle2,
+  X,
 } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
 import { useFinanceBack } from "../hooks/useFinanceBack";
@@ -46,6 +52,7 @@ import {
   SheetFooter,
 } from "../components/FinanceShared";
 import { ApiError } from "../../../services/api";
+
 const PAYMENT_FIELDS = [
   { key: "connecting_fund", label: "Uang Sambung" },
   { key: "community_dues", label: "Jimpitan" },
@@ -54,10 +61,12 @@ const PAYMENT_FIELDS = [
   { key: "funeral_fund", label: "Kafan" },
   { key: "ukhro_mt", label: "Ukhro MT" },
 ] as const;
+
 interface CarryoverRow {
   month: string;
   amount: number;
 }
+
 function formatCarryMonth(ym: string): string {
   const m = /^(\d{4})-(\d{2})$/.exec(ym || "");
   if (!m) return ym;
@@ -73,6 +82,7 @@ function formatCarryMonth(ym: string): string {
     return ym;
   }
 }
+
 function formatCarrySummary(
   items: { month: string; amount: number }[],
 ): string {
@@ -81,6 +91,7 @@ function formatCarrySummary(
   const total = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
   return `Susulan ${months} · ${formatRp(total)}`;
 }
+
 export const MonthlyDuesPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -153,6 +164,7 @@ export const MonthlyDuesPage: React.FC = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const overviewTopRef = useRef<HTMLDivElement>(null);
   const skipScrollRef = useRef(true);
+
   useEffect(() => {
     if (skipScrollRef.current) {
       skipScrollRef.current = false;
@@ -163,6 +175,7 @@ export const MonthlyDuesPage: React.FC = () => {
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [selectedMonth]);
+
   const loadData = async () => {
     if (!assignedGroup) {
       setData(null);
@@ -196,9 +209,11 @@ export const MonthlyDuesPage: React.FC = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadData();
   }, [selectedMonth, assignedGroup]);
+
   useEffect(() => {
     if (!assignedGroup) {
       setYearlyMembers([]);
@@ -228,13 +243,16 @@ export const MonthlyDuesPage: React.FC = () => {
       cancelled = true;
     };
   }, [assignedGroup]);
+
   const { syncing: syncingSheet, sync: syncSheet } = useFinanceSync(loadData);
+
   const handleOpenAddMember = () => {
     setEditingMember(null);
     setMemberName("");
     setMemberTarget(0);
     setIsMemberSheetOpen(true);
   };
+
   const handleSaveMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!memberName.trim()) {
@@ -266,6 +284,7 @@ export const MonthlyDuesPage: React.FC = () => {
       setSavingMember(false);
     }
   };
+
   const handleConfirmDeleteMember = async () => {
     if (!deleteMemberTarget) return;
     setDeletingMember(true);
@@ -287,6 +306,7 @@ export const MonthlyDuesPage: React.FC = () => {
       setDeletingMember(false);
     }
   };
+
   const handleOpenPaymentSheet = async (member: DueMember, existing?: any) => {
     setSelectedMember(member);
     setPayMethod("manual");
@@ -355,10 +375,12 @@ export const MonthlyDuesPage: React.FC = () => {
     }
     setIsPaymentSheetOpen(true);
   };
+
   const carryoverTotal = carryovers.reduce(
     (s, r) => s + (Number(r.amount) || 0),
     0,
   );
+
   const paymentTotal =
     carryoverTotal +
     paymentForm.connecting_fund +
@@ -367,6 +389,7 @@ export const MonthlyDuesPage: React.FC = () => {
     paymentForm.thousand_fund +
     paymentForm.funeral_fund +
     paymentForm.ukhro_mt;
+
   const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMember) return;
@@ -444,6 +467,7 @@ export const MonthlyDuesPage: React.FC = () => {
       setSavingPayment(false);
     }
   };
+
   const handleAiExtract = async () => {
     if (!aiPhotoUrl.trim()) {
       showToast("Masukkan Base64 atau URL foto terlebih dahulu", "error");
@@ -471,7 +495,7 @@ export const MonthlyDuesPage: React.FC = () => {
             prev.length ? prev : [{ month: "", amount: aiIr }],
           );
           showToast(
-            "Nominal susulan terdeteksi — pilih bulannya manual",
+            "Nominal susulan terdeteksi - pilih bulannya manual",
             "warning",
           );
         }
@@ -488,6 +512,7 @@ export const MonthlyDuesPage: React.FC = () => {
       setAiExtracting(false);
     }
   };
+
   const membersList = data?.members || [];
   const paymentsList = data?.payments || [];
   const paidIds = new Set(
@@ -593,7 +618,7 @@ export const MonthlyDuesPage: React.FC = () => {
       `*Rekap Shodaqoh ${monthLabel}*`,
       `Target: ${formatRp(dashboard?.target || 0)}`,
       `Terkumpul: ${formatRp(dashboard?.received || 0)} (${dashboard?.paidCount || 0} lunas / ${dashboard?.unpaidCount || 0} belum)`,
-      `— Rincian —`,
+      `- Rincian -`,
       `Susulan IR: ${formatRp(allocationTotals.ir)}`,
       `Uang Sambung: ${formatRp(allocationTotals.sambung)}`,
       `Jimpitan: ${formatRp(allocationTotals.jimpitan)}`,
@@ -642,6 +667,7 @@ export const MonthlyDuesPage: React.FC = () => {
       setCancelling(false);
     }
   };
+
   return (
     <AppLayout
       fab={
@@ -680,55 +706,44 @@ export const MonthlyDuesPage: React.FC = () => {
                 setFilterSheetOpen(true);
               }}
             />
-            <span className="relative">
-              <HeaderIconButton
-                onClick={() => setPrintMenuOpen((v) => !v)}
-                label="Cetak rekap"
-                testId="shod-btn-print-dropdown"
+            <HeaderIconButton
+              onClick={() => setPrintMenuOpen((v) => !v)}
+              label="Cetak rekap"
+              testId="shod-btn-print"
+            >
+              <Printer size={16} />
+            </HeaderIconButton>
+            {printMenuOpen && (
+              <div
+                className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5 anim-dropdown"
+                data-testid="shod-print-dropdown"
               >
-                <Printer size={16} />
-              </HeaderIconButton>
-              {printMenuOpen && (
-                <div
-                  className="absolute right-0 top-9 z-50 w-52 rounded-2xl border border-surface-border bg-surface-card shadow-lg p-1.5"
-                  data-testid="shod-print-dropdown"
+                <button
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                  onClick={() => {
+                    navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
+                    setPrintMenuOpen(false);
+                  }}
+                  data-testid="btn-print-shodaqoh"
                 >
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-print-shodaqoh"
-                  >
-                    Cetak Rekap Shodaqoh
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      navigate(`/finance/monthly-dues/print?variant=infak-ir`);
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-print-infak-ir"
-                  >
-                    Cetak Rekap Infak IR
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
-                    onClick={() => {
-                      handleCopyRekap();
-                      setPrintMenuOpen(false);
-                    }}
-                    data-testid="btn-copy-shodaqoh-rekap"
-                  >
-                    Salin Rekap (WA)
-                  </button>
-                </div>
-              )}
-            </span>
+                  Cetak Rekap Shodaqoh
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
+                  onClick={() => {
+                    navigate(`/finance/monthly-dues/print?variant=infak-ir`);
+                    setPrintMenuOpen(false);
+                  }}
+                  data-testid="btn-print-infak-ir"
+                >
+                  Cetak Rekap Infak IR
+                </button>
+              </div>
+            )}
           </HeaderActions>
         }
       />
+
       <div className="py-4">
         {!assignedGroup ? (
           <NoGroupEmpty
@@ -753,11 +768,13 @@ export const MonthlyDuesPage: React.FC = () => {
                 ]}
               />
             </div>
+
             {shodTab === "overview" && (
               <div data-testid="shod-tab-overview" className="contents">
                 <div ref={overviewTopRef} className="scroll-mt-20" />
+
                 {monthlyRecap.length > 0 && (
-                  <section>
+                  <section className="mt-4">
                     <SectionTitle>Periode · {monthLabel}</SectionTitle>
                     <div className="px-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
                       {monthlyRecap.map((r) => (
@@ -771,53 +788,125 @@ export const MonthlyDuesPage: React.FC = () => {
                     </div>
                   </section>
                 )}
+
                 {dashboard && (
-                  <section>
+                  <section className="mt-4 anim-stagger">
                     <SectionTitle>Capaian · {monthLabel}</SectionTitle>
-                    <Card className="mx-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-ios-caption font-medium text-surface-muted">
-                            Target
-                          </p>
-                          <p className="font-display text-ios-nav font-extrabold text-surface-text">
-                            {formatRp(dashboard.target)}
-                          </p>
+                    <div className="px-4">
+                      <Card className="!p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-ios-caption font-medium text-surface-muted">
+                              Terkumpul
+                            </p>
+                            <p className="font-display text-ios-nav font-extrabold text-accent tabular-nums">
+                              <AnimatedNumber value={dashboard.received} format={formatRp} />
+                            </p>
+                            <p className="text-ios-caption text-surface-muted mt-0.5">
+                              dari target {formatRp(dashboard.target)}
+                            </p>
+                          </div>
+                          <StatusPill tone="accent">{progressPct}%</StatusPill>
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-ios-caption font-medium text-surface-muted">
-                            Terkumpul
-                          </p>
-                          <p className="font-display text-ios-nav font-extrabold text-accent">
-                            {formatRp(dashboard.received)}
-                          </p>
+
+                        <div className="mt-3">
+                          <AnimatedProgress pct={progressPct} testId="shod-progress" />
                         </div>
+
+                        <div className="mt-2.5 flex items-center gap-2 text-ios-caption flex-wrap">
+                          <StatusPill tone="success">
+                            {dashboard.paidCount} lunas
+                          </StatusPill>
+                          <StatusPill tone="muted">
+                            {dashboard.unpaidCount} belum
+                          </StatusPill>
+                          <span className="text-surface-muted font-medium ml-auto">
+                            {dashboard.memberCount} anggota
+                          </span>
+                        </div>
+                      </Card>
+
+                      <div className="mt-3 grid grid-cols-3 gap-2">
+                        {postStatus === "posted" ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<X size={14} />}
+                            disabled={cancelling}
+                            onClick={handleCancelPost}
+                            data-testid="btn-cancel-post-card"
+                          >
+                            {cancelling ? "Batal…" : "Batal Post"}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            leftIcon={<CheckCircle2 size={14} />}
+                            disabled={posting}
+                            onClick={handlePostToKas}
+                            data-testid="btn-post-kas-card"
+                          >
+                            {posting ? "Posting…" : "Post Kas"}
+                          </Button>
+                        )}
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          leftIcon={<Copy size={14} />}
+                          onClick={async () => {
+                            await handleCopyRekap();
+                            showToast("Rekap disalin");
+                          }}
+                          data-testid="btn-copy-rekap-card"
+                        >
+                          Salin
+                        </Button>
+                        <Button
+                          size="sm"
+                          leftIcon={<Send size={14} />}
+                          onClick={async () => {
+                            await handleCopyRekap();
+                            const text = `Rekap Shodaqoh ${monthLabel}\nTarget: ${formatRp(dashboard.target)}\nTerkumpul: ${formatRp(dashboard.received)}\n${progressPct}% tercapai`;
+                            window.open(
+                              `https://wa.me/?text=${encodeURIComponent(text)}`,
+                              "_blank",
+                            );
+                          }}
+                          data-testid="btn-share-wa-card"
+                        >
+                          Whatsapp
+                        </Button>
                       </div>
-                      <div className="mt-3 h-2 rounded-full bg-surface-card2 overflow-hidden">
-                        <div
-                          className="h-full bg-accent rounded-full transition-all"
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
-                      <div className="mt-2.5 flex items-center gap-2 text-ios-caption flex-wrap">
-                        <StatusPill tone="accent">
-                          {progressPct}% tercapai
-                        </StatusPill>
-                        <StatusPill tone="success">
-                          {dashboard.paidCount} lunas
-                        </StatusPill>
-                        <StatusPill tone="muted">
-                          {dashboard.unpaidCount} belum
-                        </StatusPill>
-                        <span className="text-surface-muted font-medium ml-auto">
-                          {dashboard.memberCount} anggota
-                        </span>
-                      </div>
-                    </Card>
+                    </div>
                   </section>
                 )}
-                <section>
+
+                <section className="mt-5">
                   <SectionTitle>Alokasi Dana · {monthLabel}</SectionTitle>
+                  <div className="px-4 mt-3">
+                    <Card
+                      className="flex items-center gap-2 !py-3"
+                      data-testid="shod-post-status"
+                    >
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                          postStatus === "posted"
+                            ? "bg-success"
+                            : postStatus === "not-posted"
+                              ? "bg-warning"
+                              : "bg-surface-muted"
+                        }`}
+                      />
+                      <p className="text-ios-footnote font-medium flex-1">
+                        {postStatus === "posted"
+                          ? `Sudah diposting ke Kas (${monthLabel})`
+                          : postStatus === "not-posted"
+                            ? `Belum diposting ke Kas (${monthLabel})`
+                            : "Status posting belum diketahui"}
+                      </p>
+                    </Card>
+                  </div>
                   <GroupedList>
                     {[
                       { label: "Susulan IR", value: allocationTotals.ir },
@@ -831,73 +920,30 @@ export const MonthlyDuesPage: React.FC = () => {
                       { label: "Kafan", value: allocationTotals.kafan },
                       { label: "Ukhro MT", value: allocationTotals.ukhro },
                     ].map((a, idx, arr) => (
+                      <div key={a.label} className="anim-stagger contents" style={staggerStyle(idx)}>
                       <ListRow
-                        key={a.label}
                         insetDivider={idx !== arr.length - 1}
                       >
                         <div className="flex items-center justify-between gap-2 w-full">
                           <p className="text-ios-body text-surface-text">
                             {a.label}
                           </p>
-                          <p className="font-mono font-bold text-surface-text shrink-0">
-                            {formatRp(a.value)}
+                          <p className="font-bold text-surface-text shrink-0 tabular-nums">
+                            <AnimatedNumber value={a.value} format={formatRp} />
                           </p>
                         </div>
                       </ListRow>
+                      </div>
                     ))}
                   </GroupedList>
-                  <Card
-                    className="mx-4 mt-2.5 flex items-center gap-2"
-                    data-testid="shod-post-status"
-                  >
-                    <span
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${postStatus === "posted" ? "bg-success" : postStatus === "not-posted" ? "bg-warning" : "bg-surface-muted"}`}
-                    />
-                    <p className="text-ios-footnote font-medium flex-1">
-                      {postStatus === "posted"
-                        ? `Sudah diposting ke Kas (${monthLabel})`
-                        : postStatus === "not-posted"
-                          ? `Belum diposting ke Kas (${monthLabel})`
-                          : "Status posting belum diketahui"}
-                    </p>
-                  </Card>
-                  <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
-                    {postStatus === "posted" ? (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={cancelling}
-                        onClick={handleCancelPost}
-                        data-testid="btn-shod-cancel-post-to-kas"
-                      >
-                        {cancelling ? "Membatalkan…" : "Batalkan Posting"}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={posting}
-                        onClick={handlePostToKas}
-                        data-testid="btn-shod-post-to-kas"
-                      >
-                        {posting ? "Posting…" : "Post ke Kas"}
-                      </Button>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={handleCopyRekap}
-                    >
-                      Salin Rekap
-                    </Button>
-                  </div>
                 </section>
-                <section>
+
+                <section className="mt-5">
                   <SectionTitle>
-                    Rincian {yearlyYear} (Jan–
+                    Rincian {yearlyYear} (Jan-
                     {monthlyRecap.length > 0
                       ? monthlyRecap[monthlyRecap.length - 1].label
-                      : "–"}
+                      : "-"}
                     , {monthlyRecap.length} Bulan)
                   </SectionTitle>
                   <div data-testid="shodaqoh-yearly-table">
@@ -935,7 +981,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                       </p>
                                     </div>
                                     <div className="text-right shrink-0 flex flex-col items-end gap-1">
-                                      <p className="text-ios-subhead font-bold text-accent">
+                                      <p className="text-ios-subhead font-bold text-accent tabular-nums">
                                         {formatRp(r.received)}
                                       </p>
                                       {done ? (
@@ -961,7 +1007,7 @@ export const MonthlyDuesPage: React.FC = () => {
                     )}
                     <div className="px-4 py-2 flex items-center justify-between gap-2">
                       <p className="text-ios-caption text-surface-muted">
-                        Ketuk baris bulan untuk melihat rinciannya.
+                        Ketuk baris bulan untuk rinciannya.
                       </p>
                       {monthlyRecap.length > 3 && (
                         <div className="flex items-center gap-3 shrink-0">
@@ -990,35 +1036,36 @@ export const MonthlyDuesPage: React.FC = () => {
                 </section>
               </div>
             )}
+
             {shodTab === "members" && (
               <div data-testid="shod-tab-members" className="contents">
-                <section>
-                  {statusFilter !== "ALL" && (
-                    <div
-                      className="px-4 mt-4 flex gap-2 flex-wrap"
-                      data-testid="shodaqoh-active-filters"
+                {statusFilter !== "ALL" && (
+                  <div
+                    className="px-4 mt-4 flex gap-2 flex-wrap"
+                    data-testid="shodaqoh-active-filters"
+                  >
+                    <button
+                      className="px-2.5 py-1 rounded-full bg-accent-soft text-accent text-ios-caption font-bold"
+                      onClick={() => setStatusFilter("ALL")}
                     >
-                      <button
-                        className="px-2.5 py-1 rounded-full bg-accent-soft text-accent text-ios-caption font-bold"
-                        onClick={() => setStatusFilter("ALL")}
-                      >
-                        {statusFilter === "LUNAS" ? "Lunas ×" : "Belum ×"}
-                      </button>
-                    </div>
-                  )}
+                      {statusFilter === "LUNAS" ? "Lunas ×" : "Belum ×"}
+                    </button>
+                  </div>
+                )}
+
+                <div className="px-4 mt-3">
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari nama anggota…"
+                    data-testid="shodaqoh-search"
+                  />
+                </div>
+
+                <section className="mt-4">
                   <SectionTitle>
                     Anggota · {monthLabel} ({visibleMembers.length})
                   </SectionTitle>
-                  <div className="px-4 mt-2.5">
-                    <Input
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari nama anggota…"
-                      data-testid="shodaqoh-search"
-                    />
-                  </div>
-                </section>
-                <section>
                   {loading ? (
                     <GroupedListSkeleton rows={5} />
                   ) : visibleMembers.length === 0 ? (
@@ -1048,7 +1095,13 @@ export const MonthlyDuesPage: React.FC = () => {
                             onClick={() => setMemberActionTarget(m)}
                             insetDivider={idx !== visibleMembers.length - 1}
                             leading={
-                              <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-bold text-ios-body">
+                              <span
+                                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-ios-body ${
+                                  hasPaid
+                                    ? "bg-success-soft text-success"
+                                    : "bg-accent-soft text-accent"
+                                }`}
+                              >
                                 {(m.member_name || "?").charAt(0).toUpperCase()}
                               </span>
                             }
@@ -1086,9 +1139,10 @@ export const MonthlyDuesPage: React.FC = () => {
                 </section>
               </div>
             )}
+
             {shodTab === "payments" && (
               <div data-testid="shod-tab-payments" className="contents">
-                <section>
+                <section className="mt-4">
                   <SectionTitle>
                     Riwayat Pembayaran · {monthLabel} ({paymentsList.length})
                   </SectionTitle>
@@ -1110,6 +1164,13 @@ export const MonthlyDuesPage: React.FC = () => {
                             key={p.payment_id || idx}
                             onClick={() => setPaymentDetail(p)}
                             insetDivider={idx !== paymentsList.length - 1}
+                            leading={
+                              <span className="w-9 h-9 rounded-xl bg-success-soft flex items-center justify-center text-success shrink-0 font-bold text-ios-body">
+                                {(m?.member_name || "?")
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </span>
+                            }
                           >
                             <ChevronRow>
                               <div className="flex items-center justify-between gap-2 w-full">
@@ -1122,7 +1183,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                     {p.notes ? ` · ${p.notes}` : ""}
                                   </p>
                                 </div>
-                                <p className="font-mono font-bold shrink-0">
+                                <p className="font-bold shrink-0 tabular-nums">
                                   {formatRp(p.total_amount)}
                                 </p>
                               </div>
@@ -1138,6 +1199,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </>
         )}
       </div>
+
       <BottomSheet
         open={isMemberSheetOpen}
         onClose={() => setIsMemberSheetOpen(false)}
@@ -1174,6 +1236,7 @@ export const MonthlyDuesPage: React.FC = () => {
           )}
         </form>
       </BottomSheet>
+
       <BottomSheet
         open={isPaymentSheetOpen}
         onClose={() => setIsPaymentSheetOpen(false)}
@@ -1256,14 +1319,13 @@ export const MonthlyDuesPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <Input
+                  <DateInput
                     label="Tanggal Pembayaran"
-                    type="date"
                     value={paymentForm.payment_date}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setPaymentForm({
                         ...paymentForm,
-                        payment_date: e.target.value,
+                        payment_date: val,
                       })
                     }
                     required
@@ -1271,6 +1333,7 @@ export const MonthlyDuesPage: React.FC = () => {
                   />
                 </div>
               </section>
+
               <section className="rounded-2xl border border-surface-border bg-surface-card p-3.5">
                 <div className="flex items-center justify-between mb-2.5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
@@ -1298,15 +1361,6 @@ export const MonthlyDuesPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="grid grid-cols-[110px_1fr_44px] gap-2 px-3">
-                      <span className="text-ios-caption font-semibold uppercase tracking-wide text-surface-muted">
-                        Bulan
-                      </span>
-                      <span className="text-ios-caption font-semibold uppercase tracking-wide text-surface-muted">
-                        Nominal (Rp)
-                      </span>
-                      <span aria-hidden="true" />
-                    </div>
                     {carryovers.map((row, idx) => (
                       <div
                         key={idx}
@@ -1372,13 +1426,14 @@ export const MonthlyDuesPage: React.FC = () => {
                       <span className="text-ios-caption font-semibold text-surface-muted">
                         Total susulan
                       </span>
-                      <span className="font-display text-ios-body font-extrabold text-accent">
+                      <span className="font-display text-ios-body font-extrabold text-accent tabular-nums">
                         {formatRp(carryoverTotal)}
                       </span>
                     </div>
                   </div>
                 )}
               </section>
+
               <section className="rounded-2xl border border-surface-border bg-surface-card p-3.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2.5">
                   Realisasi Pembayaran
@@ -1413,11 +1468,12 @@ export const MonthlyDuesPage: React.FC = () => {
                   <span className="text-ios-body font-semibold text-surface-text">
                     Total Realisasi
                   </span>
-                  <span className="font-display text-ios-nav font-extrabold text-accent">
+                  <span className="font-display text-ios-nav font-extrabold text-accent tabular-nums">
                     {formatRp(paymentTotal)}
                   </span>
                 </div>
               </section>
+
               <section className="space-y-2.5">
                 <SheetFooter
                   onCancel={() => setIsPaymentSheetOpen(false)}
@@ -1441,6 +1497,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </form>
         )}
       </BottomSheet>
+
       <BottomSheet
         open={isAiSheetOpen}
         onClose={() => setIsAiSheetOpen(false)}
@@ -1460,6 +1517,7 @@ export const MonthlyDuesPage: React.FC = () => {
           {aiExtracting ? "Mengekstraksi…" : "Ekstrak Foto"}
         </Button>
       </BottomSheet>
+
       <BottomSheet
         open={filterSheetOpen}
         onClose={() => setFilterSheetOpen(false)}
@@ -1542,6 +1600,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </div>
         </div>
       </BottomSheet>
+
       <BottomSheet
         open={!!memberActionTarget}
         onClose={() => setMemberActionTarget(null)}
@@ -1622,6 +1681,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
+
       <BottomSheet
         open={!!memberDetailTarget}
         onClose={() => setMemberDetailTarget(null)}
@@ -1690,10 +1750,10 @@ export const MonthlyDuesPage: React.FC = () => {
                     </Card>
                     <Card className="!p-3">
                       <p className="text-ios-caption text-surface-muted">
-                        Total Jan–
+                        Total Jan-
                         {months.length > 0
                           ? mLabel(months[months.length - 1])
-                          : "–"}
+                          : "-"}
                       </p>
                       <p className="font-extrabold text-accent">
                         {formatRp(sum(mine, (p) => p.total_amount))}
@@ -1784,8 +1844,8 @@ export const MonthlyDuesPage: React.FC = () => {
                                   </>
                                 )}
                               </div>
-                              <p className="font-mono font-bold text-accent shrink-0">
-                                {v.total > 0 ? formatRp(v.total) : "–"}
+                              <p className="font-bold text-accent shrink-0">
+                                {v.total > 0 ? formatRp(v.total) : "-"}
                               </p>
                             </div>
                           </ChevronRow>
@@ -1799,10 +1859,10 @@ export const MonthlyDuesPage: React.FC = () => {
                       <div className="flex items-center justify-between gap-2 w-full">
                         <div className="min-w-0 flex-1">
                           <p className="text-ios-body font-bold text-surface-text truncate">
-                            Total Jan–
+                            Total Jan-
                             {months.length > 0
                               ? mLabel(months[months.length - 1])
-                              : "–"}
+                              : "-"}
                           </p>
                           <p className="text-ios-caption text-surface-muted truncate">
                             IR {formatRp(grand.ir)} · Sambung{" "}
@@ -1810,7 +1870,7 @@ export const MonthlyDuesPage: React.FC = () => {
                             {formatRp(grand.jimpitan)}
                           </p>
                         </div>
-                        <p className="font-mono font-extrabold text-accent shrink-0">
+                        <p className="font-extrabold text-accent shrink-0">
                           {formatRp(grand.total)}
                         </p>
                       </div>
@@ -1835,6 +1895,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
+
       <BottomSheet
         open={!!paymentDetail}
         onClose={() => setPaymentDetail(null)}
@@ -1866,14 +1927,14 @@ export const MonthlyDuesPage: React.FC = () => {
                       <ListRow key={l} insetDivider>
                         <div className="flex items-center justify-between w-full">
                           <p className="text-ios-body">{l}</p>
-                          <p className="font-mono font-bold">{formatRp(v)}</p>
+                          <p className="font-bold">{formatRp(v)}</p>
                         </div>
                       </ListRow>
                     ))}
                     <ListRow insetDivider={false}>
                       <div className="flex items-center justify-between w-full">
                         <p className="font-bold">Total</p>
-                        <p className="font-mono font-extrabold text-accent">
+                        <p className="font-extrabold text-accent">
                           {formatRp(paymentDetail.total_amount)}
                         </p>
                       </div>
@@ -1965,6 +2026,7 @@ export const MonthlyDuesPage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
+
       <ConfirmDialog
         open={!!deleteMemberTarget}
         title="Hapus anggota?"

@@ -6,7 +6,7 @@ import {
   type KasDataResponse,
   type CashType,
 } from "../api/financeApi";
-import { formatRp } from "../../../utils/format";
+import { formatRp, formatDateShort } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
 import {
@@ -17,6 +17,7 @@ import {
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   Segmented,
   GroupedList,
@@ -875,10 +876,10 @@ export const FinanceLedgerPage: React.FC = () => {
                           <div className="flex items-center justify-between gap-2 w-full">
                             <div className="min-w-0 flex-1">
                               <p className="text-ios-body font-medium text-surface-text truncate">
-                                {t.description || "—"}
+                                {t.description || "-"}
                               </p>
                               <p className="text-ios-caption text-surface-muted truncate">
-                                {t.transaction_date}
+                                {formatDateShort(t.transaction_date)}
                                 {t.account_name ? ` · ${t.account_name}` : ""}
                               </p>
                             </div>
@@ -927,12 +928,11 @@ export const FinanceLedgerPage: React.FC = () => {
         title={editingTx ? "Edit Transaksi" : "Tambah Transaksi"}
       >
         <form onSubmit={handleSubmitTx}>
-          <Input
+          <DateInput
             label="Tanggal"
-            type="date"
             value={txForm.transaction_date}
-            onChange={(e) =>
-              setTxForm({ ...txForm, transaction_date: e.target.value })
+            onChange={(val) =>
+              setTxForm({ ...txForm, transaction_date: val })
             }
             required
           />

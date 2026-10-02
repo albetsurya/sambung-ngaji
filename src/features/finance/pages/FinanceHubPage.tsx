@@ -6,7 +6,7 @@ import { usePermission } from "../../../hooks/usePermission";
 import { useFinanceHubBack } from "../hooks/useFinanceBack";
 
 /**
- * Hub Keuangan — ringkas 3 modul (Kas/Shodaqoh/Zakat) dalam 1 pintu.
+ * Hub Keuangan - ringkas 3 modul (Kas/Shodaqoh/Zakat) dalam 1 pintu.
  * Menggantikan 3 item bottom-nav terpisah agar nav max 5 item dan nyaman di mobile.
  */
 export const FinanceHubPage: React.FC = () => {

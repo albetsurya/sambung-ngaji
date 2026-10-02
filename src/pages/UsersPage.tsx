@@ -844,7 +844,7 @@ function DeleteUserConfirmModal({
           Ketik nama user untuk konfirmasi:
         </label>
         <div className="rounded-xl bg-surface-card2 px-3 py-2 mb-2">
-          <code className="text-ios-body font-mono text-surface-text">
+          <code className="text-ios-body  text-surface-text">
             {targetName}
           </code>
         </div>

@@ -228,7 +228,8 @@ export default function LoginPage() {
           <Button
             type="submit"
             fullWidth
-            disabled={submitting || !username || !password}
+            loading={submitting}
+            disabled={!username || !password}
             rightIcon={!submitting ? <ArrowRight size={16} /> : undefined}
           >
             {submitting ? "Memproses..." : "Masuk"}

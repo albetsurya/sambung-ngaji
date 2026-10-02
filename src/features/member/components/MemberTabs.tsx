@@ -282,8 +282,8 @@ function formatYearRange(
 ): string {
   const m = mulai !== undefined && mulai !== "" ? String(mulai) : "";
   const s = selesai !== undefined && selesai !== "" ? String(selesai) : "";
-  if (m && s) return `${m}–${s}`;
-  if (m) return `${m}–sekarang`;
+  if (m && s) return `${m}-${s}`;
+  if (m) return `${m}-sekarang`;
   if (s) return `s.d. ${s}`;
   return "";
 }

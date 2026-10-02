@@ -55,7 +55,7 @@ export default function RegistrationSuccessPage() {
             ID Pendaftaran
           </p>
           <div className="rounded-2xl bg-surface-card2 px-4 py-3 mb-4">
-            <code className="text-ios-body font-mono font-semibold text-accent">
+            <code className="text-ios-body  font-semibold text-accent">
               {submissionId}
             </code>
           </div>

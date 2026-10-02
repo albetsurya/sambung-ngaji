@@ -86,7 +86,7 @@ export function ChangeUsernameSheet({
       <div className="rounded-xl bg-accent-soft/60 border border-accent/15 p-3 mb-4">
         <p className="text-ios-caption text-accent/80">
           Username saat ini:{" "}
-          <span className="font-mono font-semibold text-accent">
+          <span className=" font-semibold text-accent">
             @{currentUsername}
           </span>
         </p>
