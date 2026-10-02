@@ -12,10 +12,16 @@ import {
   Sun,
   Sparkles,
   Moon,
+  Navigation,
+  Search,
+  MapPin as MapPinIcon,
+  Pencil,
 } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { MasukButton } from "../components/ui";
 import { Button } from "../components/ui";
+import { BottomSheet } from "../components/ui";
+import { Input } from "../components/ui";
 import { useToast } from "../contexts/ToastContext";
 import {
   getPrayerTimesForDate,
@@ -23,11 +29,11 @@ import {
   getCurrentPrayer,
   getMonthlySchedule,
   getSunnahTimes,
-  LATUKAN_LABEL,
   type PrayerDay,
   type PrayerKey,
   type SunnahTimeInfo,
 } from "../features/ibadah/utils/prayerTimes";
+import { usePrayerLocation } from "../features/ibadah/hooks/usePrayerLocation";
 
 
 export default function MemberPrayerPage() {
@@ -37,16 +43,36 @@ export default function MemberPrayerPage() {
   const [now, setNow] = useState<Date>(() => new Date());
   const [copied, setCopied] = useState(false);
   const [showMonthly, setShowMonthly] = useState(false);
+  const [showLocationSheet, setShowLocationSheet] = useState(false);
+
+  const {
+    location,
+    autoCoords,
+    autoLoading,
+    autoError,
+    requestAutoLocation,
+    setMode,
+    setCity,
+    setCustom,
+    getEffectiveCoords,
+    getDisplayLabel,
+    searchCities,
+  } = usePrayerLocation();
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const today = useMemo(() => getPrayerTimesForDate(now), []);
-  const next = getNextPrayer(now);
-  const current = getCurrentPrayer(now);
-  const sunnah = useMemo(() => getSunnahTimes(now), []);
+  const coords = getEffectiveCoords();
+  const lat = coords?.lat ?? -6.9879;
+  const lng = coords?.lng ?? 112.3729;
+  const label = getDisplayLabel();
+
+  const today = useMemo(() => getPrayerTimesForDate(now, lat, lng), [now, lat, lng]);
+  const next = getNextPrayer(now, lat, lng);
+  const current = getCurrentPrayer(now, lat, lng);
+  const sunnah = useMemo(() => getSunnahTimes(now, lat, lng), [now, lat, lng]);
   const hijri = formatHijri(now);
 
   async function handleShare() {
@@ -54,7 +80,7 @@ export default function MemberPrayerPage() {
       .filter((p) => p.key !== "sunrise")
       .map((p) => `${p.label.padEnd(8, " ")}: ${p.timeFormatted}`);
     const text = [
-      `🕌 Waktu Sholat · ${LATUKAN_LABEL}`,
+      `Waktu Sholat · ${label}`,
       `${formatDateId(now)}`,
       ``,
       ...lines,
@@ -75,19 +101,36 @@ export default function MemberPrayerPage() {
     }
   }
 
+  function handleLocationClick() {
+    setShowLocationSheet(true);
+  }
+
   return (
     <AppLayout showAiChat={false} hideNav={!user}>
       <Header
         title="Waktu Sholat"
-        subtitle={LATUKAN_LABEL}
+        subtitle={label}
         onBack={() => goBack(navigate, user ? "/member" : "/")}
         backLabel="Kembali"
         hideBackOnDesktop
         showSyncButton={false}
         right={
-          !user ? (
+          <>
+            {user && (
+              <Button
+                variant="ghost"
+                size="xs"
+                iconOnly
+                onClick={handleLocationClick}
+                aria-label="Ganti lokasi sholat"
+              >
+                <Navigation size={16} />
+              </Button>
+            )}
+            {!user ? (
               <MasukButton />
-          ) : undefined
+            ) : undefined}
+          </>
         }
       />
 
@@ -100,12 +143,18 @@ export default function MemberPrayerPage() {
           />
 
           <div className="relative">
-            <div className="flex items-center gap-1.5 mb-3">
+            <button
+              onClick={handleLocationClick}
+              className="flex items-center gap-1.5 mb-3 w-full text-left"
+              aria-label="Ganti lokasi sholat"
+            >
               <MapPin size={12} className="text-accent/70" />
-              <p className="text-[11px] font-medium text-accent/70 truncate">
-                {LATUKAN_LABEL}
+              <p className="text-[11px] font-medium text-accent/70 truncate flex-1">
+                {label}
+                {autoLoading && <span className="ml-1 animate-pulse">⟳</span>}
               </p>
-            </div>
+              <Navigation size={12} className="text-accent/50 flex-shrink-0" />
+            </button>
 
             <p className="text-[11px] font-semibold uppercase tracking-wide text-accent/70 mb-1.5">
               Menuju {next.prayer.label}
@@ -303,6 +352,20 @@ export default function MemberPrayerPage() {
           </p>
         </div>
       </div>
+
+      <LocationSettingsBottomSheet
+        isOpen={showLocationSheet}
+        onClose={() => setShowLocationSheet(false)}
+        location={location}
+        autoCoords={autoCoords}
+        autoLoading={autoLoading}
+        autoError={autoError}
+        requestAutoLocation={requestAutoLocation}
+        setMode={setMode}
+        setCity={setCity}
+        setCustom={setCustom}
+        searchCities={searchCities}
+      />
     </AppLayout>
   );
 }
@@ -348,6 +411,230 @@ function SunnahRow({
         {info.timeFormatted}
       </p>
     </div>
+  );
+}
+
+
+function LocationSettingsBottomSheet({
+  isOpen,
+  onClose,
+  location,
+  autoCoords,
+  autoLoading,
+  autoError,
+  requestAutoLocation,
+  setMode,
+  setCity,
+  setCustom,
+  searchCities,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  location: ReturnType<typeof usePrayerLocation>["location"];
+  autoCoords: ReturnType<typeof usePrayerLocation>["autoCoords"];
+  autoLoading: ReturnType<typeof usePrayerLocation>["autoLoading"];
+  autoError: ReturnType<typeof usePrayerLocation>["autoError"];
+  requestAutoLocation: ReturnType<typeof usePrayerLocation>["requestAutoLocation"];
+  setMode: ReturnType<typeof usePrayerLocation>["setMode"];
+  setCity: ReturnType<typeof usePrayerLocation>["setCity"];
+  setCustom: ReturnType<typeof usePrayerLocation>["setCustom"];
+  searchCities: ReturnType<typeof usePrayerLocation>["searchCities"];
+}) {
+  const [query, setQuery] = useState("");
+  const [customLat, setCustomLat] = useState("");
+  const [customLng, setCustomLng] = useState("");
+  const [customLabel, setCustomLabel] = useState("");
+
+  const filteredCities = useMemo(() => searchCities(query), [query, searchCities]);
+
+  const handleAutoClick = () => {
+    setMode("auto");
+    requestAutoLocation();
+  };
+
+  const handleCityClick = (cityId: string) => {
+    setCity(cityId);
+    onClose();
+  };
+
+  const handleCustomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const lat = parseFloat(customLat);
+    const lng = parseFloat(customLng);
+    if (isNaN(lat) || isNaN(lng)) return;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+    setCustom(lat, lng, customLabel || `Custom (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+    onClose();
+  };
+
+  return (
+    <BottomSheet
+      open={isOpen}
+      onClose={onClose}
+      title="Pengaturan Lokasi Sholat"
+    >
+      <div className="space-y-4">
+        <div className="px-4">
+          <label className="block text-ios-caption font-medium text-surface-muted mb-2">
+            Mode Lokasi
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={handleAutoClick}
+              className={`p-3 rounded-xl border-2 transition-all text-left ${
+                location.mode === "auto"
+                  ? "border-accent bg-accent-soft text-accent"
+                  : "border-surface-border text-surface-text hover:bg-surface-card2"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Navigation size={18} className="flex-shrink-0" />
+                <div>
+                  <p className="text-ios-body font-medium">Otomatis (GPS)</p>
+                  <p className="text-ios-caption text-surface-muted">
+                    {autoLoading ? "Mendeteksi..." : autoCoords ? "Aktif" : "Minta izin"}
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMode("city")}
+              className={`p-3 rounded-xl border-2 transition-all text-left ${
+                location.mode === "city"
+                  ? "border-accent bg-accent-soft text-accent"
+                  : "border-surface-border text-surface-text hover:bg-surface-card2"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <MapPinIcon size={18} className="flex-shrink-0" />
+                <div>
+                  <p className="text-ios-body font-medium">Pilih Kota</p>
+                  <p className="text-ios-caption text-surface-muted">Daftar kota Indonesia</p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {location.mode === "auto" && (
+          <div className="px-4 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Navigation size={18} className="text-accent" />
+                <div>
+                  <p className="text-ios-body font-medium text-surface-text">Lokasi GPS</p>
+                  {autoCoords ? (
+                    <p className="text-ios-caption text-surface-muted">
+                      Akurasi ±{Math.round(autoCoords.accuracy)}m
+                    </p>
+                  ) : (
+                    <p className="text-ios-caption text-accent">Belum terdeteksi</p>
+                  )}
+                </div>
+              </div>
+              <Button size="xs" variant="secondary" onClick={requestAutoLocation} disabled={autoLoading}>
+                {autoLoading ? "Deteksi..." : "Deteksi Ulang"}
+              </Button>
+            </div>
+            {autoError && (
+              <p className="text-ios-caption text-danger mt-2">{autoError}</p>
+            )}
+          </div>
+        )}
+
+        {location.mode === "city" && (
+          <div className="px-4 border-t pt-4">
+            <div className="relative">
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-muted pointer-events-none" />
+              <Input
+                placeholder="Cari nama kota..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="max-h-60 overflow-y-auto mt-2">
+              {filteredCities.length === 0 ? (
+                <p className="text-ios-caption text-surface-muted text-center py-4">
+                  Kota tidak ditemukan
+                </p>
+              ) : (
+                filteredCities.map((city) => (
+                  <button
+                    key={city.id}
+                    type="button"
+                    onClick={() => handleCityClick(city.id)}
+                    className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-surface-card2 transition-colors flex items-center gap-3"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
+                      <MapPinIcon size={14} />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-ios-body font-medium text-surface-text truncate">
+                        {city.name}
+                      </p>
+                      <p className="text-ios-caption text-surface-muted truncate">
+                        {city.province}
+                      </p>
+                    </div>
+                    {location.cityId === city.id && (
+                      <Check size={18} className="text-accent flex-shrink-0" />
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {location.mode === "custom" && (
+          <div className="px-4 border-t pt-4">
+            <form onSubmit={handleCustomSubmit}>
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <Input
+                  label="Latitude"
+                  type="number"
+                  step="0.0001"
+                  value={customLat}
+                  onChange={(e) => setCustomLat(e.target.value)}
+                  placeholder="-6.1754"
+                  required
+                />
+                <Input
+                  label="Longitude"
+                  type="number"
+                  step="0.0001"
+                  value={customLng}
+                  onChange={(e) => setCustomLng(e.target.value)}
+                  placeholder="106.8272"
+                  required
+                />
+              </div>
+              <Input
+                label="Label (opsional)"
+                value={customLabel}
+                onChange={(e) => setCustomLabel(e.target.value)}
+                placeholder="Misal: Rumah, Kantor, Masjid"
+              />
+              <div className="flex gap-2 mt-3">
+                <Button type="submit" className="flex-1">
+                  Simpan Lokasi
+                </Button>
+                <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+                  Batal
+                </Button>
+              </div>
+              <p className="text-ios-caption text-surface-muted mt-2 text-center">
+                Gunakan format desimal (contoh: -6.1754, 106.8272 untuk Jakarta)
+              </p>
+            </form>
+          </div>
+        )}
+      </div>
+    </BottomSheet>
   );
 }
 
