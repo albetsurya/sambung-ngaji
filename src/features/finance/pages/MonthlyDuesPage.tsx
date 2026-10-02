@@ -495,7 +495,7 @@ export const MonthlyDuesPage: React.FC = () => {
             prev.length ? prev : [{ month: "", amount: aiIr }],
           );
           showToast(
-            "Nominal susulan terdeteksi — pilih bulannya manual",
+            "Nominal susulan terdeteksi - pilih bulannya manual",
             "warning",
           );
         }
@@ -618,7 +618,7 @@ export const MonthlyDuesPage: React.FC = () => {
       `*Rekap Shodaqoh ${monthLabel}*`,
       `Target: ${formatRp(dashboard?.target || 0)}`,
       `Terkumpul: ${formatRp(dashboard?.received || 0)} (${dashboard?.paidCount || 0} lunas / ${dashboard?.unpaidCount || 0} belum)`,
-      `— Rincian —`,
+      `- Rincian -`,
       `Susulan IR: ${formatRp(allocationTotals.ir)}`,
       `Uang Sambung: ${formatRp(allocationTotals.sambung)}`,
       `Jimpitan: ${formatRp(allocationTotals.jimpitan)}`,
@@ -940,10 +940,10 @@ export const MonthlyDuesPage: React.FC = () => {
 
                 <section className="mt-5">
                   <SectionTitle>
-                    Rincian {yearlyYear} (Jan–
+                    Rincian {yearlyYear} (Jan-
                     {monthlyRecap.length > 0
                       ? monthlyRecap[monthlyRecap.length - 1].label
-                      : "–"}
+                      : "-"}
                     , {monthlyRecap.length} Bulan)
                   </SectionTitle>
                   <div data-testid="shodaqoh-yearly-table">
@@ -1750,10 +1750,10 @@ export const MonthlyDuesPage: React.FC = () => {
                     </Card>
                     <Card className="!p-3">
                       <p className="text-ios-caption text-surface-muted">
-                        Total Jan–
+                        Total Jan-
                         {months.length > 0
                           ? mLabel(months[months.length - 1])
-                          : "–"}
+                          : "-"}
                       </p>
                       <p className="font-extrabold text-accent">
                         {formatRp(sum(mine, (p) => p.total_amount))}
@@ -1845,7 +1845,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                 )}
                               </div>
                               <p className="font-bold text-accent shrink-0">
-                                {v.total > 0 ? formatRp(v.total) : "–"}
+                                {v.total > 0 ? formatRp(v.total) : "-"}
                               </p>
                             </div>
                           </ChevronRow>
@@ -1859,10 +1859,10 @@ export const MonthlyDuesPage: React.FC = () => {
                       <div className="flex items-center justify-between gap-2 w-full">
                         <div className="min-w-0 flex-1">
                           <p className="text-ios-body font-bold text-surface-text truncate">
-                            Total Jan–
+                            Total Jan-
                             {months.length > 0
                               ? mLabel(months[months.length - 1])
-                              : "–"}
+                              : "-"}
                           </p>
                           <p className="text-ios-caption text-surface-muted truncate">
                             IR {formatRp(grand.ir)} · Sambung{" "}

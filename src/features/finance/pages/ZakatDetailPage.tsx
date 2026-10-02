@@ -748,7 +748,7 @@ export const ZakatDetailPage: React.FC = () => {
                     </div>
                     {r.isPreview && (
                       <p className="mt-2 text-ios-caption text-warning font-medium leading-relaxed">
-                        Pratinjau default 45/40/15 — ketuk Ubah lalu Simpan
+                        Pratinjau default 45/40/15 - ketuk Ubah lalu Simpan
                         untuk mengunci rincian.
                       </p>
                     )}

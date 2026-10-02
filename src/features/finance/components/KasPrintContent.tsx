@@ -10,7 +10,7 @@ interface KasPrintContentProps {
   mode: "rincian" | "rekap";
 }
 function formatDateDMY(input?: string | null): string {
-  if (!input) return "—";
+  if (!input) return "-";
   const s = String(input).trim();
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) return `${m[3]}-${m[2]}-${m[1]}`;
@@ -123,10 +123,10 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                   {r.t.description}
                 </td>
                 <td className="border border-slate-300 p-1.5 text-right ">
-                  {r.deb > 0 ? formatRp(r.deb) : "—"}
+                  {r.deb > 0 ? formatRp(r.deb) : "-"}
                 </td>
                 <td className="border border-slate-300 p-1.5 text-right ">
-                  {r.kre > 0 ? formatRp(r.kre) : "—"}
+                  {r.kre > 0 ? formatRp(r.kre) : "-"}
                 </td>
                 <td className="border border-slate-300 p-1.5 text-right  font-semibold">
                   {formatRp(r.saldo)}
@@ -183,10 +183,10 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                   SALDO AWAL PERIODE
                 </td>
                 <td className="border border-slate-300 p-2 text-right ">
-                  —
+                  -
                 </td>
                 <td className="border border-slate-300 p-2 text-right ">
-                  —
+                  -
                 </td>
                 <td className="border border-slate-300 p-2 text-right  text-slate-900">
                   {formatRp(initial_balance)}
@@ -226,10 +226,10 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                     {formatRp(val)}
                   </td>
                   <td className="border border-slate-300 p-1.5 text-right ">
-                    —
+                    -
                   </td>
                   <td className="border border-slate-300 p-1.5 text-right ">
-                    —
+                    -
                   </td>
                 </tr>
               ))}

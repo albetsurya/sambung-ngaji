@@ -876,7 +876,7 @@ export const FinanceLedgerPage: React.FC = () => {
                           <div className="flex items-center justify-between gap-2 w-full">
                             <div className="min-w-0 flex-1">
                               <p className="text-ios-body font-medium text-surface-text truncate">
-                                {t.description || "—"}
+                                {t.description || "-"}
                               </p>
                               <p className="text-ios-caption text-surface-muted truncate">
                                 {formatDateShort(t.transaction_date)}

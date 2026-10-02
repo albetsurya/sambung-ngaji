@@ -185,7 +185,7 @@ export const ZakatPage: React.FC = () => {
           </>
         )}
       </div>
-      {/* Filter sheet — pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
+      {/* Filter sheet - pola sama dengan Shodaqoh: Status/Tipe/Tahun + Reset/Terapkan */}
       <BottomSheet
         open={filterSheetOpen}
         onClose={() => setFilterSheetOpen(false)}
