@@ -425,7 +425,7 @@ function AppRoutes() {
           <Route
             path="/jamaah"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MembersListPage />
               </RoleRoute>
             }
@@ -445,7 +445,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/baru"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
@@ -469,7 +469,7 @@ function AppRoutes() {
           <Route
             path="/jamaah/:id/edit"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }

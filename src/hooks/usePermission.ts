@@ -31,11 +31,11 @@ export const ROLE_LABEL: Record<Role, string> = {
   MEMBER: "Member",
 };
 const NAV_BY_ROLE: Record<Role, string[]> = {
-  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
-  ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
-  TIM_KU: ["beranda", "keuangan", "lainnya"],
+  SUPER_ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "keuangan", "lainnya"],
+  ADMIN: ["beranda", "jamaah", "absensi", "pengumuman", "keuangan", "lainnya"],
+  TIM_KU: ["kas", "shodaqoh", "zakat", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
-  TIM_ABSENSI: ["beranda", "absensi", "lainnya"],
+  TIM_ABSENSI: ["beranda", "jamaah", "absensi", "jadwal", "lainnya"],
   PENGAWAS: ["beranda", "jamaah", "absensi", "pengumuman", "lainnya"],
   MEMBER: [],
 };
@@ -68,8 +68,17 @@ export function usePermission() {
   const isMember = role === "MEMBER";
   const assignedGroup = isSuperAdmin ? focusGroupId : groupId;
   const isGlobal = isSuperAdmin && !focusGroupId;
-  const canViewAllMembers = isGlobal || role === "ADMIN" || role === "PENGAWAS";
-  const canEditMembers = isGlobal || role === "ADMIN";
+  const canViewAllMembers =
+    isGlobal ||
+    role === "ADMIN" ||
+    role === "PENGAWAS" ||
+    role === "TIM_PNKB" ||
+    role === "TIM_ABSENSI";
+  const canEditMembers =
+    isGlobal ||
+    role === "ADMIN" ||
+    role === "TIM_PNKB" ||
+    role === "TIM_ABSENSI";
   const canWriteMonitoring =
     isGlobal || role === "ADMIN" || role === "TIM_PNKB" || role === "PENGAWAS";
   const canManageUsers = isGlobal || isSuperAdmin;

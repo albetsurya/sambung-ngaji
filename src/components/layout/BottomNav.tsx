@@ -12,11 +12,14 @@ import {
   RefreshCw,
   Calendar,
   Wallet,
+  Heart,
+  ClipboardList,
 } from "../ui/FontAwesomeIcons";
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
   { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
+  { key: "jadwal", label: "Jadwal", to: "/lainnya/jadwal", icon: Calendar },
   {
     key: "pengumuman",
     label: "Pengumuman",
@@ -24,6 +27,9 @@ const ADMIN_ITEMS = [
     icon: Megaphone,
   },
   { key: "keuangan", label: "Keuangan", to: "/finance", icon: Wallet },
+  { key: "kas", label: "Kas", to: "/finance/ledger", icon: Wallet },
+  { key: "shodaqoh", label: "Shodaqoh", to: "/finance/monthly-dues", icon: Heart },
+  { key: "zakat", label: "Zakat", to: "/finance/zakat", icon: ClipboardList },
   { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
 ];
 const MEMBER_ITEMS = [

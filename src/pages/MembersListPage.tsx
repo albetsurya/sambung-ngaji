@@ -287,9 +287,13 @@ export default function MembersListPage() {
         toggleSelect(id);
         return;
       }
+      if (role === "TIM_ABSENSI") {
+        navigate(`/jamaah/${id}/edit`);
+        return;
+      }
       navigate(`/jamaah/${id}`);
     },
-    [navigate, selectMode, toggleSelect],
+    [navigate, selectMode, toggleSelect, role],
   );
 
   const handleBulkSubmit = useCallback(async () => {
