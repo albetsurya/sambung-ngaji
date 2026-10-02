@@ -1,27 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { X } from "../../../components/ui/FontAwesomeIcons";
 import { Button } from "../../../components/ui/Button";
-
-function MapMarker({ position, onDragEnd }: { position: [number, number]; onDragEnd: (pos: [number, number]) => void }) {
-  const map = useMapEvents({
-    moveend() {
-      const center = map.getCenter();
-      onDragEnd([center.lat, center.lng]);
-    },
-  });
-  return (
-    <Marker
-      position={position}
-      draggable
-      opacity={0}
-      eventHandlers={{
-        dragend: (e: any) => onDragEnd([e.target.getLatLng().lat, e.target.getLatLng().lng]),
-      }}
-    />
-  );
-}
 
 export function MapPicker({
   isOpen,
@@ -36,20 +17,46 @@ export function MapPicker({
   initialLng?: number;
   onPick: (lat: number, lng: number) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
   const [position, setPosition] = useState<[number, number]>([
     initialLat ?? -6.1754,
     initialLng ?? 106.8272,
   ]);
-  const [mapReady, setMapReady] = useState(false);
-  const mapRef = useRef<any>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        setMapReady(true);
-        mapRef.current?.invalidateSize();
-      }, 100);
+      setPosition([initialLat ?? -6.1754, initialLng ?? 106.8272]);
     }
+  }, [isOpen, initialLat, initialLng]);
+
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+    const map = L.map(containerRef.current, {
+      center: position,
+      zoom: 15,
+      scrollWheelZoom: true,
+    });
+    mapRef.current = map;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+      maxZoom: 19,
+    }).addTo(map);
+    const onMove = () => {
+      const c = map.getCenter();
+      setPosition([c.lat, c.lng]);
+    };
+    map.on("moveend", onMove);
+    setTimeout(() => map.invalidateSize(), 150);
+    return () => {
+      map.off("moveend", onMove);
+      map.remove();
+      mapRef.current = null;
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -65,35 +72,21 @@ export function MapPicker({
         </div>
 
         <div className="flex-1 relative overflow-hidden">
-          {mapReady && (
-            <MapContainer
-              ref={mapRef}
-              center={position}
-              zoom={15}
-              scrollWheelZoom={true}
-              className="absolute inset-0"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                <div className="relative w-12 h-12">
-                  <div className="absolute left-1/2 top-0 w-[2px] h-1/2 -translate-x-1/2 bg-accent" />
-                  <div className="absolute left-1/2 bottom-0 w-[2px] h-1/2 -translate-x-1/2 bg-accent" />
-                  <div className="absolute top-1/2 left-0 w-1/2 h-[2px] -translate-y-1/2 bg-accent" />
-                  <div className="absolute top-1/2 right-0 w-1/2 h-[2px] -translate-y-1/2 bg-accent" />
-                  <div className="absolute left-1/2 top-1/2 w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent bg-transparent" />
-                </div>
-                <div className="absolute bottom-[60px] left-1/2 -translate-x-1/2">
-                  <span className="bg-surface-card/95 backdrop-blur-sm px-3 py-1.5 rounded-xl text-ios-caption font-medium text-surface-text shadow-lg whitespace-nowrap">
-                    Titik terpilih
-                  </span>
-                </div>
-              </div>
-              <MapMarker position={position} onDragEnd={setPosition} />
-            </MapContainer>
-          )}
+          <div ref={containerRef} className="absolute inset-0" style={{ minHeight: 200 }} />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[500]">
+            <div className="relative w-12 h-12">
+              <div className="absolute left-1/2 top-0 w-[2px] h-1/2 -translate-x-1/2 bg-accent" />
+              <div className="absolute left-1/2 bottom-0 w-[2px] h-1/2 -translate-x-1/2 bg-accent" />
+              <div className="absolute top-1/2 left-0 w-1/2 h-[2px] -translate-y-1/2 bg-accent" />
+              <div className="absolute top-1/2 right-0 w-1/2 h-[2px] -translate-y-1/2 bg-accent" />
+              <div className="absolute left-1/2 top-1/2 w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent bg-transparent" />
+            </div>
+            <div className="absolute bottom-[60px] left-1/2 -translate-x-1/2">
+              <span className="bg-surface-card/95 backdrop-blur-sm px-3 py-1.5 rounded-xl text-ios-caption font-medium text-surface-text shadow-lg whitespace-nowrap">
+                Titik terpilih
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="px-5 pb-4 md:pb-5 border-t border-surface-border">
