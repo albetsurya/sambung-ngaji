@@ -196,24 +196,23 @@ export function AppLayout({
   showAiChat?: boolean;
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [fabExpanded, setFabExpanded] = useState(false);
   const [entranceReady, setEntranceReady] = useState(false);
 
   const showAiChatFab = showAiChat && !hideNav;
   const bothFabs = showAiChatFab && !!fab;
+  const singleFab = !bothFabs && (showAiChatFab || !!fab);
   const showFloating = showAiChatFab || !!fab || !hideNav;
   const containerPadding = hideNav ? "pb-[68px] md:pb-0" : "pb-2 md:pb-0";
 
+  const contentPadding = hideNav
+    ? ""
+    : bothFabs
+      ? "pb-40 md:pb-8"
+      : singleFab
+        ? "pb-32 md:pb-8"
+        : "pb-24 md:pb-8";
+
   const softEase = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-  useEffect(() => {
-    setFabExpanded(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!bothFabs) setFabExpanded(false);
-  }, [bothFabs]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setEntranceReady(true));
@@ -221,18 +220,9 @@ export function AppLayout({
   }, []);
 
   useEffect(() => {
-    if (!fabExpanded) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setFabExpanded(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [fabExpanded]);
-
-  useEffect(() => {
     let offset = 16;
     if (!hideNav) {
-      offset = showAiChatFab ? 96 : 80;
+      offset = bothFabs ? 140 : showAiChatFab ? 96 : 80;
     } else if (fab) {
       offset = 84;
     }
@@ -240,7 +230,7 @@ export function AppLayout({
     return () => {
       document.documentElement.style.removeProperty("--toast-offset");
     };
-  }, [hideNav, fab, showAiChatFab]);
+  }, [hideNav, fab, showAiChatFab, bothFabs]);
 
   return (
     <div className="min-h-screen bg-surface-bg surface-shift flex flex-col md:flex-row">
@@ -248,9 +238,7 @@ export function AppLayout({
 
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen min-w-0 w-full overflow-x-clip">
         <div className="app-shell flex flex-col flex-1 w-full max-w-7xl md:px-0 py-2 md:py-6 md:border-x md:border-surface-border">
-          <div
-            className={`flex flex-col flex-1 min-w-0 ${hideNav ? "" : "pb-24 md:pb-8"}`}
-          >
+          <div className={`flex flex-col flex-1 min-w-0 ${contentPadding}`}>
             {children}
             {hideNav && fab && <div className="h-20 shrink-0" aria-hidden />}
           </div>
@@ -267,139 +255,63 @@ export function AppLayout({
               transitionTimingFunction: softEase,
             }}
           >
-            {bothFabs && (
-              <div
-                className="fixed inset-0 pointer-events-auto md:hidden motion-safe:transition-opacity motion-safe:duration-[600ms]"
-                style={{
-                  backgroundColor: fabExpanded
-                    ? "rgba(0, 0, 0, 0.18)"
-                    : "rgba(0, 0, 0, 0)",
-                  pointerEvents: fabExpanded ? "auto" : "none",
-                  transitionTimingFunction: softEase,
-                }}
-                onClick={() => setFabExpanded(false)}
-                aria-hidden="true"
-              />
-            )}
-
             <div
               className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
             >
-              <div className="md:hidden relative">
-                {bothFabs ? (
-                  <>
-                    <div
-                      className={`absolute bottom-full right-0 mb-3 flex flex-col items-end gap-2.5 ${
-                        fabExpanded ? "" : "pointer-events-none"
-                      }`}
-                      aria-hidden={!fabExpanded}
-                    >
-                      <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[700ms]"
-                        style={{
-                          opacity: fabExpanded ? 1 : 0,
-                          transform: fabExpanded
-                            ? "translateY(0)"
-                            : "translateY(10px)",
-                          filter: fabExpanded ? "blur(0px)" : "blur(3px)",
-                          transitionDelay: fabExpanded ? "120ms" : "0ms",
-                          transitionTimingFunction: softEase,
-                          willChange: "opacity, transform, filter",
-                        }}
-                      >
-                        <FloatingActionButton
-                          onClick={() => {
-                            setFabExpanded(false);
-                            navigate("/ai-chat");
-                          }}
-                          label="Tanya AI"
-                          variant="secondary"
-                          icon={<Sparkles size={18} strokeWidth={2.2} />}
-                        />
-                      </div>
-                      <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[700ms]"
-                        style={{
-                          opacity: fabExpanded ? 1 : 0,
-                          transform: fabExpanded
-                            ? "translateY(0)"
-                            : "translateY(10px)",
-                          filter: fabExpanded ? "blur(0px)" : "blur(3px)",
-                          transitionDelay: fabExpanded ? "60ms" : "0ms",
-                          transitionTimingFunction: softEase,
-                          willChange: "opacity, transform, filter",
-                        }}
-                      >
-                        {fab}
-                      </div>
-                    </div>
-
-                    <div className="pointer-events-auto">
-                      <FloatingActionButton
-                        onClick={() => setFabExpanded((v) => !v)}
-                        label={fabExpanded ? "Tutup menu" : "Menu aksi"}
-                        icon={
-                          <Plus
-                            size={26}
-                            strokeWidth={2.5}
-                            className={`motion-safe:transition-transform motion-safe:duration-[700ms] ${
-                              fabExpanded ? "rotate-45" : ""
-                            }`}
-                            style={{
-                              transitionTimingFunction: softEase,
-                            }}
-                          />
-                        }
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {showAiChatFab && (
-                      <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
-                        style={{
-                          opacity: entranceReady ? 1 : 0,
-                          transform: entranceReady
-                            ? "translateY(0)"
-                            : "translateY(10px)",
-                          filter: entranceReady ? "blur(0px)" : "blur(3px)",
-                          transitionDelay: entranceReady ? "160ms" : "0ms",
-                          transitionTimingFunction: softEase,
-                          willChange: "opacity, transform, filter",
-                        }}
-                      >
-                        <FloatingActionButton
-                          onClick={() => navigate("/ai-chat")}
-                          label="Tanya AI"
-                          variant="secondary"
-                          icon={<Sparkles size={18} strokeWidth={2.2} />}
-                        />
-                      </div>
-                    )}
-                    {fab && (
-                      <div
-                        className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
-                        style={{
-                          opacity: entranceReady ? 1 : 0,
-                          transform: entranceReady
-                            ? "translateY(0)"
-                            : "translateY(10px)",
-                          filter: entranceReady ? "blur(0px)" : "blur(3px)",
-                          transitionDelay: entranceReady ? "80ms" : "0ms",
-                          transitionTimingFunction: softEase,
-                          willChange: "opacity, transform, filter",
-                        }}
-                      >
-                        {fab}
-                      </div>
-                    )}
-                  </>
+              <div className="md:hidden flex flex-col items-end gap-2.5">
+                {showAiChatFab && (
+                  <div
+                    className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
+                    style={{
+                      opacity: entranceReady ? 1 : 0,
+                      transform: entranceReady
+                        ? "translateY(0)"
+                        : "translateY(10px)",
+                      filter: entranceReady ? "blur(0px)" : "blur(3px)",
+                      transitionDelay: entranceReady ? "160ms" : "0ms",
+                      transitionTimingFunction: softEase,
+                      willChange: "opacity, transform, filter",
+                    }}
+                  >
+                    <FloatingActionButton
+                      onClick={() => navigate("/ai-chat")}
+                      label="Tanya AI"
+                      variant="secondary"
+                      icon={<Sparkles size={18} strokeWidth={2.2} />}
+                    />
+                  </div>
+                )}
+                {fab && (
+                  <div
+                    className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
+                    style={{
+                      opacity: entranceReady ? 1 : 0,
+                      transform: entranceReady
+                        ? "translateY(0)"
+                        : "translateY(10px)",
+                      filter: entranceReady ? "blur(0px)" : "blur(3px)",
+                      transitionDelay: entranceReady ? "80ms" : "0ms",
+                      transitionTimingFunction: softEase,
+                      willChange: "opacity, transform, filter",
+                    }}
+                  >
+                    {fab}
+                  </div>
                 )}
               </div>
 
               {showAiChatFab && (
-                <div className="pointer-events-auto hidden md:block">
+                <div
+                  className="pointer-events-auto hidden md:block motion-safe:transition-all motion-safe:duration-[800ms]"
+                  style={{
+                    opacity: entranceReady ? 1 : 0,
+                    transform: entranceReady
+                      ? "translateY(0)"
+                      : "translateY(6px)",
+                    transitionDelay: entranceReady ? "160ms" : "0ms",
+                    transitionTimingFunction: softEase,
+                  }}
+                >
                   <button
                     onClick={() => {
                       tapFeedback();
@@ -414,7 +326,19 @@ export function AppLayout({
                 </div>
               )}
               {fab && (
-                <div className="pointer-events-auto hidden md:block">{fab}</div>
+                <div
+                  className="pointer-events-auto hidden md:block motion-safe:transition-all motion-safe:duration-[800ms]"
+                  style={{
+                    opacity: entranceReady ? 1 : 0,
+                    transform: entranceReady
+                      ? "translateY(0)"
+                      : "translateY(6px)",
+                    transitionDelay: entranceReady ? "80ms" : "0ms",
+                    transitionTimingFunction: softEase,
+                  }}
+                >
+                  {fab}
+                </div>
               )}
               {!hideNav && (
                 <div className="pointer-events-auto w-full md:hidden">

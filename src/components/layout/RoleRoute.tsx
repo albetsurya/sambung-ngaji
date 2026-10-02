@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { LoadingScreen } from "../ui";
+import { LoadingState } from "../ui/States";
 import type { Role } from "../../types";
 
 export function RoleRoute({
@@ -14,7 +14,7 @@ export function RoleRoute({
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <LoadingScreen label="Memeriksa sesi..." />;
+    return <LoadingState label="Memeriksa sesi..." />;
   }
 
   if (!user || !allowed.includes(user.role as Role)) {

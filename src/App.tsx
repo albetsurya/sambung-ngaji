@@ -181,7 +181,9 @@ function PageFallback() {
 }
 function HomeRoute() {
   const { user, loading } = useAuth();
-  if (loading) return <LoadingScreen label="Memuat..." />;
+  if (loading) return <PageFallback />;
+  // Langsung tampilkan landing page saat loading, biarkan PageFallback/Suspense
+  // yang lain menghandle loading di route dalam (jika perlu).
   if (!user) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
   return <DashboardPage />;
