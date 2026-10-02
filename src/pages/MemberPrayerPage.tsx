@@ -503,7 +503,7 @@ function LocationSettingsBottomSheet({
           <label className="block text-ios-caption font-medium text-surface-muted mb-2">
             Mode Lokasi
           </label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={handleAutoClick}
@@ -538,6 +538,24 @@ function LocationSettingsBottomSheet({
                 <div>
                   <p className="text-ios-body font-medium">Pilih Kota</p>
                   <p className="text-ios-caption text-surface-muted">Daftar kota Indonesia</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMode("custom")}
+              className={`p-3 rounded-xl border-2 transition-all text-left ${
+                location.mode === "custom"
+                  ? "border-accent bg-accent-soft text-accent"
+                  : "border-surface-border text-surface-text hover:bg-surface-card2"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <MapPinSolid size={18} className="flex-shrink-0" />
+                <div>
+                  <p className="text-ios-body font-medium">Koordinat Manual</p>
+                  <p className="text-ios-caption text-surface-muted">Input / Pilih di Peta</p>
                 </div>
               </div>
             </button>
