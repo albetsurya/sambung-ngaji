@@ -62,8 +62,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
           "vendor-excel": ["exceljs"],
           "vendor-pdf": ["jspdf", "jspdf-autotable"],
+          "vendor-ui": ["html2canvas"],
         },
       },
     },
