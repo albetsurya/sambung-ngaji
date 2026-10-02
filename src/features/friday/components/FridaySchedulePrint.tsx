@@ -21,7 +21,7 @@ export const FridaySchedulePrint = forwardRef<
   }).format(new Date());
   const period =
     schedules.length > 0
-      ? `${formatDateLongText(schedules[0].tanggal)} – ${formatDateLongText(
+      ? `${formatDateLongText(schedules[0].tanggal)} - ${formatDateLongText(
           schedules[schedules.length - 1].tanggal,
         )}`
       : "";

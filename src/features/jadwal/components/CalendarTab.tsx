@@ -300,7 +300,7 @@ function AgendaList({
                     )}
                   </div>
                   <p className="text-ios-caption text-surface-muted truncate">
-                    {m.jam || "—"}
+                    {m.jam || "-"}
                     {m.group_id ? ` · ${m.group_id}` : ""}
                   </p>
                   {targets.length > 0 && (
