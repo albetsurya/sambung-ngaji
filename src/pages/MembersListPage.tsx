@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Search,
@@ -11,6 +11,7 @@ import {
   List,
   Loader2,
   KeyRound,
+  Check,
 } from "../components/ui/FontAwesomeIcons";
 import {
   AppLayout,
@@ -100,7 +101,14 @@ export default function MembersListPage() {
     return 2;
   });
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkGroupId, setBulkGroupId] = useState("");
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0 });
 
+  const queryClient = useQueryClient();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const kategori: MemberCategory | "" = useMemo(() => {
@@ -251,12 +259,73 @@ export default function MembersListPage() {
     }
   }, [debouncedSearch, kategori, jenisKelamin]);
 
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }, []);
+
+  const exitSelectMode = useCallback(() => {
+    setSelectMode(false);
+    setSelectedIds([]);
+    setBulkOpen(false);
+  }, []);
+
+  const enterSelectMode = useCallback(() => {
+    setSelectedIds([]);
+    setBulkGroupId("");
+    setSelectMode(true);
+  }, []);
+
+  const selectAllVisible = useCallback(() => {
+    setSelectedIds(allMembers.map((m) => m.member_id));
+  }, [allMembers]);
+
   const handlePress = useCallback(
     (id: string) => {
+      if (selectMode) {
+        toggleSelect(id);
+        return;
+      }
       navigate(`/jamaah/${id}`);
     },
-    [navigate],
+    [navigate, selectMode, toggleSelect],
   );
+
+  const handleBulkSubmit = useCallback(async () => {
+    const target = groups.find((g) => g.group_id === bulkGroupId);
+    if (!target || selectedIds.length === 0 || bulkSaving) return;
+    setBulkSaving(true);
+    setBulkProgress({ done: 0, total: selectedIds.length });
+    let ok = 0;
+    const failed: string[] = [];
+    for (const id of selectedIds) {
+      try {
+        await memberApi.update(id, {
+          group_id: target.group_id,
+          kelompok: target.group_name,
+        });
+        ok += 1;
+      } catch {
+        failed.push(id);
+      }
+      setBulkProgress({ done: ok + failed.length, total: selectedIds.length });
+    }
+    await queryClient.invalidateQueries({ queryKey: ["members-paged"] });
+    await queryClient.invalidateQueries({ queryKey: ["members"] });
+    setBulkSaving(false);
+    setBulkOpen(false);
+    if (failed.length === 0) {
+      showToast(`${ok} jamaah dipindah ke ${target.group_name}`);
+      exitSelectMode();
+    } else {
+      setSelectedIds(failed);
+      showToast(
+        `${ok} berhasil, ${failed.length} gagal. Yang gagal tetap terpilih.`,
+        "error",
+      );
+    }
+  }, [bulkGroupId, selectedIds, bulkSaving, groups, queryClient, showToast, exitSelectMode]);
 
   const renderItem = useCallback(
     (index: number) => {
@@ -268,6 +337,8 @@ export default function MembersListPage() {
             member={m}
             role={roleByMemberId.get(m.member_id)}
             onPress={handlePress}
+            selectMode={selectMode}
+            selected={selectedIds.includes(m.member_id)}
           />
         );
       }
@@ -279,6 +350,8 @@ export default function MembersListPage() {
             member={m}
             role={roleByMemberId.get(m.member_id)}
             onPress={handlePress}
+            selectMode={selectMode}
+            selected={selectedIds.includes(m.member_id)}
           />
         );
       }
@@ -293,12 +366,23 @@ export default function MembersListPage() {
               role={roleByMemberId.get(m.member_id)}
               cols={gridCols}
               onPress={handlePress}
+              selectMode={selectMode}
+              selected={selectedIds.includes(m.member_id)}
             />
           ))}
         </div>
       );
     },
-    [allMembers, view, gridCols, gridColsClass, handlePress, roleByMemberId],
+    [
+      allMembers,
+      view,
+      gridCols,
+      gridColsClass,
+      handlePress,
+      roleByMemberId,
+      selectMode,
+      selectedIds,
+    ],
   );
 
   const showSkeleton = query.isLoading;
@@ -316,13 +400,26 @@ export default function MembersListPage() {
       }
     >
       <Header
-        title="Jamaah"
+        title={selectMode ? "Pilih Jamaah" : "Jamaah"}
         subtitle={
-          query.isLoading
-            ? "Memuat..."
-            : `${allMembers.length} dari ${total} jamaah`
+          selectMode
+            ? `${selectedIds.length} dipilih`
+            : query.isLoading
+              ? "Memuat..."
+              : `${allMembers.length} dari ${total} jamaah`
         }
-        showSyncButton
+        showSyncButton={!selectMode}
+        right={
+          selectMode ? (
+            <Button variant="ghost" size="xs" onClick={exitSelectMode}>
+              Batal
+            </Button>
+          ) : isSuperAdmin ? (
+            <Button variant="ghost" size="xs" onClick={enterSelectMode}>
+              Pilih
+            </Button>
+          ) : undefined
+        }
       />
 
       <div
@@ -515,6 +612,77 @@ export default function MembersListPage() {
           </div>
         )}
       </div>
+
+      {selectMode && (
+        <div className="fixed bottom-[76px] md:bottom-6 left-0 right-0 z-30 px-4 pointer-events-none">
+          <div className="app-shell pointer-events-auto mx-auto rounded-2xl border border-surface-border bg-surface-card shadow-lg p-3 flex items-center gap-2 anim-slide-up">
+            <button
+              onClick={selectAllVisible}
+              className="text-ios-footnote font-medium text-accent px-2 py-2 whitespace-nowrap"
+            >
+              Pilih semua
+            </button>
+            <p className="text-ios-footnote text-surface-muted flex-1 truncate">
+              {selectedIds.length} dipilih
+            </p>
+            <Button
+              size="sm"
+              disabled={selectedIds.length === 0}
+              onClick={() => {
+                setBulkGroupId("");
+                setBulkOpen(true);
+              }}
+            >
+              Ubah Kelompok
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <BottomSheet
+        open={bulkOpen}
+        onClose={() => {
+          if (!bulkSaving) setBulkOpen(false);
+        }}
+        title="Ubah Kelompok Massal"
+      >
+        <div className="space-y-3">
+          <p className="text-ios-footnote text-surface-muted">
+            {selectedIds.length} jamaah akan dipindah ke kelompok baru.
+          </p>
+          <div>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
+              Kelompok Tujuan
+            </p>
+            <Select
+              value={bulkGroupId}
+              onChange={(e) => setBulkGroupId(e.target.value)}
+              disabled={bulkSaving}
+            >
+              <option value="">Pilih kelompok</option>
+              {groups.map((g) => (
+                <option key={g.group_id} value={g.group_id}>
+                  {g.group_name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          {bulkSaving && (
+            <p className="text-ios-footnote text-surface-muted text-center tabular-nums">
+              Menyimpan {bulkProgress.done}/{bulkProgress.total}...
+            </p>
+          )}
+          <Button
+            fullWidth
+            disabled={!bulkGroupId || bulkSaving}
+            onClick={handleBulkSubmit}
+          >
+            {bulkSaving
+              ? `Menyimpan ${bulkProgress.done}/${bulkProgress.total}...`
+              : `Pindah ${selectedIds.length} Jamaah`}
+          </Button>
+        </div>
+      </BottomSheet>
 
       <BottomSheet
         open={actionsOpen}
@@ -770,21 +938,31 @@ const JamaahRow = memo(function JamaahRow({
   member,
   role,
   onPress,
+  selectMode = false,
+  selected = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
+  selectMode?: boolean;
+  selected?: boolean;
 }) {
   return (
     <button
       onClick={() => onPress(member.member_id)}
-      className="w-full flex items-center gap-3 h-16 px-4 text-left bg-transparent active:bg-surface-card2 transition-colors"
+      className={`w-full flex items-center gap-3 h-16 px-4 text-left transition-colors ${
+        selected ? "bg-accent-soft" : "bg-transparent active:bg-surface-card2"
+      }`}
     >
-      <Avatar
-        src={member.foto_url}
-        name={member.nama_lengkap}
-        gender={normalizeGender(member?.jenis_kelamin)}
-      />
+      {selectMode ? (
+        <SelectCheckbox selected={selected} />
+      ) : (
+        <Avatar
+          src={member.foto_url}
+          name={member.nama_lengkap}
+          gender={normalizeGender(member?.jenis_kelamin)}
+        />
+      )}
       <div className="flex-1 min-w-0">
         <p className="text-[15px] font-medium text-surface-text truncate">
           {getDisplayName(member)}
@@ -793,12 +971,16 @@ const JamaahRow = memo(function JamaahRow({
           {member.kelompok || "Belum ada kelompok"}
         </p>
       </div>
-      <AccountBadge hasAccount={member.has_user} compact />
-      {role && <RoleBadge role={role} />}
-      {member.kategori && (
-        <span className="text-ios-footnote text-surface-muted flex-shrink-0">
-          {CATEGORY_LABEL[member.kategori]}
-        </span>
+      {!selectMode && (
+        <>
+          <AccountBadge hasAccount={member.has_user} compact />
+          {role && <RoleBadge role={role} />}
+          {member.kategori && (
+            <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+              {CATEGORY_LABEL[member.kategori]}
+            </span>
+          )}
+        </>
       )}
     </button>
   );
@@ -808,22 +990,32 @@ const JamaahCard = memo(function JamaahCard({
   member,
   role,
   onPress,
+  selectMode = false,
+  selected = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
+  selectMode?: boolean;
+  selected?: boolean;
 }) {
   return (
     <div className="px-4 pb-2">
       <Card
         onClick={() => onPress(member.member_id)}
-        className="flex items-center gap-3 h-[68px]"
+        className={`flex items-center gap-3 h-[68px] ${
+          selected ? "!bg-accent-soft !border-accent/40" : ""
+        }`}
       >
-        <Avatar
-          src={member.foto_url}
-          name={member.nama_lengkap}
-          gender={normalizeGender(member?.jenis_kelamin)}
-        />
+        {selectMode ? (
+          <SelectCheckbox selected={selected} />
+        ) : (
+          <Avatar
+            src={member.foto_url}
+            name={member.nama_lengkap}
+            gender={normalizeGender(member?.jenis_kelamin)}
+          />
+        )}
         <div className="flex-1 min-w-0">
           <p className="font-medium text-ios-subhead text-surface-text truncate">
             {getDisplayName(member)}
@@ -832,9 +1024,13 @@ const JamaahCard = memo(function JamaahCard({
             {member.kelompok || "Belum ada kelompok"}
           </p>
         </div>
-        <AccountBadge hasAccount={member.has_user} compact />
-        {role && <RoleBadge role={role} />}
-        {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
+        {!selectMode && (
+          <>
+            <AccountBadge hasAccount={member.has_user} compact />
+            {role && <RoleBadge role={role} />}
+            {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
+          </>
+        )}
       </Card>
     </div>
   );
@@ -845,11 +1041,15 @@ const JamaahGridCard = memo(function JamaahGridCard({
   role,
   cols,
   onPress,
+  selectMode = false,
+  selected = false,
 }: {
   member: Member;
   role?: Role;
   cols: GridCols;
   onPress: (id: string) => void;
+  selectMode?: boolean;
+  selected?: boolean;
 }) {
   const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
   const padding =
@@ -860,8 +1060,15 @@ const JamaahGridCard = memo(function JamaahGridCard({
   return (
     <Card
       onClick={() => onPress(member.member_id)}
-      className={`flex flex-col items-center text-center gap-1.5 ${padding}`}
+      className={`relative flex flex-col items-center text-center gap-1.5 ${padding} ${
+        selected ? "!bg-accent-soft !border-accent/40" : ""
+      }`}
     >
+      {selectMode && (
+        <span className="absolute top-1.5 right-1.5">
+          <SelectCheckbox selected={selected} />
+        </span>
+      )}
       <Avatar
         src={member.foto_url}
         name={member.nama_lengkap}
@@ -885,14 +1092,30 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
-      
-      <div className="min-h-[26px] flex items-center justify-center gap-1">
-        <AccountBadge hasAccount={member.has_user} compact />
-        {role && <RoleBadge role={role} />}
-      </div>
+      {!selectMode && (
+        <div className="min-h-[26px] flex items-center justify-center gap-1">
+          <AccountBadge hasAccount={member.has_user} compact />
+          {role && <RoleBadge role={role} />}
+        </div>
+      )}
     </Card>
   );
 });
+
+function SelectCheckbox({ selected }: { selected: boolean }) {
+  return (
+    <span
+      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+        selected
+          ? "bg-accent border-accent text-white"
+          : "border-surface-border bg-surface-card text-transparent"
+      }`}
+      aria-hidden="true"
+    >
+      <Check size={12} strokeWidth={3} />
+    </span>
+  );
+}
 
 function CategoryChip({
   active,
