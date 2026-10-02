@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-/* Count-up halus, hormati reduced-motion */
 export function AnimatedNumber({
   value,
   format,
@@ -97,7 +96,7 @@ export function SuccessCheck({ size = 44 }: { size?: number }) {
   );
 }
 
-/* Wrapper stagger: pakai style={{ '--stagger-delay': '60ms' }} */
+/* Wrapper stagger */
 export function staggerStyle(index: number, step = 30): CSSProperties {
   return { "--stagger-delay": `${Math.min(index * step, 300)}ms` } as CSSProperties;
 }
