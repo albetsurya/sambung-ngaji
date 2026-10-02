@@ -108,6 +108,77 @@ html.dark {
   animation: slideUp 0.2s ease-out;
 }
 
+/* ── Motion system: stagger + dropdown + chat ── */
+.anim-stagger {
+  animation: slideUpStagger 0.28s ease-out both;
+  animation-delay: var(--stagger-delay, 0ms);
+}
+.anim-dropdown {
+  animation: dropdownIn 0.18s ease-out both;
+  transform-origin: top right;
+}
+.anim-message-in {
+  animation: messageIn 0.22s ease-out both;
+}
+.anim-float-soft {
+  animation: floatSoft 3s ease-in-out infinite;
+}
+.anim-success-pop {
+  animation: successPop 0.3s ease-out both;
+}
+
+/* Progress bar halus + shine */
+.progress-track {
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.progress-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: progressShine 1.8s ease-in-out infinite;
+}
+
+/* Typing dots AI chat */
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.typing-dots > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgb(var(--c-muted));
+  animation: typingDot 1.2s ease-in-out infinite;
+}
+.typing-dots > span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots > span:nth-child(3) { animation-delay: 0.3s; }
+
+/* Success morph button */
+.btn-success-morph {
+  background: rgb(var(--c-success)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* SVG check draw */
+.draw-check-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawCheck 0.6s ease-out 0.1s forwards;
+}
+
+/* FAB lembut — gantikan glow agresif */
+.fab-soft {
+  animation: fabGlowSecondary 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .surface-shift {
   transition:
     background-color 0.3s ease-out,
@@ -366,6 +437,40 @@ img {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes slideUpStagger {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dropdownIn {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes drawCheck {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes successPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 @keyframes toast-in {
