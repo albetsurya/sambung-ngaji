@@ -3,9 +3,18 @@ import { CityLocation, searchCities, getCityById } from "../data/indonesianCitie
 
 export type LocationMode = "auto" | "city" | "custom";
 
+export interface PlaceSuggestion {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+}
+
 export interface PrayerLocation {
   mode: LocationMode;
   cityId?: string;
+  place?: { lat: number; lng: number; label: string };
   customCoords?: { lat: number; lng: number; label: string };
   lastAutoCoords?: { lat: number; lng: number; accuracy: number; timestamp: number; address?: string | null };
 }
@@ -30,6 +39,49 @@ function saveStored(loc: PrayerLocation) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(loc));
   } catch {
+  }
+}
+
+export async function searchPlaces(query: string): Promise<PlaceSuggestion[]> {
+  const q = query.trim();
+  if (q.length < 3) return [];
+  try {
+    const url =
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8` +
+      `&countrycodes=id&addressdetails=1&accept-language=id` +
+      `&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+    return data
+      .map((item: any, idx: number) => {
+        const lat = parseFloat(item.lat);
+        const lng = parseFloat(item.lon);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+        const addr = item.address || {};
+        const name =
+          item.namedetails?.name ||
+          addr.village ||
+          addr.hamlet ||
+          addr.suburb ||
+          addr.neighbourhood ||
+          addr.city_district ||
+          addr.city ||
+          addr.regency ||
+          addr.county ||
+          (typeof item.display_name === "string" ? item.display_name.split(",")[0] : q);
+        return {
+          id: String(item.place_id ?? `${lat},${lng},${idx}`),
+          name: String(name),
+          address: String(item.display_name || ""),
+          lat,
+          lng,
+        } as PlaceSuggestion;
+      })
+      .filter(Boolean) as PlaceSuggestion[];
+  } catch {
+    return [];
   }
 }
 
@@ -127,7 +179,18 @@ export function usePrayerLocation() {
   const setCity = useCallback((cityId: string) => {
     const city = getCityById(cityId);
     if (!city) return;
-    const updated: PrayerLocation = { ...location, mode: "city", cityId };
+    const updated: PrayerLocation = { ...location, mode: "city", cityId, place: undefined };
+    setLocation(updated);
+    saveStored(updated);
+  }, [location]);
+
+  const setPlace = useCallback((lat: number, lng: number, label: string) => {
+    const updated: PrayerLocation = {
+      ...location,
+      mode: "city",
+      cityId: undefined,
+      place: { lat, lng, label },
+    };
     setLocation(updated);
     saveStored(updated);
   }, [location]);
@@ -149,6 +212,7 @@ export function usePrayerLocation() {
         if (location.lastAutoCoords) return { lat: location.lastAutoCoords.lat, lng: location.lastAutoCoords.lng };
         return null;
       case "city": {
+        if (location.place) return { lat: location.place.lat, lng: location.place.lng };
         const city = location.cityId ? getCityById(location.cityId) : undefined;
         if (city) return { lat: city.lat, lng: city.lng };
         return null;
@@ -166,8 +230,9 @@ export function usePrayerLocation() {
         if (location.lastAutoCoords?.address) return location.lastAutoCoords.address;
         return autoCoords ? "Lokasi GPS (Otomatis)" : "Mendeteksi lokasi...";
       case "city": {
+        if (location.place) return location.place.label;
         const city = location.cityId ? getCityById(location.cityId) : undefined;
-        return city ? `${city.name}, ${city.province}` : "Kota tidak ditemukan";
+        return city ? `${city.name}, ${city.province}` : "Cari tempat dulu";
       }
       case "custom":
         return location.customCoords?.label || "Lokasi kustom";
@@ -182,9 +247,11 @@ export function usePrayerLocation() {
     requestAutoLocation,
     setMode,
     setCity,
+    setPlace,
     setCustom,
     getEffectiveCoords,
     getDisplayLabel,
     searchCities,
+    searchPlaces,
   };
 }

@@ -57,10 +57,12 @@ export default function MemberPrayerPage() {
     requestAutoLocation,
     setMode,
     setCity,
+    setPlace,
     setCustom,
     getEffectiveCoords,
     getDisplayLabel,
     searchCities,
+    searchPlaces,
   } = usePrayerLocation();
 
   const openMapPicker = () => {
@@ -378,8 +380,10 @@ export default function MemberPrayerPage() {
         requestAutoLocation={requestAutoLocation}
         setMode={setMode}
         setCity={setCity}
+        setPlace={setPlace}
         setCustom={setCustom}
         searchCities={searchCities}
+        searchPlaces={searchPlaces}
         onOpenMapPicker={openMapPicker}
       />
       <MapPicker
@@ -448,8 +452,10 @@ function LocationSettingsBottomSheet({
   requestAutoLocation,
   setMode,
   setCity,
+  setPlace,
   setCustom,
   searchCities,
+  searchPlaces,
   onOpenMapPicker,
 }: {
   isOpen: boolean;
@@ -461,16 +467,52 @@ function LocationSettingsBottomSheet({
   requestAutoLocation: ReturnType<typeof usePrayerLocation>["requestAutoLocation"];
   setMode: ReturnType<typeof usePrayerLocation>["setMode"];
   setCity: ReturnType<typeof usePrayerLocation>["setCity"];
+  setPlace: ReturnType<typeof usePrayerLocation>["setPlace"];
   setCustom: ReturnType<typeof usePrayerLocation>["setCustom"];
   searchCities: ReturnType<typeof usePrayerLocation>["searchCities"];
+  searchPlaces: ReturnType<typeof usePrayerLocation>["searchPlaces"];
   onOpenMapPicker: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [customLat, setCustomLat] = useState("");
   const [customLng, setCustomLng] = useState("");
   const [customLabel, setCustomLabel] = useState("");
+  const [placeResults, setPlaceResults] = useState<Awaited<ReturnType<typeof searchPlaces>>>([]);
+  const [placeLoading, setPlaceLoading] = useState(false);
+  const [placeError, setPlaceError] = useState<string | null>(null);
 
-  const filteredCities = useMemo(() => searchCities(query), [query, searchCities]);
+  const offlineCities = useMemo(() => searchCities(query), [query, searchCities]);
+
+  useEffect(() => {
+    if (!isOpen || location.mode !== "city") return;
+    const q = query.trim();
+    if (q.length < 3) {
+      setPlaceResults([]);
+      setPlaceLoading(false);
+      setPlaceError(null);
+      return;
+    }
+    let cancelled = false;
+    setPlaceLoading(true);
+    setPlaceError(null);
+    const t = setTimeout(async () => {
+      try {
+        const res = await searchPlaces(q);
+        if (!cancelled) setPlaceResults(res);
+      } catch {
+        if (!cancelled) {
+          setPlaceResults([]);
+          setPlaceError("Pencarian gagal, periksa koneksi.");
+        }
+      } finally {
+        if (!cancelled) setPlaceLoading(false);
+      }
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [query, isOpen, location.mode, searchPlaces]);
 
   const handleAutoClick = () => {
     setMode("auto");
@@ -479,6 +521,11 @@ function LocationSettingsBottomSheet({
 
   const handleCityClick = (cityId: string) => {
     setCity(cityId);
+    onClose();
+  };
+
+  const handlePlaceClick = (lat: number, lng: number, label: string) => {
+    setPlace(lat, lng, label);
     onClose();
   };
 
@@ -536,8 +583,8 @@ function LocationSettingsBottomSheet({
               <div className="flex items-center gap-2">
                 <MapPinIcon size={18} className="flex-shrink-0" />
                 <div>
-                  <p className="text-ios-body font-medium">Pilih Kota</p>
-                  <p className="text-ios-caption text-surface-muted">Daftar kota Indonesia</p>
+                  <p className="text-ios-body font-medium">Cari Tempat</p>
+                  <p className="text-ios-caption text-surface-muted">Dusun, desa, kota, masjid</p>
                 </div>
               </div>
             </button>
@@ -590,22 +637,65 @@ function LocationSettingsBottomSheet({
 
         {location.mode === "city" && (
           <div className="px-4 border-t pt-4">
+            {location.place && (
+              <div className="mb-2 flex items-center gap-2 rounded-xl border border-accent/25 bg-accent-soft px-3 py-2.5">
+                <MapPinIcon size={14} className="text-accent flex-shrink-0" />
+                <p className="text-ios-footnote font-medium text-accent truncate flex-1">
+                  {location.place.label}
+                </p>
+              </div>
+            )}
             <div className="relative">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-muted pointer-events-none" />
               <Input
-                placeholder="Cari nama kota..."
+                placeholder="Cari dusun, desa, kota... misal: Latukan"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="max-h-60 overflow-y-auto mt-2">
-              {filteredCities.length === 0 ? (
+              {query.trim().length >= 3 ? (
+                placeLoading ? (
+                  <p className="text-ios-caption text-surface-muted text-center py-4">
+                    Mencari tempat...
+                  </p>
+                ) : placeError ? (
+                  <p className="text-ios-caption text-danger text-center py-4">
+                    {placeError}
+                  </p>
+                ) : placeResults.length === 0 ? (
+                  <p className="text-ios-caption text-surface-muted text-center py-4">
+                    Tempat tidak ditemukan, coba kata kunci lain
+                  </p>
+                ) : (
+                  placeResults.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => handlePlaceClick(p.lat, p.lng, `${p.name} - ${p.address.split(",").slice(0, 3).join(",")}`)}
+                      className="w-full px-3 py-2.5 text-left rounded-xl hover:bg-surface-card2 transition-colors flex items-center gap-3"
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-accent-soft flex items-center justify-center text-accent flex-shrink-0">
+                        <MapPinIcon size={14} />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-ios-body font-medium text-surface-text truncate">
+                          {p.name}
+                        </p>
+                        <p className="text-ios-caption text-surface-muted truncate">
+                          {p.address}
+                        </p>
+                      </div>
+                    </button>
+                  ))
+                )
+              ) : offlineCities.length === 0 ? (
                 <p className="text-ios-caption text-surface-muted text-center py-4">
-                  Kota tidak ditemukan
+                  Ketik minimal 3 huruf untuk mencari
                 </p>
               ) : (
-                filteredCities.map((city) => (
+                offlineCities.map((city) => (
                   <button
                     key={city.id}
                     type="button"
