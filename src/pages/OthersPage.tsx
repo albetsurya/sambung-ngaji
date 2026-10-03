@@ -9,6 +9,7 @@ import {
   LogOut,
   Lock,
   ClipboardList,
+  Megaphone,
   Sparkles,
   QrCode,
   Calendar,
@@ -42,7 +43,7 @@ import { queryKeys } from "../lib/queryClient";
 import type { Group } from "../types";
 import { GroupedListSkeleton } from "../components/ui/Skeleton";
 
-type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "sistem" | "akun";
+type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "info" | "sistem" | "akun";
 
 const FOCUS_GROUP_KEY = "superadmin_focus_group";
 
@@ -233,6 +234,17 @@ export default function OthersPage() {
       },
 
       {
+        key: "pengumuman",
+        label: "Pengumuman",
+        description: "Buat & kelola pengumuman jamaah",
+        Icon: Megaphone,
+        to: "/pengumuman",
+        show:
+          isSuperAdmin ||
+          ((isAdminLike && !isHubUser) || role === "PENGAWAS"),
+        group: "info",
+      },
+      {
         key: "finance",
         label: "Keuangan",
         description: assignedGroup
@@ -302,6 +314,7 @@ export default function OthersPage() {
 
   const SUPER_SETTING_KEYS = [
     "theme",
+    "pengumuman",
     "finance",
     "ai-usage",
     "audit",
@@ -314,6 +327,7 @@ export default function OthersPage() {
     tampilan: "Pengaturan Aplikasi",
     jamaah: "Jamaah & Kelompok",
     jadwal: "Jadwal & Absensi",
+    info: "Informasi",
     sistem: "Sistem & Hak Akses",
     akun: "Akun Saya",
   };
@@ -322,6 +336,7 @@ export default function OthersPage() {
     "tampilan",
     "jamaah",
     "jadwal",
+    "info",
     "akun",
     "sistem",
   ];

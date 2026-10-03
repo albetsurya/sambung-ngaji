@@ -1070,8 +1070,8 @@ export const MonthlyDuesPage: React.FC = () => {
                     <GroupedListSkeleton rows={5} />
                   ) : visibleMembers.length === 0 ? (
                     <EmptyState
-                      title="Belum ada anggota"
-                      description="Tambahkan anggota shodaqoh memakai tombol + di bawah."
+                      title="Belum ada data shodaqoh di kelompok ini"
+                      description="Belum ada anggota shodaqoh yang terdaftar di kelompok ini. Tambahkan anggota memakai tombol + di bawah, lalu catat iuran bulanannya di sini."
                     />
                   ) : (
                     <GroupedList>
@@ -1150,8 +1150,8 @@ export const MonthlyDuesPage: React.FC = () => {
                     <GroupedListSkeleton rows={5} />
                   ) : paymentsList.length === 0 ? (
                     <EmptyState
-                      title="Belum ada pembayaran"
-                      description="Riwayat pembayaran bulan ini akan tampil di sini."
+                      title="Belum ada pembayaran bulan ini"
+                      description="Belum ada iuran yang tercatat untuk periode ini di kelompok ini. Setiap pembayaran yang dicatat akan tampil di sini sebagai riwayat."
                     />
                   ) : (
                     <GroupedList>

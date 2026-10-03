@@ -871,8 +871,8 @@ export const ZakatDetailPage: React.FC = () => {
                 </SectionTitle>
                 {payers.length === 0 ? (
                   <EmptyState
-                    title="Belum ada muzakki"
-                    description="Tambah via tombol +."
+                    title="Belum ada muzakki tercatat"
+                    description="Daftar orang yang berzakat akan tampil di sini. Tambahkan muzakki pertama memakai tombol + di bawah."
                   />
                 ) : (
                   <>
@@ -1088,8 +1088,8 @@ export const ZakatDetailPage: React.FC = () => {
                 <div className="mt-4">
                   {recipients.length === 0 ? (
                     <EmptyState
-                      title="Belum ada mustahik"
-                      description="Tambah via tombol +."
+                      title="Belum ada mustahik tercatat"
+                      description="Daftar penerima zakat akan tampil di sini. Tambahkan mustahik pertama memakai tombol + di bawah agar penyaluran bisa dicatat."
                     />
                   ) : (
                     <>

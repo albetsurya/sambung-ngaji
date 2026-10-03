@@ -843,11 +843,11 @@ export const FinanceLedgerPage: React.FC = () => {
                 <GroupedListSkeleton rows={5} />
               ) : visibleTx.length === 0 ? (
                 <EmptyState
-                  title="Belum ada transaksi"
+                  title="Kas kelompok ini masih kosong"
                   description={
                     searchQuery
-                      ? "Tidak ada transaksi yang cocok dengan pencarian."
-                      : "Catat transaksi pertama memakai tombol + di bawah."
+                      ? "Tidak ada transaksi yang cocok dengan pencarian. Coba kata kunci lain."
+                      : "Belum ada pemasukan atau pengeluaran yang tercatat di kelompok ini. Catat transaksi pertama memakai tombol + di bawah, semua tercatat rapi per kelompok."
                   }
                 />
               ) : (

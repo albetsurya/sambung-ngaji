@@ -24,16 +24,17 @@ import {
 } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
-import { Card, Avatar, ErrorState, BottomSheet, Button } from "../components/ui";
+import { Card, Avatar, ErrorState, BottomSheet, Button, GroupedList, ListRow, ChevronRow, EmptyState } from "../components/ui";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useToast } from "../contexts/ToastContext";
 import { dashboardApi } from "../services/domainApi";
+import { memberApi } from "../features/member/api/memberApi";
 import { CATEGORY_LABEL, normalizeGender } from "../utils/format";
+import { Download } from "../components/ui/FontAwesomeIcons";
 import type {
   DashboardAbsensi,
   DashboardGeneral,
-  DashboardPNKB,
 } from "../types";
 import { ApiError } from "../services/api";
 import { DashboardSkeleton } from "../components/ui/Skeleton";
@@ -106,6 +107,9 @@ export default function DashboardPage() {
           />
         )}
 
+        {!loading && !error && user?.role === "TIM_PNKB" && (
+          <PNKBDashboard greeting={greeting} userName={user?.nama || ""} />
+        )}
         {!loading &&
           !error &&
           data &&
@@ -113,7 +117,6 @@ export default function DashboardPage() {
             user?.role === "ADMIN" ||
             user?.role === "PENGAWAS" ||
             user?.role === "TIM_KU" ||
-            user?.role === "TIM_PNKB" ||
             user?.role === "TIM_ABSENSI") && (
             <GeneralDashboard
               data={data as DashboardGeneral}
@@ -535,20 +538,45 @@ function GeneralDashboard({
 
 
 function PNKBDashboard({
-  data,
   greeting,
   userName,
 }: {
-  data: DashboardPNKB;
   greeting: string;
   userName: string;
 }) {
+  const navigate = useNavigate();
+  const { assignedGroup } = usePermission();
+  const { data: pnkbList = [], isLoading: loadingPnkb } = useQuery({
+    queryKey: ["members-pnkb", assignedGroup ?? "all"],
+    queryFn: () =>
+      memberApi.listPNKB(assignedGroup ? { group_id: assignedGroup } : {}),
+    staleTime: 60_000,
+  });
+
+  const total = pnkbList.length;
+  const aktif = pnkbList.filter(
+    (m) => (m.status_pembinaan || "AKTIF") === "AKTIF",
+  ).length;
+  const perluPerhatian = pnkbList.filter(
+    (m) => (m.status_pembinaan || "AKTIF") !== "AKTIF",
+  ).length;
+  const belumLengkap = pnkbList.filter(
+    (m) => !m.tanggal_lahir || !m.no_wa || !m.alamat_rumah,
+  ).length;
+  const ikhwan = pnkbList.filter((m) => m.jenis_kelamin === "L").length;
+  const akhwat = pnkbList.filter((m) => m.jenis_kelamin === "P").length;
+  const preview = pnkbList.slice(0, 5);
+
   return (
     <>
       <HeroStatCard
-        label="Jamaah Pra Nikah"
-        value={data.total}
-        footer={`${data.aktif} aktif dalam pembinaan`}
+        label="Binaan Pra Nikah & Keluarga Bahagia"
+        value={loadingPnkb ? "…" : total}
+        footer={
+          loadingPnkb
+            ? "Memuat data binaan…"
+            : `${aktif} aktif dibina · ${ikhwan} ikhwan · ${akhwat} akhwat`
+        }
         Icon={Heart}
         greeting={greeting}
         userName={userName}
@@ -557,24 +585,126 @@ function PNKBDashboard({
       <div className="flex gap-3">
         <StatTile
           label="Perlu Perhatian"
-          value={data.perlu_perhatian}
+          value={loadingPnkb ? "…" : perluPerhatian}
           tone="warning"
           Icon={AlertTriangle}
         />
         <StatTile
-          label="Kehadiran"
-          value={`${data.kehadiran}%`}
-          tone="accent"
-          Icon={TrendingUp}
+          label="Biodata Belum Lengkap"
+          value={loadingPnkb ? "…" : belumLengkap}
+          tone="warning"
+          Icon={FileWarning}
         />
       </div>
 
-      <StatTile
-        label="Data Belum Lengkap"
-        value={data.data_belum_lengkap}
-        tone="warning"
-        Icon={FileWarning}
-      />
+      <div className="space-y-2">
+        <SectionHeader
+          title="Siap Taaruf"
+          onSeeAll={
+            total > 0 ? () => navigate("/jamaah?kategori=PRA_NIKAH") : undefined
+          }
+        />
+        {loadingPnkb ? (
+          <Card className="py-5">
+            <p className="text-ios-caption text-surface-muted text-center">
+              Memuat biodata binaan…
+            </p>
+          </Card>
+        ) : total === 0 ? (
+          <EmptyState
+            title="Belum ada binaan pra nikah"
+            description="Belum ada jamaah pra nikah, duda, atau janda yang terdata di kelompok ini. Tambahkan lewat menu Jamaah agar bisa dipantau persiapannya."
+            action={
+              <Button
+                size="sm"
+                onClick={() => navigate("/jamaah/baru")}
+              >
+                Tambah Jamaah
+              </Button>
+            }
+          />
+        ) : (
+          <GroupedList>
+            {preview.map((m, i) => (
+              <ListRow
+                key={m.member_id}
+                onClick={() => navigate(`/jamaah/${m.member_id}`)}
+                insetDivider={i !== preview.length - 1}
+                leading={
+                  <Avatar
+                    src={m.foto_url}
+                    name={m.nama_lengkap}
+                    size={40}
+                    gender={normalizeGender(m.jenis_kelamin)}
+                  />
+                }
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      {m.nama_panggilan || m.nama_lengkap}
+                    </p>
+                    <p className="text-ios-caption text-surface-muted truncate">
+                      {m.jenis_kelamin === "L" ? "Ikhwan" : m.jenis_kelamin === "P" ? "Akhwat" : "Jamaah"}
+                      {m.usia ? ` · ${m.usia} th` : ""}
+                      {m.status_pembinaan && m.status_pembinaan !== "AKTIF"
+                        ? ` · ${m.status_pembinaan}`
+                        : ""}
+                    </p>
+                  </div>
+                  <Button
+                    size="xs"
+                    variant="secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/jamaah/${m.member_id}/cv-taaruf`);
+                    }}
+                    aria-label={`Cetak CV taaruf ${m.nama_lengkap}`}
+                  >
+                    <Download size={13} /> CV
+                  </Button>
+                </div>
+              </ListRow>
+            ))}
+          </GroupedList>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <SectionHeader title="Persiapan Pernikahan" />
+        <div className="grid grid-cols-2 gap-2.5">
+          <Card
+            onClick={() => navigate("/jamaah?kategori=PRA_NIKAH")}
+            className="flex flex-col gap-2 !p-3.5"
+          >
+            <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent">
+              <ClipboardList size={16} />
+            </span>
+            <p className="text-ios-subhead font-semibold text-surface-text leading-tight">
+              Kelola Pembinaan
+            </p>
+            <p className="text-ios-caption text-surface-muted leading-snug">
+              Pantau kelancaran & kesiapan menikah tiap binaan
+            </p>
+          </Card>
+          <Card
+            onClick={() =>
+              preview[0] && navigate(`/jamaah/${preview[0].member_id}/cv-taaruf`)
+            }
+            className="flex flex-col gap-2 !p-3.5"
+          >
+            <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent">
+              <Download size={16} />
+            </span>
+            <p className="text-ios-subhead font-semibold text-surface-text leading-tight">
+              Cetak CV Taaruf
+            </p>
+            <p className="text-ios-caption text-surface-muted leading-snug">
+              Siapkan biodata taaruf untuk proses perkenalan
+            </p>
+          </Card>
+        </div>
+      </div>
     </>
   );
 }

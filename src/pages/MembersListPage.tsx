@@ -318,6 +318,8 @@ export default function MembersListPage() {
     }
     await queryClient.invalidateQueries({ queryKey: ["members-paged"] });
     await queryClient.invalidateQueries({ queryKey: ["members"] });
+    await queryClient.invalidateQueries({ queryKey: ["users"] });
+    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     setBulkSaving(false);
     setBulkOpen(false);
     if (failed.length === 0) {
