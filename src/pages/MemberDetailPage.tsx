@@ -59,15 +59,15 @@ import { MonitoringTab } from "../features/monitoring/components/MonitoringTab";
 
 
 function generateUsernameFromMember(member: Member): string {
-  const panggilan = member.nama_panggilan?.trim();
-  const fallback = member.nama_lengkap?.trim().split(/\s+/)[0] || "";
+  const panggilan = member.nickname?.trim();
+  const fallback = member.full_name?.trim().split(/\s+/)[0] || "";
   const source = panggilan || fallback;
   const clean = source.toLowerCase().replace(/[^a-z0-9]/g, "");
   return clean.slice(0, 20) || "user";
 }
 
 function generatePasswordFromMember(member: Member): string {
-  const tgl = member.tanggal_lahir;
+  const tgl = member.birth_date;
   if (tgl) {
     const iso = tgl.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (iso) return `${iso[3]}${iso[2]}${iso[1]}`;
@@ -211,16 +211,16 @@ export default function MemberDetailPage() {
   const attendanceItems: AttendanceItem[] = attendance
     .map((a): AttendanceItem => {
       const m = meetingsById[a.meeting_id];
-      const tanggal = m?.tanggal || "";
-      const hari = m?.hari || "";
-      const acara = m?.acara || "Pengajian";
-      const jam = m?.jam || "";
+      const meetingDate = m?.date || "";
+      const hari = m?.day || "";
+      const acara = m?.event || "Pengajian";
+      const jam = m?.time || "";
 
       return {
         id: a.attendance_id,
-        date: tanggal,
+        date: meetingDate,
         label: acara,
-        sublabel: [hari, tanggal, jam].filter(Boolean).join(" · "),
+        sublabel: [hari, meetingDate, jam].filter(Boolean).join(" · "),
         status: a.status,
         libur: m?.status === "LIBUR",
       };
@@ -266,19 +266,19 @@ export default function MemberDetailPage() {
       
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
-          src={member.foto_url}
-          name={member.nama_lengkap}
+          src={member.photo_url}
+          name={member.full_name}
           size={64}
-          gender={normalizeGender(member?.jenis_kelamin)}
+          gender={normalizeGender(member?.gender)}
         />
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
             {getDisplayName(member)}
           </p>
-          {member.kelompok && (
+          {member.group_label && (
             <p className="text-ios-footnote text-surface-muted truncate mt-0.5 flex items-center gap-1">
               <Users size={11} className="shrink-0" />
-              {member.kelompok}
+              {member.group_label}
             </p>
           )}
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -410,7 +410,7 @@ export default function MemberDetailPage() {
 
       <ConfirmDialog
         open={confirmDeleteMember}
-        title={`Hapus ${member.nama_lengkap}?`}
+        title={`Hapus ${member.full_name}?`}
         description="Biodata, foto, riwayat absensi & pembinaan ikut terhapus permanen. Tidak bisa dibatalkan."
         confirmLabel="Ya, Hapus"
         danger
@@ -528,7 +528,7 @@ function CreateUserFromMemberSheet({
     mutationFn: () =>
       userApi.create({
         username: username.trim(),
-        nama: member.nama_lengkap,
+        name: member.full_name,
         password,
         role,
         member_id: member.member_id,
@@ -552,7 +552,7 @@ function CreateUserFromMemberSheet({
       <BottomSheet open={open} onClose={onClose} title="Jadikan User">
         <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
           <p className="text-ios-footnote text-accent/80 leading-relaxed">
-            Buat akun login untuk <strong>{member.nama_lengkap}</strong>
+            Buat akun login untuk <strong>{member.full_name}</strong>
           </p>
         </div>
 

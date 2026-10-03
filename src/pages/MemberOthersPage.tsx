@@ -109,7 +109,7 @@ export default function MemberOthersPage() {
       group: "data",
     },
     {
-      key: "jadwal",
+      key: "schedule",
       label: "Jadwal Pengajian",
       description: "Kalender & daftar bulanan",
       Icon: Calendar,
@@ -306,14 +306,14 @@ export default function MemberOthersPage() {
           >
             <div className="flex items-center gap-3">
               <Avatar
-                src={user?.foto_url}
-                name={user?.nama || "?"}
+                src={user?.photo_url}
+                name={user?.name || "?"}
                 size={52}
-                gender={normalizeGender(user?.jenis_kelamin)}
+                gender={normalizeGender(user?.gender)}
               />
               <div className="min-w-0 flex-1">
                 <p className="text-ios-body font-semibold text-surface-text truncate">
-                  {user?.nama}
+                  {user?.name}
                 </p>
                 <p className="text-ios-footnote text-surface-muted truncate">
                   @{user?.username}

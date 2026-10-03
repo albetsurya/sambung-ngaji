@@ -25,27 +25,27 @@ export const meetingApi = {
     restGet<Meeting[]>("/api/v1/meetings", params || {}),
 
   create: (payload: {
-    tanggal: string;
-    jam: string;
+    date: string;
+    time: string;
     group_id: string;
-    acara: string;
-    materi?: string;
-    catatan?: string;
-    kategori_target?: string[];
+    event: string;
+    topic?: string;
+    notes?: string;
+    target_categories?: string[];
     gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
   }) => restPost<Meeting>("/api/v1/meetings", payload),
 
   update: (payload: {
     meeting_id: string;
-    tanggal?: string;
-    jam?: string;
+    date?: string;
+    time?: string;
     group_id?: string;
-    acara?: string;
-    materi?: string;
+    event?: string;
+    topic?: string;
     status?: string;
-    catatan?: string;
-    kategori_target?: string[];
+    notes?: string;
+    target_categories?: string[];
     gender_target?: "L" | "P" | null;
     send_reminder?: boolean;
   }) => restPut<Meeting>("/api/v1/meetings", payload),
@@ -62,13 +62,13 @@ export const meetingApi = {
 };
 
 export interface FridaySchedulePayload {
-  tanggal: string;
-  khatib_imam?: string;
+  date: string;
+  sermon_leader?: string;
   muadzin?: string;
-  penasihat?: string;
-  petugas_parkir?: string;
-  penata_sandal?: string;
-  catatan?: string;
+  advisor?: string;
+  parking_attendant?: string;
+  footwear_attendant?: string;
+  notes?: string;
 }
 
 export const fridayApi = {
@@ -78,13 +78,13 @@ export const fridayApi = {
   save: (payload: FridaySchedulePayload) =>
     restPost<FridaySchedule>("/api/v1/friday", payload),
 
-  remove: (tanggal: string) =>
-    restDelete<{ tanggal: string; deleted: boolean }>("/api/v1/friday", {
-      tanggal,
+  remove: (date: string) =>
+    restDelete<{ date: string; deleted: boolean }>("/api/v1/friday", {
+      date,
     }),
 
-  markSent: (tanggal: string) =>
-    restPost<{ marked: boolean }>("/api/v1/friday/mark-reminder-sent", { tanggal }),
+  markSent: (date: string) =>
+    restPost<{ marked: boolean }>("/api/v1/friday/mark-reminder-sent", { date }),
 };
 
 export const attendanceApi = {
@@ -105,7 +105,7 @@ export const attendanceApi = {
     meeting_id: string;
     member_id: string;
     status: string;
-    catatan?: string;
+    notes?: string;
   }) => restPost<AttendanceRecord>("/api/v1/attendance", payload),
 
   bulkSave: (
@@ -158,7 +158,7 @@ export const announcementApi = {
   templates: () => restGet<AnnouncementTemplate[]>("/api/v1/announcements/templates"),
 
   generate: (payload: Record<string, unknown>) =>
-    restPost<{ generated_text: string; warning: string; hari: string }>(
+    restPost<{ generated_text: string; warning: string; day: string }>(
       "/api/v1/announcements/generate",
       payload,
     ),
@@ -166,8 +166,8 @@ export const announcementApi = {
   generateWeekly: (payload: Record<string, unknown>) =>
     restPost<
       {
-        hari: string;
-        tanggal: string;
+        day: string;
+        date: string;
         generated_text: string;
         warning: string;
       }[]
@@ -201,13 +201,13 @@ export const uploadApi = {
     member_id: string | undefined,
     base64: string,
     mime_type: string,
-    old_foto_url?: string,
+    old_photo_url?: string,
   ) => {
     return restPost<{ foto_url: string }>("/api/v1/photo", {
       member_id: member_id || "",
       base64,
       mime_type,
-      _old_foto_url: old_foto_url || "",
+      _old_photo_url: old_photo_url || "",
     });
   },
 
@@ -219,13 +219,13 @@ export interface MoodEntry {
   mood_id: string;
   member_id: string;
   mood_key: string;
-  tanggal: string;
+  date: string;
   created_at: string;
 }
 
 export const moodApi = {
-  save: (mood_key: string, tanggal?: string) =>
-    restPost<MoodEntry>("/api/v1/moods", { mood_key, ...(tanggal ? { tanggal } : {}) }),
+  save: (mood_key: string, date?: string) =>
+    restPost<MoodEntry>("/api/v1/moods", { mood_key, ...(date ? { date } : {}) }),
 
   listMy: (limit = 100) => restGet<MoodEntry[]>("/api/v1/moods/my", { limit }),
 
@@ -236,7 +236,7 @@ export const moodApi = {
 export interface MemberRequestEntry {
   request_id: string;
   user_id: string;
-  nama: string;
+  name: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   member_id?: string;
   reason?: string;
@@ -311,7 +311,7 @@ export const userApi = {
 export interface AuditLogEntry {
   log_id: string;
   user_id: string;
-  user_nama?: string;
+  user_name?: string;
   action: string;
   target_type: string;
   target_id: string;
@@ -345,7 +345,7 @@ export interface AiUsageStats {
   }[];
   top_users: {
     user_id: string;
-    user_nama: string;
+    user_name: string;
     role: string;
     chat_count: number;
     total_tokens: number;
@@ -357,9 +357,9 @@ export const aiUsageApi = {
 };
 
 export interface BulkMeetingPreviewItem {
-  tanggal: string;
+  date: string;
   tanggal_display: string;
-  hari: string;
+  day: string;
   sudah_ada: boolean;
 }
 
@@ -375,9 +375,9 @@ export interface BulkMeetingCreateResponse {
   skipped: number;
   meetings: {
     meeting_id: string;
-    tanggal: string;
+    date: string;
     tanggal_display: string;
-    hari: string;
+    day: string;
   }[];
 }
 
@@ -385,25 +385,25 @@ export const bulkMeetingApi = {
   preview: (params: {
     tahun: number;
     bulan: number;
-    hari: string[];
-    jam: string;
+    day: string[];
+    time: string;
     group_id: string;
-    acara: string;
-    materi?: string;
-    catatan?: string;
-    kategori_target?: string[];
+    event: string;
+    topic?: string;
+    notes?: string;
+    target_categories?: string[];
   }) => restPost<BulkMeetingPreviewResponse>("/api/v1/meetings/bulk-preview", params),
 
   create: (params: {
     tahun: number;
     bulan: number;
-    hari: string[];
-    jam: string;
+    day: string[];
+    time: string;
     group_id: string;
-    acara: string;
-    materi?: string;
-    catatan?: string;
-    kategori_target?: string[];
+    event: string;
+    topic?: string;
+    notes?: string;
+    target_categories?: string[];
   }) => restPost<BulkMeetingCreateResponse>("/api/v1/meetings/bulk-create", params),
 };
 
@@ -421,19 +421,19 @@ export const announcementTemplateApi = {
     }),
 
   create: (payload: {
-    nama_template: string;
+    template_name: string;
     kode: string;
-    isi_template: string;
-    status_aktif?: boolean;
+    template_body: string;
+    is_active?: boolean;
   }) => restPost<AnnouncementTemplate>("/api/v1/announcements/templates", payload),
 
   update: (
     template_id: string,
     payload: {
-      nama_template?: string;
+      template_name?: string;
       kode?: string;
-      isi_template?: string;
-      status_aktif?: boolean;
+      template_body?: string;
+      is_active?: boolean;
     },
   ) =>
     restPut<AnnouncementTemplate>("/api/v1/announcements/templates", {
@@ -449,8 +449,8 @@ export const announcementTemplateApi = {
 
   createFromAnnouncement: (payload: {
     source_announcement_id?: string;
-    isi_template?: string;
-    nama_template: string;
+    template_body?: string;
+    template_name: string;
     kode: string;
   }) => restPost<AnnouncementTemplate>("/api/v1/announcements/templates/from-announcement", payload),
 };

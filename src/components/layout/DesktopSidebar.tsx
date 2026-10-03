@@ -200,11 +200,11 @@ export function DesktopSidebar() {
         {user ? (
           <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-card border border-surface-border">
             <div className="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center font-bold text-ios-footnote shrink-0">
-              {user.nama ? user.nama.charAt(0).toUpperCase() : <UserIcon size={16} />}
+              {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon size={16} />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-ios-footnote font-semibold text-surface-text truncate">
-                {user.nama || user.username}
+                {user.name || user.username}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
                 <RoleBadge role={user.role} />

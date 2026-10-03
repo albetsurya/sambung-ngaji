@@ -91,7 +91,7 @@ export default function GroupHubPage() {
     description: string;
     Icon: ComponentType<{ size?: number; className?: string }>;
     to: string;
-    section: "jamaah" | "jadwal" | "keuangan";
+    section: "jamaah" | "schedule" | "keuangan";
     badge?: number;
     needsGroup?: boolean;
   }[] = useMemo(() => {
@@ -165,7 +165,7 @@ export default function GroupHubPage() {
       ...(isGlobalMode
         ? [
             {
-              key: "kelompok",
+              key: "group_label",
               label: "Kelompok",
               description: "Kelola data master kelompok pengajian",
               Icon: Building2,
@@ -193,12 +193,12 @@ export default function GroupHubPage() {
         section: "jamaah",
       },
       {
-        key: "jadwal",
+        key: "schedule",
         label: "Kelola Jadwal",
         description: "Kalender, tambah massal & import PDF",
         Icon: Calendar,
         to: "/lainnya/jadwal",
-        section: "jadwal",
+        section: "schedule",
       },
       {
         key: "rekap-absensi",
@@ -206,7 +206,7 @@ export default function GroupHubPage() {
         description: "Matriks kehadiran bulanan",
         Icon: CalendarCheck,
         to: "/lainnya/rekap-absensi",
-        section: "jadwal",
+        section: "schedule",
       },
       {
         key: "petugas-jumat",
@@ -214,7 +214,7 @@ export default function GroupHubPage() {
         description: "Kelola petugas sholat Jumat",
         Icon: Mosque,
         to: "/lainnya/petugas-jumat",
-        section: "jadwal",
+        section: "schedule",
       },
     ];
   }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance, myGroup?.group_name]);
@@ -302,8 +302,8 @@ export default function GroupHubPage() {
                               : myGroup.group_name}
                           </p>
                           <p className="text-ios-caption text-surface-muted truncate">
-                            Pembina: {myGroup.pembina || "-"} ·{" "}
-                            {myGroup.jadwal || ""}
+                            Pembina: {myGroup.mentor || "-"} ·{" "}
+                            {myGroup.schedule || ""}
                           </p>
                         </div>
                       </div>
@@ -315,7 +315,7 @@ export default function GroupHubPage() {
             {[
               { key: "keuangan" as const, label: "Keuangan & SabilKas" },
               { key: "jamaah" as const, label: "Jamaah & Keanggotaan" },
-              { key: "jadwal" as const, label: "Jadwal & Absensi" },
+              { key: "schedule" as const, label: "Jadwal & Absensi" },
             ].map((sec) => {
               const items = menu.filter((m) => m.section === sec.key);
               if (items.length === 0) return null;
@@ -359,7 +359,7 @@ export default function GroupHubPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{g.group_name}</p>
                   <p className="text-ios-caption text-surface-muted truncate">
-                    {g.pembina ? `Pembina: ${g.pembina}` : ""}
+                    {g.mentor ? `Pembina: ${g.mentor}` : ""}
                   </p>
                 </div>
               </ChevronRow>

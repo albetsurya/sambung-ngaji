@@ -91,7 +91,7 @@ export function MushafPageView({
                         lineHeight: 1.4,
                       }}
                     >
-                      سُورَةُ {surahInfo.nama.replace("سُورَةُ ", "")}
+                      سُورَةُ {surahInfo.name.replace("سُورَةُ ", "")}
                     </p>
                     <p className="text-[11px] text-surface-muted">
                       {surahInfo.namaLatin} · {surahInfo.arti}

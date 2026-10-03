@@ -160,10 +160,10 @@ export default function PendingMembersPage() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="text-ios-body font-medium text-surface-text truncate">
-                          {p.nama_lengkap}
+                          {p.full_name}
                         </p>
                         <p className="text-ios-footnote text-surface-muted truncate">
-                          {p.no_wa ? `+${p.no_wa}` : "-"}
+                          {p.whatsapp_number ? `+${p.whatsapp_number}` : "-"}
                           {p.submitted_at
                             ? ` · ${formatDateShort(p.submitted_at)}`
                             : ""}

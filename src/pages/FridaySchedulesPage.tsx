@@ -51,13 +51,13 @@ import {
 type Tab = "upcoming" | "history";
 
 const EMPTY_FORM = {
-  tanggal: "",
-  khatib_imam: "",
+  date: "",
+  sermon_leader: "",
   muadzin: "",
-  penasihat: "",
-  petugas_parkir: "",
-  penata_sandal: "",
-  catatan: "",
+  advisor: "",
+  parking_attendant: "",
+  footwear_attendant: "",
+  notes: "",
 };
 
 export default function FridaySchedulesPage() {
@@ -94,15 +94,15 @@ export default function FridaySchedulesPage() {
   const upcoming = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal >= today)
-        .sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
+        .filter((s) => s.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)),
     [schedules, today],
   );
   const past = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal < today)
-        .sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
+        .filter((s) => s.date < today)
+        .sort((a, b) => b.date.localeCompare(a.date)),
     [schedules, today],
   );
 
@@ -120,13 +120,13 @@ export default function FridaySchedulesPage() {
   const saveMutation = useMutation({
     mutationFn: () =>
       fridayApi.save({
-        tanggal: form.tanggal,
-        khatib_imam: form.khatib_imam.trim(),
+        date: form.date,
+        sermon_leader: form.sermon_leader.trim(),
         muadzin: form.muadzin.trim(),
-        penasihat: form.penasihat.trim(),
-        petugas_parkir: form.petugas_parkir.trim(),
-        penata_sandal: form.penata_sandal.trim(),
-        catatan: form.catatan.trim(),
+        advisor: form.advisor.trim(),
+        parking_attendant: form.parking_attendant.trim(),
+        footwear_attendant: form.footwear_attendant.trim(),
+        notes: form.notes.trim(),
       }),
     onSuccess: () => {
       invalidate();
@@ -146,7 +146,7 @@ export default function FridaySchedulesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (tanggal: string) => fridayApi.remove(tanggal),
+    mutationFn: (date: string) => fridayApi.remove(date),
     onSuccess: () => {
       invalidate();
       showToast("Jadwal dihapus");
@@ -161,7 +161,7 @@ export default function FridaySchedulesPage() {
   });
 
   const markSentMutation = useMutation({
-    mutationFn: (tanggal: string) => fridayApi.markSent(tanggal),
+    mutationFn: (date: string) => fridayApi.markSent(date),
     onSuccess: () => {
       invalidate();
       showToast("Ditandai sudah terkirim");
@@ -181,25 +181,25 @@ export default function FridaySchedulesPage() {
     const delta = (5 - d.getDay() + 7) % 7;
     d.setDate(d.getDate() + delta);
     const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    setForm({ ...EMPTY_FORM, tanggal: iso });
+    setForm({ ...EMPTY_FORM, date: iso });
     setFormOpen(true);
   }
 
   function openEdit(s: FridaySchedule) {
     setEditing(s);
     setForm({
-      tanggal: s.tanggal,
-      khatib_imam: s.khatib_imam || "",
+      date: s.date,
+      sermon_leader: s.sermon_leader || "",
       muadzin: s.muadzin || "",
-      penasihat: s.penasihat || "",
-      petugas_parkir: s.petugas_parkir || "",
-      penata_sandal: s.penata_sandal || "",
-      catatan: s.catatan || "",
+      advisor: s.advisor || "",
+      parking_attendant: s.parking_attendant || "",
+      footwear_attendant: s.footwear_attendant || "",
+      notes: s.notes || "",
     });
     setFormOpen(true);
   }
 
-  const tanggalValid = form.tanggal !== "" && isFridayDate(form.tanggal);
+  const tanggalValid = form.date !== "" && isFridayDate(form.date);
   const hasOneRole = FRIDAY_ROLES.some(
     (r) =>
       form[
@@ -269,7 +269,7 @@ export default function FridaySchedulesPage() {
                 Jumat terdekat
               </p>
               <p className="text-ios-body font-semibold text-surface-text truncate">
-                {formatDateLongText(upcoming[0].tanggal)}
+                {formatDateLongText(upcoming[0].date)}
               </p>
             </div>
             {incompleteCount > 0 ? (
@@ -337,13 +337,13 @@ export default function FridaySchedulesPage() {
             const complete = missing.length === 0;
             return (
               <div
-                key={s.tanggal}
+                key={s.date}
                 className="rounded-2xl border border-surface-border bg-surface-card p-4"
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="min-w-0">
                     <p className="text-ios-body font-semibold text-surface-text">
-                      {formatDateLongText(s.tanggal)}
+                      {formatDateLongText(s.date)}
                     </p>
                     <p className="text-ios-caption text-surface-muted">
                       Sholat Jumat
@@ -407,9 +407,9 @@ export default function FridaySchedulesPage() {
                   })}
                 </div>
 
-                {s.catatan?.trim() && (
+                {s.notes?.trim() && (
                   <p className="mt-2 text-ios-footnote text-surface-muted italic">
-                    {s.catatan}
+                    {s.notes}
                   </p>
                 )}
 
@@ -468,12 +468,12 @@ export default function FridaySchedulesPage() {
         <div className="space-y-3 pb-2">
           <DateInput
             label="Tanggal (harus hari Jumat)"
-            value={form.tanggal}
-            onChange={(v) => set("tanggal", v)}
+            value={form.date}
+            onChange={(v) => set("date", v)}
             disabled={!!editing}
             required
             hint={
-              form.tanggal && !tanggalValid
+              form.date && !tanggalValid
                 ? "Tanggal harus jatuh di hari Jumat"
                 : undefined
             }
@@ -491,8 +491,8 @@ export default function FridaySchedulesPage() {
             label="Catatan"
             placeholder="Catatan tambahan (opsional)"
             rows={2}
-            value={form.catatan}
-            onChange={(e) => set("catatan", e.target.value)}
+            value={form.notes}
+            onChange={(e) => set("notes", e.target.value)}
           />
           <Button
             fullWidth
@@ -517,7 +517,7 @@ export default function FridaySchedulesPage() {
         {followUp && (
           <div className="space-y-3 pb-2">
             <p className="text-ios-footnote text-surface-muted">
-              {formatDateLongText(followUp.tanggal)} ·{" "}
+              {formatDateLongText(followUp.date)} ·{" "}
               {missingRoles(followUp).length === 0
                 ? "semua peran terisi, tinggal konfirmasi kehadiran."
                 : `${missingRoles(followUp)
@@ -553,7 +553,7 @@ export default function FridaySchedulesPage() {
                 fullWidth
                 variant="secondary"
                 disabled={markSentMutation.isPending}
-                onClick={() => markSentMutation.mutate(followUp.tanggal)}
+                onClick={() => markSentMutation.mutate(followUp.date)}
                 leftIcon={
                   markSentMutation.isPending ? (
                     <Loader2 size={15} className="animate-spin" />
@@ -576,7 +576,7 @@ export default function FridaySchedulesPage() {
         title="Hapus jadwal ini?"
         description={
           deleteTarget
-            ? `Jadwal petugas ${formatDateLongText(deleteTarget.tanggal)} akan dihapus permanen.`
+            ? `Jadwal petugas ${formatDateLongText(deleteTarget.date)} akan dihapus permanen.`
             : ""
         }
         confirmLabel="Ya, Hapus"
@@ -584,7 +584,7 @@ export default function FridaySchedulesPage() {
         loading={deleteMutation.isPending}
         onCancel={() => setDeleteTarget(null)}
         onConfirm={() =>
-          deleteTarget && deleteMutation.mutate(deleteTarget.tanggal)
+          deleteTarget && deleteMutation.mutate(deleteTarget.date)
         }
       />
 

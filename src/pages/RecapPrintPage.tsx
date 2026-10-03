@@ -91,7 +91,7 @@ export default function RecapPrintPage() {
       );
       const members = await memberApi.list({
         kategori: kategori || undefined,
-        jenis_kelamin: gender || undefined,
+        gender: gender || undefined,
       });
       return buildRecapMatrix(members, meetings, attendanceByMeeting);
     },
@@ -399,10 +399,10 @@ export default function RecapPrintPage() {
                                   className="px-1 py-1.5 font-bold text-white text-center border-b border-slate-600"
                                 >
                                   <div className="tabular-nums">
-                                    {formatDayMonth(m.tanggal)}
+                                    {formatDayMonth(m.date)}
                                   </div>
                                   <div className="font-normal text-slate-300 break-words">
-                                    {m.acara || "Pengajian"}
+                                    {m.event || "Pengajian"}
                                   </div>
                                 </th>
                               ))}
@@ -443,7 +443,7 @@ export default function RecapPrintPage() {
                                   </td>
                                   <td className="px-2 py-1 font-medium border-b border-slate-100">
                                     <span className="block break-words">
-                                      {row.member.nama_lengkap}
+                                      {row.member.full_name}
                                     </span>
                                   </td>
                                   {matrix.meetings.map((m: Meeting) => {

@@ -37,13 +37,13 @@ import { ApiError } from "../services/api";
 
 const TEMPLATE_VARIABLES = [
   "{{nama_kelompok}}",
-  "{{hari}}",
-  "{{tanggal}}",
-  "{{jam}}",
-  "{{acara}}",
-  "{{materi}}",
-  "{{catatan}}",
-  "{{penandatangan}}",
+  "{{day}}",
+  "{{date}}",
+  "{{time}}",
+  "{{event}}",
+  "{{topic}}",
+  "{{notes}}",
+  "{{signatory}}",
 ];
 
 export default function AnnouncementTemplatesPage() {
@@ -93,7 +93,7 @@ export default function AnnouncementTemplatesPage() {
 
   const reactivateMutation = useMutation({
     mutationFn: (template_id: string) =>
-      announcementTemplateApi.update(template_id, { status_aktif: true }),
+      announcementTemplateApi.update(template_id, { is_active: true }),
     onSuccess: () => {
       showToast("Template diaktifkan kembali");
       queryClient.invalidateQueries({
@@ -160,7 +160,7 @@ export default function AnnouncementTemplatesPage() {
           <div className="py-3">
             <GroupedList>
               {templates.map((t, i) => {
-                const active = t.status_aktif !== false;
+                const active = t.is_active !== false;
                 return (
                   <ListRow
                     key={t.template_id}
@@ -186,7 +186,7 @@ export default function AnnouncementTemplatesPage() {
                               : "text-surface-muted line-through"
                           }`}
                         >
-                          {t.nama_template}
+                          {t.template_name}
                         </p>
                         <p className="text-ios-caption text-surface-muted truncate">
                           {t.kode}
@@ -290,7 +290,7 @@ export default function AnnouncementTemplatesPage() {
         title="Nonaktifkan template?"
         description={
           deleteTarget
-            ? `Template "${deleteTarget.nama_template}" akan dinonaktifkan. Anda bisa mengaktifkan kembali nanti.`
+            ? `Template "${deleteTarget.template_name}" akan dinonaktifkan. Anda bisa mengaktifkan kembali nanti.`
             : ""
         }
         confirmLabel="Nonaktifkan"
@@ -322,7 +322,7 @@ function TemplateEditorSheet({
   const { showToast } = useToast();
   const isEdit = !!editing;
 
-  const [nama, setNama] = useState("");
+  const [name, setName] = useState("");
   const [kode, setKode] = useState("");
   const [isi, setIsi] = useState("");
   const [active, setActive] = useState(true);
@@ -330,12 +330,12 @@ function TemplateEditorSheet({
   useMemo(() => {
     if (!open) return;
     if (editing) {
-      setNama(editing.nama_template || "");
+      setName(editing.template_name || "");
       setKode(editing.kode || "");
-      setIsi(editing.isi_template || "");
-      setActive(editing.status_aktif !== false);
+      setIsi(editing.template_body || "");
+      setActive(editing.is_active !== false);
     } else {
-      setNama("");
+      setName("");
       setKode("");
       setIsi("");
       setActive(true);
@@ -345,10 +345,10 @@ function TemplateEditorSheet({
   const mutation = useMutation({
     mutationFn: () => {
       const payload = {
-        nama_template: nama.trim(),
+        template_name: name.trim(),
         kode: kode.trim().toUpperCase(),
-        isi_template: isi,
-        status_aktif: active,
+        template_body: isi,
+        is_active: active,
       };
       if (isEdit && editing) {
         return announcementTemplateApi.update(editing.template_id, payload);
@@ -376,7 +376,7 @@ function TemplateEditorSheet({
   }
 
   const canSubmit =
-    nama.trim().length >= 3 && kode.trim().length >= 3 && isi.trim().length > 0;
+    name.trim().length >= 3 && kode.trim().length >= 3 && isi.trim().length > 0;
 
   return (
     <BottomSheet
@@ -387,8 +387,8 @@ function TemplateEditorSheet({
       <Input
         label="Nama Template"
         placeholder="Undangan Sambung Kelompok"
-        value={nama}
-        onChange={(e) => setNama(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
       <Input
@@ -494,7 +494,7 @@ function TemplatePreviewModal({
 
   async function copyText() {
     try {
-      await navigator.clipboard.writeText(template!.isi_template || "");
+      await navigator.clipboard.writeText(template!.template_body || "");
       showToast("Template disalin");
     } catch {
       showToast("Gagal menyalin", "error");
@@ -502,10 +502,10 @@ function TemplatePreviewModal({
   }
 
   return (
-    <Modal open={!!template} onClose={onClose} title={template.nama_template}>
+    <Modal open={!!template} onClose={onClose} title={template.template_name}>
       <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <Badge color={template.status_aktif !== false ? "emerald" : "ink"}>
-          {template.status_aktif !== false ? "Aktif" : "Nonaktif"}
+        <Badge color={template.is_active !== false ? "emerald" : "ink"}>
+          {template.is_active !== false ? "Aktif" : "Nonaktif"}
         </Badge>
         <span className="text-ios-caption  text-surface-muted">
           {template.kode}
@@ -514,7 +514,7 @@ function TemplatePreviewModal({
 
       <div className="rounded-2xl border border-surface-border p-4 mb-4 max-h-[45vh] overflow-y-auto bg-accent-soft/40">
         <pre className="whitespace-pre-wrap text-[14.5px] leading-relaxed text-surface-text font-sans">
-          {template.isi_template}
+          {template.template_body}
         </pre>
       </div>
 

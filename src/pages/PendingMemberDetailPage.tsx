@@ -95,14 +95,14 @@ export default function PendingMemberDetailPage() {
 
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
-          src={data.foto_url}
-          name={data.nama_lengkap}
+          src={data.photo_url}
+          name={data.full_name}
           size={64}
-          gender={normalizeGender(data.jenis_kelamin)}
+          gender={normalizeGender(data.gender)}
         />
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
-            {data.nama_lengkap}
+            {data.full_name}
           </p>
           <div className="flex items-center gap-2 mt-1">
             <Badge color={badge.color}>{badge.label}</Badge>
@@ -119,21 +119,21 @@ export default function PendingMemberDetailPage() {
             Data Diri
           </p>
           <div className="space-y-2.5">
-            <Field label="Nama Panggilan" value={data.nama_panggilan} />
+            <Field label="Nama Panggilan" value={data.nickname} />
             <Field
               label="Jenis Kelamin"
-              value={data.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"}
+              value={data.gender === "L" ? "Laki-laki" : "Perempuan"}
             />
-            <Field label="Tempat Lahir" value={data.tempat_lahir} />
+            <Field label="Tempat Lahir" value={data.birth_place} />
             <Field
               label="Tanggal Lahir"
               value={
-                data.tanggal_lahir ? formatDateShort(data.tanggal_lahir) : "-"
+                data.birth_date ? formatDateShort(data.birth_date) : "-"
               }
             />
             <Field
               label="Status Pernikahan"
-              value={data.is_nikah ? "Sudah menikah" : "Belum menikah"}
+              value={data.is_married ? "Sudah menikah" : "Belum menikah"}
             />
           </div>
         </Card>
@@ -145,11 +145,11 @@ export default function PendingMemberDetailPage() {
           <div className="space-y-2.5">
             <Field
               label="No. WhatsApp"
-              value={data.no_wa ? `+${data.no_wa}` : "-"}
+              value={data.whatsapp_number ? `+${data.whatsapp_number}` : "-"}
             />
-            <Field label="Alamat" value={data.alamat_rumah} />
-            <Field label="Desa" value={data.desa} />
-            <Field label="Daerah" value={data.daerah} />
+            <Field label="Alamat" value={data.home_address} />
+            <Field label="Desa" value={data.village} />
+            <Field label="Daerah" value={data.region} />
           </div>
         </Card>
 
@@ -162,31 +162,31 @@ export default function PendingMemberDetailPage() {
           </div>
         </Card>
 
-        {(data.pekerjaan || data.hobi) && (
+        {(data.occupation || data.hobby) && (
           <Card>
             <p className="text-ios-footnote font-medium text-surface-muted mb-3">
               Pekerjaan & Hobi
             </p>
             <div className="space-y-2.5">
-              <Field label="Pekerjaan" value={data.pekerjaan} />
-              <Field label="Hobi" value={data.hobi} />
+              <Field label="Pekerjaan" value={data.occupation} />
+              <Field label="Hobi" value={data.hobby} />
             </div>
           </Card>
         )}
 
-        {(data.jenjang_pendidikan || data.sekolah || data.jurusan) && (
+        {(data.education_level || data.school || data.major) && (
           <Card>
             <p className="text-ios-footnote font-medium text-surface-muted mb-3">
               Pendidikan
             </p>
             <div className="space-y-2.5">
-              <Field label="Jenjang" value={data.jenjang_pendidikan} />
-              <Field label="Sekolah" value={data.sekolah} />
-              <Field label="Jurusan" value={data.jurusan} />
-              <Field label="Tahun Mulai" value={data.tahun_mulai_pendidikan} />
+              <Field label="Jenjang" value={data.education_level} />
+              <Field label="Sekolah" value={data.school} />
+              <Field label="Jurusan" value={data.major} />
+              <Field label="Tahun Mulai" value={data.education_start_year} />
               <Field
                 label="Tahun Selesai"
-                value={data.tahun_selesai_pendidikan}
+                value={data.education_end_year}
               />
             </div>
           </Card>
@@ -251,7 +251,7 @@ export default function PendingMemberDetailPage() {
       <RejectSheet
         open={rejectOpen}
         submissionId={data.submission_id}
-        noWa={data.no_wa}
+        noWa={data.whatsapp_number}
         onClose={() => setRejectOpen(false)}
         onSuccess={() => {
           invalidateAll();
@@ -323,7 +323,7 @@ function ApproveSheet({
       return pendingApi.approve({
         submission_id: data.submission_id,
         group_id: groupId || undefined,
-        kelompok: g?.group_name || undefined,
+        group_label: g?.group_name || undefined,
       });
     },
     onSuccess: () => onSuccess(),
@@ -340,7 +340,7 @@ function ApproveSheet({
       <BottomSheet open={open} onClose={onClose} title="Setujui Pendaftar">
         <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
           <p className="text-ios-footnote text-accent/80 leading-relaxed">
-            <strong>{data.nama_lengkap}</strong> akan ditambahkan sebagai jamaah
+            <strong>{data.full_name}</strong> akan ditambahkan sebagai jamaah
             aktif.
             {data.username && (
               <>

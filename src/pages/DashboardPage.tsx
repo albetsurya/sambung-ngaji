@@ -82,10 +82,10 @@ export default function DashboardPage() {
             className="rounded-full overflow-hidden transition-all hover:opacity-80 active:scale-95"
           >
             <Avatar
-              src={user?.foto_url}
-              name={user?.nama || "?"}
+              src={user?.photo_url}
+              name={user?.name || "?"}
               size={32}
-              gender={normalizeGender(user?.jenis_kelamin)}
+              gender={normalizeGender(user?.gender)}
             />
           </button>
         }
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         )}
 
         {!loading && !error && user?.role === "TIM_PNKB" && (
-          <PNKBDashboard greeting={greeting} userName={user?.nama || ""} />
+          <PNKBDashboard greeting={greeting} userName={user?.name || ""} />
         )}
         {!loading &&
           !error &&
@@ -122,7 +122,7 @@ export default function DashboardPage() {
               data={data as DashboardGeneral}
               isSuperAdmin={user.role === "SUPER_ADMIN"}
               greeting={greeting}
-              userName={user?.nama || ""}
+              userName={user?.name || ""}
             />
           )}
       </div>
@@ -298,14 +298,14 @@ function MeetingCard({
 }: {
   meeting: {
     meeting_id: string;
-    tanggal: string;
-    hari: string;
-    acara?: string;
-    jam?: string;
+    date: string;
+    day: string;
+    event?: string;
+    time?: string;
   };
   onClick?: () => void;
 }) {
-  const dateNum = new Date(meeting.tanggal).getDate();
+  const dateNum = new Date(meeting.date).getDate();
   return (
     <Card onClick={onClick} className="flex items-center gap-3">
       <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
@@ -316,13 +316,13 @@ function MeetingCard({
       </div>
       <div className="flex-1 min-w-0">
         <span className="inline-block text-[10px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 mb-1 uppercase">
-          {meeting.hari}
+          {meeting.day}
         </span>
         <p className="font-medium text-ios-subhead text-surface-text truncate">
-          {meeting.acara || "Pengajian"}
+          {meeting.event || "Pengajian"}
         </p>
-        {meeting.jam && (
-          <p className="text-ios-caption text-surface-muted truncate">{meeting.jam}</p>
+        {meeting.time && (
+          <p className="text-ios-caption text-surface-muted truncate">{meeting.time}</p>
         )}
       </div>
       <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
@@ -336,9 +336,9 @@ function AttentionListSection({
 }: {
   items: {
     member_id: string;
-    nama_lengkap: string;
-    foto_url?: string;
-    jenis_kelamin?: "L" | "P";
+    full_name: string;
+    photo_url?: string;
+    gender?: "L" | "P";
     reasons: string[];
   }[];
 }) {
@@ -374,13 +374,13 @@ function AttentionListSection({
               className="flex items-center gap-3"
             >
               <Avatar
-                src={m.foto_url}
-                name={m.nama_lengkap}
-                gender={normalizeGender(m?.jenis_kelamin)}
+                src={m.photo_url}
+                name={m.full_name}
+                gender={normalizeGender(m?.gender)}
               />
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-ios-subhead text-surface-text truncate">
-                  {m.nama_lengkap}
+                  {m.full_name}
                 </p>
                 <p className="text-ios-caption text-surface-muted truncate">
                   {m.reasons[0]}
@@ -555,16 +555,16 @@ function PNKBDashboard({
 
   const total = pnkbList.length;
   const aktif = pnkbList.filter(
-    (m) => (m.status_pembinaan || "AKTIF") === "AKTIF",
+    (m) => (m.mentoring_status || "AKTIF") === "AKTIF",
   ).length;
   const perluPerhatian = pnkbList.filter(
-    (m) => (m.status_pembinaan || "AKTIF") !== "AKTIF",
+    (m) => (m.mentoring_status || "AKTIF") !== "AKTIF",
   ).length;
   const belumLengkap = pnkbList.filter(
-    (m) => !m.tanggal_lahir || !m.no_wa || !m.alamat_rumah,
+    (m) => !m.birth_date || !m.whatsapp_number || !m.home_address,
   ).length;
-  const ikhwan = pnkbList.filter((m) => m.jenis_kelamin === "L").length;
-  const akhwat = pnkbList.filter((m) => m.jenis_kelamin === "P").length;
+  const ikhwan = pnkbList.filter((m) => m.gender === "L").length;
+  const akhwat = pnkbList.filter((m) => m.gender === "P").length;
   const preview = pnkbList.slice(0, 5);
 
   return (
@@ -632,23 +632,23 @@ function PNKBDashboard({
                 insetDivider={i !== preview.length - 1}
                 leading={
                   <Avatar
-                    src={m.foto_url}
-                    name={m.nama_lengkap}
+                    src={m.photo_url}
+                    name={m.full_name}
                     size={40}
-                    gender={normalizeGender(m.jenis_kelamin)}
+                    gender={normalizeGender(m.gender)}
                   />
                 }
               >
                 <div className="flex items-center gap-2 w-full">
                   <div className="min-w-0 flex-1">
                     <p className="text-ios-body font-medium text-surface-text truncate">
-                      {m.nama_panggilan || m.nama_lengkap}
+                      {m.nickname || m.full_name}
                     </p>
                     <p className="text-ios-caption text-surface-muted truncate">
-                      {m.jenis_kelamin === "L" ? "Ikhwan" : m.jenis_kelamin === "P" ? "Akhwat" : "Jamaah"}
+                      {m.gender === "L" ? "Ikhwan" : m.gender === "P" ? "Akhwat" : "Jamaah"}
                       {m.usia ? ` · ${m.usia} th` : ""}
-                      {m.status_pembinaan && m.status_pembinaan !== "AKTIF"
-                        ? ` · ${m.status_pembinaan}`
+                      {m.mentoring_status && m.mentoring_status !== "AKTIF"
+                        ? ` · ${m.mentoring_status}`
                         : ""}
                     </p>
                   </div>
@@ -659,7 +659,7 @@ function PNKBDashboard({
                       e.stopPropagation();
                       navigate(`/jamaah/${m.member_id}/cv-taaruf`);
                     }}
-                    aria-label={`Cetak CV taaruf ${m.nama_lengkap}`}
+                    aria-label={`Cetak CV taaruf ${m.full_name}`}
                   >
                     <Download size={13} /> CV
                   </Button>
@@ -765,20 +765,20 @@ function AbsensiDashboard({
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
                   <Calendar size={12} className="text-accent" />
                   <span className="text-[10px] font-bold text-accent leading-none mt-0.5">
-                    {m.jam || "-"}
+                    {m.time || "-"}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-ios-subhead text-surface-text truncate">
-                    {m.acara || "Pengajian"}
+                    {m.event || "Pengajian"}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                    {m.kategori_target.length === 0 ? (
+                    {m.target_categories.length === 0 ? (
                       <span className="text-[10px] font-semibold tracking-wide text-surface-muted bg-surface-card2 rounded-full px-2 py-0.5 uppercase">
                         Semua Kategori
                       </span>
                     ) : (
-                      m.kategori_target.map((k) => (
+                      m.target_categories.map((k) => (
                         <span
                           key={k}
                           className="text-[10px] font-semibold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 uppercase"

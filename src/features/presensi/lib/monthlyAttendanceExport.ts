@@ -119,7 +119,7 @@ export async function exportRecapPDF(
   doc.text(`Bulan: ${monthLabel}  |  Kategori: ${kategoriLabel}`, 14, 26);
   doc.text(`Dicetak: ${new Date().toLocaleString("id-ID")}`, 14, 32);
   const meetingHeaders = matrix.meetings.map(
-    (m) => `${formatDayMonth(m.tanggal)}\n${m.acara || "Pengajian"}`,
+    (m) => `${formatDayMonth(m.date)}\n${m.event || "Pengajian"}`,
   );
   const headers = [
     "No",
@@ -131,7 +131,7 @@ export async function exportRecapPDF(
   ];
   const body = matrix.rows.map((row, idx) => [
     String(idx + 1),
-    row.member.nama_lengkap,
+    row.member.full_name,
     ...matrix.meetings.map(
       (m) => STATUS_INITIAL[row.cells[m.meeting_id] ?? ""] ?? "-",
     ),
@@ -256,7 +256,7 @@ export async function exportRecapExcel(
   ws.addRow([]); // spacer
   /* --- Header row --- */
   const meetingHeaders = matrix.meetings.map(
-    (m) => `${formatDayMonth(m.tanggal)}\n${m.acara || "Pengajian"}`,
+    (m) => `${formatDayMonth(m.date)}\n${m.event || "Pengajian"}`,
   );
   const headerValues = ["No", "Nama", ...meetingHeaders, "Hadir", "Tdk", "%"];
   const headerRow = ws.addRow(headerValues);
@@ -279,7 +279,7 @@ export async function exportRecapExcel(
   matrix.rows.forEach((row, idx) => {
     const values = [
       idx + 1,
-      row.member.nama_lengkap,
+      row.member.full_name,
       ...matrix.meetings.map(
         (m) => STATUS_INITIAL[row.cells[m.meeting_id] ?? ""] ?? "-",
       ),

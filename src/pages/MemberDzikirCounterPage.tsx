@@ -73,7 +73,7 @@ export default function MemberDzikirCounterPage() {
 
           <div className="flex flex-col items-center min-w-0">
             <h1 className="text-ios-nav font-semibold text-surface-text truncate">
-              {preset.nama}
+              {preset.name}
             </h1>
             <p className="text-ios-caption text-surface-muted truncate">
               Tap untuk berdzikir

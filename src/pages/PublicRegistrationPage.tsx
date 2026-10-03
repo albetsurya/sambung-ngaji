@@ -26,23 +26,23 @@ import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 interface FormData {
   group_id: string;
-  nama_lengkap: string;
-  nama_panggilan: string;
-  jenis_kelamin: "L" | "P" | "";
-  tempat_lahir: string;
-  tanggal_lahir: string;
-  no_wa: string;
-  alamat_rumah: string;
-  desa: string;
-  daerah: string;
-  pekerjaan: string;
-  hobi: string;
-  is_nikah: boolean;
-  jenjang_pendidikan: string;
-  sekolah: string;
-  jurusan: string;
-  tahun_mulai_pendidikan: string;
-  tahun_selesai_pendidikan: string;
+  full_name: string;
+  nickname: string;
+  gender: "L" | "P" | "";
+  birth_place: string;
+  birth_date: string;
+  whatsapp_number: string;
+  home_address: string;
+  village: string;
+  region: string;
+  occupation: string;
+  hobby: string;
+  is_married: boolean;
+  education_level: string;
+  school: string;
+  major: string;
+  education_start_year: string;
+  education_end_year: string;
   username: string;
   password: string;
   passwordConfirm: string;
@@ -50,23 +50,23 @@ interface FormData {
 
 const EMPTY_FORM: FormData = {
   group_id: "",
-  nama_lengkap: "",
-  nama_panggilan: "",
-  jenis_kelamin: "",
-  tempat_lahir: "",
-  tanggal_lahir: "",
-  no_wa: "",
-  alamat_rumah: "",
-  desa: "",
-  daerah: "",
-  pekerjaan: "",
-  hobi: "",
-  is_nikah: false,
-  jenjang_pendidikan: "",
-  sekolah: "",
-  jurusan: "",
-  tahun_mulai_pendidikan: "",
-  tahun_selesai_pendidikan: "",
+  full_name: "",
+  nickname: "",
+  gender: "",
+  birth_place: "",
+  birth_date: "",
+  whatsapp_number: "",
+  home_address: "",
+  village: "",
+  region: "",
+  occupation: "",
+  hobby: "",
+  is_married: false,
+  education_level: "",
+  school: "",
+  major: "",
+  education_start_year: "",
+  education_end_year: "",
   username: "",
   password: "",
   passwordConfirm: "",
@@ -141,22 +141,22 @@ export default function PublicRegistrationPage() {
 
   function canProceed(): { ok: boolean; message?: string } {
     if (step === 1) {
-      if (form.nama_lengkap.trim().length < 3) {
+      if (form.full_name.trim().length < 3) {
         return { ok: false, message: "Nama lengkap minimal 3 karakter" };
       }
-      if (!form.jenis_kelamin) {
+      if (!form.gender) {
         return { ok: false, message: "Jenis kelamin wajib dipilih" };
       }
     }
 
     if (step === 2) {
-      if (!form.no_wa.trim()) {
+      if (!form.whatsapp_number.trim()) {
         return { ok: false, message: "Nomor WhatsApp wajib diisi" };
       }
       if (!form.group_id) {
         return { ok: false, message: "Kelompok wajib dipilih" };
       }
-      const normalized = normalizePhoneNumber(form.no_wa);
+      const normalized = normalizePhoneNumber(form.whatsapp_number);
       if (normalized.length < 10 || normalized.length > 15) {
         return { ok: false, message: "Nomor WhatsApp tidak valid" };
       }
@@ -232,30 +232,30 @@ export default function PublicRegistrationPage() {
     try {
       const result = await publicApi.submitRegistration({
         group_id: form.group_id || undefined,
-        nama_lengkap: form.nama_lengkap.trim(),
-        nama_panggilan: form.nama_panggilan.trim(),
-        jenis_kelamin: form.jenis_kelamin as "L" | "P",
-        tempat_lahir: form.tempat_lahir.trim(),
-        tanggal_lahir: form.tanggal_lahir,
-        no_wa: normalizePhoneNumber(form.no_wa),
-        alamat_rumah: form.alamat_rumah.trim(),
-        desa: form.desa.trim(),
-        daerah: form.daerah.trim(),
-        pekerjaan: form.pekerjaan.trim(),
-        hobi: form.hobi.trim(),
-        is_nikah: form.is_nikah,
-        jenjang_pendidikan: form.jenjang_pendidikan,
-        sekolah: form.sekolah.trim(),
-        jurusan: form.jurusan.trim(),
-        tahun_mulai_pendidikan: form.tahun_mulai_pendidikan,
-        tahun_selesai_pendidikan: form.tahun_selesai_pendidikan,
+        full_name: form.full_name.trim(),
+        nickname: form.nickname.trim(),
+        gender: form.gender as "L" | "P",
+        birth_place: form.birth_place.trim(),
+        birth_date: form.birth_date,
+        whatsapp_number: normalizePhoneNumber(form.whatsapp_number),
+        home_address: form.home_address.trim(),
+        village: form.village.trim(),
+        region: form.region.trim(),
+        occupation: form.occupation.trim(),
+        hobby: form.hobby.trim(),
+        is_married: form.is_married,
+        education_level: form.education_level,
+        school: form.school.trim(),
+        major: form.major.trim(),
+        education_start_year: form.education_start_year,
+        education_end_year: form.education_end_year,
         username: form.username.trim().toLowerCase(),
         password: form.password,
       });
 
       navigate("/daftar/sukses", {
         state: {
-          nama: result.nama_lengkap,
+          name: result.full_name,
           submissionId: result.submission_id,
         },
         replace: true,
@@ -365,21 +365,21 @@ export default function PublicRegistrationPage() {
               <Input
                 label="Nama Lengkap *"
                 placeholder="Nama sesuai KTP"
-                value={form.nama_lengkap}
-                onChange={(e) => update("nama_lengkap", e.target.value)}
+                value={form.full_name}
+                onChange={(e) => update("full_name", e.target.value)}
                 required
               />
               <Input
                 label="Nama Panggilan"
                 placeholder="Nama sehari-hari"
-                value={form.nama_panggilan}
-                onChange={(e) => update("nama_panggilan", e.target.value)}
+                value={form.nickname}
+                onChange={(e) => update("nickname", e.target.value)}
               />
               <Select
                 label="Jenis Kelamin *"
-                value={form.jenis_kelamin}
+                value={form.gender}
                 onChange={(e) =>
-                  update("jenis_kelamin", e.target.value as "L" | "P" | "")
+                  update("gender", e.target.value as "L" | "P" | "")
                 }
                 required
               >
@@ -391,13 +391,13 @@ export default function PublicRegistrationPage() {
                 <Input
                   label="Tempat Lahir"
                   placeholder="Kota"
-                  value={form.tempat_lahir}
-                  onChange={(e) => update("tempat_lahir", e.target.value)}
+                  value={form.birth_place}
+                  onChange={(e) => update("birth_place", e.target.value)}
                 />
                 <DateInput
                   label="Tanggal Lahir"
-                  value={form.tanggal_lahir || ""}
-                  onChange={(iso) => update("tanggal_lahir", iso)}
+                  value={form.birth_date || ""}
+                  onChange={(iso) => update("birth_date", iso)}
                 />
               </div>
             </div>
@@ -418,29 +418,29 @@ export default function PublicRegistrationPage() {
                 label="No. WhatsApp *"
                 placeholder="0812xxxxxxxx"
                 inputMode="tel"
-                value={form.no_wa}
-                onChange={(e) => update("no_wa", e.target.value)}
+                value={form.whatsapp_number}
+                onChange={(e) => update("whatsapp_number", e.target.value)}
                 hint="Contoh: 081234567890"
                 required
               />
               <Textarea
                 label="Alamat Rumah"
                 placeholder="Alamat lengkap"
-                value={form.alamat_rumah}
-                onChange={(e) => update("alamat_rumah", e.target.value)}
+                value={form.home_address}
+                onChange={(e) => update("home_address", e.target.value)}
               />
               <div className="grid grid-cols-2 gap-3">
                 <Input
                   label="Desa"
                   placeholder="Nama desa"
-                  value={form.desa}
-                  onChange={(e) => update("desa", e.target.value)}
+                  value={form.village}
+                  onChange={(e) => update("village", e.target.value)}
                 />
                 <Input
                   label="Daerah"
                   placeholder="Nama daerah"
-                  value={form.daerah}
-                  onChange={(e) => update("daerah", e.target.value)}
+                  value={form.region}
+                  onChange={(e) => update("region", e.target.value)}
                 />
               </div>
               <Select
@@ -473,8 +473,8 @@ export default function PublicRegistrationPage() {
 
               <Select
                 label="Jenjang Pendidikan"
-                value={form.jenjang_pendidikan}
-                onChange={(e) => update("jenjang_pendidikan", e.target.value)}
+                value={form.education_level}
+                onChange={(e) => update("education_level", e.target.value)}
               >
                 <option value="">Pilih jenjang</option>
                 <option value="PAUD">PAUD</option>
@@ -497,14 +497,14 @@ export default function PublicRegistrationPage() {
                 <Input
                   label="Sekolah"
                   placeholder="Nama sekolah"
-                  value={form.sekolah}
-                  onChange={(e) => update("sekolah", e.target.value)}
+                  value={form.school}
+                  onChange={(e) => update("school", e.target.value)}
                 />
                 <Input
                   label="Jurusan"
                   placeholder="Jurusan"
-                  value={form.jurusan}
-                  onChange={(e) => update("jurusan", e.target.value)}
+                  value={form.major}
+                  onChange={(e) => update("major", e.target.value)}
                 />
               </div>
 
@@ -514,9 +514,9 @@ export default function PublicRegistrationPage() {
                   type="number"
                   inputMode="numeric"
                   placeholder="2020"
-                  value={form.tahun_mulai_pendidikan}
+                  value={form.education_start_year}
                   onChange={(e) =>
-                    update("tahun_mulai_pendidikan", e.target.value)
+                    update("education_start_year", e.target.value)
                   }
                 />
                 <Input
@@ -524,9 +524,9 @@ export default function PublicRegistrationPage() {
                   type="number"
                   inputMode="numeric"
                   placeholder="2024"
-                  value={form.tahun_selesai_pendidikan}
+                  value={form.education_end_year}
                   onChange={(e) =>
-                    update("tahun_selesai_pendidikan", e.target.value)
+                    update("education_end_year", e.target.value)
                   }
                 />
               </div>
@@ -534,20 +534,20 @@ export default function PublicRegistrationPage() {
               <Input
                 label="Pekerjaan"
                 placeholder="Contoh: Karyawan, Wiraswasta"
-                value={form.pekerjaan}
-                onChange={(e) => update("pekerjaan", e.target.value)}
+                value={form.occupation}
+                onChange={(e) => update("occupation", e.target.value)}
               />
 
               <Input
                 label="Hobi"
                 placeholder="Membaca, olahraga, dll"
-                value={form.hobi}
-                onChange={(e) => update("hobi", e.target.value)}
+                value={form.hobby}
+                onChange={(e) => update("hobby", e.target.value)}
               />
 
               <ModernCheckbox
-                checked={form.is_nikah}
-                onChange={(v) => update("is_nikah", v)}
+                checked={form.is_married}
+                onChange={(v) => update("is_married", v)}
                 label="Sudah menikah"
               />
 

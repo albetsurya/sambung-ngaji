@@ -19,7 +19,7 @@ const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
   { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
-  { key: "jadwal", label: "Jadwal", to: "/lainnya/jadwal", icon: Calendar },
+  { key: "schedule", label: "Jadwal", to: "/lainnya/jadwal", icon: Calendar },
   {
     key: "pengumuman",
     label: "Pengumuman",

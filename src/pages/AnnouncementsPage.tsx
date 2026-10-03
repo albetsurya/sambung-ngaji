@@ -148,10 +148,10 @@ export default function AnnouncementsPage() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="text-ios-body font-medium text-surface-text truncate">
-                          {a.acara || "Pengumuman"}
+                          {a.event || "Pengumuman"}
                         </p>
                         <p className="text-ios-footnote text-surface-muted truncate">
-                          {a.hari}, {formatDateShort(a.tanggal)}
+                          {a.day}, {formatDateShort(a.date)}
                         </p>
                       </div>
                       <Badge color={status.color}>{status.label}</Badge>
@@ -250,7 +250,7 @@ function PreviewModal({
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <Badge color={status.color}>{status.label}</Badge>
         <span className="text-ios-caption text-surface-muted">
-          {announcement.hari}, {formatDateShort(announcement.tanggal)}
+          {announcement.day}, {formatDateShort(announcement.date)}
         </span>
       </div>
 
@@ -302,11 +302,11 @@ function CreateAnnouncementSheet({
   const { showToast } = useToast();
   const [templateId, setTemplateId] = useState("");
   const [groupId, setGroupId] = useState("");
-  const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
-  const [jam, setJam] = useState("Isya di tempat");
-  const [acara, setAcara] = useState("Sambung Kelompok");
-  const [materi, setMateri] = useState("");
-  const [catatan, setCatatan] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [time, setTime] = useState("Isya di tempat");
+  const [event, setEvent] = useState("Sambung Kelompok");
+  const [topic, setTopic] = useState("");
+  const [notes, setNotes] = useState("");
 
   const { data: templates = [] } = useQuery({
     queryKey: ["announcement-templates"],
@@ -331,11 +331,11 @@ function CreateAnnouncementSheet({
   useMemo(() => {
     if (open) {
       setGroupId("");
-      setTanggal(new Date().toISOString().slice(0, 10));
-      setJam("Isya di tempat");
-      setAcara("Sambung Kelompok");
-      setMateri("");
-      setCatatan("");
+      setDate(new Date().toISOString().slice(0, 10));
+      setTime("Isya di tempat");
+      setEvent("Sambung Kelompok");
+      setTopic("");
+      setNotes("");
     }
   }, [open]);
 
@@ -344,11 +344,11 @@ function CreateAnnouncementSheet({
       announcementApi.create({
         template_id: templateId,
         group_id: groupId,
-        tanggal,
-        jam,
-        acara,
-        materi,
-        catatan,
+        date,
+        time,
+        event,
+        topic,
+        notes,
       }),
     onSuccess: (created) => {
       showToast("Pengumuman dibuat");
@@ -363,7 +363,7 @@ function CreateAnnouncementSheet({
     },
   });
 
-  const hari = getHariFromDate(tanggal);
+  const day = getHariFromDate(date);
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Buat Pengumuman">
@@ -374,7 +374,7 @@ function CreateAnnouncementSheet({
       >
         {templates.map((t) => (
           <option key={t.template_id} value={t.template_id}>
-            {t.nama_template}
+            {t.template_name}
           </option>
         ))}
       </Select>
@@ -395,27 +395,27 @@ function CreateAnnouncementSheet({
       <Input
         label="Tanggal"
         type="date"
-        value={tanggal}
-        onChange={(e) => setTanggal(e.target.value)}
-        hint={`Hari: ${hari}`}
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        hint={`Hari: ${day}`}
       />
 
-      <Input label="Jam" value={jam} onChange={(e) => setJam(e.target.value)} />
+      <Input label="Jam" value={time} onChange={(e) => setTime(e.target.value)} />
       <Input
         label="Acara"
-        value={acara}
-        onChange={(e) => setAcara(e.target.value)}
+        value={event}
+        onChange={(e) => setEvent(e.target.value)}
       />
       <Textarea
         label="Materi"
-        value={materi}
-        onChange={(e) => setMateri(e.target.value)}
+        value={topic}
+        onChange={(e) => setTopic(e.target.value)}
         placeholder="Tema atau materi pengajian"
       />
       <Textarea
         label="Catatan (NB)"
-        value={catatan}
-        onChange={(e) => setCatatan(e.target.value)}
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
         placeholder="Catatan tambahan (opsional)"
       />
 
@@ -441,11 +441,11 @@ function SaveAsTemplateSheet({
   onSaved: () => void;
 }) {
   const { showToast } = useToast();
-  const [nama, setNama] = useState("");
+  const [name, setName] = useState("");
   const [kode, setKode] = useState("");
 
   useMemo(() => {
-    setNama("");
+    setName("");
     setKode("");
   }, [announcement.announcement_id]);
 
@@ -453,7 +453,7 @@ function SaveAsTemplateSheet({
     mutationFn: () =>
       announcementTemplateApi.createFromAnnouncement({
         source_announcement_id: announcement.announcement_id,
-        nama_template: nama.trim(),
+        template_name: name.trim(),
         kode: kode.trim().toUpperCase(),
       }),
     onSuccess: () => {
@@ -468,7 +468,7 @@ function SaveAsTemplateSheet({
     },
   });
 
-  const canSubmit = nama.trim().length >= 3 && kode.trim().length >= 3;
+  const canSubmit = name.trim().length >= 3 && kode.trim().length >= 3;
 
   return (
     <BottomSheet
@@ -486,8 +486,8 @@ function SaveAsTemplateSheet({
       <Input
         label="Nama Template"
         placeholder="Undangan Sambung Kelompok"
-        value={nama}
-        onChange={(e) => setNama(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
 
       <Input

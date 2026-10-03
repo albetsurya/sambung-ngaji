@@ -35,13 +35,13 @@ import type { MoodEntry } from "../../../services/domainApi";
 
 
 export function BiodataTab({ member }: { member: Member }) {
-  const GenderIcon = member.jenis_kelamin === "P" ? Venus : Mars;
-  const ttl = [member.tempat_lahir, member.tanggal_lahir ? formatDateLongText(member.tanggal_lahir) : ""]
+  const GenderIcon = member.gender === "P" ? Venus : Mars;
+  const ttl = [member.birth_place, member.birth_date ? formatDateLongText(member.birth_date) : ""]
     .filter(Boolean)
     .join(", ");
   const fisik = [
-    member.tinggi_badan ? `${member.tinggi_badan} cm` : "",
-    member.berat_badan ? `${member.berat_badan} kg` : "",
+    member.height ? `${member.height} cm` : "",
+    member.weight ? `${member.weight} kg` : "",
   ]
     .filter(Boolean)
     .join(" / ");
@@ -53,14 +53,14 @@ export function BiodataTab({ member }: { member: Member }) {
     {
       title: "Pribadi",
       rows: [
-        { Icon: User, label: "Nama panggilan", value: member.nama_panggilan },
+        { Icon: User, label: "Nama panggilan", value: member.nickname },
         {
           Icon: GenderIcon,
           label: "Jenis kelamin",
           value:
-            member.jenis_kelamin === "L"
+            member.gender === "L"
               ? "Laki-laki"
-              : member.jenis_kelamin === "P"
+              : member.gender === "P"
                 ? "Perempuan"
                 : undefined,
         },
@@ -74,25 +74,25 @@ export function BiodataTab({ member }: { member: Member }) {
         {
           Icon: CalendarCheck,
           label: "Aktif sejak",
-          value: member.tanggal_masuk ? formatDateShort(member.tanggal_masuk) : undefined,
+          value: member.joined_date ? formatDateShort(member.joined_date) : undefined,
         },
       ],
     },
     {
       title: "Domisili",
       rows: [
-        { Icon: Building2, label: "Kelompok", value: member.kelompok },
-        { Icon: Home, label: "Desa", value: member.desa },
-        { Icon: Compass, label: "Daerah", value: member.daerah },
-        { Icon: MapPin, label: "Alamat rumah", value: member.alamat_rumah },
+        { Icon: Building2, label: "Kelompok", value: member.group_label },
+        { Icon: Home, label: "Desa", value: member.village },
+        { Icon: Compass, label: "Daerah", value: member.region },
+        { Icon: MapPin, label: "Alamat rumah", value: member.home_address },
       ],
     },
     {
       title: "Kontak & Kesibukan",
       rows: [
-        { Icon: Phone, label: "No. WhatsApp", value: member.no_wa },
-        { Icon: Briefcase, label: "Pekerjaan", value: member.pekerjaan },
-        { Icon: Star, label: "Hobi", value: member.hobi },
+        { Icon: Phone, label: "No. WhatsApp", value: member.whatsapp_number },
+        { Icon: Briefcase, label: "Pekerjaan", value: member.occupation },
+        { Icon: Star, label: "Hobi", value: member.hobby },
       ],
     },
   ];
@@ -178,8 +178,8 @@ export function EducationTab({
   }
 
   const latest = items[0];
-  const yearRange = formatYearRange(latest.tahun_mulai, latest.tahun_selesai);
-  const duration = studyDuration(latest.tahun_mulai, latest.tahun_selesai);
+  const yearRange = formatYearRange(latest.start_year, latest.end_year);
+  const duration = studyDuration(latest.start_year, latest.end_year);
 
   return (
     <div className="space-y-3">
@@ -194,12 +194,12 @@ export function EducationTab({
               Pendidikan terakhir
             </p>
             <p className="text-[17px] font-semibold text-surface-text truncate tracking-[-0.01em]">
-              {latest.jenjang}
-              {latest.kelas ? ` · Kelas ${latest.kelas}` : ""}
+              {latest.level}
+              {latest.grade ? ` · Kelas ${latest.grade}` : ""}
             </p>
-            {(latest.sekolah || latest.jurusan) && (
+            {(latest.school || latest.major) && (
               <p className="text-ios-footnote text-surface-muted truncate">
-                {[latest.sekolah, latest.jurusan].filter(Boolean).join(" · ")}
+                {[latest.school, latest.major].filter(Boolean).join(" · ")}
               </p>
             )}
           </div>
@@ -230,7 +230,7 @@ export function EducationTab({
         <div className="absolute left-[7px] top-2 bottom-2 w-px bg-surface-border" />
         <div className="space-y-2.5">
           {items.map((e, idx) => {
-            const range = formatYearRange(e.tahun_mulai, e.tahun_selesai);
+            const range = formatYearRange(e.start_year, e.end_year);
             return (
               <div key={e.education_id} className="relative">
                 <div
@@ -244,12 +244,12 @@ export function EducationTab({
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-ios-subhead text-surface-text truncate">
-                        {e.jenjang}
-                        {e.kelas ? ` · Kelas ${e.kelas}` : ""}
+                        {e.level}
+                        {e.grade ? ` · Kelas ${e.grade}` : ""}
                       </p>
-                      {(e.sekolah || e.jurusan) && (
+                      {(e.school || e.major) && (
                         <p className="text-ios-footnote text-surface-muted truncate mt-0.5">
-                          {[e.sekolah, e.jurusan].filter(Boolean).join(" · ")}
+                          {[e.school, e.major].filter(Boolean).join(" · ")}
                         </p>
                       )}
                     </div>
@@ -302,17 +302,17 @@ function studyDuration(
 
 function fallbackEducation(member?: Member): Education[] {
   if (!member) return [];
-  const { jenjang_pendidikan, sekolah, jurusan } = member;
-  if (!jenjang_pendidikan && !sekolah && !jurusan) return [];
+  const { education_level, school, major } = member;
+  if (!education_level && !school && !major) return [];
   return [
     {
       education_id: "biodata",
       member_id: member.member_id,
-      jenjang: jenjang_pendidikan || "Pendidikan",
-      sekolah,
-      jurusan,
-      tahun_mulai: member.tahun_mulai_pendidikan,
-      tahun_selesai: member.tahun_selesai_pendidikan,
+      level: education_level || "Pendidikan",
+      school,
+      major,
+      start_year: member.education_start_year,
+      end_year: member.education_end_year,
     },
   ];
 }
@@ -733,9 +733,9 @@ export function MemberStatusChips({
   inline?: boolean;
 }) {
   const chips: { Icon: typeof Heart; label: string }[] = [];
-  if (member.is_muballigh) chips.push({ Icon: Mosque, label: "Muballigh" });
-  if (member.is_kerja) chips.push({ Icon: Briefcase, label: "Bekerja" });
-  if (member.is_nikah) chips.push({ Icon: Heart, label: "Menikah" });
+  if (member.is_preacher) chips.push({ Icon: Mosque, label: "Muballigh" });
+  if (member.is_employed) chips.push({ Icon: Briefcase, label: "Bekerja" });
+  if (member.is_married) chips.push({ Icon: Heart, label: "Menikah" });
   if (chips.length === 0) return null;
   const items = chips.map((c) => {
     const Icon = c.Icon;
@@ -792,7 +792,7 @@ export function MoodTab({ entries }: { entries: MoodEntry[] }) {
                   {meta.label}
                 </p>
                 <p className="text-ios-caption text-surface-muted">
-                  {formatDateLongText(e.tanggal)}
+                  {formatDateLongText(e.date)}
                 </p>
               </ListRow>
             );

@@ -66,7 +66,7 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
       deb: Number(t.debit) || 0,
       kre: Number(t.credit) || 0,
       saldo: Number(t.balance) || 0,
-      tanggal: formatDateDMY(t.transaction_date),
+      date: formatDateDMY(t.transaction_date),
     }));
   }, [transactions]);
   const printTitle =
@@ -117,7 +117,7 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
                   {r.idx + 1}
                 </td>
                 <td className="border border-slate-300 p-1.5 whitespace-nowrap">
-                  {r.tanggal}
+                  {r.date}
                 </td>
                 <td className="border border-slate-300 p-1.5">
                   {r.t.description}

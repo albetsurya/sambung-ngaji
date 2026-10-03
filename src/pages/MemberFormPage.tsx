@@ -30,24 +30,24 @@ import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 
 
 const emptyForm: Partial<Member> = {
-  nama_lengkap: "",
-  nama_panggilan: "",
-  jenis_kelamin: "L",
-  tempat_lahir: "",
-  tanggal_lahir: "",
+  full_name: "",
+  nickname: "",
+  gender: "L",
+  birth_place: "",
+  birth_date: "",
   group_id: "",
-  kelompok: "",
-  desa: "",
-  daerah: "",
-  alamat_rumah: "",
-  no_wa: "",
-  is_nikah: false,
-  is_kerja: false,
-  is_muballigh: false,
-  tinggi_badan: "",
-  berat_badan: "",
-  hobi: "",
-  pekerjaan: "",
+  group_label: "",
+  village: "",
+  region: "",
+  home_address: "",
+  whatsapp_number: "",
+  is_married: false,
+  is_employed: false,
+  is_preacher: false,
+  height: "",
+  weight: "",
+  hobby: "",
+  occupation: "",
 };
 
 
@@ -77,7 +77,7 @@ export default function MemberFormPage() {
             (g) => g.group_id === assignedGroup || g.group_name === assignedGroup
           );
           if (matched) {
-            setForm((f) => ({ ...f, group_id: matched.group_id, kelompok: matched.group_name }));
+            setForm((f) => ({ ...f, group_id: matched.group_id, group_label: matched.group_name }));
           }
         }
       })
@@ -87,7 +87,7 @@ export default function MemberFormPage() {
         .detail(id)
         .then((m) => {
           setForm(m);
-          setPhotoPreview(m.foto_url || "");
+          setPhotoPreview(m.photo_url || "");
           setLoading(false);
         })
         .catch(() => setLoading(false));
@@ -99,15 +99,15 @@ export default function MemberFormPage() {
     if (!groups.length) return;
     setForm((f) => {
       if (f.group_id) return f;
-      if (!f.kelompok && !f.group_name) return f;
-      const name = f.kelompok || f.group_name || "";
+      if (!f.group_label && !f.group_name) return f;
+      const name = f.group_label || f.group_name || "";
       const matched =
         groups.find((g) => g.group_name === name) ||
         groups.find(
           (g) => g.group_name.toLowerCase() === String(name).toLowerCase()
         );
       if (!matched) return f;
-      return { ...f, group_id: matched.group_id, kelompok: matched.group_name };
+      return { ...f, group_id: matched.group_id, group_label: matched.group_name };
     });
   }, [groups]);
 
@@ -167,13 +167,13 @@ export default function MemberFormPage() {
     setSubmitting(true);
     try {
       const matched = groups.find(
-        (g) => g.group_id === form.group_id || g.group_name === form.kelompok
+        (g) => g.group_id === form.group_id || g.group_name === form.group_label
       );
       const payload = {
         ...form,
         group_id: form.group_id || matched?.group_id || "",
-        kelompok: matched?.group_name || form.kelompok || "",
-        no_wa: form.no_wa ? normalizePhoneNumber(form.no_wa) : "",
+        group_label: matched?.group_name || form.group_label || "",
+        whatsapp_number: form.whatsapp_number ? normalizePhoneNumber(form.whatsapp_number) : "",
       };
       let memberId = id;
       if (isEdit && id) {
@@ -287,21 +287,21 @@ export default function MemberFormPage() {
           <Input
             label="Nama Lengkap"
             required
-            value={form.nama_lengkap || ""}
-            onChange={(e) => update("nama_lengkap", e.target.value)}
+            value={form.full_name || ""}
+            onChange={(e) => update("full_name", e.target.value)}
             placeholder="Nama sesuai KTP"
           />
           <Input
             label="Nama Panggilan"
-            value={form.nama_panggilan || ""}
-            onChange={(e) => update("nama_panggilan", e.target.value)}
+            value={form.nickname || ""}
+            onChange={(e) => update("nickname", e.target.value)}
             placeholder="Nama sehari-hari"
           />
           <Select
             label="Jenis Kelamin"
-            value={form.jenis_kelamin || "L"}
+            value={form.gender || "L"}
             onChange={(e) =>
-              update("jenis_kelamin", e.target.value as Member["jenis_kelamin"])
+              update("gender", e.target.value as Member["gender"])
             }
           >
             <option value="L">Laki-laki</option>
@@ -310,14 +310,14 @@ export default function MemberFormPage() {
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Tempat Lahir"
-              value={form.tempat_lahir || ""}
-              onChange={(e) => update("tempat_lahir", e.target.value)}
+              value={form.birth_place || ""}
+              onChange={(e) => update("birth_place", e.target.value)}
               placeholder="Kota"
             />
             <DateInput
               label="Tanggal Lahir"
-              value={form.tanggal_lahir || ""}
-              onChange={(iso) => update("tanggal_lahir", iso)}
+              value={form.birth_date || ""}
+              onChange={(iso) => update("birth_date", iso)}
             />
           </div>
         </FormSection>
@@ -334,7 +334,7 @@ export default function MemberFormPage() {
             onChange={(e) => {
               const gid = e.target.value;
               const g = groups.find((x) => x.group_id === gid);
-              setForm((f) => ({ ...f, group_id: gid, kelompok: g?.group_name || "" }));
+              setForm((f) => ({ ...f, group_id: gid, group_label: g?.group_name || "" }));
             }}
             hint={!isSuperAdmin && !isEdit && !!assignedGroup ? "Otomatis diisi sesuai kelompok Anda" : undefined}
           >
@@ -348,29 +348,29 @@ export default function MemberFormPage() {
           <div className="grid grid-cols-2 gap-3">
             <Input
               label="Desa"
-              value={form.desa || ""}
-              onChange={(e) => update("desa", e.target.value)}
+              value={form.village || ""}
+              onChange={(e) => update("village", e.target.value)}
               placeholder="Nama desa"
             />
             <Input
               label="Daerah"
-              value={form.daerah || ""}
-              onChange={(e) => update("daerah", e.target.value)}
+              value={form.region || ""}
+              onChange={(e) => update("region", e.target.value)}
               placeholder="Nama daerah"
             />
           </div>
           <Textarea
             label="Alamat Rumah"
-            value={form.alamat_rumah || ""}
-            onChange={(e) => update("alamat_rumah", e.target.value)}
+            value={form.home_address || ""}
+            onChange={(e) => update("home_address", e.target.value)}
             placeholder="Alamat lengkap"
           />
           <Input
             label="No. WhatsApp"
             placeholder="0812xxxxxxxx"
             inputMode="tel"
-            value={form.no_wa || ""}
-            onChange={(e) => update("no_wa", e.target.value)}
+            value={form.whatsapp_number || ""}
+            onChange={(e) => update("whatsapp_number", e.target.value)}
           />
         </FormSection>
 
@@ -380,44 +380,44 @@ export default function MemberFormPage() {
           description="Informasi pembinaan"
         >
           <ModernCheckbox
-            checked={!!form.is_nikah}
-            onChange={(v) => update("is_nikah", v)}
+            checked={!!form.is_married}
+            onChange={(v) => update("is_married", v)}
             label="Sudah menikah"
             description="Centang jika jamaah sudah menikah"
           />
 
-          {!form.is_nikah && (
+          {!form.is_married && (
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <Input
                   label="Tinggi Badan (cm)"
                   type="number"
                   inputMode="numeric"
-                  value={form.tinggi_badan || ""}
-                  onChange={(e) => update("tinggi_badan", e.target.value)}
+                  value={form.height || ""}
+                  onChange={(e) => update("height", e.target.value)}
                   placeholder="170"
                 />
                 <Input
                   label="Berat Badan (kg)"
                   type="number"
                   inputMode="numeric"
-                  value={form.berat_badan || ""}
-                  onChange={(e) => update("berat_badan", e.target.value)}
+                  value={form.weight || ""}
+                  onChange={(e) => update("weight", e.target.value)}
                   placeholder="60"
                 />
               </div>
               <Input
                 label="Hobi"
-                value={form.hobi || ""}
-                onChange={(e) => update("hobi", e.target.value)}
+                value={form.hobby || ""}
+                onChange={(e) => update("hobby", e.target.value)}
                 placeholder="Membaca, olahraga, dll"
               />
             </div>
           )}
 
           <ModernCheckbox
-            checked={!!form.is_muballigh}
-            onChange={(v) => update("is_muballigh", v)}
+            checked={!!form.is_preacher}
+            onChange={(v) => update("is_preacher", v)}
             label="Muballigh"
             description="Centang jika jamaah aktif sebagai muballigh"
           />
@@ -430,8 +430,8 @@ export default function MemberFormPage() {
         >
           <Input
             label="Pekerjaan"
-            value={form.pekerjaan || ""}
-            onChange={(e) => update("pekerjaan", e.target.value)}
+            value={form.occupation || ""}
+            onChange={(e) => update("occupation", e.target.value)}
             placeholder="Contoh: Karyawan, Wiraswasta"
           />
         </FormSection>

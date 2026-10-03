@@ -8,12 +8,12 @@ export interface PdfTextItem {
 
 export interface ParsedMeetingDraft {
   id: string;
-  acara: string;
-  tanggal: string;
+  event: string;
+  date: string;
   tanggalSelesai?: string;
-  hari: string;
-  jam: string;
-  catatan: string;
+  day: string;
+  time: string;
+  notes: string;
   genderTarget: "" | "L" | "P";
   kategoriTarget: string[];
   confidence: number;
@@ -344,12 +344,12 @@ function parseSection(section: RawSection): ParsedMeetingDraft {
 
   return {
     id: cryptoId(),
-    acara,
-    tanggal: tgl.iso,
+    event: acara,
+    date: tgl.iso,
     tanggalSelesai,
-    hari: tgl.hari,
-    jam,
-    catatan,
+    day: tgl.hari,
+    time: jam,
+    notes: catatan,
     genderTarget: detectGenderFromTitle(acara + " " + bodyText),
     kategoriTarget: detectKategoriFromTitle(acara + " " + bodyText),
     confidence,
@@ -416,7 +416,7 @@ function parseLines(lines: string[]): ParsedMeetingDraft[] {
   const sections = splitSections(cleaned);
   const parsed = sections.map(parseSection);
 
-  return parsed.filter((p) => p.acara && p.acara.length >= 3);
+  return parsed.filter((p) => p.event && p.event.length >= 3);
 }
 
 export function parseMeetingsFromPdf(rawItems: any[]): ParsedMeetingDraft[] {

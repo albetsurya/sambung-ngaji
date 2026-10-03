@@ -145,7 +145,7 @@ export default function MembersListPage() {
     const f: MemberFilters = { limit: PAGE_SIZE };
     if (debouncedSearch) f.search = debouncedSearch;
     if (kategori) f.kategori = kategori;
-    if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
+    if (jenisKelamin) f.gender = jenisKelamin;
     if (assignedGroup) f.group_id = assignedGroup;
     return f;
   }, [debouncedSearch, kategori, jenisKelamin, assignedGroup]);
@@ -182,7 +182,7 @@ export default function MembersListPage() {
   const roleByMemberId = useMemo(() => {
     const m = new Map<string, Role>();
     users.forEach((u) => {
-      if (u.member_id && u.status_aktif !== false) m.set(u.member_id, u.role);
+      if (u.member_id && u.is_active !== false) m.set(u.member_id, u.role);
     });
     return m;
   }, [users]);
@@ -308,7 +308,7 @@ export default function MembersListPage() {
       try {
         await memberApi.update(id, {
           group_id: target.group_id,
-          kelompok: target.group_name,
+          group_label: target.group_name,
         });
         ok += 1;
       } catch {
@@ -818,7 +818,7 @@ export default function MembersListPage() {
 
                   const exportFilters: MemberFilters = {};
                   if (kategori) exportFilters.kategori = kategori;
-                  if (jenisKelamin) exportFilters.jenis_kelamin = jenisKelamin;
+                  if (jenisKelamin) exportFilters.gender = jenisKelamin;
 
                   const exportData = await memberApi.listForExport(
                     isPNKB
@@ -983,9 +983,9 @@ const JamaahRow = memo(function JamaahRow({
         <SelectCheckbox selected={selected} />
       ) : (
         <Avatar
-          src={member.foto_url}
-          name={member.nama_lengkap}
-          gender={normalizeGender(member?.jenis_kelamin)}
+          src={member.photo_url}
+          name={member.full_name}
+          gender={normalizeGender(member?.gender)}
         />
       )}
       <div className="flex-1 min-w-0">
@@ -993,7 +993,7 @@ const JamaahRow = memo(function JamaahRow({
           {getDisplayName(member)}
         </p>
         <p className="text-[13px] text-surface-muted truncate">
-          {member.kelompok || "Belum ada kelompok"}
+          {member.group_label || "Belum ada kelompok"}
         </p>
       </div>
       {!selectMode && (
@@ -1044,9 +1044,9 @@ const JamaahCard = memo(function JamaahCard({
           <SelectCheckbox selected={selected} />
         ) : (
           <Avatar
-            src={member.foto_url}
-            name={member.nama_lengkap}
-            gender={normalizeGender(member?.jenis_kelamin)}
+            src={member.photo_url}
+            name={member.full_name}
+            gender={normalizeGender(member?.gender)}
           />
         )}
         <div className="flex-1 min-w-0">
@@ -1054,7 +1054,7 @@ const JamaahCard = memo(function JamaahCard({
             {getDisplayName(member)}
           </p>
           <p className="text-ios-caption text-surface-muted truncate">
-            {member.kelompok || "Belum ada kelompok"}
+            {member.group_label || "Belum ada kelompok"}
           </p>
         </div>
         {!selectMode && (
@@ -1111,10 +1111,10 @@ const JamaahGridCard = memo(function JamaahGridCard({
         </span>
       )}
       <Avatar
-        src={member.foto_url}
-        name={member.nama_lengkap}
+        src={member.photo_url}
+        name={member.full_name}
         size={avatarSize}
-        gender={normalizeGender(member?.jenis_kelamin)}
+        gender={normalizeGender(member?.gender)}
       />
       <div className="min-w-0 w-full">
         <p
@@ -1123,7 +1123,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {getDisplayName(member)}
         </p>
         <p className="text-[10px] text-surface-muted truncate mt-0.5">
-          {member.kelompok || "Belum ada kelompok"}
+          {member.group_label || "Belum ada kelompok"}
         </p>
       </div>
       {member.kategori && (

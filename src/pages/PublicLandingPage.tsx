@@ -52,8 +52,8 @@ export default function PublicLandingPage() {
   const upcoming = useMemo(() => {
     const t = todayIso();
     return meetings
-      .filter((m) => m.tanggal >= t && m.status !== "LIBUR")
-      .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
+      .filter((m) => m.date >= t && m.status !== "LIBUR")
+      .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 3);
   }, [meetings]);
 
@@ -146,16 +146,16 @@ export default function PublicLandingPage() {
               <Card key={m.meeting_id} className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
                   <span className="text-ios-subhead font-bold text-accent leading-none tabular-nums">
-                    {new Date(m.tanggal).getDate()}
+                    {new Date(m.date).getDate()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-ios-subhead text-surface-text truncate">
-                    {m.acara || "Pengajian"}
+                    {m.event || "Pengajian"}
                   </p>
                   <p className="text-ios-caption text-surface-muted truncate">
-                    {m.hari} · {formatDateLongText(m.tanggal)}
-                    {m.jam ? ` · ${m.jam}` : ""}
+                    {m.day} · {formatDateLongText(m.date)}
+                    {m.time ? ` · ${m.time}` : ""}
                   </p>
                 </div>
               </Card>

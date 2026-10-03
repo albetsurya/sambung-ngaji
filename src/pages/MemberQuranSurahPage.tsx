@@ -436,7 +436,7 @@ export default function MemberQuranSurahPage() {
                         (active ? "text-accent" : "text-surface-text")
                       }
                     >
-                      {q.nama}
+                      {q.name}
                     </span>
                   </button>
                 );

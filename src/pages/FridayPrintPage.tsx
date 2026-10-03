@@ -44,15 +44,15 @@ export default function FridayPrintPage() {
   const upcoming = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal >= today)
-        .sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
+        .filter((s) => s.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)),
     [schedules, today],
   );
   const past = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal < today)
-        .sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
+        .filter((s) => s.date < today)
+        .sort((a, b) => b.date.localeCompare(a.date)),
     [schedules, today],
   );
 

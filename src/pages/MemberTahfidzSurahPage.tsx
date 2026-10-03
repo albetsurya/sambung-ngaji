@@ -295,7 +295,7 @@ export default function MemberTahfidzSurahPage() {
                   direction: "rtl",
                 }}
               >
-                {data.nama}
+                {data.name}
               </p>
               <p className="text-ios-footnote font-semibold text-accent">
                 {data.namaLatin}

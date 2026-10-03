@@ -156,7 +156,7 @@ export function SurahHeaderCard({ data }: { data: SurahDetail }) {
           direction: "rtl",
         }}
       >
-        {data.nama}
+        {data.name}
       </p>
       <p className="text-ios-body font-semibold text-accent">
         {data.namaLatin}

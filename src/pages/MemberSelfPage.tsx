@@ -183,8 +183,8 @@ export default function MemberSelfPage() {
   const { profile, attendance, monitoring, upcoming } = data;
 
   const attendanceHistory = attendance
-    .filter((a) => a.tanggal && a.status_meeting !== "LIBUR")
-    .map((a) => ({ date: a.tanggal, status: a.status }))
+    .filter((a) => a.date && a.status_meeting !== "LIBUR")
+    .map((a) => ({ date: a.date, status: a.status }))
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   return (
@@ -211,7 +211,7 @@ export default function MemberSelfPage() {
     >
       <Header
         title={isMember ? "Profil Saya" : "Biodata Saya"}
-        subtitle={profile.kelompok || "Jamaah"}
+        subtitle={profile.group_label || "Jamaah"}
         onBack={handleBack}
         backLabel="Kembali"
         showSyncButton
@@ -235,14 +235,14 @@ export default function MemberSelfPage() {
       
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <Avatar
-          src={profile.foto_url}
-          name={profile.nama_lengkap}
+          src={profile.photo_url}
+          name={profile.full_name}
           size={64}
-          gender={normalizeGender(profile.jenis_kelamin)}
+          gender={normalizeGender(profile.gender)}
         />
         <div className="min-w-0 flex-1">
           <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
-            {profile.nama_lengkap}
+            {profile.full_name}
           </p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {profile.kategori && (
@@ -250,9 +250,9 @@ export default function MemberSelfPage() {
                 {CATEGORY_LABEL[profile.kategori]}
               </span>
             )}
-            {profile.kelompok && (
+            {profile.group_label && (
               <span className="text-ios-footnote text-surface-muted truncate">
-                {profile.kelompok}
+                {profile.group_label}
               </span>
             )}
           </div>
@@ -347,19 +347,19 @@ function ProfileTab({
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
                   <Calendar size={12} className="text-accent" />
                   <span className="text-ios-subhead font-bold text-accent leading-none mt-0.5 tabular-nums">
-                    {new Date(m.tanggal).getDate()}
+                    {new Date(m.date).getDate()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="inline-block text-[10px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-2 py-0.5 mb-1 uppercase">
-                    {m.hari}
+                    {m.day}
                   </span>
                   <p className="font-medium text-ios-subhead text-surface-text truncate">
-                    {m.acara || "Pengajian"}
+                    {m.event || "Pengajian"}
                   </p>
-                  {m.jam && (
+                  {m.time && (
                     <p className="text-ios-caption text-surface-muted truncate">
-                      {m.jam}
+                      {m.time}
                     </p>
                   )}
                 </div>

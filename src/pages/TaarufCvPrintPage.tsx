@@ -41,7 +41,7 @@ export default function TaarufCvPrintPage() {
     <AppLayout hideNav>
       <Header
         title="CV Taaruf"
-        subtitle={member ? member.nama_lengkap : undefined}
+        subtitle={member ? member.full_name : undefined}
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
           else navigate(`/jamaah/${id}`, { replace: true });

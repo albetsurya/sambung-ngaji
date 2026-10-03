@@ -4,7 +4,7 @@ import type { PendingMember, PendingStatus } from "../../../types";
 export interface ApprovePayload {
   submission_id: string;
   group_id?: string;
-  kelompok?: string;
+  group_label?: string;
 }
 
 export interface ApproveResult {

@@ -2,7 +2,7 @@ const BASE = "https://equran.id/api/v2";
 
 export interface SurahSummary {
   nomor: number;
-  nama: string;
+  name: string;
   namaLatin: string;
   jumlahAyat: number;
   tempatTurun: string;
@@ -72,18 +72,18 @@ export function getSurahAudioUrl(
 
 export interface QariInfo {
   key: string;
-  nama: string;
+  name: string;
 }
 
 export const QARI_LIST: QariInfo[] = [
-  { key: "01", nama: "Misyari Rasyid Al-Afasy" },
-  { key: "02", nama: "Abdurrahman As-Sudais" },
-  { key: "03", nama: "Fares Abbad" },
-  { key: "04", nama: "Maher Al-Muaiqly" },
-  { key: "05", nama: "Sa\'ud As-Syuraim" },
-  { key: "06", nama: "Yasser Ad-Dussary" },
+  { key: "01", name: "Misyari Rasyid Al-Afasy" },
+  { key: "02", name: "Abdurrahman As-Sudais" },
+  { key: "03", name: "Fares Abbad" },
+  { key: "04", name: "Maher Al-Muaiqly" },
+  { key: "05", name: "Sa\'ud As-Syuraim" },
+  { key: "06", name: "Yasser Ad-Dussary" },
 ];
 
 export function getQariName(key: string): string {
-  return QARI_LIST.find((q) => q.key === key)?.nama ?? "Qari";
+  return QARI_LIST.find((q) => q.key === key)?.name ?? "Qari";
 }

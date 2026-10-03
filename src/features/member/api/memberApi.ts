@@ -4,10 +4,10 @@ import type { Member, MemberUserStatus } from "../../../types";
 export interface MemberFilters {
   search?: string;
   kategori?: string;
-  jenis_kelamin?: string;
-  kelompok?: string;
+  gender?: string;
+  group_label?: string;
   group_id?: string;
-  desa?: string;
+  village?: string;
   includeInactive?: boolean;
   limit?: number;
   offset?: number;

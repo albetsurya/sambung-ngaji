@@ -4,18 +4,18 @@ import { formatDateLong } from "../../../utils/format";
 export interface FridayRole {
   key: keyof Pick<
     FridaySchedule,
-    "khatib_imam" | "muadzin" | "penasihat" | "petugas_parkir" | "penata_sandal"
+    "sermon_leader" | "muadzin" | "advisor" | "parking_attendant" | "footwear_attendant"
   >;
   label: string;
   short: string;
 }
 
 export const FRIDAY_ROLES: FridayRole[] = [
-  { key: "khatib_imam", label: "Khatib / Imam", short: "Khatib" },
+  { key: "sermon_leader", label: "Khatib / Imam", short: "Khatib" },
   { key: "muadzin", label: "Muadzin", short: "Muadzin" },
-  { key: "penasihat", label: "Penasihat", short: "Penasihat" },
-  { key: "petugas_parkir", label: "Petugas Parkir", short: "Parkir" },
-  { key: "penata_sandal", label: "Penata Sandal", short: "Sandal" },
+  { key: "advisor", label: "Penasihat", short: "Penasihat" },
+  { key: "parking_attendant", label: "Petugas Parkir", short: "Parkir" },
+  { key: "footwear_attendant", label: "Penata Sandal", short: "Sandal" },
 ];
 
 export function missingRoles(s: FridaySchedule): FridayRole[] {
@@ -43,14 +43,14 @@ export function buildFridayMessage(s: FridaySchedule): string {
   return [
     "╔════════════════════╗",
     "🕌 JADWAL PETUGAS SHALAT JUMAT",
-    `🗓️ ${formatDateLong(s.tanggal)}`,
+    `🗓️ ${formatDateLong(s.date)}`,
     "╚════════════════════╝",
     "",
-    `👤 Khatib & Imam : ${v(s.khatib_imam)}`,
+    `👤 Khatib & Imam : ${v(s.sermon_leader)}`,
     `🎙️ Muadzin          : ${v(s.muadzin)}`,
-    `📖 Penasihat        : ${v(s.penasihat)}`,
-    `🚗 Petugas Parkir : ${v(s.petugas_parkir)}`,
-    `👞 Penata Sandal : ${v(s.penata_sandal)}`,
+    `📖 Penasihat        : ${v(s.advisor)}`,
+    `🚗 Petugas Parkir : ${v(s.parking_attendant)}`,
+    `👞 Penata Sandal : ${v(s.footwear_attendant)}`,
     "",
     "Semoga Allah ﷻ memberikan pahala dan kebarokahan.",
     "",

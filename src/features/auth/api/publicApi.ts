@@ -2,24 +2,24 @@ import { restGet, restPost } from "../../../services/apiClient";
 
 export interface SubmitRegistrationPayload {
   group_id?: string;
-  nama_lengkap: string;
-  nama_panggilan?: string;
-  jenis_kelamin: "L" | "P";
-  tempat_lahir?: string;
-  tanggal_lahir?: string;
-  no_wa: string;
-  alamat_rumah?: string;
-  desa?: string;
-  daerah?: string;
-  pekerjaan?: string;
-  hobi?: string;
-  is_nikah?: boolean;
-  jenjang_pendidikan?: string;
-  sekolah?: string;
-  jurusan?: string;
-  tahun_mulai_pendidikan?: string;
-  tahun_selesai_pendidikan?: string;
-  foto_url?: string;
+  full_name: string;
+  nickname?: string;
+  gender: "L" | "P";
+  birth_place?: string;
+  birth_date?: string;
+  whatsapp_number: string;
+  home_address?: string;
+  village?: string;
+  region?: string;
+  occupation?: string;
+  hobby?: string;
+  is_married?: boolean;
+  education_level?: string;
+  school?: string;
+  major?: string;
+  education_start_year?: string;
+  education_end_year?: string;
+  photo_url?: string;
   username: string;
   password: string;
   _client_ip?: string;
@@ -27,7 +27,7 @@ export interface SubmitRegistrationPayload {
 
 export interface SubmitRegistrationResponse {
   submission_id: string;
-  nama_lengkap: string;
+  full_name: string;
   submitted_at: string;
 }
 

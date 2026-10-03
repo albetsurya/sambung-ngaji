@@ -229,7 +229,7 @@ export default function MemberSholatJournalPage() {
               const complete2 = isComplete(h.entry);
               return (
                 <div
-                  key={h.tanggal}
+                  key={h.date}
                   className={
                     "flex items-center gap-3 px-4 py-3 " +
                     (i !== history.length - 1
@@ -239,7 +239,7 @@ export default function MemberSholatJournalPage() {
                 >
                   <div className="w-20 flex-shrink-0">
                     <p className="text-ios-caption font-medium text-surface-text truncate">
-                      {i === 0 ? "Hari ini" : formatDateShort(h.tanggal)}
+                      {i === 0 ? "Hari ini" : formatDateShort(h.date)}
                     </p>
                   </div>
 

@@ -66,13 +66,13 @@ export default function MemberSettingsPage() {
         <div className="rounded-2xl border border-surface-border bg-surface-card p-4">
           <div className="flex items-center gap-3">
             <Avatar
-              name={user?.nama || "?"}
+              name={user?.name || "?"}
               size={56}
-              gender={user?.jenis_kelamin === "P" ? "P" : "L"}
+              gender={user?.gender === "P" ? "P" : "L"}
             />
             <div className="flex-1 min-w-0">
               <p className="text-ios-body font-semibold text-surface-text truncate">
-                {user?.nama || "Pengguna"}
+                {user?.name || "Pengguna"}
               </p>
               <p className="text-ios-caption text-surface-muted truncate">
                 @{user?.username || "-"}

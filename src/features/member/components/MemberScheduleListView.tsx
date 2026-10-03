@@ -41,7 +41,7 @@ export function MemberScheduleListView({
   const grouped = useMemo(() => {
     const map = new Map<string, Meeting[]>();
     for (const m of meetings) {
-      const monthKey = m.tanggal.slice(0, 7);
+      const monthKey = m.date.slice(0, 7);
       const list = map.get(monthKey) ?? [];
       list.push(m);
       map.set(monthKey, list);
@@ -51,7 +51,7 @@ export function MemberScheduleListView({
       .map(([monthKey, items]) => ({
         monthKey,
         label: formatMonthLabel(monthKey),
-        items: [...items].sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
+        items: [...items].sort((a, b) => a.date.localeCompare(b.date)),
       }));
   }, [meetings]);
 
@@ -79,8 +79,8 @@ export function MemberScheduleListView({
 
           <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
             {g.items.map((m, i) => {
-              const isToday = m.tanggal === today;
-              const targets = normalizeTargets(m.kategori_target);
+              const isToday = m.date === today;
+              const targets = normalizeTargets(m.target_categories);
               return (
                 <button
                   key={m.meeting_id}
@@ -102,17 +102,17 @@ export function MemberScheduleListView({
                     }
                   >
                     <span className="text-[9px] font-semibold uppercase tracking-wide leading-none">
-                      {m.hari.slice(0, 3)}
+                      {m.day.slice(0, 3)}
                     </span>
                     <span className="text-ios-subhead font-bold leading-none mt-0.5 tabular-nums">
-                      {parseInt(m.tanggal.slice(8, 10), 10)}
+                      {parseInt(m.date.slice(8, 10), 10)}
                     </span>
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <p className="text-ios-body font-medium text-surface-text truncate">
-                        {m.acara || "Pengajian"}
+                        {m.event || "Pengajian"}
                       </p>
                       {isToday && (
                         <span className="text-[9px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
@@ -121,7 +121,7 @@ export function MemberScheduleListView({
                       )}
                     </div>
                     <p className="text-ios-caption text-surface-muted truncate">
-                      {m.jam || "-"}
+                      {m.time || "-"}
                     </p>
                     {targets.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">

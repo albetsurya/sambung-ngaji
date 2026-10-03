@@ -187,7 +187,7 @@ export default function AttendancePage() {
       if (pinned) return pinned;
     }
     const today = new Date().toISOString().slice(0, 10);
-    return meetings.find((m) => m.tanggal === today) || meetings[0] || null;
+    return meetings.find((m) => m.date === today) || meetings[0] || null;
   }, [meetings, pinnedMeetingId]);
 
   const selectedMeetingId = selectedMeeting?.meeting_id || "";
@@ -216,20 +216,20 @@ export default function AttendancePage() {
   const eligibleMembers = useMemo(() => {
     let list = members;
 
-    const targets = normalizeTargets(selectedMeeting?.kategori_target);
+    const targets = normalizeTargets(selectedMeeting?.target_categories);
     if (targets.length > 0) {
       list = list.filter((m) => m.kategori && targets.includes(m.kategori));
     }
 
     const gt = getGenderTarget(selectedMeeting);
     if (gt) {
-      list = list.filter((m) => m.jenis_kelamin === gt);
+      list = list.filter((m) => m.gender === gt);
     }
 
     return list;
   }, [
     members,
-    selectedMeeting?.kategori_target,
+    selectedMeeting?.target_categories,
     selectedMeeting?.gender_target,
   ]);
 
@@ -247,11 +247,11 @@ export default function AttendancePage() {
 
   const filteredMembers = useMemo(() => {
     return eligibleMembers.filter((m) => {
-      if (gender && m.jenis_kelamin !== gender) return false;
+      if (gender && m.gender !== gender) return false;
       if (category && m.kategori !== category) return false;
       if (
         deferredSearch &&
-        !m.nama_lengkap.toLowerCase().includes(deferredSearch.toLowerCase())
+        !m.full_name.toLowerCase().includes(deferredSearch.toLowerCase())
       )
         return false;
       return true;
@@ -686,7 +686,7 @@ export default function AttendancePage() {
       <Header
         title="Absensi"
         subtitle={
-          selectedMeeting ? formatDateLong(selectedMeeting.tanggal) : undefined
+          selectedMeeting ? formatDateLong(selectedMeeting.date) : undefined
         }
         showSyncButton={false}
         right={
@@ -746,20 +746,20 @@ export default function AttendancePage() {
                       </div>
                       <p className="text-ios-body font-medium text-surface-text truncate">
                         {selectedMeeting
-                          ? `${selectedMeeting.hari} - ${selectedMeeting.acara || "Pengajian"}`
+                          ? `${selectedMeeting.day} - ${selectedMeeting.event || "Pengajian"}`
                           : "Pilih jadwal"}
                       </p>
                       {selectedMeeting && (
                         <p className="text-ios-footnote text-surface-muted truncate">
-                          {formatDateLongText(selectedMeeting.tanggal)} ·{" "}
-                          {selectedMeeting.jam || "-"}
+                          {formatDateLongText(selectedMeeting.date)} ·{" "}
+                          {selectedMeeting.time || "-"}
                         </p>
                       )}
                       {selectedMeeting &&
-                        normalizeTargets(selectedMeeting.kategori_target)
+                        normalizeTargets(selectedMeeting.target_categories)
                           .length > 0 && (
                           <p className="text-ios-caption text-accent truncate mt-0.5">
-                            {normalizeTargets(selectedMeeting.kategori_target)
+                            {normalizeTargets(selectedMeeting.target_categories)
                               .map((k) => CATEGORY_LABEL[k])
                               .join(" · ")}
                           </p>
@@ -929,10 +929,10 @@ export default function AttendancePage() {
                     description={
                       search || category || gender
                         ? "Coba ubah kata kunci atau filter."
-                        : normalizeTargets(selectedMeeting?.kategori_target)
+                        : normalizeTargets(selectedMeeting?.target_categories)
                               .length > 0
                           ? `Tidak ada jamaah dengan kategori ${normalizeTargets(
-                              selectedMeeting?.kategori_target,
+                              selectedMeeting?.target_categories,
                             )
                               .map((k) => CATEGORY_LABEL[k])
                               .join(", ")}.`
@@ -1019,7 +1019,7 @@ export default function AttendancePage() {
         title="Hapus jadwal pengajian?"
         description={
           deleteMeetingTarget
-            ? `Jadwal "${deleteMeetingTarget.acara || "Pengajian"}" pada ${formatDateLongText(deleteMeetingTarget.tanggal)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
+            ? `Jadwal "${deleteMeetingTarget.event || "Pengajian"}" pada ${formatDateLongText(deleteMeetingTarget.date)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
             : ""
         }
         confirmLabel="Ya, Hapus"
@@ -1056,7 +1056,7 @@ export default function AttendancePage() {
         open={confirmResetAll}
         title="Reset semua absensi?"
         description={`Semua catatan absensi untuk ${
-          selectedMeeting?.acara || "pengajian ini"
+          selectedMeeting?.event || "pengajian ini"
         } akan dihapus. Tindakan ini tidak bisa dibatalkan.`}
         confirmLabel="Ya, Reset"
         danger
@@ -1070,7 +1070,7 @@ export default function AttendancePage() {
         title="Tandai jadwal libur?"
         description={
           confirmLibur
-            ? `Jadwal "${confirmLibur.acara || "Pengajian"}" akan ditandai libur. Absensi yang sudah ada tidak akan dihitung dalam persentase kehadiran dan tidak dapat diubah.`
+            ? `Jadwal "${confirmLibur.event || "Pengajian"}" akan ditandai libur. Absensi yang sudah ada tidak akan dihitung dalam persentase kehadiran dan tidak dapat diubah.`
             : ""
         }
         confirmLabel="Ya, Tandai Libur"
@@ -1112,7 +1112,7 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
     didLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
       didLongPress.current = true;
-      onRequestDelete(member.member_id, member.nama_lengkap);
+      onRequestDelete(member.member_id, member.full_name);
     }, 600);
   }
 
@@ -1127,7 +1127,7 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
     if (readonly) return;
     if (status) {
       e.preventDefault();
-      onRequestDelete(member.member_id, member.nama_lengkap);
+      onRequestDelete(member.member_id, member.full_name);
     }
   }
 
@@ -1145,9 +1145,9 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
           <p className="text-ios-body font-medium text-surface-text truncate">
             {getDisplayName(member)}
           </p>
-          {member.kelompok && (
+          {member.group_label && (
             <p className="text-ios-caption text-surface-muted truncate">
-              {member.kelompok}
+              {member.group_label}
             </p>
           )}
         </div>
@@ -1186,9 +1186,9 @@ const CompactAttendanceRow = memo(function CompactAttendanceRow({
         <p className="text-ios-body font-medium text-surface-text truncate">
           {getDisplayName(member)}
         </p>
-        {member.kelompok && (
+        {member.group_label && (
           <p className="text-ios-caption text-surface-muted truncate">
-            {member.kelompok}
+            {member.group_label}
           </p>
         )}
       </div>
@@ -1368,13 +1368,13 @@ function MeetingPickerContent({
     const q = deferredSearch.toLowerCase().trim();
     return meetings.filter((m) => {
       const hay =
-        (m.acara || "").toLowerCase() +
+        (m.event || "").toLowerCase() +
         " " +
-        (m.hari || "").toLowerCase() +
+        (m.day || "").toLowerCase() +
         " " +
-        (m.tanggal || "") +
+        (m.date || "") +
         " " +
-        (m.jam || "").toLowerCase();
+        (m.time || "").toLowerCase();
       return hay.includes(q);
     });
   }, [meetings, deferredSearch]);
@@ -1382,7 +1382,7 @@ function MeetingPickerContent({
   const grouped = useMemo(() => {
     const map = new Map<string, Meeting[]>();
     for (const m of filtered) {
-      const monthKey = m.tanggal.slice(0, 7);
+      const monthKey = m.date.slice(0, 7);
       const list = map.get(monthKey) ?? [];
       list.push(m);
       map.set(monthKey, list);
@@ -1392,7 +1392,7 @@ function MeetingPickerContent({
       .map(([monthKey, items]) => ({
         monthKey,
         label: formatMonthLabel(monthKey),
-        items: [...items].sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
+        items: [...items].sort((a, b) => b.date.localeCompare(a.date)),
       }));
   }, [filtered]);
 
@@ -1543,8 +1543,8 @@ function MeetingPickerContent({
           <div className="mt-2 rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
             {items.map((m, i) => {
               const active = m.meeting_id === selectedId;
-              const isToday = m.tanggal === today;
-              const targets = normalizeTargets(m.kategori_target);
+              const isToday = m.date === today;
+              const targets = normalizeTargets(m.target_categories);
               const isSelected = selectedIds.has(m.meeting_id);
 
               return (
@@ -1629,10 +1629,10 @@ function MeetingPickerContent({
                       }
                     >
                       <span className="text-[8px] font-semibold uppercase tracking-wide leading-none">
-                        {m.hari.slice(0, 3)}
+                        {m.day.slice(0, 3)}
                       </span>
                       <span className="text-[13px] font-bold leading-none mt-0.5 tabular-nums">
-                        {parseInt(m.tanggal.slice(8, 10), 10)}
+                        {parseInt(m.date.slice(8, 10), 10)}
                       </span>
                     </div>
 
@@ -1646,7 +1646,7 @@ function MeetingPickerContent({
                               : "text-surface-text")
                           }
                         >
-                          {m.acara || "Pengajian"}
+                          {m.event || "Pengajian"}
                         </p>
                         {isToday && !active && !selectionMode && (
                           <span className="text-[8px] font-bold tracking-wide text-success bg-success-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
@@ -1662,7 +1662,7 @@ function MeetingPickerContent({
                         )}
                       </div>
                       <p className="text-ios-caption text-surface-muted truncate">
-                        {m.jam || "-"}
+                        {m.time || "-"}
                         {targets.length > 0 &&
                           " · " +
                             targets
@@ -1683,7 +1683,7 @@ function MeetingPickerContent({
                         e.stopPropagation();
                         onRequestAction(m);
                       }}
-                      aria-label={`Aksi jadwal ${m.acara || "Pengajian"}`}
+                      aria-label={`Aksi jadwal ${m.event || "Pengajian"}`}
                       title="Aksi jadwal"
                       className="flex-shrink-0"
                     >
@@ -1745,7 +1745,7 @@ function MeetingPickerContent({
             ? "Jadwal berikut akan dihapus permanen:\n" +
               selectedMeetings
                 .slice(0, 5)
-                .map((m) => "• " + m.tanggal + " · " + (m.acara || "Pengajian"))
+                .map((m) => "• " + m.date + " · " + (m.event || "Pengajian"))
                 .join("\n") +
               (selectedMeetings.length > 5
                 ? "\n• +" + (selectedMeetings.length - 5) + " lainnya"
@@ -1796,7 +1796,7 @@ function MeetingActionContent({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-medium text-surface-text truncate">
-                        {meeting.hari} · {meeting.acara || "Pengajian"}
+                        {meeting.day} · {meeting.event || "Pengajian"}
             {isLibur && (
               <span className="ml-2 inline-block text-[10px] font-semibold bg-danger-soft text-danger rounded-full px-2 py-0.5 align-middle">
                 Libur
@@ -1804,7 +1804,7 @@ function MeetingActionContent({
             )}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
-            {formatDateLongText(meeting.tanggal)} · {meeting.jam || "-"}
+            {formatDateLongText(meeting.date)} · {meeting.time || "-"}
           </p>
         </div>
       </div>
@@ -1842,7 +1842,7 @@ function MeetingActionContent({
               Edit Jadwal
             </p>
             <p className="text-ios-footnote text-surface-muted">
-              Ubah tanggal, jam, acara, atau kategori
+              Ubah tanggal, time, event, atau kategori
             </p>
           </div>
         </button>
@@ -1896,10 +1896,10 @@ function MeetingFormContent({
   const { assignedGroup } = usePermission();
   const isEdit = mode === "edit";
 
-  const [tanggal, setTanggal] = useState(getTodayIso());
-  const [jam, setJam] = useState("Isya di tempat");
+  const [date, setDate] = useState(getTodayIso());
+  const [time, setTime] = useState("Isya di tempat");
   const [groupId, setGroupId] = useState("");
-  const [acara, setAcara] = useState("Sambung Kelompok");
+  const [event, setEvent] = useState("Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>([]);
   const [genderTarget, setGenderTarget] = useState<GenderTarget>("");
 
@@ -1916,21 +1916,21 @@ function MeetingFormContent({
 
   useEffect(() => {
     if (isEdit && meeting) {
-      setTanggal(meeting.tanggal || getTodayIso());
-      setJam(meeting.jam || "Isya di tempat");
+      setDate(meeting.date || getTodayIso());
+      setTime(meeting.time || "Isya di tempat");
       setGroupId(meeting.group_id || "");
-      setAcara(meeting.acara || "Sambung Kelompok");
+      setEvent(meeting.event || "Sambung Kelompok");
       setKategoriTarget(
-        Array.isArray(meeting.kategori_target)
-          ? (meeting.kategori_target as MemberCategory[])
+        Array.isArray(meeting.target_categories)
+          ? (meeting.target_categories as MemberCategory[])
           : [],
       );
       setGenderTarget(getGenderTarget(meeting));
     } else {
-      setTanggal(getTodayIso());
-      setJam("Isya di tempat");
+      setDate(getTodayIso());
+      setTime("Isya di tempat");
       setGroupId(assignedGroup ?? "");
-      setAcara("Sambung Kelompok");
+      setEvent("Sambung Kelompok");
       setKategoriTarget([]);
       setGenderTarget("");
     }
@@ -1939,11 +1939,11 @@ function MeetingFormContent({
   const mutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        tanggal,
-        jam,
+        date,
+        time,
         group_id: groupId,
-        acara,
-        kategori_target: kategoriTarget,
+        event,
+        target_categories: kategoriTarget,
         /* "" (Semua) dikirim null agar lolos CHECK database. */
         gender_target: genderTarget || null,
         send_reminder: true,
@@ -1982,9 +1982,9 @@ function MeetingFormContent({
     <>
       <DateInput
         label="Tanggal"
-        value={tanggal}
-        onChange={setTanggal}
-        hint={`Hari: ${getHariFromDate(tanggal)}`}
+        value={date}
+        onChange={setDate}
+        hint={`Hari: ${getHariFromDate(date)}`}
       />
       <Select
         label="Kelompok"
@@ -1998,11 +1998,11 @@ function MeetingFormContent({
           </option>
         ))}
       </Select>
-      <Input label="Jam" value={jam} onChange={(e) => setJam(e.target.value)} />
+      <Input label="Jam" value={time} onChange={(e) => setTime(e.target.value)} />
       <Input
         label="Acara"
-        value={acara}
-        onChange={(e) => setAcara(e.target.value)}
+        value={event}
+        onChange={(e) => setEvent(e.target.value)}
       />
 
       <div className="mb-4">

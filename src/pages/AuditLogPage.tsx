@@ -90,7 +90,7 @@ export default function AuditLogPage() {
         const q = deferredSearch.toLowerCase();
         const matches =
           l.action?.toLowerCase().includes(q) ||
-          l.user_nama?.toLowerCase().includes(q) ||
+          l.user_name?.toLowerCase().includes(q) ||
           l.user_id?.toLowerCase().includes(q) ||
           l.target_id?.toLowerCase().includes(q) ||
           l.target_type?.toLowerCase().includes(q);
@@ -246,7 +246,7 @@ export default function AuditLogPage() {
                       <Badge color={getActionColor(l.action)}>{l.action}</Badge>
                     </div>
                     <p className="text-ios-body font-medium text-surface-text truncate">
-                      {l.user_nama || l.user_id || "-"}
+                      {l.user_name || l.user_id || "-"}
                     </p>
                     <p className="text-ios-footnote text-surface-muted truncate">
                       {l.target_type}

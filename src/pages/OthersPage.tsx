@@ -43,7 +43,7 @@ import { queryKeys } from "../lib/queryClient";
 import type { Group } from "../types";
 import { GroupedListSkeleton } from "../components/ui/Skeleton";
 
-type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "info" | "sistem" | "akun";
+type MenuGroup = "tampilan" | "jamaah" | "schedule" | "info" | "sistem" | "akun";
 
 const FOCUS_GROUP_KEY = "superadmin_focus_group";
 
@@ -117,7 +117,7 @@ export default function OthersPage() {
     return allGroups.filter(
       (g) =>
         g.group_name.toLowerCase().includes(s) ||
-        (g.pembina || "").toLowerCase().includes(s),
+        (g.mentor || "").toLowerCase().includes(s),
     );
   }, [allGroups, groupSearch]);
 
@@ -169,7 +169,7 @@ export default function OthersPage() {
         group: "jamaah",
       },
       {
-        key: "kelompok",
+        key: "group_label",
         label: "Kelompok",
         description: "Kelola kelompok pengajian",
         Icon: Building2,
@@ -197,7 +197,7 @@ export default function OthersPage() {
       },
 
       {
-        key: "jadwal",
+        key: "schedule",
         label: "Kelola Jadwal",
         description: "Kalender, tambah massal, import PDF",
         Icon: Calendar,
@@ -206,7 +206,7 @@ export default function OthersPage() {
           (isAdminLike || role === "TIM_ABSENSI") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
       {
         key: "rekap-absensi",
@@ -218,7 +218,7 @@ export default function OthersPage() {
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
       {
         key: "petugas-jumat",
@@ -230,7 +230,7 @@ export default function OthersPage() {
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
 
       {
@@ -326,7 +326,7 @@ export default function OthersPage() {
   const GROUP_LABEL: Record<MenuGroup, string> = {
     tampilan: "Pengaturan Aplikasi",
     jamaah: "Jamaah & Kelompok",
-    jadwal: "Jadwal & Absensi",
+    schedule: "Jadwal & Absensi",
     info: "Informasi",
     sistem: "Sistem & Hak Akses",
     akun: "Akun Saya",
@@ -335,7 +335,7 @@ export default function OthersPage() {
   const GROUP_ORDER: MenuGroup[] = [
     "tampilan",
     "jamaah",
-    "jadwal",
+    "schedule",
     "info",
     "akun",
     "sistem",
@@ -411,14 +411,14 @@ export default function OthersPage() {
           >
             <div className="flex items-center gap-3">
               <Avatar
-                src={user?.foto_url}
-                name={user?.nama || "?"}
+                src={user?.photo_url}
+                name={user?.name || "?"}
                 size={52}
-                gender={normalizeGender(user?.jenis_kelamin)}
+                gender={normalizeGender(user?.gender)}
               />
               <div className="min-w-0 flex-1">
                 <p className="text-ios-body font-semibold text-surface-text truncate">
-                  {user?.nama}
+                  {user?.name}
                 </p>
                 <p className="text-ios-footnote text-surface-muted truncate">
                   @{user?.username}
@@ -625,10 +625,10 @@ export default function OthersPage() {
                           {g.group_name}
                         </p>
                         <p className="text-ios-caption text-surface-muted truncate">
-                          {g.pembina
-                            ? `Pembina: ${g.pembina}`
+                          {g.mentor
+                            ? `Pembina: ${g.mentor}`
                             : "Kelola anggota, jadwal & absensi"}
-                          {g.jadwal ? ` · ${g.jadwal}` : ""}
+                          {g.schedule ? ` · ${g.schedule}` : ""}
                         </p>
                       </div>
                       {focusGroupId === g.group_id && (

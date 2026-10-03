@@ -504,7 +504,7 @@ function AppRoutes() {
           <Route path="/lainnya">
             <Route index element={<OthersPage />} />
             <Route
-              path="kelompok"
+              path="group_label"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                   <GroupsPage />

@@ -94,23 +94,23 @@ export default function MemberImportPage() {
     for (const m of parsed) {
       try {
         const payload: Partial<Member> = {
-          nama_lengkap: m.nama_lengkap,
-          nama_panggilan: m.nama_panggilan || undefined,
-          jenis_kelamin: m.jenis_kelamin || undefined,
-          tempat_lahir: m.tempat_lahir || undefined,
-          tanggal_lahir: m.tanggal_lahir || undefined,
-          no_wa: m.no_wa || undefined,
-          alamat_rumah: m.alamat_rumah || undefined,
-          desa: m.desa || undefined,
-          daerah: m.daerah || undefined,
-          pekerjaan: m.pekerjaan || undefined,
-          hobi: m.hobi || undefined,
-          is_muballigh: m.is_muballigh,
-          is_nikah: m.is_nikah,
-          is_kerja: m.is_kerja,
-          jenjang_pendidikan: m.jenjang_pendidikan || undefined,
-          sekolah: m.sekolah || undefined,
-          jurusan: m.jurusan || undefined,
+          full_name: m.full_name,
+          nickname: m.nickname || undefined,
+          gender: m.gender || undefined,
+          birth_place: m.birth_place || undefined,
+          birth_date: m.birth_date || undefined,
+          whatsapp_number: m.whatsapp_number || undefined,
+          home_address: m.home_address || undefined,
+          village: m.village || undefined,
+          region: m.region || undefined,
+          occupation: m.occupation || undefined,
+          hobby: m.hobby || undefined,
+          is_preacher: m.is_preacher,
+          is_married: m.is_married,
+          is_employed: m.is_employed,
+          education_level: m.education_level || undefined,
+          school: m.school || undefined,
+          major: m.major || undefined,
         };
         await memberApi.create(payload);
         out.push({ member: m, ok: true });
@@ -424,15 +424,15 @@ function MemberPreviewCard({
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-medium text-surface-text truncate">
-            {member.nama_lengkap}
+            {member.full_name}
           </p>
           <p className="text-ios-caption text-surface-muted truncate">
-            {member.jenis_kelamin === "L"
+            {member.gender === "L"
               ? "Laki-laki"
-              : member.jenis_kelamin === "P"
+              : member.gender === "P"
                 ? "Perempuan"
                 : "Gender ?"}{" "}
-            · {member.no_wa || "WA ?"}
+            · {member.whatsapp_number || "WA ?"}
           </p>
         </div>
         {hasWarning && (
@@ -449,26 +449,26 @@ function MemberPreviewCard({
 
       {open && (
         <div className="px-4 py-3 border-t border-surface-border space-y-2">
-          <Field label="Nama Lengkap" value={member.nama_lengkap} />
-          <Field label="Nama Panggilan" value={member.nama_panggilan} />
-          <Field label="Jenis Kelamin" value={member.jenis_kelamin} />
-          <Field label="Tempat Lahir" value={member.tempat_lahir} />
-          <Field label="Tanggal Lahir" value={member.tanggal_lahir} />
-          <Field label="No. WA" value={member.no_wa} />
-          <Field label="Alamat" value={member.alamat_rumah} />
-          <Field label="Desa" value={member.desa} />
-          <Field label="Daerah" value={member.daerah} />
-          <Field label="Pekerjaan" value={member.pekerjaan} />
-          <Field label="Hobi" value={member.hobi} />
-          <Field label="Jenjang" value={member.jenjang_pendidikan} />
-          <Field label="Sekolah" value={member.sekolah} />
-          <Field label="Jurusan" value={member.jurusan} />
+          <Field label="Nama Lengkap" value={member.full_name} />
+          <Field label="Nama Panggilan" value={member.nickname} />
+          <Field label="Jenis Kelamin" value={member.gender} />
+          <Field label="Tempat Lahir" value={member.birth_place} />
+          <Field label="Tanggal Lahir" value={member.birth_date} />
+          <Field label="No. WA" value={member.whatsapp_number} />
+          <Field label="Alamat" value={member.home_address} />
+          <Field label="Desa" value={member.village} />
+          <Field label="Daerah" value={member.region} />
+          <Field label="Pekerjaan" value={member.occupation} />
+          <Field label="Hobi" value={member.hobby} />
+          <Field label="Jenjang" value={member.education_level} />
+          <Field label="Sekolah" value={member.school} />
+          <Field label="Jurusan" value={member.major} />
           <Field
             label="Muballigh"
-            value={member.is_muballigh ? "Ya" : "Tidak"}
+            value={member.is_preacher ? "Ya" : "Tidak"}
           />
-          <Field label="Kerja" value={member.is_kerja ? "Ya" : "Tidak"} />
-          <Field label="Nikah" value={member.is_nikah ? "Ya" : "Tidak"} />
+          <Field label="Kerja" value={member.is_employed ? "Ya" : "Tidak"} />
+          <Field label="Nikah" value={member.is_married ? "Ya" : "Tidak"} />
           {hasWarning && (
             <div className="pt-2 mt-2 border-t border-surface-border">
               {member.warnings.map((w, i) => (
@@ -589,7 +589,7 @@ function DonePhase({
                   <X size={12} className="text-danger flex-shrink-0 mt-1" />
                   <div className="min-w-0 flex-1">
                     <p className="text-ios-footnote font-medium text-surface-text truncate">
-                      {r.member.nama_lengkap}
+                      {r.member.full_name}
                     </p>
                     <p className="text-ios-caption text-danger/80">
                       {r.error}

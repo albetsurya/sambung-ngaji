@@ -36,7 +36,7 @@ export function MonitoringTab({
 }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<MonitoringStatus>("AKTIF");
-  const [catatan, setCatatan] = useState("");
+  const [notes, setNotes] = useState("");
   const [tindakLanjut, setTindakLanjut] = useState("");
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
@@ -45,7 +45,7 @@ export function MonitoringTab({
   const analysis = useMemo(() => analyzeAttendance(attendance), [attendance]);
 
   function handleOpenSheet() {
-    setCatatan(analysis.suggestedCatatan);
+    setNotes(analysis.suggestedCatatan);
 
     if (analysis.alpaStreak >= 3 || analysis.sakitStreak >= 3) {
       setStatus("PERLU_PERHATIAN");
@@ -65,12 +65,12 @@ export function MonitoringTab({
       await monitoringApi.create({
         member_id: memberId,
         status,
-        catatan,
-        tindak_lanjut: tindakLanjut,
+        notes,
+        follow_up: tindakLanjut,
       });
       showToast("Catatan monitoring disimpan");
       setOpen(false);
-      setCatatan("");
+      setNotes("");
       setTindakLanjut("");
       queryClient.invalidateQueries({
         queryKey: queryKeys.monitoring(memberId),
@@ -138,20 +138,20 @@ export function MonitoringTab({
         <Card key={m.monitoring_id}>
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-ios-caption text-surface-muted">
-              {formatDateShort(m.tanggal)}
+              {formatDateShort(m.date)}
             </span>
             <Badge color={STATUS_COLOR[m.status] || "ink"}>
               {MONITORING_LABEL[m.status]}
             </Badge>
           </div>
-          {m.catatan && (
+          {m.notes && (
             <p className="text-ios-subhead text-surface-text mb-1 whitespace-pre-line">
-              {m.catatan}
+              {m.notes}
             </p>
           )}
-          {m.tindak_lanjut && (
+          {m.follow_up && (
             <p className="text-ios-footnote text-surface-muted">
-              Tindak lanjut: {m.tindak_lanjut}
+              Tindak lanjut: {m.follow_up}
             </p>
           )}
         </Card>
@@ -187,8 +187,8 @@ export function MonitoringTab({
 
         <Textarea
           label="Catatan"
-          value={catatan}
-          onChange={(e) => setCatatan(e.target.value)}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
           placeholder="Ceritakan kondisi jamaah..."
           rows={5}
         />

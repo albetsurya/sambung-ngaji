@@ -1,7 +1,7 @@
 
 export interface PuasaInfo {
   key: string;
-  nama: string;
+  name: string;
   deskripsi: string;
   keutamaan?: string;
   dalil?: string;
@@ -26,7 +26,7 @@ export interface PuasaDay {
 
 export const PUASA_SENIN: PuasaInfo = {
   key: "senin",
-  nama: "Puasa Senin",
+  name: "Puasa Senin",
   deskripsi: "Puasa sunnah hari Senin",
   keutamaan:
     "Rasulullah SAW biasa berpuasa pada hari Senin karena pada hari itu beliau dilahirkan dan wahyu pertama diturunkan.",
@@ -36,7 +36,7 @@ export const PUASA_SENIN: PuasaInfo = {
 
 export const PUASA_KAMIS: PuasaInfo = {
   key: "kamis",
-  nama: "Puasa Kamis",
+  name: "Puasa Kamis",
   deskripsi: "Puasa sunnah hari Kamis",
   keutamaan:
     "Pada hari Kamis amal-amal perbuatan dilaporkan kepada Allah, dan Rasulullah SAW senang amalnya dilaporkan dalam keadaan berpuasa.",
@@ -46,7 +46,7 @@ export const PUASA_KAMIS: PuasaInfo = {
 
 export const PUASA_AYYAMUL_BIDH: PuasaInfo = {
   key: "ayyamul-bidh",
-  nama: "Puasa Ayyamul Bidh",
+  name: "Puasa Ayyamul Bidh",
   deskripsi: "Puasa hari ke-13, 14, 15 bulan Hijriah",
   keutamaan:
     "Barangsiapa berpuasa 3 hari setiap bulan (Ayyamul Bidh), seolah-olah ia berpuasa sepanjang tahun.",
@@ -56,7 +56,7 @@ export const PUASA_AYYAMUL_BIDH: PuasaInfo = {
 
 export const PUASA_TASUA: PuasaInfo = {
   key: "tasua",
-  nama: "Puasa Tasu'a",
+  name: "Puasa Tasu'a",
   deskripsi: "Puasa 9 Muharram",
   keutamaan:
     "Puasa sehari sebelum Asyura untuk menyelisihi kebiasaan Yahudi dalam berpuasa Asyura.",
@@ -66,7 +66,7 @@ export const PUASA_TASUA: PuasaInfo = {
 
 export const PUASA_ASYURA: PuasaInfo = {
   key: "asyura",
-  nama: "Puasa Asyura",
+  name: "Puasa Asyura",
   deskripsi: "Puasa 10 Muharram",
   keutamaan:
     "Menghapus dosa-dosa setahun yang telah lalu.",
@@ -76,7 +76,7 @@ export const PUASA_ASYURA: PuasaInfo = {
 
 export const PUASA_TARWIYAH: PuasaInfo = {
   key: "tarwiyah",
-  nama: "Puasa Tarwiyah",
+  name: "Puasa Tarwiyah",
   deskripsi: "Puasa 8 Dzulhijjah",
   keutamaan:
     "Termasuk puasa sunnah di 10 hari awal Dzulhijjah yang sangat dianjurkan.",
@@ -86,7 +86,7 @@ export const PUASA_TARWIYAH: PuasaInfo = {
 
 export const PUASA_ARAFAH: PuasaInfo = {
   key: "arafah",
-  nama: "Puasa Arafah",
+  name: "Puasa Arafah",
   deskripsi: "Puasa 9 Dzulhijjah",
   keutamaan:
     "Menghapus dosa setahun yang lalu dan setahun yang akan datang, khusus bagi yang tidak berhaji.",
@@ -96,7 +96,7 @@ export const PUASA_ARAFAH: PuasaInfo = {
 
 export const PUASA_SYAWAL: PuasaInfo = {
   key: "syawal",
-  nama: "Puasa 6 Hari Syawal",
+  name: "Puasa 6 Hari Syawal",
   deskripsi: "Puasa 6 hari di bulan Syawal",
   keutamaan:
     "Barangsiapa berpuasa Ramadhan lalu melanjutkan dengan 6 hari di bulan Syawal, seolah-olah ia berpuasa sepanjang tahun.",

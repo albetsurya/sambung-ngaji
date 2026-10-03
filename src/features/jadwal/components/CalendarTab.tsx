@@ -30,7 +30,7 @@ import { CalendarSkeleton } from "../../../components/ui/Skeleton";
 type ModalState =
   | { view: "closed" }
   | { view: "detail"; meeting: Meeting }
-  | { view: "form"; mode: "create"; tanggal: string }
+  | { view: "form"; mode: "create"; date: string }
   | { view: "form"; mode: "edit"; meeting: Meeting };
 
 export function CalendarTab() {
@@ -68,15 +68,15 @@ export function CalendarTab() {
     () =>
       meetings.map((m: Meeting) => ({
         id: m.meeting_id,
-        title: m.acara || "Pengajian",
-        date: m.tanggal,
+        title: m.event || "Pengajian",
+        date: m.date,
         extendedProps: { meeting: m },
       })),
     [meetings],
   );
 
   function handleDateClick(arg: DateClickArg) {
-    setModal({ view: "form", mode: "create", tanggal: arg.dateStr });
+    setModal({ view: "form", mode: "create", date: arg.dateStr });
   }
 
   function handleEventClick(arg: EventClickArg) {
@@ -185,7 +185,7 @@ export function CalendarTab() {
           <MeetingFormContent
             mode={modal.mode}
             meeting={modal.mode === "edit" ? modal.meeting : null}
-            initialTanggal={modal.mode === "create" ? modal.tanggal : undefined}
+            initialTanggal={modal.mode === "create" ? modal.date : undefined}
             onClose={closeModal}
             onSaved={() => {
               const wasCreate =
@@ -204,7 +204,7 @@ export function CalendarTab() {
         title="Hapus jadwal ini?"
         description={
           confirmDelete
-            ? `Jadwal "${confirmDelete.acara || "Pengajian"}" pada ${formatDateLongText(confirmDelete.tanggal)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
+            ? `Jadwal "${confirmDelete.event || "Pengajian"}" pada ${formatDateLongText(confirmDelete.date)} akan dihapus permanen, BESERTA semua catatan absensi yang terkait. Tindakan ini tidak bisa dibatalkan.`
             : ""
         }
         confirmLabel="Ya, Hapus"
@@ -233,8 +233,8 @@ function AgendaList({
 
   const filtered = useMemo(() => {
     return meetings
-      .filter((m) => m.tanggal >= range.from && m.tanggal <= range.to)
-      .sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+      .filter((m) => m.date >= range.from && m.date <= range.to)
+      .sort((a, b) => a.date.localeCompare(b.date));
   }, [meetings, range]);
 
   return (
@@ -258,9 +258,9 @@ function AgendaList({
       ) : (
         <div className="rounded-2xl border border-surface-border bg-surface-card overflow-hidden">
           {filtered.map((m, i) => {
-            const isToday = m.tanggal === today;
-            const targets = Array.isArray(m.kategori_target)
-              ? (m.kategori_target as MemberCategory[])
+            const isToday = m.date === today;
+            const targets = Array.isArray(m.target_categories)
+              ? (m.target_categories as MemberCategory[])
               : [];
 
             return (
@@ -281,17 +281,17 @@ function AgendaList({
                   }`}
                 >
                   <span className="text-[9px] font-semibold uppercase tracking-wide leading-none">
-                    {m.hari.slice(0, 3)}
+                    {m.day.slice(0, 3)}
                   </span>
                   <span className="text-ios-subhead font-bold leading-none mt-0.5 tabular-nums">
-                    {parseInt(m.tanggal.slice(8, 10), 10)}
+                    {parseInt(m.date.slice(8, 10), 10)}
                   </span>
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="text-ios-body font-medium text-surface-text truncate">
-                      {m.acara || "Pengajian"}
+                      {m.event || "Pengajian"}
                     </p>
                     {isToday && (
                       <span className="text-[9px] font-bold tracking-wide text-accent bg-accent-soft rounded-full px-1.5 py-0.5 uppercase flex-shrink-0">
@@ -300,7 +300,7 @@ function AgendaList({
                     )}
                   </div>
                   <p className="text-ios-caption text-surface-muted truncate">
-                    {m.jam || "-"}
+                    {m.time || "-"}
                     {m.group_id ? ` · ${m.group_id}` : ""}
                   </p>
                   {targets.length > 0 && (
@@ -340,28 +340,28 @@ function MeetingDetailContent({
   onEdit: () => void;
   onRequestDelete: (m: Meeting) => void;
 }) {
-  const targets = Array.isArray(meeting.kategori_target)
-    ? (meeting.kategori_target as MemberCategory[])
+  const targets = Array.isArray(meeting.target_categories)
+    ? (meeting.target_categories as MemberCategory[])
     : [];
 
   return (
     <>
       <div className="mb-4 p-4 rounded-2xl bg-accent-soft/60 border border-accent/15">
         <p className="text-[11px] font-medium text-accent uppercase tracking-wide mb-1">
-          {meeting.hari}
+          {meeting.day}
         </p>
         <p className="text-ios-nav font-semibold text-surface-text mb-1">
-          {meeting.acara || "Pengajian"}
+          {meeting.event || "Pengajian"}
         </p>
         <div className="flex items-center gap-3 text-ios-footnote text-surface-muted flex-wrap">
           <span className="inline-flex items-center gap-1">
             <Calendar size={12} />
-            {formatDateLongText(meeting.tanggal)}
+            {formatDateLongText(meeting.date)}
           </span>
-          {meeting.jam && (
+          {meeting.time && (
             <span className="inline-flex items-center gap-1">
               <Calendar size={12} />
-              {meeting.jam}
+              {meeting.time}
             </span>
           )}
         </div>
@@ -379,17 +379,17 @@ function MeetingDetailContent({
         )}
       </div>
 
-      {meeting.materi && (
+      {meeting.topic && (
         <div className="mb-3">
           <p className="text-ios-caption text-surface-muted mb-1">Materi</p>
-          <p className="text-ios-body text-surface-text">{meeting.materi}</p>
+          <p className="text-ios-body text-surface-text">{meeting.topic}</p>
         </div>
       )}
 
-      {meeting.catatan && (
+      {meeting.notes && (
         <div className="mb-3">
           <p className="text-ios-caption text-surface-muted mb-1">Catatan</p>
-          <p className="text-ios-body text-surface-text">{meeting.catatan}</p>
+          <p className="text-ios-body text-surface-text">{meeting.notes}</p>
         </div>
       )}
 
@@ -431,17 +431,17 @@ function MeetingFormContent({
   const { assignedGroup } = usePermission();
   const isEdit = mode === "edit";
 
-  const [tanggal, setTanggal] = useState(
-    initialTanggal || meeting?.tanggal || getTodayIso(),
+  const [date, setDate] = useState(
+    initialTanggal || meeting?.date || getTodayIso(),
   );
-  const [jam, setJam] = useState(meeting?.jam || "Isya di tempat");
+  const [time, setTime] = useState(meeting?.time || "Isya di tempat");
   const [groupId, setGroupId] = useState(
     meeting?.group_id || assignedGroup || "",
   );
-  const [acara, setAcara] = useState(meeting?.acara || "Sambung Kelompok");
+  const [event, setEvent] = useState(meeting?.event || "Sambung Kelompok");
   const [kategoriTarget, setKategoriTarget] = useState<MemberCategory[]>(
-    Array.isArray(meeting?.kategori_target)
-      ? (meeting?.kategori_target as MemberCategory[])
+    Array.isArray(meeting?.target_categories)
+      ? (meeting?.target_categories as MemberCategory[])
       : [],
   );
   const [genderTarget, setGenderTarget] = useState<GenderTarget>(
@@ -462,11 +462,11 @@ function MeetingFormContent({
   const mutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        tanggal,
-        jam,
+        date,
+        time,
         group_id: groupId,
-        acara,
-        kategori_target: kategoriTarget,
+        event,
+        target_categories: kategoriTarget,
         /* "" (Semua) dikirim null agar lolos CHECK database. */
         gender_target: genderTarget || null,
         send_reminder: true,
@@ -504,9 +504,9 @@ function MeetingFormContent({
     <>
       <DateInput
         label="Tanggal"
-        value={tanggal}
-        onChange={setTanggal}
-        hint={`Hari: ${getHariFromDate(tanggal)}`}
+        value={date}
+        onChange={setDate}
+        hint={`Hari: ${getHariFromDate(date)}`}
       />
 
       <Select
@@ -524,15 +524,15 @@ function MeetingFormContent({
 
       <Input
         label="Jam"
-        value={jam}
-        onChange={(e) => setJam(e.target.value)}
+        value={time}
+        onChange={(e) => setTime(e.target.value)}
         placeholder="Isya di tempat"
       />
 
       <Input
         label="Acara"
-        value={acara}
-        onChange={(e) => setAcara(e.target.value)}
+        value={event}
+        onChange={(e) => setEvent(e.target.value)}
         placeholder="Sambung Kelompok"
       />
 

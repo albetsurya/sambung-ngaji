@@ -103,7 +103,7 @@ export default function MemberHomePage() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   const greeting = getGreeting();
-  const displayName = user?.nama || "Jamaah";
+  const displayName = user?.name || "Jamaah";
   const isNonMember = !!user?.role && user.role !== "MEMBER";
 
   const { data: selfDashboard } = useQuery({
@@ -146,10 +146,10 @@ export default function MemberHomePage() {
             className="rounded-full overflow-hidden transition-all hover:opacity-80 active:scale-95"
           >
             <Avatar
-              src={user?.foto_url}
-              name={user?.nama || "?"}
+              src={user?.photo_url}
+              name={user?.name || "?"}
               size={32}
-              gender={normalizeGender(user?.jenis_kelamin)}
+              gender={normalizeGender(user?.gender)}
             />
           </button>
         }
@@ -304,14 +304,14 @@ function SchedulePreviewCard({
     const today = isoDate(new Date());
     const filtered = meetings.filter((m: Meeting) => {
       if (!userKategori) return true;
-      const targets = normalizeTargets(m.kategori_target);
+      const targets = normalizeTargets(m.target_categories);
       if (targets.length > 0 && !targets.includes(userKategori)) return false;
       return true;
     });
     return (
       filtered
-        .filter((m) => m.tanggal >= today)
-        .sort((a, b) => a.tanggal.localeCompare(b.tanggal))[0] || null
+        .filter((m) => m.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date))[0] || null
     );
   }, [meetings, userKategori]);
 
@@ -333,11 +333,11 @@ function SchedulePreviewCard({
         {nextMeeting ? (
           <>
             <p className="text-ios-body font-medium text-surface-text truncate">
-              {nextMeeting.acara || "Pengajian"}
+              {nextMeeting.event || "Pengajian"}
             </p>
             <p className="text-ios-caption text-surface-muted truncate">
-              {formatScheduleDate(nextMeeting.tanggal)}
-              {nextMeeting.jam ? ` · ${nextMeeting.jam}` : ""}
+              {formatScheduleDate(nextMeeting.date)}
+              {nextMeeting.time ? ` · ${nextMeeting.time}` : ""}
             </p>
           </>
         ) : (

@@ -11,5 +11,5 @@ export function useIsMuballigh(): boolean {
     enabled: !!user?.user_id,
     staleTime: 5 * 60_000,
   });
-  return data?.profile?.is_muballigh === true;
+  return data?.profile?.is_preacher === true;
 }

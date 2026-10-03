@@ -460,11 +460,11 @@ export const TaarufCvPreview = forwardRef<
   const pendidikan = member.pendidikan || [];
   const fallbackEdu =
     !pendidikan.length &&
-    (member.jenjang_pendidikan || member.sekolah || member.jurusan)
+    (member.education_level || member.school || member.major)
       ? [
-          member.jenjang_pendidikan,
-          member.sekolah,
-          member.jurusan,
+          member.education_level,
+          member.school,
+          member.major,
         ]
           .filter(Boolean)
           .join(" · ")
@@ -645,22 +645,22 @@ export const TaarufCvPreview = forwardRef<
                   className="font-semibold leading-snug"
                   style={{ fontSize: px(14, opts.fontSize.pendidikan) }}
                 >
-                  {e.jenjang}
-                  {e.kelas ? ` · Kelas ${e.kelas}` : ""}
+                  {e.level}
+                  {e.grade ? ` · Kelas ${e.grade}` : ""}
                 </p>
                 <p
                   className="text-slate-500 leading-snug"
                   style={{ fontSize: px(13, opts.fontSize.pendidikan) }}
                 >
-                  {[e.sekolah, e.jurusan].filter(Boolean).join(" · ")}
+                  {[e.school, e.major].filter(Boolean).join(" · ")}
                 </p>
               </div>
-              {(e.tahun_mulai || e.tahun_selesai) && (
+              {(e.start_year || e.end_year) && (
                 <p
                   className="text-slate-400 tabular-nums shrink-0"
                   style={{ fontSize: px(12, opts.fontSize.pendidikan) }}
                 >
-                  {[e.tahun_mulai, e.tahun_selesai].filter(Boolean).join("-")}
+                  {[e.start_year, e.end_year].filter(Boolean).join("-")}
                 </p>
               )}
             </div>
@@ -722,17 +722,17 @@ export const TaarufCvPreview = forwardRef<
                 className="leading-tight font-bold tracking-[-0.01em] mt-1 break-words"
                 style={{ fontSize: px(22, opts.fontSize.kop) }}
               >
-                {member.nama_lengkap}
+                {member.full_name}
               </h2>
               <p
                 className="text-slate-500 mt-0.5"
                 style={{ fontSize: px(13, opts.fontSize.kop) }}
               >
                 {[
-                  member.nama_panggilan
-                    ? `Panggilan: ${member.nama_panggilan}`
+                  member.nickname
+                    ? `Panggilan: ${member.nickname}`
                     : "",
-                  member.is_nikah ? "Menikah" : "",
+                  member.is_married ? "Menikah" : "",
                 ]
                   .filter(Boolean)
                   .join(" · ") || "\u00A0"}
@@ -740,8 +740,8 @@ export const TaarufCvPreview = forwardRef<
             </div>
             {opts.showPhoto ? (
               <PhotoFrame
-                src={member.foto_url}
-                name={member.nama_lengkap}
+                src={member.photo_url}
+                name={member.full_name}
                 photo={opts.photo}
                 themeKey={opts.theme}
                 selected={selection === "foto"}

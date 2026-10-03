@@ -89,7 +89,7 @@ export default function MemberAttendanceRecapPage() {
       memberApi.listPaged({
         limit: PAGE_SIZE,
         offset: pageParam,
-        jenis_kelamin: recapGender || undefined,
+        gender: recapGender || undefined,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
@@ -313,13 +313,13 @@ export default function MemberAttendanceRecapPage() {
                       <th
                         key={m.meeting_id}
                         className="px-2 py-2 font-semibold text-surface-text text-center min-w-[56px] whitespace-nowrap border-b border-surface-border"
-                        title={`${formatDateLongText(m.tanggal)} - ${m.acara || "Pengajian"}`}
+                        title={`${formatDateLongText(m.date)} - ${m.event || "Pengajian"}`}
                       >
                         <div className="text-[11px] tabular-nums">
-                          {formatDayMonth(m.tanggal)}
+                          {formatDayMonth(m.date)}
                         </div>
                         <div className="text-[9px] font-normal text-surface-muted truncate max-w-[64px] mx-auto">
-                          {m.acara || "Pengajian"}
+                          {m.event || "Pengajian"}
                         </div>
                       </th>
                     ))}
@@ -362,7 +362,7 @@ export default function MemberAttendanceRecapPage() {
                         </td>
                         <td className="sticky left-8 z-10 bg-surface-card px-2 py-1.5 font-medium text-surface-text border-b border-surface-border shadow-[1px_0_0_rgb(var(--c-border))]">
                           <span className="block truncate max-w-[88px]">
-                            {row.member.nama_lengkap}
+                            {row.member.full_name}
                           </span>
                         </td>
                         {recapMatrix.meetings.map((m: Meeting) => {

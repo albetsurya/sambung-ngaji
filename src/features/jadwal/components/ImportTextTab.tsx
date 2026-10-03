@@ -60,19 +60,19 @@ export function ImportTextTab() {
       const errors: string[] = [];
 
       for (const item of items) {
-        if (!item.tanggal || !item.acara.trim()) {
+        if (!item.date || !item.event.trim()) {
           failed++;
           continue;
         }
         try {
           await meetingApi.create({
-            tanggal: item.tanggal,
-            jam: item.jam || "",
+            date: item.date,
+            time: item.time || "",
             group_id: "",
-            acara: item.acara,
-            materi: "",
-            catatan: item.catatan || "",
-            kategori_target: item.kategoriTarget,
+            event: item.event,
+            topic: "",
+            notes: item.notes || "",
+            target_categories: item.kategoriTarget,
             gender_target: item.genderTarget || null,
           });
           success++;
@@ -144,7 +144,7 @@ export function ImportTextTab() {
     setEditing(null);
   }
 
-  const validDrafts = drafts.filter((d) => d.tanggal && d.acara.trim());
+  const validDrafts = drafts.filter((d) => d.date && d.event.trim());
   const lineCount = rawText.split(/\r?\n/).filter((l) => l.trim()).length;
 
   return (
@@ -321,7 +321,7 @@ function DraftCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const invalid = !draft.tanggal || !draft.acara.trim();
+  const invalid = !draft.date || !draft.event.trim();
 
   return (
     <Card className={`${invalid ? "border-danger/30 bg-danger-soft/30" : ""}`}>
@@ -332,21 +332,21 @@ function DraftCard({
 
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-semibold text-surface-text mb-1 leading-snug">
-            {draft.acara || "(tanpa acara)"}
+            {draft.event || "(tanpa acara)"}
           </p>
 
           <div className="flex items-center gap-2 text-ios-caption text-surface-muted mb-1 flex-wrap">
-            {draft.tanggal ? (
+            {draft.date ? (
               <>
                 <span className="inline-flex items-center gap-1">
                   <Calendar size={12} />
-                  {draft.hari && `${draft.hari}, `}
-                  {formatDateShort(draft.tanggal)}
+                  {draft.day && `${draft.day}, `}
+                  {formatDateShort(draft.date)}
                   {draft.tanggalSelesai && (
                     <> - {formatDateShort(draft.tanggalSelesai)}</>
                   )}
                 </span>
-                {draft.jam && <span>· {draft.jam}</span>}
+                {draft.time && <span>· {draft.time}</span>}
               </>
             ) : (
               <span className="text-danger inline-flex items-center gap-1">
@@ -374,9 +374,9 @@ function DraftCard({
             </div>
           )}
 
-          {draft.catatan && (
+          {draft.notes && (
             <p className="text-ios-caption text-surface-muted whitespace-pre-line leading-relaxed">
-              {draft.catatan}
+              {draft.notes}
             </p>
           )}
 
@@ -419,10 +419,10 @@ function EditDraftForm({
   onSave: (d: ParsedMeetingDraft) => void;
   onCancel: () => void;
 }) {
-  const [acara, setAcara] = useState(draft.acara);
-  const [tanggal, setTanggal] = useState(draft.tanggal);
-  const [jam, setJam] = useState(draft.jam);
-  const [catatan, setCatatan] = useState(draft.catatan);
+  const [event, setEvent] = useState(draft.event);
+  const [date, setDate] = useState(draft.date);
+  const [time, setTime] = useState(draft.time);
+  const [notes, setNotes] = useState(draft.notes);
   const [genderTarget, setGenderTarget] = useState<GenderTarget>(
     draft.genderTarget,
   );
@@ -433,35 +433,35 @@ function EditDraftForm({
   function handleSave() {
     onSave({
       ...draft,
-      acara: acara.trim(),
-      tanggal,
-      jam: jam.trim(),
-      catatan: catatan.trim(),
+      event: event.trim(),
+      date,
+      time: time.trim(),
+      notes: notes.trim(),
       genderTarget,
       kategoriTarget,
     });
   }
 
-  const canSave = !!acara.trim() && !!tanggal;
+  const canSave = !!event.trim() && !!date;
 
   return (
     <>
-      <DateInput label="Tanggal" value={tanggal} onChange={setTanggal} />
+      <DateInput label="Tanggal" value={date} onChange={setDate} />
 
       <Input
         label="Acara"
-        value={acara}
+        value={event}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setAcara(e.target.value)
+          setEvent(e.target.value)
         }
         placeholder="Nama acara"
       />
 
       <Input
         label="Jam"
-        value={jam}
+        value={time}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setJam(e.target.value)
+          setTime(e.target.value)
         }
         placeholder="08:30 WIB - Selesai"
       />
@@ -471,9 +471,9 @@ function EditDraftForm({
           Catatan (Tempat & Peserta)
         </label>
         <textarea
-          value={catatan}
+          value={notes}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setCatatan(e.target.value)
+            setNotes(e.target.value)
           }
           rows={4}
           className="w-full rounded-xl border border-surface-border bg-surface-card px-3 py-2.5 text-ios-body text-surface-text placeholder:text-surface-muted/70 focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10 resize-none"

@@ -108,14 +108,14 @@ export default function UsersPage() {
     return users.filter((u) => {
       const member = u.member_id ? memberById.get(u.member_id) : undefined;
       if (q) {
-        const hay = `${u.nama} ${u.username} ${u.role} ${member?.nama_lengkap ?? ""}`.toLowerCase();
+        const hay = `${u.name} ${u.username} ${u.role} ${member?.full_name ?? ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       if (fRole && u.role !== fRole) return false;
-      if (fGender && member?.jenis_kelamin !== fGender) return false;
+      if (fGender && member?.gender !== fGender) return false;
       if (fKategori && member?.kategori !== fKategori) return false;
-      if (fStatus === "ACTIVE" && u.status_aktif === false) return false;
-      if (fStatus === "INACTIVE" && u.status_aktif !== false) return false;
+      if (fStatus === "ACTIVE" && u.is_active === false) return false;
+      if (fStatus === "INACTIVE" && u.is_active !== false) return false;
       return true;
     });
   }, [users, memberById, fSearch, fGender, fKategori, fStatus, fRole]);
@@ -243,7 +243,7 @@ export default function UsersPage() {
                   insetDivider={i !== filteredUsers.length - 1}
                   leading={
                     <span className="w-10 h-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-semibold">
-                      {u.nama ? u.nama.charAt(0).toUpperCase() : <UserIcon size={18} />}
+                      {u.name ? u.name.charAt(0).toUpperCase() : <UserIcon size={18} />}
                     </span>
                   }
                 >
@@ -251,15 +251,15 @@ export default function UsersPage() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="text-ios-body font-semibold text-surface-text truncate">
-                          {u.nama}
+                          {u.name}
                         </p>
                         <p className="text-ios-footnote text-surface-muted truncate">
                         @{u.username}
-                        {member ? ` · ${member.nama_lengkap}` : ""}
+                        {member ? ` · ${member.full_name}` : ""}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {u.status_aktif === false && (
+                        {u.is_active === false && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-danger-soft text-danger border border-danger/20">
                             Nonaktif
                           </span>
@@ -273,10 +273,10 @@ export default function UsersPage() {
                             e.stopPropagation();
                             setResetTarget({
                               userId: u.user_id,
-                              userName: u.nama || u.username,
+                              userName: u.name || u.username,
                             });
                           }}
-                          aria-label={`Reset password ${u.nama}`}
+                          aria-label={`Reset password ${u.name}`}
                           title="Reset password"
                           className="hover:bg-accent-soft hover:text-accent"
                         >
@@ -425,7 +425,7 @@ function CreateUserSheet({
   onCreated: () => void;
 }) {
   const [username, setUsername] = useState("");
-  const [nama, setNama] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("MEMBER");
   const [memberId, setMemberId] = useState("");
@@ -435,7 +435,7 @@ function CreateUserSheet({
   useEffect(() => {
     if (!open) return;
     setUsername("");
-    setNama("");
+    setName("");
     setPassword("");
     setRole("MEMBER");
     setMemberId("");
@@ -445,7 +445,7 @@ function CreateUserSheet({
     mutationFn: () =>
       userApi.create({
         username,
-        nama,
+        name,
         password,
         role,
         member_id: memberId,
@@ -465,7 +465,7 @@ function CreateUserSheet({
 
   const canSubmit =
     username.trim().length >= 3 &&
-    nama.trim().length >= 2 &&
+    name.trim().length >= 2 &&
     password.length >= 6 &&
     memberId !== "";
 
@@ -487,8 +487,8 @@ function CreateUserSheet({
           <option value="">Pilih jamaah</option>
           {members.map((m) => (
             <option key={m.member_id} value={m.member_id}>
-              {m.nama_lengkap}
-              {m.kelompok ? ` · ${m.kelompok}` : ""}
+              {m.full_name}
+              {m.group_label ? ` · ${m.group_label}` : ""}
             </option>
           ))}
         </Select>
@@ -496,8 +496,8 @@ function CreateUserSheet({
         <Input
           label="Nama Lengkap"
           placeholder="Contoh: Ahmad Fauzi"
-          value={nama}
-          onChange={(e) => setNama(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <Input
           label="Username"
@@ -568,13 +568,13 @@ function EditUserSheet({
 }) {
   const { showToast } = useToast();
   const { isSuperAdmin } = usePermission();
-  const [nama, setNama] = useState("");
+  const [name, setName] = useState("");
   const [role, setRole] = useState<Role>("MEMBER");
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    setNama(user.nama || "");
+    setName(user.name || "");
     setRole(user.role);
     setConfirmDeactivate(false);
   }, [user]);
@@ -584,7 +584,7 @@ function EditUserSheet({
     : null;
 
   const updateMutation = useMutation({
-    mutationFn: () => userApi.update(user!.user_id, { nama }),
+    mutationFn: () => userApi.update(user!.user_id, { name }),
     onSuccess: () => {
       showToast("User diperbarui");
       onUpdated();
@@ -641,7 +641,7 @@ function EditUserSheet({
 
   if (!user) return null;
 
-  const isDirty = nama !== (user.nama || "");
+  const isDirty = name !== (user.name || "");
   const roleChanged = role !== user.role;
 
   return (
@@ -649,7 +649,7 @@ function EditUserSheet({
       <BottomSheet
         open={!!user}
         onClose={onClose}
-        title={`Edit User: ${user.nama}`}
+        title={`Edit User: ${user.name}`}
       >
         <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
           <p className="text-ios-footnote text-accent/80 leading-relaxed">
@@ -667,7 +667,7 @@ function EditUserSheet({
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-ios-body font-medium text-surface-text truncate">
-                {member.nama_lengkap}
+                {member.full_name}
               </p>
               <p className="text-ios-footnote text-surface-muted truncate">
                 Lihat detail jamaah
@@ -678,8 +678,8 @@ function EditUserSheet({
 
         <Input
           label="Nama Lengkap"
-          value={nama}
-          onChange={(e) => setNama(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
 
         <Button
@@ -722,7 +722,7 @@ function EditUserSheet({
 
         {user.role !== "SUPER_ADMIN" && (
           <div className="mt-6 pt-4 border-t border-surface-border">
-            {user.status_aktif !== false ? (
+            {user.is_active !== false ? (
               <Button
                 variant="danger"
                 fullWidth
@@ -770,7 +770,7 @@ function EditUserSheet({
       <ConfirmDialog
         open={confirmDeactivate}
         title="Nonaktifkan user?"
-        description={`User ${user.nama} tidak akan bisa login. Data jamaah tetap tersimpan.`}
+        description={`User ${user.name} tidak akan bisa login. Data jamaah tetap tersimpan.`}
         confirmLabel="Ya, Nonaktifkan"
         danger
         loading={deactivateMutation.isPending}
@@ -818,7 +818,7 @@ function DeleteUserConfirmModal({
 
   if (!user) return null;
 
-  const targetName = user.nama || user.username;
+  const targetName = user.name || user.username;
   const canDelete = confirmText.trim() === targetName;
 
   return (

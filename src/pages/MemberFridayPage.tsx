@@ -42,8 +42,8 @@ export default function MemberFridayPage() {
   const upcoming = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal >= today)
-        .sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
+        .filter((s) => s.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)),
     [schedules, today],
   );
 
@@ -99,13 +99,13 @@ export default function MemberFridayPage() {
             const complete = isFridayComplete(s);
             return (
               <div
-                key={s.tanggal}
+                key={s.date}
                 className="rounded-2xl border border-surface-border bg-surface-card p-4"
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="min-w-0">
                     <p className="text-ios-body font-semibold text-surface-text">
-                      {formatDateLongText(s.tanggal)}
+                      {formatDateLongText(s.date)}
                     </p>
                     <p className="text-ios-caption text-surface-muted">
                       {i === 0 ? "Jumat terdekat" : "Sholat Jumat"}
@@ -137,9 +137,9 @@ export default function MemberFridayPage() {
                   })}
                 </div>
 
-                {s.catatan?.trim() && (
+                {s.notes?.trim() && (
                   <p className="mt-2 text-ios-footnote text-surface-muted italic">
-                    {s.catatan}
+                    {s.notes}
                   </p>
                 )}
               </div>

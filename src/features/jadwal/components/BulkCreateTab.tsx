@@ -55,12 +55,12 @@ export function BulkCreateTab() {
   const now = new Date();
   const [tahun, setTahun] = useState(now.getFullYear());
   const [bulan, setBulan] = useState(now.getMonth() + 1);
-  const [hari, setHari] = useState<string[]>([]);
-  const [jam, setJam] = useState("Isya di tempat");
+  const [day, setDay] = useState<string[]>([]);
+  const [time, setTime] = useState("Isya di tempat");
   const [groupId, setGroupId] = useState("");
-  const [acara, setAcara] = useState("Sambung Kelompok");
-  const [materi, setMateri] = useState("");
-  const [catatan, setCatatan] = useState("");
+  const [event, setEvent] = useState("Sambung Kelompok");
+  const [topic, setTopic] = useState("");
+  const [notes, setNotes] = useState("");
   const [kategoriTarget, setKategoriTarget] = useState<string[]>([]);
 
   const [preview, setPreview] = useState<BulkMeetingPreviewResponse | null>(
@@ -80,13 +80,13 @@ export function BulkCreateTab() {
       bulkMeetingApi.preview({
         tahun,
         bulan,
-        hari,
-        jam,
+        day,
+        time,
         group_id: groupId,
-        acara,
-        materi,
-        catatan,
-        kategori_target: kategoriTarget,
+        event,
+        topic,
+        notes,
+        target_categories: kategoriTarget,
       }),
     onSuccess: (data) => {
       setPreview(data);
@@ -105,13 +105,13 @@ export function BulkCreateTab() {
       bulkMeetingApi.create({
         tahun,
         bulan,
-        hari,
-        jam,
+        day,
+        time,
         group_id: groupId,
-        acara,
-        materi,
-        catatan,
-        kategori_target: kategoriTarget,
+        event,
+        topic,
+        notes,
+        target_categories: kategoriTarget,
       }),
     onSuccess: (data) => {
       setShowConfirm(false);
@@ -131,7 +131,7 @@ export function BulkCreateTab() {
   });
 
   function toggleHari(h: string) {
-    setHari((prev) =>
+    setDay((prev) =>
       prev.includes(h) ? prev.filter((x) => x !== h) : [...prev, h],
     );
   }
@@ -148,7 +148,7 @@ export function BulkCreateTab() {
   }
 
   const canPreview =
-    hari.length > 0 && !!groupId && !!acara.trim() && !!jam.trim();
+    day.length > 0 && !!groupId && !!event.trim() && !!time.trim();
   const canSubmit = preview !== null && preview.total_new > 0;
 
   return (
@@ -187,11 +187,11 @@ export function BulkCreateTab() {
         </div>
 
         <p className="text-ios-footnote font-medium text-surface-muted mb-2">
-          Hari Pengajian ({hari.length} dipilih)
+          Hari Pengajian ({day.length} dipilih)
         </p>
         <div className="flex flex-wrap gap-2 mb-4">
           {HARI_LIST.map((h) => {
-            const active = hari.includes(h);
+            const active = day.includes(h);
             return (
               <button
                 key={h}
@@ -224,28 +224,28 @@ export function BulkCreateTab() {
 
         <Input
           label="Jam"
-          value={jam}
-          onChange={(e) => setJam(e.target.value)}
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
           placeholder="Isya di tempat"
         />
 
         <Input
           label="Acara"
-          value={acara}
-          onChange={(e) => setAcara(e.target.value)}
+          value={event}
+          onChange={(e) => setEvent(e.target.value)}
           placeholder="Sambung Kelompok"
         />
 
         <Input
           label="Materi (opsional)"
-          value={materi}
-          onChange={(e) => setMateri(e.target.value)}
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
         />
 
         <Input
           label="Catatan (opsional)"
-          value={catatan}
-          onChange={(e) => setCatatan(e.target.value)}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
         />
 
         <div className="mt-2">
@@ -345,7 +345,7 @@ export function BulkCreateTab() {
                     }`}
                   >
                     <span className="truncate">
-                      {m.hari}, {m.tanggal_display}
+                      {m.day}, {m.tanggal_display}
                     </span>
                     {m.sudah_ada && (
                       <span className="text-ios-caption text-surface-muted flex-shrink-0 ml-2">

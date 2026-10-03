@@ -51,7 +51,7 @@ export default function MemberEditProfilePage() {
       .then((m) => {
         setForm(m);
         setOriginal(m);
-        setPhotoPreview(m.foto_url || "");
+        setPhotoPreview(m.photo_url || "");
       })
       .catch(() => {
         showToast("Gagal memuat profil", "error");
@@ -132,23 +132,23 @@ export default function MemberEditProfilePage() {
 
     try {
       const payload = {
-        nama_panggilan: form.nama_panggilan || "",
-        no_wa: form.no_wa ? normalizePhoneNumber(form.no_wa) : "",
-        alamat_rumah: form.alamat_rumah || "",
-        desa: form.desa || "",
-        daerah: form.daerah || "",
-        pekerjaan: form.pekerjaan || "",
-        hobi: form.hobi || "",
-        tinggi_badan: form.tinggi_badan || "",
-        berat_badan: form.berat_badan || "",
-        is_kerja: !!form.is_kerja,
-        is_nikah: !!form.is_nikah,
-        is_muballigh: !!form.is_muballigh,
-        jenjang_pendidikan: form.jenjang_pendidikan || "",
-        sekolah: form.sekolah || "",
-        jurusan: form.jurusan || "",
-        tahun_mulai_pendidikan: form.tahun_mulai_pendidikan || "",
-        tahun_selesai_pendidikan: form.tahun_selesai_pendidikan || "",
+        nickname: form.nickname || "",
+        whatsapp_number: form.whatsapp_number ? normalizePhoneNumber(form.whatsapp_number) : "",
+        home_address: form.home_address || "",
+        village: form.village || "",
+        region: form.region || "",
+        occupation: form.occupation || "",
+        hobby: form.hobby || "",
+        height: form.height || "",
+        weight: form.weight || "",
+        is_employed: !!form.is_employed,
+        is_married: !!form.is_married,
+        is_preacher: !!form.is_preacher,
+        education_level: form.education_level || "",
+        school: form.school || "",
+        major: form.major || "",
+        education_start_year: form.education_start_year || "",
+        education_end_year: form.education_end_year || "",
       };
 
       await memberSelfApi.updateProfile(payload);
@@ -159,7 +159,7 @@ export default function MemberEditProfilePage() {
           undefined,
           base64,
           photoFile.type,
-          original?.foto_url,
+          original?.photo_url,
         );
       }
 
@@ -276,27 +276,27 @@ export default function MemberEditProfilePage() {
             </div>
           </div>
           <div className="p-4 space-y-3">
-            <LockedField label="Nama Lengkap" value={original?.nama_lengkap} />
+            <LockedField label="Nama Lengkap" value={original?.full_name} />
             <LockedField
               label="Jenis Kelamin"
               value={
-                original?.jenis_kelamin === "L"
+                original?.gender === "L"
                   ? "Laki-laki"
-                  : original?.jenis_kelamin === "P"
+                  : original?.gender === "P"
                     ? "Perempuan"
                     : "-"
               }
             />
-            <LockedField label="Tempat Lahir" value={original?.tempat_lahir} />
+            <LockedField label="Tempat Lahir" value={original?.birth_place} />
             <LockedField
               label="Tanggal Lahir"
               value={
-                original?.tanggal_lahir
-                  ? formatDateShort(original.tanggal_lahir)
+                original?.birth_date
+                  ? formatDateShort(original.birth_date)
                   : "-"
               }
             />
-            <LockedField label="Kelompok" value={original?.kelompok} />
+            <LockedField label="Kelompok" value={original?.group_label} />
           </div>
         </section>
 
@@ -309,27 +309,27 @@ export default function MemberEditProfilePage() {
           <div className="p-4">
             <Input
               label="Nama Panggilan"
-              value={form.nama_panggilan || ""}
-              onChange={(e) => update("nama_panggilan", e.target.value)}
+              value={form.nickname || ""}
+              onChange={(e) => update("nickname", e.target.value)}
               placeholder="Mis. Fauzi, Budi, dll"
             />
             <Input
               label="No. WhatsApp"
               placeholder="Mis. 081234567890"
               inputMode="tel"
-              value={form.no_wa || ""}
-              onChange={(e) => update("no_wa", e.target.value)}
+              value={form.whatsapp_number || ""}
+              onChange={(e) => update("whatsapp_number", e.target.value)}
             />
             <Input
               label="Pekerjaan"
-              value={form.pekerjaan || ""}
-              onChange={(e) => update("pekerjaan", e.target.value)}
+              value={form.occupation || ""}
+              onChange={(e) => update("occupation", e.target.value)}
               placeholder="Mis. Karyawan, Wiraswasta, Mahasiswa"
             />
             <Input
               label="Hobi"
-              value={form.hobi || ""}
-              onChange={(e) => update("hobi", e.target.value)}
+              value={form.hobby || ""}
+              onChange={(e) => update("hobby", e.target.value)}
               placeholder="Mis. Membaca, olahraga, traveling"
             />
           </div>
@@ -344,21 +344,21 @@ export default function MemberEditProfilePage() {
           <div className="p-4">
             <Textarea
               label="Alamat Rumah"
-              value={form.alamat_rumah || ""}
-              onChange={(e) => update("alamat_rumah", e.target.value)}
+              value={form.home_address || ""}
+              onChange={(e) => update("home_address", e.target.value)}
               placeholder="Mis. Jl. Merdeka No. 10, RT 02/RW 03"
             />
             <div className="grid grid-cols-2 gap-3">
               <Input
                 label="Desa"
-                value={form.desa || ""}
-                onChange={(e) => update("desa", e.target.value)}
+                value={form.village || ""}
+                onChange={(e) => update("village", e.target.value)}
                 placeholder="Mis. Medokan Semampir"
               />
               <Input
                 label="Daerah"
-                value={form.daerah || ""}
-                onChange={(e) => update("daerah", e.target.value)}
+                value={form.region || ""}
+                onChange={(e) => update("region", e.target.value)}
                 placeholder="Mis. Surabaya"
               />
             </div>
@@ -374,8 +374,8 @@ export default function MemberEditProfilePage() {
           <div className="p-4">
             <Select
               label="Jenjang"
-              value={form.jenjang_pendidikan || ""}
-              onChange={(e) => update("jenjang_pendidikan", e.target.value)}
+              value={form.education_level || ""}
+              onChange={(e) => update("education_level", e.target.value)}
             >
               <option value="">Pilih jenjang pendidikan</option>
               <option value="SD">SD</option>
@@ -389,14 +389,14 @@ export default function MemberEditProfilePage() {
             <div className="grid grid-cols-2 gap-3">
               <Input
                 label="Sekolah"
-                value={form.sekolah || ""}
-                onChange={(e) => update("sekolah", e.target.value)}
+                value={form.school || ""}
+                onChange={(e) => update("school", e.target.value)}
                 placeholder="Mis. Universitas Airlangga"
               />
               <Input
                 label="Jurusan"
-                value={form.jurusan || ""}
-                onChange={(e) => update("jurusan", e.target.value)}
+                value={form.major || ""}
+                onChange={(e) => update("major", e.target.value)}
                 placeholder="Mis. Teknik Informatika"
               />
             </div>
@@ -405,9 +405,9 @@ export default function MemberEditProfilePage() {
                 label="Tahun Mulai"
                 type="number"
                 inputMode="numeric"
-                value={form.tahun_mulai_pendidikan || ""}
+                value={form.education_start_year || ""}
                 onChange={(e) =>
-                  update("tahun_mulai_pendidikan", e.target.value)
+                  update("education_start_year", e.target.value)
                 }
                 placeholder="Mis. 2018"
               />
@@ -415,9 +415,9 @@ export default function MemberEditProfilePage() {
                 label="Tahun Selesai"
                 type="number"
                 inputMode="numeric"
-                value={form.tahun_selesai_pendidikan || ""}
+                value={form.education_end_year || ""}
                 onChange={(e) =>
-                  update("tahun_selesai_pendidikan", e.target.value)
+                  update("education_end_year", e.target.value)
                 }
                 placeholder="Mis. 2022"
               />
@@ -433,36 +433,36 @@ export default function MemberEditProfilePage() {
           </div>
           <div className="p-4 space-y-3">
             <ModernCheckbox
-              checked={!!form.is_nikah}
-              onChange={(v) => update("is_nikah", v)}
+              checked={!!form.is_married}
+              onChange={(v) => update("is_married", v)}
               label="Sudah menikah"
             />
             <ModernCheckbox
-              checked={!!form.is_kerja}
-              onChange={(v) => update("is_kerja", v)}
+              checked={!!form.is_employed}
+              onChange={(v) => update("is_employed", v)}
               label="Sedang bekerja"
             />
             <ModernCheckbox
-              checked={!!form.is_muballigh}
-              onChange={(v) => update("is_muballigh", v)}
+              checked={!!form.is_preacher}
+              onChange={(v) => update("is_preacher", v)}
               label="Muballigh"
             />
-            {!form.is_nikah && (
+            {!form.is_married && (
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <Input
                   label="Tinggi Badan (cm)"
                   type="number"
                   inputMode="numeric"
-                  value={form.tinggi_badan || ""}
-                  onChange={(e) => update("tinggi_badan", e.target.value)}
+                  value={form.height || ""}
+                  onChange={(e) => update("height", e.target.value)}
                   placeholder="Mis. 170"
                 />
                 <Input
                   label="Berat Badan (kg)"
                   type="number"
                   inputMode="numeric"
-                  value={form.berat_badan || ""}
-                  onChange={(e) => update("berat_badan", e.target.value)}
+                  value={form.weight || ""}
+                  onChange={(e) => update("weight", e.target.value)}
                   placeholder="Mis. 60"
                 />
               </div>

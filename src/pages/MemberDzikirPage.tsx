@@ -71,7 +71,7 @@ export default function MemberDzikirPage() {
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <div className="flex-1 min-w-0">
                     <p className="text-ios-body font-medium text-surface-text truncate">
-                      {d.nama}
+                      {d.name}
                     </p>
                     <p
                       className="text-surface-muted truncate mt-0.5"
