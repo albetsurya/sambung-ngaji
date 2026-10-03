@@ -251,7 +251,7 @@ export default function NgajiCeriaQuizPage() {
               </div>
               <div>
                 <p className="font-extrabold text-base leading-none">
-                  Hebat! Jawabanmu Benar! 🎉
+                  Hebat! Jawabanmu Benar!
                 </p>
                 <p className="text-xs mt-1 text-success/80">
                   Lafadz terbaca fasih sesuai kaidah Tilawati.

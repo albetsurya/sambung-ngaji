@@ -1,9 +1,10 @@
 import React, { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Fire, Star } from "../../../components/ui/FontAwesomeIcons";
+import { X, ChevronLeft } from "../../../components/ui/FontAwesomeIcons";
 import { NgajiCeriaBottomNav } from "./NgajiCeriaBottomNav";
-import { MascotStar, BubblyCloud } from "./NgajiCeriaIllustrations";
+import { BubblyCloud } from "./NgajiCeriaIllustrations";
 import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
+import { NGAJI_CERIA_ASSETS } from "../data/assets";
 
 interface NgajiCeriaLayoutProps {
   children: ReactNode;
@@ -26,41 +27,46 @@ export function NgajiCeriaLayout({
   const { currentStreak } = useNgajiCeriaStreak();
 
   return (
-    <div className="min-h-screen bg-surface-bg text-surface-text flex flex-col justify-between selection:bg-accent/20 relative overflow-x-hidden">
-      {/* Playful Floating Cloud Backgrounds */}
-      <BubblyCloud className="absolute top-8 -left-8 w-28 h-14 text-accent/10 pointer-events-none animate-pulse" />
-      <BubblyCloud className="absolute top-28 -right-10 w-36 h-18 text-accent/10 pointer-events-none" />
+    <div className="min-h-screen bg-surface-bg text-surface-text flex flex-col justify-between selection:bg-accent/20 relative overflow-x-hidden font-sans">
+      {/* Background Decorative Cloud Elements */}
+      <BubblyCloud className="absolute top-10 -left-6 w-28 h-14 text-accent/10 pointer-events-none animate-pulse" />
+      <BubblyCloud className="absolute top-36 -right-8 w-36 h-18 text-accent/10 pointer-events-none" />
 
-      {/* Top Header */}
-      <header className="sticky top-0 z-30 pt-safe bg-surface-bg/85 backdrop-blur-md border-b border-surface-border">
+      {/* Floating Top Game HUD */}
+      <header className="sticky top-0 z-30 pt-safe bg-surface-bg/90 backdrop-blur-lg border-b border-surface-border shadow-sm">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {showBack && (
               <button
                 onClick={onBack || (() => navigate("/member"))}
-                aria-label="Kembali"
-                className="w-9 h-9 rounded-full bg-surface-card border border-surface-border flex items-center justify-center text-surface-text transition-all active:scale-90 hover:bg-surface-card2"
+                aria-label="Keluar ke Menu Utama"
+                className="px-3 py-1.5 rounded-full bg-surface-card border border-surface-border text-xs font-bold text-surface-text flex items-center gap-1.5 hover:bg-surface-card2 transition-all active:scale-95 shadow-sm"
               >
-                <ChevronLeft size={16} />
+                <X size={14} className="text-surface-muted" />
+                <span>Keluar</span>
               </button>
             )}
-            <div className="flex items-center gap-1.5">
-              <span className="font-display font-extrabold text-lg text-accent tracking-tight">
-                {title}
-              </span>
-            </div>
+            <span className="font-display font-black text-base text-accent tracking-tight ml-1">
+              {title}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Streak Pill */}
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-warning-soft text-warning border border-warning/30 font-bold text-xs shadow-sm">
-              <Fire size={14} className="animate-bounce" />
-              <span>{currentStreak}</span>
+            {/* Lives / Nyawa HUD */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-danger-soft text-danger border border-danger/20 font-black text-xs shadow-sm">
+              <img src={NGAJI_CERIA_ASSETS.hatiNyawa} alt="Nyawa" className="w-4 h-4 object-contain" />
+              <span>5</span>
             </div>
 
-            {/* Star Points Pill */}
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent/30 font-bold text-xs shadow-sm">
-              <Star size={14} />
+            {/* Streak HUD */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning-soft text-warning border border-warning/20 font-black text-xs shadow-sm">
+              <img src={NGAJI_CERIA_ASSETS.apiStreak} alt="Streak" className="w-4 h-4 object-contain" />
+              <span>{currentStreak} Hari</span>
+            </div>
+
+            {/* Koin / XP HUD */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent/20 font-black text-xs shadow-sm">
+              <img src={NGAJI_CERIA_ASSETS.koinHijaiyah} alt="Koin" className="w-4 h-4 object-contain" />
               <span>120</span>
             </div>
 
@@ -69,12 +75,12 @@ export function NgajiCeriaLayout({
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className={`flex-1 max-w-md w-full mx-auto relative ${hideNav ? "pb-8" : "pb-24"}`}>
+      {/* Main Content Viewport */}
+      <main className={`flex-1 max-w-md w-full mx-auto relative ${hideNav ? "pb-6" : "pb-24"}`}>
         {children}
       </main>
 
-      {/* Dedicated Bottom Navigation */}
+      {/* Floating Bottom Navigation Game Dock */}
       {!hideNav && <NgajiCeriaBottomNav />}
     </div>
   );
