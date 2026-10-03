@@ -1,87 +1,95 @@
-// Assets import for Ngaji Ceria
-import apiStreak from "../../../assets/ngaji-ceria/aset-gamifikasi/api-streak.svg";
-import bintang from "../../../assets/ngaji-ceria/aset-gamifikasi/bintang.svg";
-import bintangKosong from "../../../assets/ngaji-ceria/aset-gamifikasi/bintang-kosong.svg";
-import bukuQuran from "../../../assets/ngaji-ceria/aset-gamifikasi/buku-quran.svg";
-import hadiah from "../../../assets/ngaji-ceria/aset-gamifikasi/hadiah.svg";
-import hatiNyawa from "../../../assets/ngaji-ceria/aset-gamifikasi/hati-nyawa.svg";
-import kalenderStreak from "../../../assets/ngaji-ceria/aset-gamifikasi/kalender-streak.svg";
-import koinHijaiyah from "../../../assets/ngaji-ceria/aset-gamifikasi/koin-hijaiyah.svg";
-import konfeti from "../../../assets/ngaji-ceria/aset-gamifikasi/konfeti.svg";
-import lencanaKhatam from "../../../assets/ngaji-ceria/aset-gamifikasi/lencana-khatam.svg";
-import mahkotaVip from "../../../assets/ngaji-ceria/aset-gamifikasi/mahkota-vip.svg";
-import medaliEmas from "../../../assets/ngaji-ceria/aset-gamifikasi/medali-emas.svg";
-import medaliPerak from "../../../assets/ngaji-ceria/aset-gamifikasi/medali-perak.svg";
-import medaliPerunggu from "../../../assets/ngaji-ceria/aset-gamifikasi/medali-perunggu.svg";
-import mikrofonBaca from "../../../assets/ngaji-ceria/aset-gamifikasi/mikrofon-baca.svg";
-import perisai from "../../../assets/ngaji-ceria/aset-gamifikasi/perisai.svg";
-import petiHarta from "../../../assets/ngaji-ceria/aset-gamifikasi/peti-harta.svg";
-import petirXp from "../../../assets/ngaji-ceria/aset-gamifikasi/petir-xp.svg";
-import piala from "../../../assets/ngaji-ceria/aset-gamifikasi/piala.svg";
-import sertifikat from "../../../assets/ngaji-ceria/aset-gamifikasi/sertifikat.svg";
-
-// Tilawati
-import bannerTilawati from "../../../assets/ngaji-ceria/aset-tilawati-baru/banner-tilawati.svg";
-import jilid1 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-1.svg";
-import jilid2 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-2.svg";
-import jilid3 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-3.svg";
-import jilid4 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-4.svg";
-import jilid5 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-5.svg";
-import jilid6 from "../../../assets/ngaji-ceria/aset-tilawati-baru/jilid-6.svg";
-import kartuLengkung from "../../../assets/ngaji-ceria/aset-tilawati-baru/kartu-lengkung.svg";
-import lenteraPop from "../../../assets/ngaji-ceria/aset-tilawati-baru/lentera-pop.svg";
-import nodeAktif from "../../../assets/ngaji-ceria/aset-tilawati-baru/node-aktif.svg";
-import nodeSelesai from "../../../assets/ngaji-ceria/aset-tilawati-baru/node-selesai.svg";
-import nodeTerkunci from "../../../assets/ngaji-ceria/aset-tilawati-baru/node-terkunci.svg";
-import tebakSurahBaru from "../../../assets/ngaji-ceria/aset-tilawati-baru/tebak-surah-baru.svg";
-
-// Games
-import qirraPop from "../../../assets/ngaji-ceria/aset-qirra/qirra-pop.svg";
-import qirraMatch from "../../../assets/ngaji-ceria/aset-qirra/qirra-match.svg";
-import tebakSurah from "../../../assets/ngaji-ceria/aset-qirra/tebak-surah.svg";
+// Assets import for Ngaji Ceria using 200+ new SVG asset suite
+import * as NEW from "../../../assets/ngaji-ceria-new/ngaji-ceria-tilawati/index";
 
 export const NGAJI_CERIA_ASSETS = {
-  // Gamifikasi
-  apiStreak,
-  bintang,
-  bintangKosong,
-  bukuQuran,
-  hadiah,
-  hatiNyawa,
-  kalenderStreak,
-  koinHijaiyah,
-  konfeti,
-  lencanaKhatam,
-  mahkotaVip,
-  medaliEmas,
-  medaliPerak,
-  medaliPerunggu,
-  mikrofonBaca,
-  perisai,
-  petiHarta,
-  petirXp,
-  piala,
-  sertifikat,
+  // HUD Elements
+  apiStreak: NEW.apiStreak,
+  apiStreakMati: NEW.apiStreakMati,
+  bintang: NEW.bintangPenuh,
+  bintangKosong: NEW.bintangKosong,
+  bukuQuran: NEW.bukuJuzAmma,
+  hatiNyawa: NEW.hatiNyawa,
+  hatiKosong: NEW.hatiKosong,
+  koinHijaiyah: NEW.koinHijaiyah,
+  mahkotaVip: NEW.mahkotaVip,
+  
+  // Icons & Buttons
+  iconBeranda: NEW.iconBeranda,
+  iconJelajah: NEW.iconJelajah,
+  iconKuis: NEW.iconKuis,
+  iconGames: NEW.iconGames,
+  iconPrestasi: NEW.iconPrestasi,
+  iconKeluar: NEW.iconKeluar,
+  iconProfil: NEW.iconProfil,
+  iconSuara: NEW.iconSuara,
+  mikrofonBaca: NEW.ikonMikrofon,
 
-  // Tilawati Jilid Cover
-  bannerTilawati,
+  // Map / Path
+  nodeAktif: NEW.nodeAktif,
+  nodeSelesai: NEW.nodeSelesai,
+  nodeTerkunci: NEW.nodeTerkunci,
+  nodeBonus: NEW.nodeBonus,
+  petiHarta: NEW.petiHarta,
+  petiHartaTerbuka: NEW.petiHartaTerbuka,
+  piala: NEW.piala,
+  benderaCheckpoint: NEW.benderaCheckpoint,
+  jalurSCurve: NEW.jalurSCurve,
+  tombolMulaiNgaji: NEW.tombolMulaiNgaji,
+
+  // Books / Tilawati Jilid
+  bannerTilawati: NEW.nodeAktif,
   jilidCovers: {
-    1: jilid1,
-    2: jilid2,
-    3: jilid3,
-    4: jilid4,
-    5: jilid5,
-    6: jilid6,
+    1: NEW.bukuTilawatiJilid1,
+    2: NEW.bukuTilawatiJilid2,
+    3: NEW.bukuTilawatiJilid3,
+    4: NEW.bukuTilawatiJilid4,
+    5: NEW.bukuTilawatiJilid5,
+    6: NEW.bukuTilawatiJilid6,
   } as Record<number, string>,
-  kartuLengkung,
-  lenteraPop,
-  nodeAktif,
-  nodeSelesai,
-  nodeTerkunci,
-  tebakSurahBaru,
+  bukuGhorib: NEW.bukuTilawatiGhorib,
+  bukuTajwid: NEW.bukuTilawatiTajwid,
+  bukuJuzAmma: NEW.bukuJuzAmma,
 
-  // Games
-  qirraPop,
-  qirraMatch,
-  tebakSurah,
+  // Kartu Kuis
+  kartuHuruf: NEW.kartuHuruf,
+  kartuBelakang: NEW.kartuBelakang,
+  kartuTebakJuz: NEW.kartuTebakJuz,
+  kartuAcak: NEW.kartuAcak,
+  kartuMatchCocok: NEW.kartuMatchCocok,
+  kartuTerkunci: NEW.kartuTerkunci,
+
+  // Mini Games
+  qirraPop: NEW.qirraPop,
+  qirraMatch: NEW.qirraMatch,
+  tebakSurahBaru: NEW.tebakSurahBaru,
+  balonMerah: NEW.balonMerah,
+  balonBiru: NEW.balonBiru,
+  balonKuning: NEW.balonKuning,
+  balonHijau: NEW.balonHijau,
+
+  // Characters / Avatar
+  avatarAnak: NEW.avatarAnak,
+
+  // Badges / Lencana
+  lencanaJilid1: NEW.lencanaJilid1,
+  lencanaJilid2: NEW.lencanaJilid2,
+  lencanaJilid3: NEW.lencanaJilid3,
+  lencanaJilid4: NEW.lencanaJilid4,
+  lencanaJilid5: NEW.lencanaJilid5,
+  lencanaJilid6: NEW.lencanaJilid6,
+
+  // Legacy mappings for backwards compatibility
+  hadiah: NEW.petiHarta,
+  kalenderStreak: NEW.apiStreak,
+  konfeti: NEW.ornamenKilau,
+  lencanaKhatam: NEW.piala,
+  medaliEmas: NEW.piala,
+  medaliPerak: NEW.piala,
+  medaliPerunggu: NEW.piala,
+  perisai: NEW.nodeAktif,
+  petirXp: NEW.koinHijaiyah,
+  sertifikat: NEW.piala,
+  kartuLengkung: NEW.kartuHuruf,
+  lenteraPop: NEW.ornamenBulanSabit,
+  tebakSurah: NEW.tebakSurahBaru,
 };

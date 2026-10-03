@@ -216,7 +216,7 @@ export default function NgajiCeriaHomePage() {
 
                   {node.status === "active" && (
                     <button
-                      onClick={() => navigate("/member/ngaji-ceria/quiz")}
+                      onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
                       className="mt-3 px-5 py-2.5 rounded-2xl bg-accent text-white font-black text-xs shadow-lg shadow-accent/30 flex items-center gap-2 border-b-4 border-accent-dark active:translate-y-1 transition-all"
                     >
                       <Play size={14} />
@@ -230,7 +230,7 @@ export default function NgajiCeriaHomePage() {
         </section>
 
         {/* Audio Rost Melody Prompt Bar */}
-        <section className="rounded-3xl bg-surface-card border-2 border-surface-border p-4 flex items-center gap-4 shadow-sm">
+        <section className="rounded-3xl bg-surface-card border-2 border-surface-border p-4 flex items-center gap-4 shadow-sm relative z-20">
           <div className="w-12 h-12 shrink-0 bg-accent-soft rounded-2xl flex items-center justify-center">
             <img
               src={NGAJI_CERIA_ASSETS.mikrofonBaca}

@@ -32,40 +32,40 @@ export function NgajiCeriaLayout({
       <BubblyCloud className="absolute top-10 -left-6 w-28 h-14 text-accent/10 pointer-events-none animate-pulse" />
       <BubblyCloud className="absolute top-36 -right-8 w-36 h-18 text-accent/10 pointer-events-none" />
 
-      {/* Floating Top Game HUD */}
-      <header className="sticky top-0 z-30 pt-safe bg-surface-bg/90 backdrop-blur-lg border-b border-surface-border shadow-sm">
+      {/* Sticky Top Game HUD */}
+      <header className="sticky top-0 z-40 pt-safe bg-surface-bg/95 backdrop-blur-md border-b border-surface-border shadow-sm transition-all">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {showBack && (
               <button
                 onClick={onBack || (() => navigate("/member"))}
                 aria-label="Keluar ke Menu Utama"
-                className="px-3 py-1.5 rounded-full bg-surface-card border border-surface-border text-xs font-bold text-surface-text flex items-center gap-1.5 hover:bg-surface-card2 transition-all active:scale-95 shadow-sm"
+                className="px-2.5 py-1.5 rounded-full bg-surface-card border border-surface-border text-xs font-bold text-surface-text flex items-center gap-1 hover:bg-surface-card2 transition-all active:scale-95 shadow-sm"
               >
                 <X size={14} className="text-surface-muted" />
-                <span>Keluar</span>
+                <span className="hidden sm:inline">Keluar</span>
               </button>
             )}
-            <span className="font-display font-black text-base text-accent tracking-tight ml-1">
+            <span className="font-display font-black text-sm sm:text-base text-accent tracking-tight truncate max-w-[100px] sm:max-w-none">
               {title}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Lives / Nyawa HUD */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-danger-soft text-danger border border-danger/20 font-black text-xs shadow-sm">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-danger-soft text-danger border border-danger/20 font-black text-xs shadow-sm">
               <img src={NGAJI_CERIA_ASSETS.hatiNyawa} alt="Nyawa" className="w-4 h-4 object-contain" />
               <span>5</span>
             </div>
 
             {/* Streak HUD */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning-soft text-warning border border-warning/20 font-black text-xs shadow-sm">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-warning-soft text-warning border border-warning/20 font-black text-xs shadow-sm">
               <img src={NGAJI_CERIA_ASSETS.apiStreak} alt="Streak" className="w-4 h-4 object-contain" />
-              <span>{currentStreak} Hari</span>
+              <span>{currentStreak}d</span>
             </div>
 
             {/* Koin / XP HUD */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-soft text-accent border border-accent/20 font-black text-xs shadow-sm">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent-soft text-accent border border-accent/20 font-black text-xs shadow-sm">
               <img src={NGAJI_CERIA_ASSETS.koinHijaiyah} alt="Koin" className="w-4 h-4 object-contain" />
               <span>120</span>
             </div>
