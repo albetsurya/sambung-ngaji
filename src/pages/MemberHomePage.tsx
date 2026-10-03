@@ -20,6 +20,7 @@ import {
 } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
 import { Avatar } from "../components/ui";
+import { ClayTile, ClayBackdrop, MiniMosque } from "../components/clay";
 import { MeetingCardSkeleton } from "../components/ui/Skeleton";
 import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
 import { useQuery } from "@tanstack/react-query";
@@ -53,12 +54,15 @@ const QUICK_ITEMS: QuickItem[] = [
   { key: "mood",    label: "Tenangkan",  Icon: Heart,         to: "/member/mood",          tone: "danger" },
 ];
 
-const TONE_BG: Record<Tone, string> = {
-  accent:  "bg-accent-soft text-accent",
-  success: "bg-success-soft text-success",
-  warning: "bg-warning-soft text-warning",
-  info:    "bg-info-soft text-info",
-  danger:  "bg-danger-soft text-danger",
+const QUICK_DESCRIPTIONS: Record<string, string> = {
+  quran: "Baca & tandai",
+  doa: "Doa harian",
+  dzikir: "Dzikir pagi-petang",
+  sholat: "Waktu & arah",
+  jurnal: "Catat sholat",
+  tahfidz: "Setoran hafalan",
+  kiblat: "Arah kiblat",
+  mood: "Tenangkan hati",
 };
 
 
@@ -155,31 +159,51 @@ export default function MemberHomePage() {
         }
       />
 
-      <div className="px-4 py-4 space-y-5 pb-8">
-        
+      <div className="relative px-4 py-4 space-y-5 pb-8">
+        <ClayBackdrop />
+
+        <section className="clay relative overflow-hidden p-5">
+          <div className="flex items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-ios-caption text-surface-muted">
+                {greeting}
+              </p>
+              <p className="font-display text-xl font-bold text-surface-text tracking-[-0.02em] truncate">
+                {displayName}
+              </p>
+              <p className="text-ios-caption text-surface-muted mt-1">
+                {isNonMember
+                  ? "Jelajahi mode jamaah"
+                  : "Semangat ibadah hari ini"}
+              </p>
+            </div>
+            <MiniMosque className="w-24 h-[72px] text-accent opacity-90 shrink-0 clay-bob" />
+          </div>
+        </section>
+
         <PrayerTimesCard />
 
-        
+
         <SchedulePreviewCard
           userKategori={userKategori}
           onSeeAll={() => navigate("/member/jadwal")}
         />
 
-        
+
         <section>
           <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
             Perkembangan Saya
           </p>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate("/member/progres")}
-              className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-card p-3.5 text-left transition-all active:scale-[0.98] hover:bg-surface-card2 hover:border-accent/30"
+              className="clay clay-pressable flex items-center gap-3 !rounded-3xl p-3.5 text-left"
             >
-              <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-                <Trophy size={18} />
+              <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
+                <Trophy size={20} className="text-surface-text" />
               </span>
               <span className="flex-1 min-w-0">
-                <span className="block text-ios-body font-medium text-surface-text">
+                <span className="block text-ios-body font-semibold text-surface-text">
                   Progres
                 </span>
                 <span className="block text-ios-caption text-surface-muted truncate">
@@ -189,13 +213,13 @@ export default function MemberHomePage() {
             </button>
             <button
               onClick={() => navigate("/member/absensi")}
-              className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-card p-3.5 text-left transition-all active:scale-[0.98] hover:bg-surface-card2 hover:border-accent/30"
+              className="clay clay-pressable flex items-center gap-3 !rounded-3xl p-3.5 text-left"
             >
-              <span className="w-10 h-10 rounded-xl bg-success-soft text-success flex items-center justify-center flex-shrink-0">
-                <CalendarCheck size={18} />
+              <span className="clay-tile clay-tile-success w-11 h-11 flex items-center justify-center flex-shrink-0">
+                <CalendarCheck size={20} className="text-surface-text" />
               </span>
               <span className="flex-1 min-w-0">
-                <span className="block text-ios-body font-medium text-surface-text">
+                <span className="block text-ios-body font-semibold text-surface-text">
                   Absensi
                 </span>
                 <span className="block text-ios-caption text-surface-muted truncate">
@@ -206,7 +230,7 @@ export default function MemberHomePage() {
           </div>
         </section>
 
-        
+
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-ios-footnote font-semibold text-surface-text">
@@ -222,41 +246,29 @@ export default function MemberHomePage() {
           </div>
 
           <div className="grid grid-cols-4 gap-2.5">
-            {QUICK_ITEMS.map((item) => {
-              const Icon = item.Icon;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => navigate(item.to)}
-                  className="flex flex-col items-center gap-1.5 rounded-2xl border border-surface-border bg-surface-card p-3 min-h-[88px] transition-all active:scale-[0.97] hover:bg-surface-card2 hover:border-accent/30"
-                >
-                  <span
-                    className={
-                      "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 " +
-                      TONE_BG[item.tone]
-                    }
-                  >
-                    <Icon size={18} />
-                  </span>
-                  <span className="text-[11px] font-medium text-center leading-tight text-surface-text">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
+            {QUICK_ITEMS.map((item) => (
+              <ClayTile
+                key={item.key}
+                label={item.label}
+                description={QUICK_DESCRIPTIONS[item.key]}
+                icon={item.Icon}
+                tone={item.tone}
+                onClick={() => navigate(item.to)}
+              />
+            ))}
           </div>
         </section>
 
-        
+
         <button
           onClick={() => navigate("/member/more")}
-          className="w-full rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2"
+          className="clay clay-pressable w-full !rounded-3xl p-4 flex items-center gap-3"
         >
-          <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-            <Sparkles size={18} />
+          <span className="clay-tile clay-tile-info w-11 h-11 flex items-center justify-center flex-shrink-0">
+            <Sparkles size={20} className="text-surface-text" />
           </span>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-ios-body font-medium text-surface-text">
+            <p className="text-ios-body font-semibold text-surface-text">
               Menu Lengkap
             </p>
             <p className="text-ios-caption text-surface-muted truncate">
@@ -320,10 +332,10 @@ function SchedulePreviewCard({
   return (
     <button
       onClick={onSeeAll}
-      className="w-full text-left rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2 hover:border-accent/30"
+      className="clay clay-pressable w-full text-left !rounded-3xl p-4 flex items-center gap-3"
     >
-      <span className="w-11 h-11 rounded-2xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">
-        <Calendar size={18} strokeWidth={2.2} />
+      <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
+        <Calendar size={20} strokeWidth={2.2} className="text-surface-text" />
       </span>
 
       <div className="flex-1 min-w-0">
