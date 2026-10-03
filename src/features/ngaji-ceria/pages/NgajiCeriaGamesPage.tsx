@@ -1,75 +1,111 @@
 import React from "react";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
-import { Dice, Sparkles, ChevronRight } from "../../../components/ui/FontAwesomeIcons";
+import { NGAJI_CERIA_ASSETS } from "../data/assets";
+import { Star, Play } from "../../../components/ui/FontAwesomeIcons";
+
+interface GameTheme {
+  cardBg: string;
+  cardBorder: string;
+  titleColor: string;
+  buttonBg: string;
+}
+
+const GAME_THEMES: Record<string, GameTheme> = {
+  blue: {
+    cardBg: "bg-[#EAF6FB]",
+    cardBorder: "border-[#BCE3F5]",
+    titleColor: "text-[#1C5D79]",
+    buttonBg: "bg-[#1C5D79]",
+  },
+  peach: {
+    cardBg: "bg-[#FFF3E4]",
+    cardBorder: "border-[#FCDCB8]",
+    titleColor: "text-[#8C4A14]",
+    buttonBg: "bg-[#8C4A14]",
+  },
+  lavender: {
+    cardBg: "bg-[#F1EDFF]",
+    cardBorder: "border-[#D7CCFF]",
+    titleColor: "text-[#553894]",
+    buttonBg: "bg-[#553894]",
+  },
+};
 
 interface MiniGameCardProps {
   title: string;
   description: string;
-  icon: "dice" | "sparkles";
-  status: "soon" | "available";
+  cover: string;
+  best: number;
+  theme: GameTheme;
   onClick: () => void;
 }
 
-function MiniGameCard({ title, description, icon, status, onClick }: MiniGameCardProps) {
-  const bgColorClass = status === "available" ? "bg-accent-soft text-accent border-accent/30" : "bg-surface-card2 text-surface-muted border-surface-border";
-  const iconBgClass = status === "available" ? "bg-accent text-white" : "bg-surface-card text-surface-muted";
-
+function MiniGameCard({ title, description, cover, best, theme, onClick }: MiniGameCardProps) {
   return (
-    <button
-      onClick={onClick}
-      disabled={status === "soon"}
-      className={`w-full rounded-2xl p-4 text-left transition-all active:scale-[0.98] shadow-sm flex items-center gap-4 border-2 ${bgColorClass}`}
+    <div
+      className={`w-full rounded-[22px] p-4 border-2 ${theme.cardBg} ${theme.cardBorder} shadow-sm flex flex-col gap-3`}
     >
-      <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-md ${iconBgClass}`}>
-        {icon === "dice" ? <Dice size={24} /> : <Sparkles size={24} />}
+      <div className="flex items-start gap-3">
+        <div className="shrink-0 w-20 h-20 rounded-2xl bg-white/80 border border-black/5 p-2 shadow-sm">
+          <img src={cover} alt={title} className="w-full h-full object-contain" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className={`font-display font-black text-base leading-tight ${theme.titleColor}`}>
+            {title}
+          </h3>
+          <p className="text-[11px] text-[#5A3A2A]/70 mt-1 leading-snug">
+            {description}
+          </p>
+          <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-black px-2.5 py-1 rounded-full bg-[#FFCB45] text-[#5A3A2A] border border-[#B8590C]/20">
+            <Star size={11} />
+            Terbaik: {best}
+          </span>
+        </div>
       </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-sm text-surface-text">{title}</h3>
-        <p className="text-xs text-surface-muted mt-0.5 leading-tight">
-          {description}
-        </p>
-      </div>
-      {status === "available" ? (
-        <ChevronRight size={18} className="text-surface-muted ml-auto" />
-      ) : (
-        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-surface-card text-surface-muted ml-auto">
-          Segera Hadir
-        </span>
-      )}
-    </button>
+      <button
+        onClick={onClick}
+        className={`w-full py-3 rounded-2xl ${theme.buttonBg} text-white font-black text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-md`}
+      >
+        <Play size={15} />
+        Main Sekarang
+      </button>
+    </div>
   );
 }
 
 export default function NgajiCeriaGamesPage() {
   return (
     <NgajiCeriaLayout title="Mini Games" showBack>
-      <div className="px-4 py-4 space-y-4">
-        <p className="text-sm text-surface-muted text-center max-w-sm mx-auto mb-4">
-          Asah kemampuanmu mengenal huruf hijaiyah dan tajwid lewat berbagai mini game seru!
+      <div className="px-4 py-4 space-y-4 bg-[#FBF8F1] min-h-full rounded-t-3xl">
+        <p className="text-[12px] text-[#5A3A2A]/70 text-center max-w-sm mx-auto">
+          Asah kemampuan mengenal huruf hijaiyah dan tajwid lewat game seru.
         </p>
 
         <MiniGameCard
-          title="Tebak Hijaiyah"
-          description="Kenali dan tebak huruf hijaiyah tunggal."
-          icon="sparkles"
-          status="soon"
-          onClick={() => alert("Game Tebak Hijaiyah (Segera hadir!)")}
+          title="Qirra Pop"
+          description="Pecahkan balon huruf yang benar sebelum waktu habis."
+          cover={NGAJI_CERIA_ASSETS.qirraPop}
+          best={1200}
+          theme={GAME_THEMES.blue}
+          onClick={() => alert("Game Qirra Pop (Segera hadir!)")}
         />
 
         <MiniGameCard
-          title="Susun Kata Quran"
-          description="Susun suku kata menjadi lafadz yang benar."
-          icon="dice"
-          status="soon"
-          onClick={() => alert("Game Susun Kata Quran (Segera hadir!)")}
+          title="Qirra Match"
+          description="Cocokkan pasangan kartu huruf hijaiyah yang sama."
+          cover={NGAJI_CERIA_ASSETS.qirraMatch}
+          best={850}
+          theme={GAME_THEMES.peach}
+          onClick={() => alert("Game Qirra Match (Segera hadir!)")}
         />
 
         <MiniGameCard
-          title="Match Tajwid"
-          description="Cocokkan hukum tajwid dengan contohnya."
-          icon="sparkles"
-          status="soon"
-          onClick={() => alert("Game Match Tajwid (Segera hadir!)")}
+          title="Tebak Surah"
+          description="Tebak nama surah dari potongan ayat Juz Amma."
+          cover={NGAJI_CERIA_ASSETS.tebakSurahBaru}
+          best={640}
+          theme={GAME_THEMES.lavender}
+          onClick={() => alert("Game Tebak Surah (Segera hadir!)")}
         />
       </div>
     </NgajiCeriaLayout>
