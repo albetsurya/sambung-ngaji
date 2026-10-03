@@ -98,6 +98,8 @@ import {
   faMicrochip,
   faPrint,
   faWallet,
+  faMedal,
+  faCirclePlay,
 } from "@fortawesome/free-solid-svg-icons";
 
 export type IconProps = Omit<FontAwesomeIconProps, "icon" | "size"> & {
@@ -197,10 +199,12 @@ export const List = createIcon(faList);
 export const Star = createIcon(faStar);
 export const Fire = createIcon(faFire);
 export const Trophy = createIcon(faTrophy);
+export const Medal = createIcon(faMedal);
 
 export const Bookmark = createIcon(faBookmark);
 
 export const Play = createIcon(faPlay);
+export const PlayCircle = createIcon(faCirclePlay);
 
 export const Pause = createIcon(faPause);
 

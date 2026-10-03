@@ -166,6 +166,9 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
+const NgajiCeriaHomePage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
+);
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -243,6 +246,14 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <MemberKiblatPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaHomePage />
             </MemberRoute>
           }
         />

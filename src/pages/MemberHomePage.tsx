@@ -191,6 +191,29 @@ export default function MemberHomePage() {
 
 
         <section>
+          <button
+            onClick={() => navigate("/member/ngaji-ceria")}
+            className="clay clay-pressable w-full text-left !rounded-3xl p-4 flex items-center gap-3 bg-gradient-to-r from-accent-soft to-surface-card"
+          >
+            <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
+              <Sparkles size={20} className="text-accent" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-accent/80 mb-0.5">
+                Modul Interaktif
+              </p>
+              <p className="text-ios-body font-semibold text-surface-text truncate">
+                Ngaji Ceria (Tilawati)
+              </p>
+              <p className="text-ios-caption text-surface-muted truncate">
+                Belajar membaca Al-Quran dengan lagu Rost
+              </p>
+            </div>
+            <ChevronRight size={18} className="text-surface-muted flex-shrink-0" />
+          </button>
+        </section>
+
+        <section>
           <p className="px-1 mb-3 text-ios-footnote font-semibold text-surface-text">
             Perkembangan Saya
           </p>
