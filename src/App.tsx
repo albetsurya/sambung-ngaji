@@ -169,6 +169,15 @@ const PublicLandingPage = lazy(
 const NgajiCeriaHomePage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
 );
+const NgajiCeriaPathPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaPathPage"),
+);
+const NgajiCeriaQuizPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizPage"),
+);
+const NgajiCeriaGamesPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
+);
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -254,6 +263,30 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <NgajiCeriaHomePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/path"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaPathPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/quiz"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaQuizPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaGamesPage />
             </MemberRoute>
           }
         />
