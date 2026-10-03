@@ -44,7 +44,7 @@ export default function TaarufCvPrintPage() {
         subtitle={member ? member.full_name : undefined}
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate(`/jamaah/${id}`, { replace: true });
+          else navigate(`/members/${id}`, { replace: true });
         }}
         backLabel="Kembali"
         showSyncButton={false}

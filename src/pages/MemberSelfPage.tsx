@@ -77,10 +77,11 @@ export default function MemberSelfPage() {
     }
   }, [tabFromUrl]);
 
-  const basePath = isMember ? "/member" : "/profil-saya";
-  const backFallback = pathname.startsWith("/member")
-    ? "/member/lainnya"
-    : "/lainnya";
+  const basePath = isMember ? "/member" : "/my-profile";
+  const backFallback =
+    pathname === "/member" || pathname.startsWith("/member/")
+    ? "/member/more"
+    : "/more";
   const handleBack = () => goBack(navigate, backFallback);
 
   const { data, isLoading, error, refetch } = useQuery({

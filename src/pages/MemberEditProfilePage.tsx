@@ -181,7 +181,7 @@ export default function MemberEditProfilePage() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
 
       showToast("Biodata diperbarui");
-      const returnPath = user?.role === "MEMBER" ? "/member" : "/profil-saya";
+      const returnPath = user?.role === "MEMBER" ? "/member" : "/my-profile";
       navigate(returnPath, { replace: true });
     } catch (err) {
       showToast(

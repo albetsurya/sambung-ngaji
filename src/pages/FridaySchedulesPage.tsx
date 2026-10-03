@@ -246,7 +246,7 @@ export default function FridaySchedulesPage() {
                 variant="ghost"
                 size="xs"
                 iconOnly
-                onClick={() => navigate("/lainnya/petugas-jumat/cetak")}
+                onClick={() => navigate("/more/friday-officers/print")}
                 aria-label="Pratinjau cetakan"
                 title="Pratinjau cetakan (PDF/Gambar)"
               className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"

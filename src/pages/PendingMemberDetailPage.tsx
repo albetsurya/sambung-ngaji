@@ -244,7 +244,7 @@ export default function PendingMemberDetailPage() {
           invalidateAll();
           setApproveOpen(false);
           showToast("Pendaftar disetujui");
-          navigate("/lainnya/pendaftar", { replace: true });
+          navigate("/more/registrants", { replace: true });
         }}
       />
 

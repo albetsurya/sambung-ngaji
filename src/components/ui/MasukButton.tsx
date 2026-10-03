@@ -6,7 +6,7 @@ export function MasukButton({
   variant?: "primary" | "secondary";
 }) {
   const navigate = useNavigate();
-  const to = variant === "primary" ? "/login" : "/daftar";
+  const to = variant === "primary" ? "/login" : "/register";
   const label = variant === "primary" ? "Masuk" : "Daftar";
   return (
     <button

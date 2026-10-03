@@ -311,7 +311,7 @@ export default function UsersPage() {
         }}
         onViewMember={(memberId) => {
           setEditTarget(null);
-          navigate(`/jamaah/${memberId}`);
+          navigate(`/members/${memberId}`);
         }}
         onRequestDelete={(u) => {
           setEditTarget(null);

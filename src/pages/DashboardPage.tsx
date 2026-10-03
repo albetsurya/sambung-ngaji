@@ -131,7 +131,7 @@ export default function DashboardPage() {
       <ProfileMenuSheet
         open={profileMenuOpen}
         onClose={() => setProfileMenuOpen(false)}
-        profilePath="/profil-saya"
+        profilePath="/my-profile"
       />
     </AppLayout>
   );
@@ -349,7 +349,7 @@ function AttentionListSection({
         title="Perlu Perhatian"
         Icon={AlertTriangle}
         iconColor="text-warning"
-        onSeeAll={items.length > 0 ? () => navigate("/jamaah") : undefined}
+        onSeeAll={items.length > 0 ? () => navigate("/members") : undefined}
       />
       {items.length === 0 ? (
         <Card className="flex items-center gap-3 py-5">
@@ -370,7 +370,7 @@ function AttentionListSection({
           {items.map((m) => (
             <Card
               key={m.member_id}
-              onClick={() => navigate(`/jamaah/${m.member_id}`)}
+              onClick={() => navigate(`/members/${m.member_id}`)}
               className="flex items-center gap-3"
             >
               <Avatar
@@ -479,7 +479,7 @@ function GeneralDashboard({
             {Object.entries(data.per_kategori).map(([k, v]) => (
               <button
                 key={k}
-                onClick={() => navigate(`/jamaah?kategori=${k}`)}
+                onClick={() => navigate(`/members?kategori=${k}`)}
                 aria-label={`Lihat jamaah kategori ${
                   CATEGORY_LABEL[k as keyof typeof CATEGORY_LABEL]
                 }`}
@@ -506,13 +506,13 @@ function GeneralDashboard({
         <SectionHeader
           title="Pengajian Terdekat"
           onSeeAll={
-            data.pengajian_terdekat ? () => navigate("/absensi") : undefined
+            data.pengajian_terdekat ? () => navigate("/attendance") : undefined
           }
         />
         {data.pengajian_terdekat ? (
           <MeetingCard
             meeting={data.pengajian_terdekat}
-            onClick={() => navigate("/absensi")}
+            onClick={() => navigate("/attendance")}
           />
         ) : (
           <Card className="flex items-center gap-3 py-5">
@@ -601,7 +601,7 @@ function PNKBDashboard({
         <SectionHeader
           title="Siap Taaruf"
           onSeeAll={
-            total > 0 ? () => navigate("/jamaah?kategori=PRA_NIKAH") : undefined
+            total > 0 ? () => navigate("/members?kategori=PRA_NIKAH") : undefined
           }
         />
         {loadingPnkb ? (
@@ -617,7 +617,7 @@ function PNKBDashboard({
             action={
               <Button
                 size="sm"
-                onClick={() => navigate("/jamaah/baru")}
+                onClick={() => navigate("/members/new")}
               >
                 Tambah Jamaah
               </Button>
@@ -628,7 +628,7 @@ function PNKBDashboard({
             {preview.map((m, i) => (
               <ListRow
                 key={m.member_id}
-                onClick={() => navigate(`/jamaah/${m.member_id}`)}
+                onClick={() => navigate(`/members/${m.member_id}`)}
                 insetDivider={i !== preview.length - 1}
                 leading={
                   <Avatar
@@ -657,7 +657,7 @@ function PNKBDashboard({
                     variant="secondary"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/jamaah/${m.member_id}/cv-taaruf`);
+                      navigate(`/members/${m.member_id}/taaruf-cv`);
                     }}
                     aria-label={`Cetak CV taaruf ${m.full_name}`}
                   >
@@ -674,7 +674,7 @@ function PNKBDashboard({
         <SectionHeader title="Persiapan Pernikahan" />
         <div className="grid grid-cols-2 gap-2.5">
           <Card
-            onClick={() => navigate("/jamaah?kategori=PRA_NIKAH")}
+            onClick={() => navigate("/members?kategori=PRA_NIKAH")}
             className="flex flex-col gap-2 !p-3.5"
           >
             <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent">
@@ -689,7 +689,7 @@ function PNKBDashboard({
           </Card>
           <Card
             onClick={() =>
-              preview[0] && navigate(`/jamaah/${preview[0].member_id}/cv-taaruf`)
+              preview[0] && navigate(`/members/${preview[0].member_id}/taaruf-cv`)
             }
             className="flex flex-col gap-2 !p-3.5"
           >
@@ -736,7 +736,7 @@ function AbsensiDashboard({
           title="Pengajian Hari Ini"
           onSeeAll={
             data.pengajian_hari_ini.length > 0
-              ? () => navigate("/absensi")
+              ? () => navigate("/attendance")
               : undefined
           }
         />
@@ -759,7 +759,7 @@ function AbsensiDashboard({
             {data.pengajian_hari_ini.map((m) => (
               <Card
                 key={m.meeting_id}
-                onClick={() => navigate("/absensi")}
+                onClick={() => navigate("/attendance")}
                 className="flex items-center gap-3"
               >
                 <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">

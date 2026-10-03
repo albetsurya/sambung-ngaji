@@ -159,7 +159,7 @@ export default function RecapPrintPage() {
         subtitle={`Rekap ${monthLabel}`}
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate("/lainnya/rekap-absensi", { replace: true });
+          else navigate("/more/attendance-recap", { replace: true });
         }}
         backLabel="Kembali"
         showSyncButton={false}

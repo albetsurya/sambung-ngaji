@@ -120,7 +120,7 @@ export function BulkCreateTab() {
       showToast(`${data.created} jadwal berhasil dibuat`);
       queryClient.invalidateQueries({ queryKey: queryKeys.meetings() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
-      navigate("/lainnya/jadwal");
+      navigate("/more/schedule");
     },
     onError: (err) => {
       showToast(

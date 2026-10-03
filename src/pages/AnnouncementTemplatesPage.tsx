@@ -129,7 +129,7 @@ export default function AnnouncementTemplatesPage() {
       <Header
         title="Template Pengumuman"
         subtitle={`${templates.length} template`}
-        onBack={() => navigate("/pengumuman")}
+        onBack={() => navigate("/announcements")}
         backLabel="Pengumuman"
         showSyncButton={false}
       />

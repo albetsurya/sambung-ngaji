@@ -16,7 +16,7 @@ export default function RegistrationSuccessPage() {
 
   useEffect(() => {
     if (!submissionId) {
-      navigate("/daftar", { replace: true });
+      navigate("/register", { replace: true });
     }
   }, [submissionId, navigate]);
 
@@ -99,7 +99,7 @@ export default function RegistrationSuccessPage() {
           <Button
             variant="secondary"
             fullWidth
-            onClick={() => navigate("/daftar", { replace: true })}
+            onClick={() => navigate("/register", { replace: true })}
           >
             Daftar Jamaah Lain
           </Button>

@@ -84,7 +84,7 @@ export default function AnnouncementsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => navigate("/pengumuman/templates")}
+              onClick={() => navigate("/announcements/templates")}
               aria-label="Kelola template"
               title="Kelola template"
               leftIcon={<ScrollText size={14} strokeWidth={2.4} />}

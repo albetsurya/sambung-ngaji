@@ -693,7 +693,7 @@ export default function AttendancePage() {
           <Button
             variant="soft"
             size="xs"
-            onClick={() => navigate("/lainnya/rekap-absensi")}
+            onClick={() => navigate("/more/attendance-recap")}
             aria-label="Rekap absensi bulanan"
             leftIcon={<CalendarCheck size={14} />}
           >
@@ -972,7 +972,7 @@ export default function AttendancePage() {
             onSingle={() => openCreateForm("fab")}
             onBulk={() => {
               closeSheet();
-              navigate("/lainnya/jadwal?tab=bulk");
+              navigate("/more/schedule?tab=bulk");
             }}
           />
         )}
@@ -989,7 +989,7 @@ export default function AttendancePage() {
             onCreateNew={() => openCreateForm("picker")}
             onCreateBulk={() => {
               closeSheet();
-              navigate("/lainnya/jadwal");
+              navigate("/more/schedule");
             }}
             onDeleteBulk={handleDeleteBulk}
           />

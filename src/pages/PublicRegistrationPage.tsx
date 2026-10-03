@@ -253,7 +253,7 @@ export default function PublicRegistrationPage() {
         password: form.password,
       });
 
-      navigate("/daftar/sukses", {
+      navigate("/register/success", {
         state: {
           name: result.full_name,
           submissionId: result.submission_id,

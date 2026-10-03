@@ -49,8 +49,8 @@ export default function MemberSettingsPage() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
-  const backPath = isMember ? "/member" : "/profil-saya";
-  const editPath = isMember ? "/member/edit" : "/profil-saya/edit";
+  const backPath = isMember ? "/member" : "/my-profile";
+  const editPath = isMember ? "/member/edit" : "/my-profile/edit";
 
   return (
     <AppLayout hideNav showAiChat={false}>

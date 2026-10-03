@@ -199,7 +199,7 @@ export default function MemberFormPage() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
 
       showToast(isEdit ? "Data jamaah diperbarui" : "Jamaah baru ditambahkan");
-      navigate(memberId ? `/jamaah/${memberId}` : "/jamaah", {
+      navigate(memberId ? `/members/${memberId}` : "/members", {
         replace: true,
       });
     } catch (err) {

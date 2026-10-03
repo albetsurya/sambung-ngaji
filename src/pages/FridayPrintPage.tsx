@@ -86,7 +86,7 @@ export default function FridayPrintPage() {
         subtitle="Jadwal Petugas Sholat Jumat"
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate("/lainnya/petugas-jumat", { replace: true });
+          else navigate("/more/friday-officers", { replace: true });
         }}
         backLabel="Kembali"
         showSyncButton={false}

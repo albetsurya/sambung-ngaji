@@ -142,7 +142,7 @@ export default function OthersPage() {
         label: "Kelompok Saya",
         description: "Anggota, jadwal, absensi & pendaftar kelompok ini",
         Icon: Building2,
-        to: "/kelompok-saya",
+        to: "/my-group",
         show: isHubUser,
         group: "akun",
         badge: pendingCount > 0 ? pendingCount : undefined,
@@ -153,7 +153,7 @@ export default function OthersPage() {
         label: "Pendaftar",
         description: "Verifikasi pendaftar baru",
         Icon: ClipboardList,
-        to: "/lainnya/pendaftar",
+        to: "/more/registrants",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
         badge: pendingCount > 0 ? pendingCount : undefined,
@@ -164,7 +164,7 @@ export default function OthersPage() {
         label: "Permintaan Member",
         description: "User minta menjadi member",
         Icon: UserPlus,
-        to: "/lainnya/permintaan-member",
+        to: "/more/member-requests",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -173,7 +173,7 @@ export default function OthersPage() {
         label: "Kelompok",
         description: "Kelola kelompok pengajian",
         Icon: Building2,
-        to: "/lainnya/kelompok",
+        to: "/more/groups",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -182,7 +182,7 @@ export default function OthersPage() {
         label: "Import Jamaah",
         description: "Paste text biodata dari WhatsApp",
         Icon: FileText,
-        to: "/lainnya/import-jamaah",
+        to: "/more/import-members",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -191,7 +191,7 @@ export default function OthersPage() {
         label: "QR Pendaftaran",
         description: "Bagikan link pendaftaran",
         Icon: QrCode,
-        to: "/lainnya/qr-code",
+        to: "/more/qr-code",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -201,7 +201,7 @@ export default function OthersPage() {
         label: "Kelola Jadwal",
         description: "Kalender, tambah massal, import PDF",
         Icon: Calendar,
-        to: "/lainnya/jadwal",
+        to: "/more/schedule",
         show:
           (isAdminLike || role === "TIM_ABSENSI") &&
           !isHubUser &&
@@ -213,7 +213,7 @@ export default function OthersPage() {
         label: "Rekap Absensi",
         description: "Matriks kehadiran bulanan",
         Icon: CalendarCheck,
-        to: "/lainnya/rekap-absensi",
+        to: "/more/attendance-recap",
         show:
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
@@ -225,7 +225,7 @@ export default function OthersPage() {
         label: "Petugas Jumat",
         description: "Kelola petugas sholat Jumat",
         Icon: Mosque,
-        to: "/lainnya/petugas-jumat",
+        to: "/more/friday-officers",
         show:
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
@@ -238,7 +238,7 @@ export default function OthersPage() {
         label: "Pengumuman",
         description: "Buat & kelola pengumuman jamaah",
         Icon: Megaphone,
-        to: "/pengumuman",
+        to: "/announcements",
         show:
           isSuperAdmin ||
           ((isAdminLike && !isHubUser) || role === "PENGAWAS"),
@@ -260,7 +260,7 @@ export default function OthersPage() {
         label: "Manajemen User",
         description: "Atur akun & hak akses",
         Icon: KeyRound,
-        to: "/lainnya/users",
+        to: "/more/users",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "sistem",
       },
@@ -278,7 +278,7 @@ export default function OthersPage() {
         label: "Monitoring AI",
         description: "Statistik pemakaian AI",
         Icon: Sparkles,
-        to: "/lainnya/ai-usage",
+        to: "/more/ai-usage",
         show: isSuperAdmin,
         group: "sistem",
       },
@@ -287,7 +287,7 @@ export default function OthersPage() {
         label: "Audit Log",
         description: "Riwayat aktivitas sistem",
         Icon: ScrollText,
-        to: "/lainnya/audit-log",
+        to: "/more/audit-log",
         show: isSuperAdmin,
         group: "sistem",
       },
@@ -407,7 +407,7 @@ export default function OthersPage() {
           <ListRow
             insetDivider={false}
             className="py-3.5"
-            onClick={() => navigate("/profil-saya")}
+            onClick={() => navigate("/my-profile")}
           >
             <div className="flex items-center gap-3">
               <Avatar
@@ -460,8 +460,8 @@ export default function OthersPage() {
                 onClick={() =>
                   navigate(
                     focusGroupId
-                      ? `/kelompok-saya?group_id=${focusGroupId}`
-                      : "/kelompok-saya",
+                      ? `/my-group?group_id=${focusGroupId}`
+                      : "/my-group",
                   )
                 }
                 insetDivider={false}
@@ -583,7 +583,7 @@ export default function OthersPage() {
                 onClick={() => {
                   selectFocusGroup(null);
                   setGroupSheetOpen(false);
-                  navigate("/kelompok-saya");
+                  navigate("/my-group");
                 }}
                 insetDivider={sheetGroups.length > 0}
                 leading={
@@ -609,7 +609,7 @@ export default function OthersPage() {
                   onClick={() => {
                     selectFocusGroup(g.group_id);
                     setGroupSheetOpen(false);
-                    navigate(`/kelompok-saya?group_id=${g.group_id}`);
+                    navigate(`/my-group?group_id=${g.group_id}`);
                   }}
                   insetDivider={i !== sheetGroups.length - 1}
                   leading={

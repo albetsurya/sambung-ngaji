@@ -159,7 +159,7 @@ export default function MemberImportPage() {
       <Header
         title="Import Jamaah"
         subtitle="Paste text biodata dari WhatsApp"
-        onBack={() => navigate("/lainnya")}
+        onBack={() => navigate("/more")}
         backLabel="Kembali"
         showSyncButton={false}
       />
@@ -194,7 +194,7 @@ export default function MemberImportPage() {
           <DonePhase
             results={results}
             onReset={handleReset}
-            onViewMembers={() => navigate("/jamaah", { replace: true })}
+            onViewMembers={() => navigate("/members", { replace: true })}
           />
         )}
       </div>

@@ -160,7 +160,7 @@ export default function MemberDetailPage() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
       queryClient.invalidateQueries({ queryKey: queryKeys.users() });
       setConfirmDeleteMember(false);
-      navigate("/jamaah", { replace: true });
+      navigate("/members", { replace: true });
     },
     onError: (err) => {
       showToast(
@@ -234,7 +234,7 @@ export default function MemberDetailPage() {
       fab={
         canEdit ? (
           <FloatingActionButton
-            onClick={() => navigate(`/jamaah/${member.member_id}/edit`)}
+            onClick={() => navigate(`/members/${member.member_id}/edit`)}
             label="Edit Biodata"
             variant="secondary"
             icon={<Pencil size={18} strokeWidth={2.2} />}
@@ -252,7 +252,7 @@ export default function MemberDetailPage() {
               variant="ghost"
               size="xs"
               iconOnly
-              onClick={() => navigate(`/jamaah/${member.member_id}/cv-taaruf`)}
+              onClick={() => navigate(`/members/${member.member_id}/taaruf-cv`)}
               aria-label="Cetak CV Taaruf"
               title="Cetak CV Taaruf (PDF/Gambar)"
               className="border border-surface-border bg-surface-card hover:bg-surface-card2 shrink-0"
@@ -469,7 +469,7 @@ function UserAccountSection({
               variant="secondary"
               size="sm"
               fullWidth
-              onClick={() => navigate("/lainnya/users")}
+              onClick={() => navigate("/more/users")}
               leftIcon={<ArrowUpRight size={16} />}
             >
               Kelola Akun

@@ -213,7 +213,7 @@ export default function MemberHomePage() {
               Sering Dipakai
             </p>
             <button
-              onClick={() => navigate("/member/lainnya")}
+              onClick={() => navigate("/member/more")}
               className="flex items-center gap-1 text-ios-caption font-medium text-accent transition-colors hover:text-accent-dark"
             >
               Lihat semua
@@ -249,7 +249,7 @@ export default function MemberHomePage() {
 
         
         <button
-          onClick={() => navigate("/member/lainnya")}
+          onClick={() => navigate("/member/more")}
           className="w-full rounded-2xl border border-surface-border bg-surface-card p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-surface-card2"
         >
           <span className="w-10 h-10 rounded-xl bg-accent-soft text-accent flex items-center justify-center flex-shrink-0">

@@ -2,8 +2,8 @@ import { usePermission } from "../../../hooks/usePermission";
 
 /**
  * Back navigation simetris untuk modul keuangan.
- * - SUPER_ADMIN dengan fokus grup -> kembali ke /kelompok-saya?group_id=X (chip terjaga)
- * - SUPER_ADMIN tanpa fokus -> /kelompok-saya (pilih konteks)
+ * - SUPER_ADMIN dengan fokus grup -> kembali ke /my-group?group_id=X (chip terjaga)
+ * - SUPER_ADMIN tanpa fokus -> /my-group (pilih konteks)
  * - TIM_KU / lainnya -> /finance hub (jalur BottomNav Keuangan)
  */
 export function useFinanceBack() {
@@ -12,18 +12,18 @@ export function useFinanceBack() {
   if (isSuperAdmin) {
     if (assignedGroup) {
       return {
-        backTo: `/kelompok-saya?group_id=${assignedGroup}`,
+        backTo: `/my-group?group_id=${assignedGroup}`,
         backLabel: "Kelola Kelompok",
       };
     }
-    return { backTo: "/kelompok-saya", backLabel: "Kelola Kelompok" };
+    return { backTo: "/my-group", backLabel: "Kelola Kelompok" };
   }
 
   if (role === "TIM_KU") {
     return { backTo: "/finance", backLabel: "Keuangan" };
   }
 
-  return { backTo: "/lainnya", backLabel: "Lainnya" };
+  return { backTo: "/more", backLabel: "Lainnya" };
 }
 
 /** Back untuk hub /finance sendiri: SA -> Kelola Kelompok, lainnya -> Lainnya. */
@@ -32,11 +32,11 @@ export function useFinanceHubBack() {
   if (isSuperAdmin) {
     if (assignedGroup) {
       return {
-        backTo: `/kelompok-saya?group_id=${assignedGroup}`,
+        backTo: `/my-group?group_id=${assignedGroup}`,
         backLabel: "Kelola Kelompok",
       };
     }
-    return { backTo: "/kelompok-saya", backLabel: "Kelola Kelompok" };
+    return { backTo: "/my-group", backLabel: "Kelola Kelompok" };
   }
-  return { backTo: "/lainnya", backLabel: "Lainnya" };
+  return { backTo: "/more", backLabel: "Lainnya" };
 }

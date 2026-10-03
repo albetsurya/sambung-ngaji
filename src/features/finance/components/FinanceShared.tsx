@@ -188,7 +188,7 @@ export function NoGroupEmpty({
       icon={icon}
       action={
         isSuperAdmin ? (
-          <Button size="sm" onClick={() => navigate("/kelompok-saya")}>
+          <Button size="sm" onClick={() => navigate("/my-group")}>
             Pilih Kelompok
           </Button>
         ) : undefined

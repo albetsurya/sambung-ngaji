@@ -292,7 +292,7 @@ export default function MembersListPage() {
       if (role === "TIM_ABSENSI") {
         return;
       }
-      navigate(`/jamaah/${id}`);
+      navigate(`/members/${id}`);
     },
     [navigate, selectMode, toggleSelect, role],
   );
@@ -410,7 +410,7 @@ export default function MembersListPage() {
     <AppLayout
       fab={
         !selectMode && canCreate ? (
-          <FloatingActionButton onClick={() => navigate("/jamaah/baru")} label="Tambah Jamaah" />
+          <FloatingActionButton onClick={() => navigate("/members/new")} label="Tambah Jamaah" />
         ) : undefined
       }
       showAiChat={!selectMode}
@@ -542,7 +542,7 @@ export default function MembersListPage() {
             }
             action={
               canCreate && !hasActiveSearch && !kategori && !jenisKelamin ? (
-                <Button onClick={() => navigate("/jamaah/baru")}>
+                <Button onClick={() => navigate("/members/new")}>
                   Tambah Jamaah
                 </Button>
               ) : undefined

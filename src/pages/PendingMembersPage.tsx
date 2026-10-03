@@ -147,7 +147,7 @@ export default function PendingMembersPage() {
                 <ListRow
                   key={p.submission_id}
                   onClick={() =>
-                    navigate(`/lainnya/pendaftar/${p.submission_id}`)
+                    navigate(`/more/registrants/${p.submission_id}`)
                   }
                   insetDivider={i !== list.length - 1}
                   leading={

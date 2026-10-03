@@ -180,7 +180,7 @@ export default function MemberAttendanceRecapPage() {
         subtitle="Ringkasan absensi bulanan per jamaah"
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate("/absensi", { replace: true });
+          else navigate("/attendance", { replace: true });
         }}
         backLabel="Kembali"
         hideBackOnDesktop
@@ -285,7 +285,7 @@ export default function MemberAttendanceRecapPage() {
                   <Button
                     onClick={() =>
                       navigate(
-                        `/lainnya/rekap-absensi/cetak?bulan=${recapMonth}&kategori=${recapKategori.join(",")}&gender=${recapGender}`,
+                        `/more/attendance-recap/print?bulan=${recapMonth}&kategori=${recapKategori.join(",")}&gender=${recapGender}`,
                       )
                     }
                     aria-label="Pratinjau cetakan"
