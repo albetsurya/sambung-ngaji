@@ -171,8 +171,11 @@ import { NgajiCeriaLayout } from "./features/ngaji-ceria/components/NgajiCeriaLa
 const NgajiCeriaHomePage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
 );
-const NgajiCeriaPathPage = lazy(
-  () => import("./features/ngaji-ceria/pages/NgajiCeriaPathPage"),
+const NgajiCeriaLibraryPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaLibraryPage"),
+);
+const NgajiCeriaMapPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaMapPage"),
 );
 const NgajiCeriaQuizPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizPage"),
@@ -272,10 +275,18 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/member/ngaji-ceria/map"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaMapPage />
+            </MemberRoute>
+          }
+        />
+        <Route
           path="/member/ngaji-ceria/path"
           element={
             <MemberRoute allowGuest>
-              <NgajiCeriaPathPage />
+              <NgajiCeriaLibraryPage />
             </MemberRoute>
           }
         />

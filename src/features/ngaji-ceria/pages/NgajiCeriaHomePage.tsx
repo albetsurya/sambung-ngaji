@@ -1,253 +1,189 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
-import { Sparkles, Volume2, Play } from "../../../components/ui/FontAwesomeIcons";
-import { TILAWATI_DATA } from "../data/tilawati";
-import { useNgajiCeriaProgress } from "../hooks/useNgajiCeriaProgress";
-import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
-
-interface PathNode {
-  pageNumber: number;
-  title: string;
-  status: "completed" | "active" | "locked";
-  isCheckpoint?: boolean;
-  stars?: number;
-  xOffset: string;
-}
+import {
+  Sparkles,
+  Play,
+  Star,
+  BookOpen,
+  MapPin,
+  Trophy,
+  Fire,
+  ChevronRight,
+} from "../../../components/ui/FontAwesomeIcons";
 
 export default function NgajiCeriaHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const displayName = user?.name ? user.name.split(" ")[0] : "Santri";
+  const displayName = user?.name ? user.name.split(" ")[0] : "Hamba Allah";
 
-  const { currentJilid, currentPage, progressPercentage } =
-    useNgajiCeriaProgress(TILAWATI_DATA);
-
-  const currentJilidObj = useMemo(() => {
-    return TILAWATI_DATA.find((j) => j.id === currentJilid) || TILAWATI_DATA[0];
-  }, [currentJilid]);
-
-  const nodes: PathNode[] = useMemo(() => {
-    const alignments: PathNode["xOffset"][] = [
-      "self-center",
-      "self-end",
-      "self-center",
-      "self-start",
-      "self-center",
-      "self-end",
-      "self-center",
-      "self-start",
-      "self-center",
-      "self-end",
-    ];
-
-    return Array.from({ length: 10 }, (_, i) => {
-      const pageNum = i + 1;
-      const isCp = pageNum === 5 || pageNum === 10;
-      let status: PathNode["status"] = "locked";
-      let stars = 0;
-
-      if (pageNum < currentPage) {
-        status = "completed";
-        stars = 3;
-      } else if (pageNum === currentPage) {
-        status = "active";
-      }
-
-      return {
-        pageNumber: pageNum,
-        title: isCp ? `Evaluasi Hal 1-${pageNum}` : `Halaman ${pageNum}`,
-        status,
-        isCheckpoint: isCp,
-        stars,
-        xOffset: alignments[i % alignments.length],
-      };
-    });
-  }, [currentPage]);
+  const days = [
+    { label: "SEN", active: true },
+    { label: "SEL", active: true },
+    { label: "RAB", active: true },
+    { label: "KAM", active: false },
+    { label: "JUM", active: false },
+    { label: "SAB", active: false },
+    { label: "AHD", active: false },
+  ];
 
   return (
-    <NgajiCeriaLayout title="Petualangan Tilawati">
-      <div className="px-4 py-4 space-y-6">
-        {/* Header Jilid Banner */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent/20 via-surface-card to-accent/10 border-2 border-accent/30 p-5 shadow-md">
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-white text-[10px] font-black uppercase tracking-wider mb-2 shadow-sm">
-                <Sparkles size={11} />
-                Metode Tilawati • Lagu Rost
-              </div>
-              <h2 className="font-display text-xl font-black text-surface-text tracking-tight">
-                {currentJilidObj.nama}
-              </h2>
-              <p className="text-xs text-surface-muted mt-1 leading-relaxed">
-                {currentJilidObj.deskripsi}
-              </p>
-              <p className="text-xs font-bold text-accent mt-2">
-                Progress: Halaman {currentPage} dari 10 ({progressPercentage}%)
+    <NgajiCeriaLayout title="Ngaji Ceria">
+      <div className="px-4 py-4 space-y-5 bg-[#FFF8EE] min-h-full rounded-t-3xl">
+        {/* User Greeting Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-bold text-[#8C5A3A]">
+              Assalamu'alaikum,
+            </span>
+            <h2 className="font-display font-black text-lg text-[#5A3A2A]">
+              {displayName}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-[#E2EFCF] text-[#2D5A27] font-black text-[10px] uppercase tracking-wider border border-[#2D5A27]/20 flex items-center gap-1">
+              <Sparkles size={11} /> VIP
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-[#FFCB45] text-[#5A3A2A] font-black text-xs border border-[#B8590C]/20 flex items-center gap-1">
+              <Star size={12} className="fill-[#5A3A2A]" /> 5
+            </span>
+          </div>
+        </div>
+
+        {/* Brown Hero Current Lesson Card (Ref 1) */}
+        <section className="relative overflow-hidden rounded-[26px] bg-[#5A3A2A] text-white p-5 shadow-lg border-2 border-[#3E2518]">
+          <div className="relative z-10 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#FFCB45]">
+                TILAWATI 1 • HALAMAN 2
+              </span>
+              <span className="text-[10px] font-bold text-white/80">1%</span>
+            </div>
+
+            <div>
+              <h3 className="font-display font-black text-lg text-white leading-tight">
+                Lanjutkan Tilawati 1 Hal 2: Ta (ت)
+              </h3>
+              <p className="text-xs text-white/80 mt-1">
+                Kenali cara pengucapan dan panjang bacaan huruf Ta dengan tepat.
               </p>
             </div>
 
-            {/* Jilid Cover SVG */}
-            <div className="shrink-0 w-20 h-20 bg-white rounded-2xl p-1.5 shadow-md border border-accent/20 rotate-3">
+            {/* Progress bar line */}
+            <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+              <div className="bg-[#FFCB45] h-full w-[1%]" />
+            </div>
+
+            <button
+              onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
+              className="mt-1 w-full py-3 rounded-2xl bg-[#F58A3A] hover:bg-[#E2561A] text-white font-black text-sm flex items-center justify-center gap-2 shadow-md border-b-4 border-[#A63C0E] active:translate-y-0.5 transition-all"
+            >
+              <Play size={16} />
+              Lanjutkan Pembelajaran Hari Ini
+            </button>
+          </div>
+        </section>
+
+        {/* 4 Main Grid Menus (Ref 1) */}
+        <section className="grid grid-cols-4 gap-2.5">
+          <button
+            onClick={() => navigate("/member/ngaji-ceria/library")}
+            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#EFF3EC] border-2 border-[#C5DDB9] active:scale-95 transition-transform shadow-sm gap-1.5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#2D5A27] text-white flex items-center justify-center shadow-sm">
+              <BookOpen size={18} />
+            </div>
+            <span className="text-[11px] font-black text-[#2D5A27]">Pilih Jilid</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/member/ngaji-ceria/map")}
+            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#EAF6FB] border-2 border-[#BCE3F5] active:scale-95 transition-transform shadow-sm gap-1.5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#1C5D79] text-white flex items-center justify-center shadow-sm">
+              <MapPin size={18} />
+            </div>
+            <span className="text-[11px] font-black text-[#1C5D79]">Jelajah</span>
+          </button>
+
+          <button
+            onClick={() => alert("Laporan Perkembangan Santri")}
+            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#FFF6EC] border-2 border-[#FCDCB8] active:scale-95 transition-transform shadow-sm gap-1.5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#8C4A14] text-white flex items-center justify-center shadow-sm">
+              <Sparkles size={18} />
+            </div>
+            <span className="text-[11px] font-black text-[#8C4A14]">Laporan</span>
+          </button>
+
+          <button
+            onClick={() => alert("Peringkat Santri")}
+            className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#F3F0FF] border-2 border-[#D7CCFF] active:scale-95 transition-transform shadow-sm gap-1.5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#553894] text-white flex items-center justify-center shadow-sm">
+              <Trophy size={18} />
+            </div>
+            <span className="text-[11px] font-black text-[#553894]">Peringkat</span>
+          </button>
+        </section>
+
+        {/* Weekly Streak Mengaji (Ref 1) */}
+        <section className="rounded-2xl bg-white p-4 border-2 border-[#E2D4C0] shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <img src={NGAJI_CERIA_ASSETS.apiStreak} className="w-5 h-5" alt="Flame" />
+              <h4 className="font-black text-xs text-[#5A3A2A]">Streak Mengaji</h4>
+            </div>
+            <span className="text-[10px] font-bold text-[#8C5A3A]">3 Hari Beruntun</span>
+          </div>
+
+          <div className="flex items-center justify-between gap-1">
+            {days.map((day) => (
+              <div key={day.label} className="flex flex-col items-center gap-1 flex-1">
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
+                    day.active
+                      ? "bg-[#F58A3A] border-[#C4430E] text-white shadow-sm"
+                      : "bg-[#F5F2EB] border-[#E2D4C0] text-[#B8A690]"
+                  }`}
+                >
+                  <Fire size={14} className={day.active ? "fill-white" : ""} />
+                </div>
+                <span className="text-[9px] font-bold text-[#5A3A2A]">{day.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Interactive Practice Banner (Ref 1) */}
+        <section className="rounded-2xl bg-gradient-to-r from-[#FFF0F3] to-[#FCEAEF] p-4 border-2 border-[#FCCCD4] shadow-sm flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 shrink-0 rounded-2xl bg-[#8C243B] text-white flex items-center justify-center shadow-sm">
               <img
-                src={NGAJI_CERIA_ASSETS.jilidCovers[Number(currentJilid) || 1]}
-                alt={currentJilidObj.nama}
-                className="w-full h-full object-contain"
+                src={NGAJI_CERIA_ASSETS.tebakSurahBaru}
+                alt="Kartu"
+                className="w-8 h-8 object-contain"
               />
             </div>
-          </div>
-        </section>
-
-        {/* Winding World Map Adventure Path */}
-        <section className="relative px-4 py-6 bg-surface-card/60 backdrop-blur-sm rounded-3xl border-2 border-surface-border shadow-inner">
-          <div className="text-center mb-6">
-            <h3 className="font-black text-sm text-surface-text uppercase tracking-wider">
-              Peta Alur Belajar Santri
-            </h3>
-            <p className="text-xs text-surface-muted mt-0.5">
-              Selesaikan tiap halaman untuk membuka evaluasi jilid
-            </p>
-          </div>
-
-          <div className="relative flex flex-col gap-10 items-center max-w-xs mx-auto">
-            {nodes.map((node) => {
-              return (
-                <div
-                  key={node.pageNumber}
-                  className={`relative z-10 flex flex-col items-center ${node.xOffset} transition-all duration-300`}
-                >
-                  {/* Node Button */}
-                  <button
-                    disabled={node.status === "locked"}
-                    onClick={() => {
-                      if (node.status !== "locked") {
-                        navigate("/member/ngaji-ceria/quiz");
-                      }
-                    }}
-                    className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-200 ${
-                      node.status === "active"
-                        ? "scale-110 animate-bounce"
-                        : node.status === "completed"
-                        ? "hover:scale-105"
-                        : "opacity-75 cursor-not-allowed"
-                    }`}
-                  >
-                    {/* Node Visual Asset */}
-                    {node.isCheckpoint ? (
-                      <img
-                        src={
-                          node.status === "completed"
-                            ? NGAJI_CERIA_ASSETS.piala
-                            : NGAJI_CERIA_ASSETS.petiHarta
-                        }
-                        alt="Checkpoint"
-                        className="w-20 h-20 drop-shadow-lg"
-                      />
-                    ) : node.status === "completed" ? (
-                      <img
-                        src={NGAJI_CERIA_ASSETS.nodeSelesai}
-                        alt="Selesai"
-                        className="w-20 h-20 drop-shadow-md"
-                      />
-                    ) : node.status === "active" ? (
-                      <img
-                        src={NGAJI_CERIA_ASSETS.nodeAktif}
-                        alt="Aktif"
-                        className="w-22 h-22 drop-shadow-xl"
-                      />
-                    ) : (
-                      <img
-                        src={NGAJI_CERIA_ASSETS.nodeTerkunci}
-                        alt="Terkunci"
-                        className="w-20 h-20 grayscale opacity-80"
-                      />
-                    )}
-
-
-                  </button>
-
-                  <div className="mt-2 text-center">
-                    <span
-                      className={`block text-xs font-bold px-3 py-1 rounded-full border shadow-sm ${
-                        node.status === "active"
-                          ? "bg-accent text-white border-accent-dark font-black"
-                          : node.status === "completed"
-                          ? "bg-success-soft text-success border-success/30 font-extrabold"
-                          : "bg-surface-card2 text-surface-muted border-surface-border"
-                      }`}
-                    >
-                      {node.title}
-                    </span>
-
-                    {node.status === "completed" && (
-                      <div className="flex justify-center gap-1 mt-1">
-                        <img
-                          src={NGAJI_CERIA_ASSETS.bintang}
-                          className="w-3.5 h-3.5"
-                          alt="Bintang"
-                        />
-                        <img
-                          src={NGAJI_CERIA_ASSETS.bintang}
-                          className="w-3.5 h-3.5"
-                          alt="Bintang"
-                        />
-                        <img
-                          src={NGAJI_CERIA_ASSETS.bintang}
-                          className="w-3.5 h-3.5"
-                          alt="Bintang"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {node.status === "active" && (
-                    <button
-                      onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
-                      className="mt-3 px-5 py-2.5 rounded-2xl bg-accent text-white font-black text-xs shadow-lg shadow-accent/30 flex items-center gap-2 border-b-4 border-accent-dark active:translate-y-1 transition-all"
-                    >
-                      <Play size={14} />
-                      <span>Mulai Halaman {node.pageNumber}</span>
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Audio Rost Melody Prompt Bar */}
-        <section className="rounded-3xl bg-surface-card border-2 border-surface-border p-4 flex items-center gap-4 shadow-sm relative z-20">
-          <div className="w-12 h-12 shrink-0 bg-accent-soft rounded-2xl flex items-center justify-center">
-            <img
-              src={NGAJI_CERIA_ASSETS.mikrofonBaca}
-              className="w-8 h-8"
-              alt="Mikrofon"
-            />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-bold text-xs text-surface-text">
-              Panduan Nada Rost Tilawati
-            </h4>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-card2 text-surface-text font-bold">
-                1. Datar
+            <div className="min-w-0">
+              <span className="text-[9px] font-black uppercase tracking-wider text-[#8C243B]">
+                Latihan Interaktif Tilawati 1-6
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-card2 text-surface-text font-bold">
-                2. Naik
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-card2 text-surface-text font-bold">
-                3. Turun
-              </span>
+              <h4 className="font-black text-sm text-[#5A3A2A] truncate">
+                Sesi Ngaji Kartu
+              </h4>
             </div>
           </div>
+
           <button
-            onClick={() => alert("Memutar contoh nada Rost Tilawati")}
-            className="w-11 h-11 rounded-2xl bg-accent text-white flex items-center justify-center active:scale-90 shadow-md shadow-accent/20"
-            title="Dengar Irama"
+            onClick={() => navigate("/member/ngaji-ceria/quiz")}
+            className="shrink-0 px-3.5 py-2 rounded-xl bg-[#8C243B] text-white font-black text-xs flex items-center gap-1 shadow-sm active:scale-95 transition-transform"
           >
-            <Volume2 size={20} />
+            <span>Mulai</span>
+            <ChevronRight size={14} />
           </button>
         </section>
       </div>

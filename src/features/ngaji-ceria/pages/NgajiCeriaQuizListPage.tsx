@@ -2,9 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
-import { ChevronRight, Sparkles, Star } from "../../../components/ui/FontAwesomeIcons";
+import { ChevronRight, Sparkles, Star, Lock, Play } from "../../../components/ui/FontAwesomeIcons";
 
-interface QuizBookCardProps {
+interface QuizBookProps {
   id: string;
   title: string;
   subtitle: string;
@@ -17,7 +17,7 @@ interface QuizBookCardProps {
   onClick: () => void;
 }
 
-function QuizBookCard({
+function StandaloneQuizBookCard({
   title,
   subtitle,
   level,
@@ -27,66 +27,58 @@ function QuizBookCard({
   stars,
   isLocked = false,
   onClick,
-}: QuizBookCardProps) {
+}: QuizBookProps) {
   const isCompleted = completedQuestions === totalQuestions;
   const progressPercent = Math.round((completedQuestions / totalQuestions) * 100);
 
   return (
-    <button
-      onClick={onClick}
-      disabled={isLocked}
-      className={`w-full text-left relative overflow-hidden rounded-3xl p-5 border-2 transition-all duration-200 active:scale-[0.98] shadow-md flex items-center gap-4 ${
-        isLocked
-          ? "bg-surface-card2 text-surface-muted border-surface-border opacity-75 cursor-not-allowed"
-          : "bg-surface-card hover:bg-surface-card/90 border-accent/30 hover:border-accent text-surface-text"
-      }`}
-    >
-      {/* Visual Book/Kitab Ornament / Illustration */}
-      <div className="relative shrink-0 w-20 h-24 bg-gradient-to-br from-accent-soft to-surface-card2 rounded-2xl border-2 border-accent/20 p-2 shadow-inner flex flex-col items-center justify-center overflow-hidden">
+    <div className="flex items-center gap-4 group">
+      {/* Standalone Book Illustration Card */}
+      <button
+        onClick={onClick}
+        disabled={isLocked}
+        className={`relative shrink-0 w-24 h-32 transition-all duration-300 group-hover:scale-105 active:scale-95 ${
+          isLocked ? "cursor-not-allowed opacity-60 grayscale" : "cursor-pointer drop-shadow-lg"
+        }`}
+      >
         <img
           src={coverImage}
           alt={title}
-          className={`w-14 h-14 object-contain transition-transform group-hover:scale-110 ${
-            isLocked ? "grayscale opacity-50" : ""
-          }`}
+          className="w-full h-full object-contain filter drop-shadow-md"
         />
-        {isLocked && (
-          <img
-            src={NGAJI_CERIA_ASSETS.kartuTerkunci}
-            alt="Terkunci"
-            className="absolute inset-0 m-auto w-8 h-8 object-contain"
-          />
+        {isLocked ? (
+          <div className="absolute inset-0 m-auto w-8 h-8 rounded-full bg-[#5A3A2A]/80 text-white flex items-center justify-center border border-white/40 shadow-sm">
+            <Lock size={14} />
+          </div>
+        ) : (
+          <div className="absolute top-1 right-1 w-6 h-6 rounded-full bg-[#F58A3A] text-white flex items-center justify-center border border-white shadow-sm">
+            <Play size={10} className="ml-0.5 fill-white" />
+          </div>
         )}
-      </div>
+      </button>
 
-      {/* Card Info Content */}
+      {/* Details next to book */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span
-            className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-              isLocked
-                ? "bg-surface-card text-surface-muted"
-                : "bg-accent-soft text-accent"
-            }`}
-          >
+          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#E2EFCF] text-[#2D5A27] border border-[#2D5A27]/20">
             {level}
           </span>
           {isCompleted && (
-            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-success-soft text-success">
+            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#FFCB45] text-[#5A3A2A]">
               Selesai
             </span>
           )}
         </div>
 
-        <h3 className="font-display font-black text-base text-surface-text truncate">
+        <h3 className="font-display font-black text-base text-[#5A3A2A] truncate">
           {title}
         </h3>
-        <p className="text-xs text-surface-muted line-clamp-1 mt-0.5">
+        <p className="text-xs text-[#8C5A3A] line-clamp-1 mt-0.5">
           {subtitle}
         </p>
 
         {/* Stars and Progress */}
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-2.5 flex items-center justify-between">
           <div className="flex items-center gap-1">
             {[1, 2, 3].map((starIdx) => (
               <img
@@ -102,16 +94,16 @@ function QuizBookCard({
             ))}
           </div>
 
-          <span className="text-xs font-bold text-accent">
+          <span className="text-xs font-black text-[#F58A3A]">
             {completedQuestions}/{totalQuestions} Soal
           </span>
         </div>
 
         {/* Progress Bar Line */}
         {!isLocked && (
-          <div className="w-full bg-surface-card2 rounded-full h-1.5 mt-2 overflow-hidden border border-surface-border">
+          <div className="w-full bg-[#E2D4C0] rounded-full h-1.5 mt-2 overflow-hidden border border-[#C8B8A2]">
             <div
-              className="bg-accent h-full rounded-full transition-all duration-300"
+              className="bg-[#F58A3A] h-full rounded-full transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -119,11 +111,14 @@ function QuizBookCard({
       </div>
 
       {!isLocked && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center">
-          <ChevronRight size={18} />
-        </div>
+        <button
+          onClick={onClick}
+          className="shrink-0 w-8 h-8 rounded-full bg-[#F58A3A] text-white flex items-center justify-center shadow-md active:scale-95 transition-transform"
+        >
+          <ChevronRight size={16} />
+        </button>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -136,7 +131,7 @@ export default function NgajiCeriaQuizListPage() {
       title: "Kitab Tebak Bacaan Jilid 1",
       subtitle: "Latihan membaca suku kata fathah tunggal (Ta, Ba, A).",
       level: "Tilawati Jilid 1",
-      coverImage: NGAJI_CERIA_ASSETS.kartuHuruf,
+      coverImage: NGAJI_CERIA_ASSETS.jilidCovers[1],
       totalQuestions: 14,
       completedQuestions: 4,
       stars: 2,
@@ -147,7 +142,7 @@ export default function NgajiCeriaQuizListPage() {
       title: "Kitab Huruf Sambung Jilid 2",
       subtitle: "Membaca dua huruf bersambung dan harakat kasrah.",
       level: "Tilawati Jilid 2",
-      coverImage: NGAJI_CERIA_ASSETS.kartuMatchCocok,
+      coverImage: NGAJI_CERIA_ASSETS.jilidCovers[2],
       totalQuestions: 15,
       completedQuestions: 0,
       stars: 0,
@@ -158,7 +153,7 @@ export default function NgajiCeriaQuizListPage() {
       title: "Kitab Mad & Panjang Jilid 3",
       subtitle: "Mengenal bacaan panjang (Mad Thabi'i) & fathatain.",
       level: "Tilawati Jilid 3",
-      coverImage: NGAJI_CERIA_ASSETS.kartuAcak,
+      coverImage: NGAJI_CERIA_ASSETS.jilidCovers[3],
       totalQuestions: 20,
       completedQuestions: 0,
       stars: 0,
@@ -169,7 +164,7 @@ export default function NgajiCeriaQuizListPage() {
       title: "Kitab Tebak Juz 'Amma",
       subtitle: "Tebak nama surah & ayat-ayat pendek juz 30.",
       level: "Pengayaan",
-      coverImage: NGAJI_CERIA_ASSETS.kartuTebakJuz,
+      coverImage: NGAJI_CERIA_ASSETS.bukuJuzAmma,
       totalQuestions: 10,
       completedQuestions: 0,
       stars: 0,
@@ -179,11 +174,11 @@ export default function NgajiCeriaQuizListPage() {
 
   return (
     <NgajiCeriaLayout title="Kuis Kartu Tilawati">
-      <div className="px-4 py-4 space-y-5">
+      <div className="px-4 py-4 space-y-6 bg-[#FFF8EE] min-h-full rounded-t-3xl">
         {/* Banner Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-accent/20 via-surface-card to-accent/10 border-2 border-accent/30 p-5 shadow-sm">
+        <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-r from-[#5A3A2A] to-[#3E2518] border-2 border-[#3E2518] p-5 text-white shadow-md">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 shrink-0 bg-white rounded-2xl p-2 shadow-md border border-accent/20 rotate-2">
+            <div className="w-16 h-16 shrink-0 bg-white/10 rounded-2xl p-2 shadow-md border border-white/20 rotate-2">
               <img
                 src={NGAJI_CERIA_ASSETS.tebakSurahBaru}
                 alt="Kuis Kartu"
@@ -191,14 +186,14 @@ export default function NgajiCeriaQuizListPage() {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-accent text-white text-[10px] font-black uppercase tracking-wider mb-1">
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFCB45] text-[#5A3A2A] text-[10px] font-black uppercase tracking-wider mb-1">
                 <Sparkles size={10} />
                 Tantangan Interaktif
               </div>
-              <h2 className="font-display text-lg font-black text-surface-text">
+              <h2 className="font-display text-lg font-black text-white">
                 Pilih Kitab Kuis Kartu
               </h2>
-              <p className="text-xs text-surface-muted leading-tight mt-0.5">
+              <p className="text-xs text-white/80 leading-tight mt-0.5">
                 Uji kelancaran membaca tajwid & irama Tilawati lewat pilihan kitab di bawah.
               </p>
             </div>
@@ -206,18 +201,19 @@ export default function NgajiCeriaQuizListPage() {
         </section>
 
         {/* List Card Kitab */}
-        <section className="space-y-4">
-          <h3 className="font-black text-xs uppercase tracking-wider text-surface-muted px-1">
+        <section className="space-y-5">
+          <h3 className="font-black text-xs uppercase tracking-wider text-[#8C5A3A] px-1">
             Daftar Kitab Kuis Kartu
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-4 divide-y divide-[#E2D4C0] pt-1">
             {quizBooks.map((book) => (
-              <QuizBookCard
-                key={book.id}
-                {...book}
-                onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
-              />
+              <div key={book.id} className="pt-4 first:pt-0">
+                <StandaloneQuizBookCard
+                  {...book}
+                  onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
+                />
+              </div>
             ))}
           </div>
         </section>
