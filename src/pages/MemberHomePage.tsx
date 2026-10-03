@@ -20,7 +20,6 @@ import {
 } from "../components/layout/AppLayout";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
 import { Avatar } from "../components/ui";
-import { ClayTile, ClayBackdrop, MiniMosque } from "../components/clay";
 import { MeetingCardSkeleton } from "../components/ui/Skeleton";
 import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
 import { useQuery } from "@tanstack/react-query";
@@ -30,7 +29,6 @@ import { memberSelfApi } from "../features/member/api/memberSelfApi";
 import { queryKeys } from "../lib/queryClient";
 import type { Meeting, MemberCategory } from "../types";
 import { normalizeGender } from "../utils/format";
-
 
 type Tone = "accent" | "success" | "warning" | "info" | "danger";
 
@@ -42,29 +40,72 @@ interface QuickItem {
   tone: Tone;
 }
 
-
 const QUICK_ITEMS: QuickItem[] = [
-  { key: "quran",   label: "Al-Quran",   Icon: ScrollText,    to: "/member/quran",         tone: "accent" },
-  { key: "doa",     label: "Doa",        Icon: Sparkles,      to: "/member/doa",           tone: "warning" },
-  { key: "dzikir",  label: "Dzikir",     Icon: RefreshCw,     to: "/member/dzikir",        tone: "success" },
-  { key: "sholat",  label: "Sholat",     Icon: Calendar,      to: "/member/prayer",        tone: "info" },
-  { key: "jurnal",  label: "Jurnal",     Icon: CalendarCheck, to: "/member/sholat-jurnal", tone: "accent" },
-  { key: "tahfidz", label: "Tahfidz",    Icon: BookOpen,      to: "/member/tahfidz",       tone: "success" },
-  { key: "kiblat",  label: "Kiblat",     Icon: Compass,       to: "/member/kiblat",        tone: "info" },
-  { key: "mood",    label: "Tenangkan",  Icon: Heart,         to: "/member/mood",          tone: "danger" },
+  {
+    key: "quran",
+    label: "Al-Quran",
+    Icon: ScrollText,
+    to: "/member/quran",
+    tone: "accent",
+  },
+  {
+    key: "doa",
+    label: "Doa",
+    Icon: Sparkles,
+    to: "/member/doa",
+    tone: "warning",
+  },
+  {
+    key: "dzikir",
+    label: "Dzikir",
+    Icon: RefreshCw,
+    to: "/member/dzikir",
+    tone: "success",
+  },
+  {
+    key: "sholat",
+    label: "Sholat",
+    Icon: Calendar,
+    to: "/member/prayer",
+    tone: "info",
+  },
+  {
+    key: "jurnal",
+    label: "Jurnal",
+    Icon: CalendarCheck,
+    to: "/member/sholat-jurnal",
+    tone: "accent",
+  },
+  {
+    key: "tahfidz",
+    label: "Tahfidz",
+    Icon: BookOpen,
+    to: "/member/tahfidz",
+    tone: "success",
+  },
+  {
+    key: "kiblat",
+    label: "Kiblat",
+    Icon: Compass,
+    to: "/member/kiblat",
+    tone: "info",
+  },
+  {
+    key: "mood",
+    label: "Tenangkan",
+    Icon: Heart,
+    to: "/member/mood",
+    tone: "danger",
+  },
 ];
 
-const QUICK_DESCRIPTIONS: Record<string, string> = {
-  quran: "Baca & tandai",
-  doa: "Doa harian",
-  dzikir: "Dzikir pagi-petang",
-  sholat: "Waktu & arah",
-  jurnal: "Catat sholat",
-  tahfidz: "Setoran hafalan",
-  kiblat: "Arah kiblat",
-  mood: "Tenangkan hati",
+const TONE_CLASSES: Record<Tone, string> = {
+  accent: "bg-accent-soft text-accent",
+  success: "bg-success-soft text-success",
+  warning: "bg-warning-soft text-warning",
+  info: "bg-info-soft text-info",
+  danger: "bg-danger-soft text-danger",
 };
-
 
 function isoDate(d: Date): string {
   const y = d.getFullYear();
@@ -99,7 +140,6 @@ function formatScheduleDate(iso: string): string {
     return iso;
   }
 }
-
 
 export default function MemberHomePage() {
   const { user } = useAuth();
@@ -159,15 +199,11 @@ export default function MemberHomePage() {
         }
       />
 
-      <div className="relative px-4 py-4 space-y-5 pb-8">
-        <ClayBackdrop />
-
-        <section className="clay relative overflow-hidden p-5">
+      <div className="px-4 py-4 space-y-5 pb-8">
+        <section className="bg-surface-card border border-surface-border rounded-[2rem] p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="min-w-0 flex-1">
-              <p className="text-ios-caption text-surface-muted">
-                {greeting}
-              </p>
+              <p className="text-ios-caption text-surface-muted">{greeting}</p>
               <p className="font-display text-xl font-bold text-surface-text tracking-[-0.02em] truncate">
                 {displayName}
               </p>
@@ -177,25 +213,22 @@ export default function MemberHomePage() {
                   : "Semangat ibadah hari ini"}
               </p>
             </div>
-            <MiniMosque className="w-24 h-[72px] text-accent opacity-90 shrink-0 clay-bob" />
           </div>
         </section>
 
         <PrayerTimesCard />
-
 
         <SchedulePreviewCard
           userKategori={userKategori}
           onSeeAll={() => navigate("/member/jadwal")}
         />
 
-
         <section>
           <button
             onClick={() => navigate("/member/ngaji-ceria")}
-            className="clay clay-pressable w-full text-left !rounded-3xl p-4 flex items-center gap-3 bg-gradient-to-r from-accent-soft to-surface-card"
+            className="w-full text-left bg-surface-card border border-surface-border rounded-3xl p-4 flex items-center gap-3 transition-all active:scale-[0.98] shadow-sm"
           >
-            <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
+            <span className="w-11 h-11 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
               <Sparkles size={20} className="text-accent" />
             </span>
             <div className="flex-1 min-w-0">
@@ -220,10 +253,10 @@ export default function MemberHomePage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => navigate("/member/progres")}
-              className="clay clay-pressable flex items-center gap-3 !rounded-3xl p-3.5 text-left"
+              className="bg-surface-card border border-surface-border flex items-center gap-3 rounded-3xl p-3.5 text-left transition-all active:scale-[0.98] shadow-sm"
             >
-              <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
-                <Trophy size={20} className="text-surface-text" />
+              <span className="w-11 h-11 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
+                <Trophy size={20} className="text-accent" />
               </span>
               <span className="flex-1 min-w-0">
                 <span className="block text-ios-body font-semibold text-surface-text">
@@ -236,10 +269,10 @@ export default function MemberHomePage() {
             </button>
             <button
               onClick={() => navigate("/member/absensi")}
-              className="clay clay-pressable flex items-center gap-3 !rounded-3xl p-3.5 text-left"
+              className="bg-surface-card border border-surface-border flex items-center gap-3 rounded-3xl p-3.5 text-left transition-all active:scale-[0.98] shadow-sm"
             >
-              <span className="clay-tile clay-tile-success w-11 h-11 flex items-center justify-center flex-shrink-0">
-                <CalendarCheck size={20} className="text-surface-text" />
+              <span className="w-11 h-11 rounded-2xl bg-success-soft flex items-center justify-center flex-shrink-0">
+                <CalendarCheck size={20} className="text-success" />
               </span>
               <span className="flex-1 min-w-0">
                 <span className="block text-ios-body font-semibold text-surface-text">
@@ -252,7 +285,6 @@ export default function MemberHomePage() {
             </button>
           </div>
         </section>
-
 
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
@@ -270,25 +302,32 @@ export default function MemberHomePage() {
 
           <div className="grid grid-cols-4 gap-2.5">
             {QUICK_ITEMS.map((item) => (
-              <ClayTile
+              <button
                 key={item.key}
-                label={item.label}
-                description={QUICK_DESCRIPTIONS[item.key]}
-                icon={item.Icon}
-                tone={item.tone}
                 onClick={() => navigate(item.to)}
-              />
+                className="flex flex-col items-center gap-2 p-1 group"
+              >
+                <span
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-active:scale-90 shadow-sm ${
+                    TONE_CLASSES[item.tone]
+                  }`}
+                >
+                  <item.Icon size={24} />
+                </span>
+                <span className="text-[11px] font-medium text-surface-text text-center leading-tight line-clamp-1">
+                  {item.label}
+                </span>
+              </button>
             ))}
           </div>
         </section>
 
-
         <button
           onClick={() => navigate("/member/more")}
-          className="clay clay-pressable w-full !rounded-3xl p-4 flex items-center gap-3"
+          className="w-full bg-surface-card border border-surface-border rounded-3xl p-4 flex items-center gap-3 transition-all active:scale-[0.98] shadow-sm"
         >
-          <span className="clay-tile clay-tile-info w-11 h-11 flex items-center justify-center flex-shrink-0">
-            <Sparkles size={20} className="text-surface-text" />
+          <span className="w-11 h-11 rounded-2xl bg-info-soft flex items-center justify-center flex-shrink-0">
+            <Sparkles size={20} className="text-info" />
           </span>
           <div className="flex-1 min-w-0 text-left">
             <p className="text-ios-body font-semibold text-surface-text">
@@ -313,7 +352,6 @@ export default function MemberHomePage() {
     </AppLayout>
   );
 }
-
 
 function SchedulePreviewCard({
   userKategori,
@@ -355,10 +393,10 @@ function SchedulePreviewCard({
   return (
     <button
       onClick={onSeeAll}
-      className="clay clay-pressable w-full text-left !rounded-3xl p-4 flex items-center gap-3"
+      className="w-full text-left bg-surface-card border border-surface-border rounded-3xl p-4 flex items-center gap-3 transition-all active:scale-[0.98] shadow-sm"
     >
-      <span className="clay-tile clay-tile-accent w-11 h-11 flex items-center justify-center flex-shrink-0">
-        <Calendar size={20} strokeWidth={2.2} className="text-surface-text" />
+      <span className="w-11 h-11 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
+        <Calendar size={20} strokeWidth={2.2} className="text-accent" />
       </span>
 
       <div className="flex-1 min-w-0">
@@ -391,7 +429,6 @@ function SchedulePreviewCard({
     </button>
   );
 }
-
 
 function getGreeting(): string {
   const h = new Date().getHours();

@@ -37,7 +37,7 @@ const MEMBER_ITEMS = [
   { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
   { key: "sholat", label: "Sholat", to: "/member/prayer", icon: Calendar },
   { key: "dzikir", label: "Dzikir", to: "/member/dzikir", icon: RefreshCw },
-  { key: "lainnya", label: "Lainnya", to: "/member/more", icon: MoreHorizontal },
+  { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
 ];
 export function BottomNav() {
   const location = useLocation();
