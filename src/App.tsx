@@ -166,6 +166,8 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
+import { NgajiCeriaLayout } from "./features/ngaji-ceria/components/NgajiCeriaLayout";
+
 const NgajiCeriaHomePage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
 );

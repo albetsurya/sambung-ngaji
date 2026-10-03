@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import { tapFeedback } from "../../../lib/haptics";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
@@ -33,8 +34,8 @@ export const NGAJI_CERIA_NAV_ITEMS = [
 export function NgajiCeriaBottomNav() {
   const location = useLocation();
 
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-safe pt-2 bg-gradient-to-t from-surface-bg via-surface-bg/90 to-transparent pointer-events-none">
+  const navElement = (
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-safe pt-2 bg-gradient-to-t from-surface-bg via-surface-bg/90 to-transparent pointer-events-none transition-none">
       <nav className="pointer-events-auto max-w-md mx-auto flex items-center justify-around p-2 rounded-3xl bg-surface-card/95 backdrop-blur-xl border-2 border-accent/30 shadow-xl shadow-accent/10">
         {NGAJI_CERIA_NAV_ITEMS.map((item) => {
           const isActive =
@@ -47,13 +48,13 @@ export function NgajiCeriaBottomNav() {
               key={item.key}
               to={item.to}
               end={item.to === "/member/ngaji-ceria"}
-              className="relative flex-1 flex flex-col items-center justify-center gap-1 h-14 rounded-2xl transition-all duration-200 active:scale-95"
+              className="relative flex-1 flex flex-col items-center justify-center gap-1 h-14 rounded-2xl transition-all duration-150 active:scale-95"
               onClick={() => tapFeedback()}
             >
               <div
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 p-1.5 ${
+                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-150 p-1.5 ${
                   isActive
-                    ? "bg-accent text-white shadow-md shadow-accent/30 scale-110 border border-white/40"
+                    ? "bg-accent text-white shadow-md shadow-accent/30 scale-105 border border-white/40"
                     : "bg-surface-card2 text-surface-muted hover:bg-surface-border"
                 }`}
               >
@@ -64,7 +65,7 @@ export function NgajiCeriaBottomNav() {
                 />
               </div>
               <span
-                className={`text-[10px] font-bold tracking-tight transition-colors duration-200 ${
+                className={`text-[10px] font-bold tracking-tight transition-colors duration-150 ${
                   isActive ? "text-accent font-black" : "text-surface-muted"
                 }`}
               >
@@ -76,4 +77,10 @@ export function NgajiCeriaBottomNav() {
       </nav>
     </div>
   );
+
+  if (typeof document !== "undefined") {
+    return createPortal(navElement, document.body);
+  }
+
+  return navElement;
 }

@@ -165,19 +165,7 @@ export default function NgajiCeriaHomePage() {
                       />
                     )}
 
-                    {!node.isCheckpoint && (
-                      <span
-                        className={`absolute font-black text-lg ${
-                          node.status === "active"
-                            ? "text-white drop-shadow-md"
-                            : node.status === "completed"
-                            ? "text-success-dark"
-                            : "text-surface-muted"
-                        }`}
-                      >
-                        {node.pageNumber}
-                      </span>
-                    )}
+
                   </button>
 
                   <div className="mt-2 text-center">
