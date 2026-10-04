@@ -26,7 +26,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "a"],
     options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_1_aa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_1_a_a.ogg",
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "ba"],
     options: ["ba", "ba", "a", "a", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_2_baba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_2_ba_ba.ogg",
   },
   {
     id: 3,
@@ -42,7 +42,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_3_aba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_3_a_ba.ogg",
   },
   {
     id: 4,
@@ -50,7 +50,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_1_baa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_1_ba_a.ogg",
   },
   {
     id: 5,
@@ -58,7 +58,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_2_aba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_2_a_ba.ogg",
   },
   {
     id: 6,
@@ -66,7 +66,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_3_baa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_3_ba_a.ogg",
   },
   {
     id: 7,
@@ -74,7 +74,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "a", "a"],
     options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris3_1_aaa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_1_a_a_a.ogg",
   },
   {
     id: 8,
@@ -82,7 +82,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "ba", "ba"],
     options: ["ba", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris3_2_bababa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_2_ba_ba_ba.ogg",
   },
   {
     id: 9,
@@ -90,7 +90,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "ba", "a"],
     options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_1_babaa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
   },
   {
     id: 10,
@@ -98,7 +98,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "ba", "a"],
     options: ["a", "ba", "a", "ba", "ba", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_2_ababa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_2_a_ba_a.ogg",
   },
   {
     id: 11,
@@ -106,7 +106,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "ba", "ba"],
     options: ["a", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_1_abaaba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_1_a_ba_ba.ogg",
   },
   {
     id: 12,
@@ -114,7 +114,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["ba", "a", "ba"],
     options: ["ba", "a", "ba", "ba", "a", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_2_baaba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_2_ba_a_ba.ogg",
   },
 ];
 
