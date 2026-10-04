@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { Star, Play } from "../../../components/ui/FontAwesomeIcons";
@@ -74,38 +75,39 @@ function MiniGameCard({ title, description, cover, best, theme, onClick }: MiniG
 }
 
 export default function NgajiCeriaGamesPage() {
+  const navigate = useNavigate();
   return (
     <NgajiCeriaLayout title="Mini Games" showBack>
       <div className="px-4 py-4 space-y-4 bg-[#FBF8F1] min-h-full rounded-t-3xl">
         <p className="text-[12px] text-[#5A3A2A]/70 text-center max-w-sm mx-auto">
-          Asah kemampuan mengenal huruf hijaiyah dan tajwid lewat game seru.
+          Asah kemampuan mengenal huruf hijaiyah dan tajwid lewat game seru asli Ngaji Ceria.
         </p>
 
         <MiniGameCard
-          title="Qirra Pop"
+          title="Balon Hijaiyah"
           description="Pecahkan balon huruf yang benar sebelum waktu habis."
           cover={NGAJI_CERIA_ASSETS.qirraPop}
           best={1200}
           theme={GAME_THEMES.blue}
-          onClick={() => alert("Game Qirra Pop (Segera hadir!)")}
+          onClick={() => navigate("/member/ngaji-ceria/games/balon-hijaiyah")}
         />
 
         <MiniGameCard
-          title="Qirra Match"
-          description="Cocokkan pasangan kartu huruf hijaiyah yang sama."
+          title="Pasang Huruf"
+          description="Cocokkan pasangan kartu huruf hijaiyah Arab dan Latin yang sama."
           cover={NGAJI_CERIA_ASSETS.qirraMatch}
           best={850}
           theme={GAME_THEMES.peach}
-          onClick={() => alert("Game Qirra Match (Segera hadir!)")}
+          onClick={() => navigate("/member/ngaji-ceria/games/pasang-huruf")}
         />
 
         <MiniGameCard
-          title="Tebak Surah"
-          description="Tebak nama surah dari potongan ayat Juz Amma."
+          title="Tebak Ayat"
+          description="Tebak nama surah dari potongan ayat Juz Amma beserta artinya."
           cover={NGAJI_CERIA_ASSETS.tebakSurahBaru}
           best={640}
           theme={GAME_THEMES.lavender}
-          onClick={() => alert("Game Tebak Surah (Segera hadir!)")}
+          onClick={() => navigate("/member/ngaji-ceria/games/tebak-ayat")}
         />
       </div>
     </NgajiCeriaLayout>

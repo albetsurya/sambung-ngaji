@@ -1,0 +1,187 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
+import { NGAJI_CERIA_ASSETS } from "../data/assets";
+import { HIJAIYAH_LIST, HijaiyahItem } from "../data/hijaiyah";
+import { tapFeedback } from "../../../lib/haptics";
+import { RefreshCw, Trophy } from "../../../components/ui/FontAwesomeIcons";
+
+interface BalloonTarget {
+  id: string;
+  letter: HijaiyahItem;
+  balloonSvg: string;
+  x: number; // percentage
+  speed: number;
+}
+
+const BALLOON_COLORS = [
+  NGAJI_CERIA_ASSETS.balonBiru,
+  NGAJI_CERIA_ASSETS.balonMerah,
+  NGAJI_CERIA_ASSETS.balonKuning,
+  NGAJI_CERIA_ASSETS.balonHijau,
+];
+
+export default function BalonHijaiyahGamePage() {
+  const navigate = useNavigate();
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [currentTarget, setCurrentTarget] = useState<HijaiyahItem>(HIJAIYAH_LIST[0]);
+  const [balloons, setBalloons] = useState<BalloonTarget[]>([]);
+
+  const pickNewTarget = useCallback(() => {
+    const randomIdx = Math.floor(Math.random() * HIJAIYAH_LIST.length);
+    setCurrentTarget(HIJAIYAH_LIST[randomIdx]);
+  }, []);
+
+  const spawnBalloons = useCallback((targetLetter: HijaiyahItem) => {
+    // Generate 4 balloons (1 correct, 3 random wrong)
+    const options: HijaiyahItem[] = [targetLetter];
+    while (options.length < 4) {
+      const candidate = HIJAIYAH_LIST[Math.floor(Math.random() * HIJAIYAH_LIST.length)];
+      if (!options.find((o) => o.id === candidate.id)) {
+        options.push(candidate);
+      }
+    }
+    // Shuffle
+    const shuffled = options.sort(() => Math.random() - 0.5);
+
+    const newBalloons: BalloonTarget[] = shuffled.map((item, idx) => ({
+      id: `${item.id}-${Date.now()}-${idx}`,
+      letter: item,
+      balloonSvg: BALLOON_COLORS[idx % BALLOON_COLORS.length],
+      x: 12 + idx * 22, // Distribute horizontally
+      speed: 1,
+    }));
+    setBalloons(newBalloons);
+  }, []);
+
+  const startGame = () => {
+    setScore(0);
+    setTimeLeft(30);
+    setIsGameOver(false);
+    setIsPlaying(true);
+    pickNewTarget();
+  };
+
+  useEffect(() => {
+    if (isPlaying && currentTarget) {
+      spawnBalloons(currentTarget);
+    }
+  }, [isPlaying, currentTarget, spawnBalloons]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!isPlaying) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsPlaying(false);
+          setIsGameOver(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isPlaying]);
+
+  const handlePop = (balloon: BalloonTarget) => {
+    tapFeedback();
+    if (balloon.letter.id === currentTarget.id) {
+      setScore((s) => s + 100);
+      pickNewTarget();
+    } else {
+      setScore((s) => Math.max(0, s - 30));
+    }
+  };
+
+  return (
+    <NgajiCeriaLayout title="Balon Hijaiyah" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+      <div className="px-4 py-4 space-y-4 bg-[#FFF8EE] min-h-full rounded-t-3xl flex flex-col justify-between">
+        {/* Top Game Bar */}
+        <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-[#8C7A68]">Waktu:</span>
+            <span className={`text-base font-black ${timeLeft <= 5 ? "text-[#D32F2F] animate-pulse" : "text-[#5A3A2A]"}`}>
+              {timeLeft}d
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-[#8C7A68]">Skor:</span>
+            <span className="text-lg font-black text-[#F58A3A]">{score}</span>
+          </div>
+        </div>
+
+        {/* Playfield Area */}
+        <div className="relative flex-1 min-h-[360px] bg-gradient-to-b from-[#EAF6FB] via-[#F2FAFD] to-white rounded-3xl border-2 border-[#BCE3F5] p-4 flex flex-col items-center justify-between overflow-hidden shadow-inner">
+          {/* Target Instruction Prompt */}
+          <div className="z-10 bg-white/95 px-5 py-2.5 rounded-2xl border-2 border-[#BCE3F5] shadow-md flex items-center gap-3">
+            <span className="text-xs font-bold text-[#1C5D79]">Pecahkan huruf:</span>
+            <span className="text-2xl font-black text-[#5A3A2A] font-arabic">
+              {currentTarget.arabic}
+            </span>
+            <span className="text-xs font-black px-2 py-0.5 rounded-full bg-[#E2EFCF] text-[#2D5A27]">
+              ({currentTarget.name})
+            </span>
+          </div>
+
+          {/* Balloon Grid */}
+          {isPlaying && (
+            <div className="grid grid-cols-2 gap-4 w-full my-auto z-10 py-4">
+              {balloons.map((balloon) => (
+                <button
+                  key={balloon.id}
+                  onClick={() => handlePop(balloon)}
+                  className="relative aspect-[3/4] max-h-[130px] flex items-center justify-center active:scale-90 transition-transform cursor-pointer drop-shadow-md group"
+                >
+                  <img
+                    src={balloon.balloonSvg}
+                    alt="Balon"
+                    className="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform"
+                  />
+                  {/* Arabic letter on balloon */}
+                  <span className="absolute inset-0 flex items-center justify-center font-arabic text-3xl font-black text-[#5A3A2A] pb-3 select-none">
+                    {balloon.letter.arabic}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Start / Game Over Modal Overlay */}
+          {!isPlaying && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-20">
+              <div className="bg-white rounded-[28px] p-6 text-center max-w-xs w-full border-4 border-white shadow-2xl space-y-4">
+                <div className="w-16 h-16 rounded-full bg-[#EAF6FB] border-2 border-[#BCE3F5] mx-auto flex items-center justify-center">
+                  <Trophy size={28} className="text-[#1C5D79]" />
+                </div>
+
+                <div>
+                  <h3 className="font-display font-black text-xl text-[#5A3A2A]">
+                    {isGameOver ? "Permainan Selesai!" : "Balon Hijaiyah"}
+                  </h3>
+                  <p className="text-xs text-[#8C7A68] mt-1">
+                    {isGameOver
+                      ? `Hebat! Skor akhir kamu: ${score}`
+                      : "Pecahkan balon dengan huruf hijaiyah yang tepat sebanyak mungkin sebelum 30 detik habis!"}
+                  </p>
+                </div>
+
+                <button
+                  onClick={startGame}
+                  className="w-full py-3.5 rounded-2xl bg-[#1C5D79] hover:bg-[#14485E] text-white font-black text-sm shadow-md border-b-4 border-[#0E3547] active:translate-y-1 transition-all"
+                >
+                  {isGameOver ? "Main Lagi" : "Mulai Bermain"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </NgajiCeriaLayout>
+  );
+}

@@ -186,6 +186,15 @@ const NgajiCeriaQuizListPage = lazy(
 const NgajiCeriaGamesPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
 );
+const BalonHijaiyahGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
+);
+const PasangHurufGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/PasangHurufGamePage"),
+);
+const TebakAyatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
+);
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -311,6 +320,30 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <NgajiCeriaGamesPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/balon-hijaiyah"
+          element={
+            <MemberRoute allowGuest>
+              <BalonHijaiyahGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/pasang-huruf"
+          element={
+            <MemberRoute allowGuest>
+              <PasangHurufGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tebak-ayat"
+          element={
+            <MemberRoute allowGuest>
+              <TebakAyatGamePage />
             </MemberRoute>
           }
         />
