@@ -67,6 +67,22 @@ export const NGAJI_CERIA_ASSETS = {
   balonKuning: NEW.balonKuning,
   balonHijau: NEW.balonHijau,
 
+  // UI Dock / TopBar / Pills (locked Ceria clay style)
+  dockLatar: NEW.dockLatar,
+  dockItemAktif: NEW.dockItemAktif,
+  topBarLatar: NEW.topBarLatar,
+  pillVip: NEW.pillVip,
+  pillJudulLevel: NEW.pillJudulLevel,
+
+  // Hero & Background panels
+  heroBannerVip: NEW.heroBannerVip,
+  heroLanjutkan: NEW.heroLanjutkan,
+  heroKartuNgaji: NEW.heroKartuNgaji,
+  heroStreak: NEW.heroStreak,
+  bgPeta: NEW.bgPeta,
+  bgGames: NEW.bgGames,
+  bgKuis: NEW.bgKuis,
+
   // Characters / Avatar
   avatarAnak: NEW.avatarAnak,
 

@@ -7,27 +7,27 @@ import { NGAJI_CERIA_ASSETS } from "../data/assets";
 export const NGAJI_CERIA_NAV_ITEMS = [
   {
     key: "beranda",
-    label: "Peta Jelajah",
+    label: "Jelajah",
     to: "/member/ngaji-ceria",
-    icon: NGAJI_CERIA_ASSETS.jilidCovers[1],
+    icon: NGAJI_CERIA_ASSETS.iconBeranda,
   },
   {
     key: "quiz",
-    label: "Kuis Kartu",
+    label: "Kuis",
     to: "/member/ngaji-ceria/quiz",
-    icon: NGAJI_CERIA_ASSETS.tebakSurahBaru,
+    icon: NGAJI_CERIA_ASSETS.iconKuis,
   },
   {
     key: "games",
-    label: "Mini Games",
+    label: "Games",
     to: "/member/ngaji-ceria/games",
-    icon: NGAJI_CERIA_ASSETS.qirraPop,
+    icon: NGAJI_CERIA_ASSETS.iconGames,
   },
   {
     key: "path",
-    label: "Koleksi Jilid",
+    label: "Jilid",
     to: "/member/ngaji-ceria/path",
-    icon: NGAJI_CERIA_ASSETS.piala,
+    icon: NGAJI_CERIA_ASSETS.iconPrestasi,
   },
 ];
 
@@ -35,8 +35,11 @@ export function NgajiCeriaBottomNav() {
   const location = useLocation();
 
   const navElement = (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-safe pt-2 bg-gradient-to-t from-surface-bg via-surface-bg/90 to-transparent pointer-events-none transition-none">
-      <nav className="pointer-events-auto max-w-md mx-auto flex items-center justify-around p-2 rounded-3xl bg-surface-card/95 backdrop-blur-xl border-2 border-accent/30 shadow-xl shadow-accent/10">
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-safe pt-2 bg-gradient-to-t from-[#FFF8EE] via-[#FFF8EE]/90 to-transparent pointer-events-none transition-none">
+      <nav className="pointer-events-auto max-w-md mx-auto relative flex items-center justify-around px-2 py-2.5 rounded-[36px] bg-[#FFF8EE] border-4 border-white shadow-2xl shadow-[#5A3A2A]/20">
+        {/* Soft Clay Shadow Bottom Rim */}
+        <div className="absolute inset-x-3 bottom-0 h-2 bg-[#E2D4C0] rounded-b-[32px] pointer-events-none" />
+
         {NGAJI_CERIA_NAV_ITEMS.map((item) => {
           const isActive =
             item.to === "/member/ngaji-ceria"
@@ -48,25 +51,28 @@ export function NgajiCeriaBottomNav() {
               key={item.key}
               to={item.to}
               end={item.to === "/member/ngaji-ceria"}
-              className="relative flex-1 flex flex-col items-center justify-center gap-1 h-14 rounded-2xl transition-all duration-150 active:scale-95"
+              className="relative z-10 flex-1 flex flex-col items-center justify-center gap-1 h-14 transition-transform active:scale-95"
               onClick={() => tapFeedback()}
             >
               <div
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-150 p-1.5 ${
+                className={`relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 p-2 ${
                   isActive
-                    ? "bg-accent text-white shadow-md shadow-accent/30 scale-105 border border-white/40"
-                    : "bg-surface-card2 text-surface-muted hover:bg-surface-border"
+                    ? "bg-[#F58A3A] text-white shadow-lg shadow-[#F58A3A]/40 -translate-y-2.5 scale-110 border-2 border-white"
+                    : "bg-white/80 border-2 border-[#E2D4C0] hover:bg-white"
                 }`}
               >
                 <img
                   src={item.icon}
                   alt={item.label}
-                  className="w-full h-full object-contain"
+                  className={`w-full h-full object-contain ${
+                    isActive ? "filter brightness-0 invert" : ""
+                  }`}
                 />
               </div>
+
               <span
-                className={`text-[10px] font-bold tracking-tight transition-colors duration-150 ${
-                  isActive ? "text-accent font-black" : "text-surface-muted"
+                className={`text-[10px] font-black tracking-tight leading-none transition-colors ${
+                  isActive ? "text-[#F58A3A]" : "text-[#8C7A68]"
                 }`}
               >
                 {item.label}

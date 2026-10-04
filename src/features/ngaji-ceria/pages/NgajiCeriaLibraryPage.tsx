@@ -15,6 +15,7 @@ interface BookCardProps {
   totalPages: number;
   progressPercentage: number;
   coverImg: string;
+  isOffset?: boolean;
   onClick: () => void;
 }
 
@@ -27,27 +28,34 @@ function StandaloneBookCard({
   totalPages,
   progressPercentage,
   coverImg,
+  isOffset = false,
   onClick,
 }: BookCardProps) {
   return (
-    <div className="flex flex-col items-center group relative">
-      {/* Interactive 3D Book Cover as Card */}
+    <div
+      className={`flex flex-col items-center group relative transition-transform duration-300 ${
+        isOffset ? "translate-y-8" : ""
+      }`}
+    >
+      {/* 3D Standalone Book Illustration Card (Fixed 140px width & 180px height for 100% uniformity) */}
       <button
         onClick={onClick}
         disabled={status === "locked"}
-        className={`relative w-full aspect-[3/4] max-w-[170px] transition-all duration-300 flex items-center justify-center p-2 group-hover:scale-105 active:scale-95 ${
-          status === "locked" ? "cursor-not-allowed opacity-65 grayscale" : "cursor-pointer drop-shadow-xl"
+        className={`relative w-[140px] h-[180px] transition-all duration-300 flex items-center justify-center p-1 group-hover:scale-105 active:scale-95 ${
+          status === "locked"
+            ? "cursor-not-allowed opacity-60 grayscale"
+            : "cursor-pointer drop-shadow-xl"
         }`}
       >
-        {/* SVG Book Illustration itself as the Card */}
+        {/* SVG Book Cover Artwork */}
         <img
           src={coverImg}
           alt={nama}
           className="w-full h-full object-contain filter drop-shadow-md group-hover:drop-shadow-2xl transition-all"
         />
 
-        {/* Floating Overlay Badge on Top Right of Book */}
-        <div className="absolute top-3 right-3 z-10">
+        {/* Status Badge Top Right */}
+        <div className="absolute top-2 right-2 z-10">
           {status === "completed" ? (
             <span className="w-7 h-7 rounded-full bg-[#2D5A27] text-white flex items-center justify-center shadow-md border-2 border-white text-xs">
               <Check size={14} />
@@ -63,14 +71,14 @@ function StandaloneBookCard({
           )}
         </div>
 
-        {/* Step Badge floating on Top Left */}
-        <span className="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-full bg-[#5A3A2A]/90 text-[#FFCB45] font-black text-[9px] uppercase tracking-wider border border-[#FFCB45]/30 shadow-md">
+        {/* Step Badge Top Left */}
+        <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-[#5A3A2A]/90 text-[#FFCB45] font-black text-[9px] uppercase tracking-wider border border-[#FFCB45]/30 shadow-md">
           Step 0{stepNumber}
         </span>
       </button>
 
-      {/* Book Metadata & Progress directly under the book */}
-      <div className="mt-2.5 text-center w-full max-w-[170px]">
+      {/* Book Title & Progress Underneath */}
+      <div className="mt-2.5 text-center w-[140px]">
         <h4 className="font-display font-black text-sm text-[#5A3A2A] leading-tight">
           {nama}
         </h4>
@@ -116,26 +124,26 @@ export default function NgajiCeriaLibraryPage() {
     {
       id: "ghorib",
       nama: "Tilawati Ghorib",
-      deskripsi: "Bacaan asing dan musykilat",
+      deskripsi: "Bacaan asing & musykilat",
       coverImg: NGAJI_CERIA_ASSETS.bukuGhorib,
     },
     {
       id: "tajwid",
       nama: "Tilawati Tajwid",
-      deskripsi: "Hukum nun mati dan mad",
+      deskripsi: "Hukum nun mati & mad",
       coverImg: NGAJI_CERIA_ASSETS.bukuTajwid,
     },
     {
       id: "juz-amma",
       nama: "Juz 'Amma",
-      deskripsi: "Hafalan surah-surah pendek",
+      deskripsi: "Hafalan surah pendek",
       coverImg: NGAJI_CERIA_ASSETS.bukuJuzAmma,
     },
   ];
 
   return (
     <NgajiCeriaLayout title="Koleksi Jilid">
-      <div className="px-4 py-4 space-y-6 bg-[#FFF8EE] min-h-full rounded-t-3xl">
+      <div className="px-4 py-4 space-y-6 bg-[#FFF8EE] min-h-full rounded-t-3xl pb-16">
         {/* VIP Access Banner */}
         <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-r from-[#2D5A27] to-[#1E3E1A] p-5 text-white shadow-md border-2 border-[#1E3E1A]">
           <div className="flex items-center justify-between gap-4">
@@ -177,8 +185,8 @@ export default function NgajiCeriaLibraryPage() {
           </span>
         </div>
 
-        {/* Grid of Standalone 3D Book Cover Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 justify-items-center py-2">
+        {/* 2-Column Zigzag Layout for 3D Books */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-12 justify-items-center py-4">
           {TILAWATI_DATA.map((jilid, idx) => {
             const stepNum = idx + 1;
             let status: BookCardProps["status"] = "locked";
@@ -205,6 +213,9 @@ export default function NgajiCeriaLibraryPage() {
             const coverImg =
               NGAJI_CERIA_ASSETS.jilidCovers[stepNum] || NGAJI_CERIA_ASSETS.bukuQuran;
 
+            // Column 2 (odd indexes in 0-based array: idx 1, 3, 5...) gets offset down for zigzag effect
+            const isOffset = idx % 2 === 1;
+
             return (
               <StandaloneBookCard
                 key={jilid.id}
@@ -216,14 +227,15 @@ export default function NgajiCeriaLibraryPage() {
                 totalPages={40}
                 progressPercentage={progPercent}
                 coverImg={coverImg}
+                isOffset={isOffset}
                 onClick={() => navigate("/member/ngaji-ceria/map")}
               />
             );
           })}
         </div>
 
-        {/* Pengayaan Books Section */}
-        <div className="pt-4 border-t border-[#E2D4C0]">
+        {/* Kitab Lanjutan Section */}
+        <div className="pt-8 border-t-2 border-[#E2D4C0]">
           <div className="mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#F58A3A]">
               Kitab Lanjutan
@@ -233,12 +245,12 @@ export default function NgajiCeriaLibraryPage() {
             </h3>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 justify-items-center">
-            {extraBooks.map((book, idx) => (
+          <div className="grid grid-cols-3 gap-3 justify-items-center">
+            {extraBooks.map((book) => (
               <div key={book.id} className="flex flex-col items-center text-center">
                 <button
                   onClick={() => alert(`Membuka ${book.nama}`)}
-                  className="w-full aspect-[3/4] max-w-[120px] transition-transform hover:scale-105 active:scale-95 drop-shadow-md"
+                  className="w-[100px] h-[130px] transition-transform hover:scale-105 active:scale-95 drop-shadow-md"
                 >
                   <img
                     src={book.coverImg}

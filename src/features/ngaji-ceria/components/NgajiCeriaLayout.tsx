@@ -1,8 +1,7 @@
 import React, { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, ChevronLeft } from "../../../components/ui/FontAwesomeIcons";
+import { X } from "../../../components/ui/FontAwesomeIcons";
 import { NgajiCeriaBottomNav } from "./NgajiCeriaBottomNav";
-import { BubblyCloud } from "./NgajiCeriaIllustrations";
 import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 
@@ -27,46 +26,57 @@ export function NgajiCeriaLayout({
   const { currentStreak } = useNgajiCeriaStreak();
 
   return (
-    <div className="min-h-screen bg-surface-bg text-surface-text flex flex-col justify-between selection:bg-accent/20 relative overflow-x-hidden font-sans">
-      {/* Background Decorative Cloud Elements */}
-      <BubblyCloud className="absolute top-10 -left-6 w-28 h-14 text-accent/10 pointer-events-none animate-pulse" />
-      <BubblyCloud className="absolute top-36 -right-8 w-36 h-18 text-accent/10 pointer-events-none" />
+    <div className="min-h-screen bg-[#FFF8EE] text-[#5A3A2A] flex flex-col justify-between selection:bg-[#F58A3A]/20 relative overflow-x-hidden font-sans">
+      {/* Sticky Top Game HUD Header */}
+      <header className="sticky top-0 z-40 pt-safe bg-[#FFF8EE]/95 backdrop-blur-md border-b-2 border-[#E2D4C0] shadow-sm transition-all">
+        {/* TopBar SVG Banner accent overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-30 bg-repeat-x bg-top" style={{ backgroundImage: `url(${NGAJI_CERIA_ASSETS.topBarLatar})`, backgroundSize: "auto 100%" }} />
 
-      {/* Sticky Top Game HUD */}
-      <header className="sticky top-0 z-40 pt-safe bg-surface-bg/95 backdrop-blur-md border-b border-surface-border shadow-sm transition-all">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="relative z-10 max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {showBack && (
               <button
                 onClick={onBack || (() => navigate("/member"))}
                 aria-label="Keluar ke Menu Utama"
-                className="px-2.5 py-1.5 rounded-full bg-surface-card border border-surface-border text-xs font-bold text-surface-text flex items-center gap-1 hover:bg-surface-card2 transition-all active:scale-95 shadow-sm"
+                className="px-2.5 py-1.5 rounded-full bg-white border-2 border-[#E2D4C0] text-xs font-black text-[#5A3A2A] flex items-center gap-1 hover:bg-[#FFF8EE] transition-all active:scale-95 shadow-sm"
               >
-                <X size={14} className="text-surface-muted" />
+                <X size={14} className="text-[#8C7A68]" />
                 <span className="hidden sm:inline">Keluar</span>
               </button>
             )}
-            <span className="font-display font-black text-sm sm:text-base text-accent tracking-tight truncate max-w-[100px] sm:max-w-none">
+            <span className="font-display font-black text-sm sm:text-base text-[#5A3A2A] tracking-tight truncate max-w-[120px] sm:max-w-none">
               {title}
             </span>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Lives / Nyawa HUD */}
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-danger-soft text-danger border border-danger/20 font-black text-xs shadow-sm">
-              <img src={NGAJI_CERIA_ASSETS.hatiNyawa} alt="Nyawa" className="w-4 h-4 object-contain" />
+            {/* Nyawa / Hearts HUD */}
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FCEAEA] text-[#D32F2F] border-2 border-[#F5B6B6] font-black text-xs shadow-sm">
+              <img
+                src={NGAJI_CERIA_ASSETS.hatiNyawa}
+                alt="Nyawa"
+                className="w-4 h-4 object-contain"
+              />
               <span>5</span>
             </div>
 
             {/* Streak HUD */}
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-warning-soft text-warning border border-warning/20 font-black text-xs shadow-sm">
-              <img src={NGAJI_CERIA_ASSETS.apiStreak} alt="Streak" className="w-4 h-4 object-contain" />
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFF6D5] text-[#5A3A2A] border-2 border-[#FCD882] font-black text-xs shadow-sm">
+              <img
+                src={NGAJI_CERIA_ASSETS.apiStreak}
+                alt="Streak"
+                className="w-4 h-4 object-contain"
+              />
               <span>{currentStreak}d</span>
             </div>
 
             {/* Koin / XP HUD */}
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-accent-soft text-accent border border-accent/20 font-black text-xs shadow-sm">
-              <img src={NGAJI_CERIA_ASSETS.koinHijaiyah} alt="Koin" className="w-4 h-4 object-contain" />
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FCE6DA] text-[#F58A3A] border-2 border-[#F9C2A5] font-black text-xs shadow-sm">
+              <img
+                src={NGAJI_CERIA_ASSETS.koinHijaiyah}
+                alt="Koin"
+                className="w-4 h-4 object-contain"
+              />
               <span>120</span>
             </div>
 
@@ -76,7 +86,7 @@ export function NgajiCeriaLayout({
       </header>
 
       {/* Main Content Viewport */}
-      <main className={`flex-1 max-w-md w-full mx-auto relative ${hideNav ? "pb-6" : "pb-24"}`}>
+      <main className={`flex-1 max-w-md w-full mx-auto relative ${hideNav ? "pb-6" : "pb-28"}`}>
         {children}
       </main>
 
