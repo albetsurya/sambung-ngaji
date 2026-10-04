@@ -6,7 +6,7 @@ let activeAudio: HTMLAudioElement | null = null;
 // Play opening basmalah/taawudz
 export function playOpeningDua(onEnded?: () => void): void {
   // If there is an opening audio file, play it. Otherwise, use speech synthesis or return.
-  const openingAudio = new Audio("/audio/tilawati/taawudz_basmalah.ogg");
+  const openingAudio = new Audio("/audio/tilawati/taawudz_basmalah_v2.ogg");
   openingAudio.play().then(() => {
     openingAudio.onended = () => {
       if (onEnded) onEnded();

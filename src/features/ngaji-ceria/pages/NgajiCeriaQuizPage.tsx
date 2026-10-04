@@ -27,7 +27,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
     hintTone: "Rost: Datar (3x)",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x_v2.ogg",
     isOpening: true,
   },
   {
@@ -149,12 +149,14 @@ export default function NgajiCeriaQuizPage() {
   const progressPercent = Math.round((currentStep / totalQuestions) * 100);
 
   const [isOpening, setIsOpening] = useState(true);
+  const [isTaawudzPhase, setIsTaawudzPhase] = useState(true);
 
   // Auto-play audio when question changes
   useEffect(() => {
-    // If it's the very first question, we play Taawudz/Basmalah, then Judul
     if (currentIdx === 0 && isOpening) {
+        setIsTaawudzPhase(true);
         playOpeningDua(() => {
+            setIsTaawudzPhase(false);
             handlePlayAudio();
             setIsOpening(false);
         });
@@ -312,33 +314,44 @@ export default function NgajiCeriaQuizPage() {
         </h2>
 
         {/* Big Arabic Display Card */}
-        <div className="w-full bg-white border-2 border-[#E2D4C0] rounded-3xl p-6 shadow-md flex flex-col items-center relative mb-6">
-          <button
-            onClick={handlePlayAudio}
-            className={`absolute top-3 right-3 w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
-              isAudioPlaying
-                ? "bg-[#F58A3A] text-white scale-110 shadow-lg"
-                : "bg-[#FCE6DA] text-[#F58A3A] hover:bg-[#F58A3A]/20 active:scale-95"
-            }`}
-            title="Dengarkan lafadz"
-          >
-            <Volume2
-              size={18}
-              className={isAudioPlaying ? "animate-pulse" : ""}
-            />
-          </button>
+        {isTaawudzPhase ? (
+          <div className="w-full bg-[#2D5A27] text-white border-2 border-[#2D5A27] rounded-3xl p-8 shadow-lg flex flex-col items-center justify-center min-h-[300px] mb-6">
+            <p className="text-3xl text-center mb-6 leading-relaxed" dir="rtl">
+              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+            </p>
+            <p className="text-4xl text-center leading-relaxed" dir="rtl">
+              بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+            </p>
+          </div>
+        ) : (
+          <div className="w-full bg-white border-2 border-[#E2D4C0] rounded-3xl p-6 shadow-md flex flex-col items-center relative mb-6">
+            <button
+              onClick={handlePlayAudio}
+              className={`absolute top-3 right-3 w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
+                isAudioPlaying
+                  ? "bg-[#F58A3A] text-white scale-110 shadow-lg"
+                  : "bg-[#FCE6DA] text-[#F58A3A] hover:bg-[#F58A3A]/20 active:scale-95"
+              }`}
+              title="Dengarkan lafadz"
+            >
+              <Volume2
+                size={18}
+                className={isAudioPlaying ? "animate-pulse" : ""}
+              />
+            </button>
 
-          <p
-            className="text-5xl font-arabic text-[#5A3A2A] py-4 tracking-widest text-center select-none"
-            dir="rtl"
-          >
-            {question.arabic}
-          </p>
+            <p
+              className="text-5xl font-arabic text-[#5A3A2A] py-4 tracking-widest text-center select-none"
+              dir="rtl"
+            >
+              {question.arabic}
+            </p>
 
-          <p className="text-[11px] text-[#8C7A68] mt-1">
-            Sentuh audio untuk mendengarkan lafadz
-          </p>
-        </div>
+            <p className="text-[11px] text-[#8C7A68] mt-1">
+              Sentuh audio untuk mendengarkan lafadz
+            </p>
+          </div>
+        )}
 
         {/* Answer Construction Slots */}
         <div className="w-full min-h-[64px] border-b-2 border-[#E2D4C0] pb-3 flex items-center justify-center gap-2.5 flex-wrap mb-8">
