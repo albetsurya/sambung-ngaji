@@ -1,7 +1,35 @@
-// Audio player helper for Ngaji Ceria games & learning
+  // Audio player helper for Ngaji Ceria games & learning
 import { HIJAIYAH_AUDIO_MAP, TILAWATI_AUDIO_MAP } from "@/features/ngaji-ceria/data/tilawatiAudioMap";
 
 let activeAudio: HTMLAudioElement | null = null;
+
+// Play opening basmalah/taawudz
+export function playOpeningDua(onEnded?: () => void): void {
+  // If there is an opening audio file, play it. Otherwise, use speech synthesis or return.
+  const openingAudio = new Audio("/audio/tilawati/taawudz_basmalah.ogg");
+  openingAudio.play().then(() => {
+    openingAudio.onended = () => {
+      if (onEnded) onEnded();
+    };
+  }).catch(() => {
+    // If not found, speak it via speech synthesis
+    if ("speechSynthesis" in window) {
+      const utter = new SpeechSynthesisUtterance("A'udzubillahi minasy syaithanir rajim. Bismillahirrahmanirrahim");
+      utter.lang = "ar-SA";
+      utter.rate = 0.9;
+      utter.onend = () => {
+        if (onEnded) onEnded();
+      };
+      utter.onerror = () => {
+        if (onEnded) onEnded();
+      };
+      window.speechSynthesis.speak(utter);
+    } else {
+      if (onEnded) onEnded();
+    }
+  });
+}
+
 
 /**
  * Play Tilawati recitation audio for a specific Hijaiyah letter

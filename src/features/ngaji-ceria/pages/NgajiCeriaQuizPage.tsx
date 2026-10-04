@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
-import { playAudioUrl, playSoundEffect } from "../utils/audioPlayer";
+import { playAudioUrl, playSoundEffect, playOpeningDua } from "../utils/audioPlayer";
 
 interface QuizQuestion {
   id: number;
@@ -33,7 +33,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ اَ",
     transliterationParts: ["a", "a"],
     options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Naik",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_1_a_a.ogg",
   },
   {
@@ -49,7 +49,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Turun",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_3_a_ba.ogg",
   },
   {
@@ -65,7 +65,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_2_a_ba.ogg",
   },
   {
@@ -73,7 +73,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ اَ",
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Turun",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_3_ba_a.ogg",
   },
   {
@@ -81,7 +81,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ اَ اَ",
     transliterationParts: ["a", "a", "a"],
     options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Turun",
+    hintTone: "Rost: Nada Naik",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_1_a_a_a.ogg",
   },
   {
@@ -97,7 +97,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ بَ اَ",
     transliterationParts: ["ba", "ba", "a"],
     options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Naik",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
   },
   {
@@ -105,7 +105,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ اَ",
     transliterationParts: ["a", "ba", "a"],
     options: ["a", "ba", "a", "ba", "ba", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Turun",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_2_a_ba_a.ogg",
   },
   {
@@ -121,7 +121,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ اَ بَ",
     transliterationParts: ["ba", "a", "ba"],
     options: ["ba", "a", "ba", "ba", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Turun",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_2_ba_a_ba.ogg",
   },
 ];
@@ -140,7 +140,15 @@ export default function NgajiCeriaQuizPage() {
 
   // Auto-play audio when question changes
   useEffect(() => {
-    handlePlayAudio();
+    // If it's the very first question, we can play Taawudz/Basmalah first, then the question
+    if (currentIdx === 0) {
+      // play taawudz & basmalah
+      playOpeningDua(() => {
+        handlePlayAudio();
+      });
+    } else {
+      handlePlayAudio();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIdx]);
 
