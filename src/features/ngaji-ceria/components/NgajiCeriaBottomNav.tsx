@@ -55,10 +55,10 @@ export function NgajiCeriaBottomNav() {
               onClick={() => tapFeedback()}
             >
               <div
-                className={`relative w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 p-2 ${
+                className={`relative w-11 h-11 rounded-full flex items-center justify-center p-2 ${
                   isActive
-                    ? "bg-[#F58A3A] text-white shadow-lg shadow-[#F58A3A]/40 -translate-y-2.5 scale-110 border-2 border-white"
-                    : "bg-white/80 border-2 border-[#E2D4C0] hover:bg-white"
+                    ? "bg-[#F58A3A] text-white shadow-md border-2 border-white"
+                    : "bg-white/80 border-2 border-[#E2D4C0]"
                 }`}
               >
                 <img

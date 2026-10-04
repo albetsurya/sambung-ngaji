@@ -62,6 +62,7 @@ export const NGAJI_CERIA_ASSETS = {
   qirraPop: NEW.qirraPop,
   qirraMatch: NEW.qirraMatch,
   tebakSurahBaru: NEW.tebakSurahBaru,
+  tangkapHarakat: NEW.balonBintang,
   balonMerah: NEW.balonMerah,
   balonBiru: NEW.balonBiru,
   balonKuning: NEW.balonKuning,

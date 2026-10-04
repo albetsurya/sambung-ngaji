@@ -195,6 +195,9 @@ const PasangHurufGamePage = lazy(
 const TebakAyatGamePage = lazy(
   () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
 );
+const TangkapHarakatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TangkapHarakatGamePage"),
+);
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -344,6 +347,14 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <TebakAyatGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tangkap-harakat"
+          element={
+            <MemberRoute allowGuest>
+              <TangkapHarakatGamePage />
             </MemberRoute>
           }
         />

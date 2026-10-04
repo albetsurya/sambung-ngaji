@@ -109,6 +109,15 @@ export default function NgajiCeriaGamesPage() {
           theme={GAME_THEMES.lavender}
           onClick={() => navigate("/member/ngaji-ceria/games/tebak-ayat")}
         />
+
+        <MiniGameCard
+          title="Tangkap Harakat"
+          description="Gerakkan huruf untuk menangkap harakat yang diminta!"
+          cover={NGAJI_CERIA_ASSETS.tangkapHarakat}
+          best={500}
+          theme={GAME_THEMES.blue}
+          onClick={() => navigate("/member/ngaji-ceria/games/tangkap-harakat")}
+        />
       </div>
     </NgajiCeriaLayout>
   );
