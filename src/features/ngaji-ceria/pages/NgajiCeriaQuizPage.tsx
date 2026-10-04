@@ -22,6 +22,14 @@ interface QuizQuestion {
 const SAMPLE_QUESTIONS: QuizQuestion[] = [
   {
     id: 1,
+    arabic: "اَ بَ",
+    transliterationParts: ["a", "ba"],
+    options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
+    hintTone: "Rost: Nada Datar (Judul)",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba.ogg",
+  },
+  {
+    id: 2,
     arabic: "اَ اَ",
     transliterationParts: ["a", "a"],
     options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
@@ -29,7 +37,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_1_a_a.ogg",
   },
   {
-    id: 2,
+    id: 3,
     arabic: "بَ بَ",
     transliterationParts: ["ba", "ba"],
     options: ["ba", "ba", "a", "a", "ta", "tsa", "ja", "ha"],
@@ -37,7 +45,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_2_ba_ba.ogg",
   },
   {
-    id: 3,
+    id: 4,
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
@@ -45,7 +53,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_3_a_ba.ogg",
   },
   {
-    id: 4,
+    id: 5,
     arabic: "بَ اَ",
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
@@ -53,7 +61,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_1_ba_a.ogg",
   },
   {
-    id: 5,
+    id: 6,
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
@@ -61,7 +69,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_2_a_ba.ogg",
   },
   {
-    id: 6,
+    id: 7,
     arabic: "بَ اَ",
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
@@ -69,7 +77,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_3_ba_a.ogg",
   },
   {
-    id: 7,
+    id: 8,
     arabic: "اَ اَ اَ",
     transliterationParts: ["a", "a", "a"],
     options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
@@ -77,7 +85,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_1_a_a_a.ogg",
   },
   {
-    id: 8,
+    id: 9,
     arabic: "بَ بَ بَ",
     transliterationParts: ["ba", "ba", "ba"],
     options: ["ba", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
@@ -85,7 +93,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_2_ba_ba_ba.ogg",
   },
   {
-    id: 9,
+    id: 10,
     arabic: "بَ بَ اَ",
     transliterationParts: ["ba", "ba", "a"],
     options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
@@ -93,7 +101,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
   },
   {
-    id: 10,
+    id: 11,
     arabic: "اَ بَ اَ",
     transliterationParts: ["a", "ba", "a"],
     options: ["a", "ba", "a", "ba", "ba", "ta", "tsa", "ha"],
@@ -101,7 +109,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_2_a_ba_a.ogg",
   },
   {
-    id: 11,
+    id: 12,
     arabic: "اَ بَ بَ",
     transliterationParts: ["a", "ba", "ba"],
     options: ["a", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
@@ -109,7 +117,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_1_a_ba_ba.ogg",
   },
   {
-    id: 12,
+    id: 13,
     arabic: "بَ اَ بَ",
     transliterationParts: ["ba", "a", "ba"],
     options: ["ba", "a", "ba", "ba", "a", "ta", "tsa", "ha"],
