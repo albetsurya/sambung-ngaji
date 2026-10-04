@@ -13,14 +13,11 @@ interface MapNode {
 export default function NgajiCeriaMapPage() {
   const navigate = useNavigate();
 
-  const nodes: MapNode[] = [
-    { pageNumber: 1, status: "completed", stars: 3 },
-    { pageNumber: 2, status: "active", stars: 0 },
-    { pageNumber: 3, status: "locked", stars: 0 },
-    { pageNumber: 4, status: "locked", stars: 0 },
-    { pageNumber: 5, status: "locked", stars: 0 },
-    { pageNumber: 6, status: "locked", stars: 0 },
-  ];
+  const nodes: MapNode[] = Array.from({ length: 44 }).map((_, i) => ({
+    pageNumber: i + 1,
+    status: i === 0 ? "completed" : i === 1 ? "active" : "locked",
+    stars: i === 0 ? 3 : 0,
+  }));
 
   // Alignments for S-Curve feel
   const alignments = [
@@ -47,7 +44,7 @@ export default function NgajiCeriaMapPage() {
           </div>
           <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-[#FFCB45] text-[#5A3A2A] font-black text-xs shadow-sm">
             <Star size={13} className="fill-[#5A3A2A]" />
-            <span>3 / 93</span>
+            <span>44 Halaman</span>
           </div>
         </div>
 
@@ -81,7 +78,7 @@ export default function NgajiCeriaMapPage() {
                 {/* Node Circle Button */}
                 <button
                   disabled={node.status === "locked"}
-                  onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
+                  onClick={() => navigate(`/member/ngaji-ceria/quiz/play?hal=${node.pageNumber}`)}
                   className={`relative w-20 h-20 rounded-full flex flex-col items-center justify-center border-4 shadow-md transition-all active:scale-95 ${
                     node.status === "completed"
                       ? "bg-[#FFCB45] border-[#E29A12] text-[#5A3A2A]"
