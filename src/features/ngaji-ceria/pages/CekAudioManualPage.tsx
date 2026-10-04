@@ -9,6 +9,9 @@ export default function CekAudioManualPage() {
   const [hal, setHal] = useState(1);
   const [playingId, setPlayingId] = useState<number | string | null>(null);
 
+  // Check if current page is kelipatan 6 (Latihan-latihan bacaan)
+  const isKelipatanEnam = hal % 6 === 0;
+
   // For Jilid 1, we have rich dataset per line
   const pageData = jilid === 1 ? TILAWATI_JILID_1_PAGES[hal] : null;
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -127,7 +130,7 @@ export default function CekAudioManualPage() {
         {/* Content List */}
         {pageData ? (
           <div className="space-y-3 pb-24">
-            {pageData.questions.map((q, idx) => (
+            {pageData.questions.filter((_, idx) => !(isKelipatanEnam && idx === 0)).map((q, idx) => (
               <div 
                 key={q.id} 
                 className={`flex flex-col bg-white rounded-[20px] p-4 border-2 shadow-sm transition-colors ${
@@ -137,7 +140,17 @@ export default function CekAudioManualPage() {
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex-1">
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">
-                      {idx === 0 ? 'Judul (3x Rost)' : idx === 1 ? 'Judul (Evaluasi 1x)' : idx === pageData.questions.length - 1 ? 'Baris Bawah' : `Baris ${idx-1}`}
+                      {isKelipatanEnam
+                        ? idx === pageData.questions.length - 2
+                          ? 'Baris Bawah'
+                          : `Baris ${idx + 1}`
+                        : idx === 0
+                        ? 'Judul (3x Rost)'
+                        : idx === 1
+                        ? 'Judul (Evaluasi 1x)'
+                        : idx === pageData.questions.length - 1
+                        ? 'Baris Bawah'
+                        : `Baris ${idx - 1}`}
                     </div>
                     <div className="font-arabic text-3xl mb-1 leading-normal text-right pr-2 text-slate-800">
                       {q.arabic}
