@@ -5,11 +5,12 @@ import { getFallbackAudioUrl } from "../utils/audioFallback";
 import { Play, Pause, ChevronLeft, ChevronRight, Volume2 } from "../../../components/ui/FontAwesomeIcons";
 
 export default function CekAudioManualPage() {
-  const [jilid] = useState(1);
+  const [jilid, setJilid] = useState(1);
   const [hal, setHal] = useState(1);
   const [playingId, setPlayingId] = useState<number | string | null>(null);
 
-  const pageData = TILAWATI_JILID_1_PAGES[hal];
+  // For Jilid 1, we have rich dataset per line
+  const pageData = jilid === 1 ? TILAWATI_JILID_1_PAGES[hal] : null;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function CekAudioManualPage() {
         audioRef.current.pause();
       }
     };
-  }, [hal]);
+  }, [jilid, hal]);
 
   const playAudio = (id: number | string, url: string) => {
     if (audioRef.current) {
@@ -30,9 +31,9 @@ export default function CekAudioManualPage() {
     audio.play().catch((e) => {
       console.warn("Direct slice play failed, trying fallback full page audio...", e);
       // Fallback to page full audio if specific segment is missing
-      const fallbackUrl = getFallbackAudioUrl(hal);
+      const fallbackUrl = getFallbackAudioUrl(jilid, hal);
       if (fallbackUrl && url !== fallbackUrl) {
-        playAudio(`fallback_${hal}`, fallbackUrl);
+        playAudio(`fallback_${jilid}_${hal}`, fallbackUrl);
       } else {
         setPlayingId(null);
       }
@@ -42,12 +43,34 @@ export default function CekAudioManualPage() {
     };
   };
 
-  const fullPageAudioUrl = getFallbackAudioUrl(hal);
+  const fullPageAudioUrl = getFallbackAudioUrl(jilid, hal);
 
   return (
     <NgajiCeriaLayout title="Cek Audio Manual" showBack>
       <div className="p-4 max-w-md mx-auto min-h-screen bg-slate-50/50">
         
+        {/* Jilid Selector Tabs (1 to 6) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 scrollbar-none">
+          {[1, 2, 3, 4, 5, 6].map((j) => (
+            <button
+              key={j}
+              onClick={() => {
+                setJilid(j);
+                setHal(1);
+                if (audioRef.current) audioRef.current.pause();
+                setPlayingId(null);
+              }}
+              className={`flex-1 min-w-[54px] py-2 rounded-xl font-black text-xs transition-all active:scale-95 text-center ${
+                jilid === j
+                  ? "bg-[#00923F] text-white shadow-md shadow-[#00923F]/20 scale-100"
+                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              Jilid {j}
+            </button>
+          ))}
+        </div>
+
         {/* Header Controls */}
         <div className="flex items-center justify-between mb-4 bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
           <button 
@@ -57,7 +80,7 @@ export default function CekAudioManualPage() {
             <ChevronLeft size={16} />
           </button>
           <div className="text-center">
-            <div className="text-[10px] font-black tracking-widest text-slate-400 uppercase">TILAWATI JILID {jilid}</div>
+            <div className="text-[10px] font-black tracking-widest text-[#00923F] uppercase">TILAWATI JILID {jilid}</div>
             <div className="font-black text-xl text-slate-800">Halaman {hal}</div>
           </div>
           <button 
@@ -69,40 +92,40 @@ export default function CekAudioManualPage() {
         </div>
 
         {/* Full Page Audio Player Shortcut */}
-        {fullPageAudioUrl && (
-          <div className="mb-4 bg-[#00923F]/10 border border-[#00923F]/20 p-3 rounded-2xl flex items-center justify-between">
+        {fullPageAudioUrl ? (
+          <div className="mb-4 bg-[#00923F]/10 border border-[#00923F]/20 p-3.5 rounded-2xl flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2.5">
-              <Volume2 size={18} className="text-[#00923F]" />
+              <Volume2 size={20} className="text-[#00923F]" />
               <div>
-                <div className="text-xs font-black text-[#00662C]">Putar Full Audio Halaman {hal}</div>
-                <div className="text-[10px] text-[#00662C]/70 font-medium">Rekaman audio utuh 1 halaman</div>
+                <div className="text-xs font-black text-[#00662C]">Audio Master Halaman {hal}</div>
+                <div className="text-[10px] text-[#00662C]/70 font-medium">Rekaman Tilawati Jilid {jilid}</div>
               </div>
             </div>
             <button
               onClick={() => {
-                if (playingId === `full_${hal}`) {
+                if (playingId === `full_${jilid}_${hal}`) {
                   audioRef.current?.pause();
                   setPlayingId(null);
                 } else {
-                  playAudio(`full_${hal}`, fullPageAudioUrl);
+                  playAudio(`full_${jilid}_${hal}`, fullPageAudioUrl);
                 }
               }}
-              className={`px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-sm text-white transition-all active:scale-95 ${
-                playingId === `full_${hal}` ? "bg-red-500" : "bg-[#00923F]"
+              className={`px-3.5 py-2 rounded-xl font-black text-xs flex items-center gap-1.5 shadow-md text-white transition-all active:scale-95 ${
+                playingId === `full_${jilid}_${hal}` ? "bg-red-500" : "bg-[#00923F]"
               }`}
             >
-              {playingId === `full_${hal}` ? <Pause size={12} /> : <Play size={12} />}
-              {playingId === `full_${hal}` ? "Jeda" : "Putar Full"}
+              {playingId === `full_${jilid}_${hal}` ? <Pause size={13} /> : <Play size={13} />}
+              {playingId === `full_${jilid}_${hal}` ? "Jeda" : "Putar Audio"}
             </button>
+          </div>
+        ) : (
+          <div className="mb-4 bg-amber-50 border border-amber-200 p-3 rounded-2xl text-center text-xs font-bold text-amber-700">
+            Audio utuh Halaman {hal} sedang diproses
           </div>
         )}
 
         {/* Content List */}
-        {!pageData ? (
-          <div className="text-center py-10 text-slate-400 font-bold text-sm">
-            Data halaman {hal} belum tersedia.
-          </div>
-        ) : (
+        {pageData ? (
           <div className="space-y-3 pb-24">
             {pageData.questions.map((q, idx) => (
               <div 
@@ -149,6 +172,27 @@ export default function CekAudioManualPage() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 text-center shadow-sm pb-10">
+            <div className="w-12 h-12 rounded-full bg-[#00923F]/10 text-[#00923F] flex items-center justify-center mx-auto mb-3 font-black text-lg">
+              {jilid}
+            </div>
+            <h3 className="font-black text-base text-slate-800 mb-1">
+              Tilawati Jilid {jilid} - Halaman {hal}
+            </h3>
+            <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">
+              Audio rekaman master per halaman siap diputar melalui tombol di atas untuk audit dan verifikasi makhraj & irama.
+            </p>
+            {fullPageAudioUrl && (
+              <button
+                onClick={() => playAudio(`full_${jilid}_${hal}`, fullPageAudioUrl)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00923F] text-white font-black text-xs shadow-md shadow-[#00923F]/20 active:scale-95 transition-all"
+              >
+                <Play size={14} />
+                Putar Audio Rekaman Jilid {jilid} Hal {hal}
+              </button>
+            )}
           </div>
         )}
       </div>
