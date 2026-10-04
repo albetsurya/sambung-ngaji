@@ -200,6 +200,12 @@ export default function NgajiCeriaQuizPage() {
     }
   };
 
+  const handleRetry = () => {
+    tapFeedback();
+    setSelectedTokens([]);
+    setStatus("idle");
+  };
+
   const handlePlayAudio = () => {
     if (isAudioPlaying) return;
     setIsAudioPlaying(true);
@@ -428,7 +434,7 @@ export default function NgajiCeriaQuizPage() {
             </button>
           ) : (
             <button
-              onClick={handleNext}
+              onClick={status === "correct" ? handleNext : handleRetry}
               className={`w-full py-4 rounded-2xl font-black text-base text-white tracking-wide transition-all shadow-lg active:scale-[0.98] border-b-4 ${
                 status === "correct"
                   ? "bg-[#2D5A27] hover:bg-[#1A3816] border-[#1A3816]"

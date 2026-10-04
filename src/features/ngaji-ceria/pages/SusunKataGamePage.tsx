@@ -183,6 +183,13 @@ export default function SusunKataGamePage() {
     }
   };
 
+  const handleRetry = () => {
+    tapFeedback();
+    setPlacedTiles([]);
+    setAvailableTiles([...puzzle.tiles].sort(() => Math.random() - 0.5));
+    setStatus("idle");
+  };
+
   const restart = () => {
     setScore(0);
     setIsFinished(false);
@@ -358,7 +365,7 @@ export default function SusunKataGamePage() {
             </button>
           ) : (
             <button
-              onClick={handleNext}
+              onClick={status === "correct" ? handleNext : handleRetry}
               className={`w-full py-4 rounded-2xl font-black text-base text-white transition-all shadow-lg active:scale-[0.98] border-b-4 ${
                 status === "correct"
                   ? "bg-[#2D5A27] border-[#1A3816]"
@@ -368,8 +375,10 @@ export default function SusunKataGamePage() {
               {currentIdx < PUZZLE_DATA.length - 1
                 ? status === "correct"
                   ? "Benar! Lanjut →"
-                  : "Coba Lanjut →"
-                : "Lihat Hasil Akhir"}
+                  : "Coba Lagi"
+                : status === "correct"
+                ? "Lihat Hasil Akhir"
+                : "Coba Lagi"}
             </button>
           )}
         </div>
