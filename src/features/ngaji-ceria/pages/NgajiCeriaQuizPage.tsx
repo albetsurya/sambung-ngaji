@@ -17,6 +17,7 @@ interface QuizQuestion {
   options: string[];
   hintTone: string;
   audioUrl: string;
+  isOpening?: boolean;
 }
 
 const SAMPLE_QUESTIONS: QuizQuestion[] = [
@@ -25,8 +26,9 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
-    hintTone: "Rost: Nada Datar (Judul)",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba.ogg",
+    hintTone: "Rost: Datar (3x)",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x.ogg",
+    isOpening: true,
   },
   {
     id: 2,
@@ -146,18 +148,28 @@ export default function NgajiCeriaQuizPage() {
   const currentStep = currentIdx + 1;
   const progressPercent = Math.round((currentStep / totalQuestions) * 100);
 
+  const [isOpening, setIsOpening] = useState(true);
+
   // Auto-play audio when question changes
   useEffect(() => {
-    // If it's the very first question, we can play Taawudz/Basmalah first, then the question
-    if (currentIdx === 0) {
-      // play taawudz & basmalah
-      playOpeningDua(() => {
-        handlePlayAudio();
-      });
+    // If it's the very first question, we play Taawudz/Basmalah, then Judul
+    if (currentIdx === 0 && isOpening) {
+        playOpeningDua(() => {
+            handlePlayAudio();
+            setIsOpening(false);
+        });
     } else {
-      handlePlayAudio();
+        handlePlayAudio();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
+    return () => {
+        // Auto-stop audio if component unmounts
+        const audio = document.querySelector("audio");
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    };
   }, [currentIdx]);
 
   const handlePickToken = (token: string) => {
