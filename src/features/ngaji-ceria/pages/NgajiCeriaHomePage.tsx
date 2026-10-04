@@ -158,6 +158,23 @@ export default function NgajiCeriaHomePage() {
           </div>
         </section>
 
+        {/* Shortcut Cek Audio Manual */}
+        <section
+          onClick={() => navigate("/member/ngaji-ceria/cek-audio")}
+          className="rounded-2xl bg-[#00923F]/10 border-2 border-[#00923F]/30 p-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#00923F] text-white flex items-center justify-center shadow-md">
+              <Play size={16} />
+            </div>
+            <div>
+              <h4 className="font-black text-xs text-[#00662C]">Cek Audio Manual (Verifikasi Per Huruf)</h4>
+              <p className="text-[10px] text-[#00662C]/80 mt-0.5">Putar audio tiap kombinasi huruf Hal 1-44 tanpa quiz</p>
+            </div>
+          </div>
+          <ChevronRight size={16} className="text-[#00923F]" />
+        </section>
+
         {/* Interactive Practice Banner (Ref 1) */}
         <section className="rounded-2xl bg-gradient-to-r from-[#FFF0F3] to-[#FCEAEF] p-4 border-2 border-[#FCCCD4] shadow-sm flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">

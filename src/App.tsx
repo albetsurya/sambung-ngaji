@@ -186,6 +186,9 @@ const NgajiCeriaQuizListPage = lazy(
 const NgajiCeriaGamesPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
 );
+const CekAudioManualPage = lazy(
+  () => import("./features/ngaji-ceria/pages/CekAudioManualPage"),
+);
 const BalonHijaiyahGamePage = lazy(
   () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
 );
@@ -326,6 +329,14 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <NgajiCeriaGamesPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio"
+          element={
+            <MemberRoute allowGuest>
+              <CekAudioManualPage />
             </MemberRoute>
           }
         />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Volume2,
   Check,
@@ -9,175 +9,56 @@ import {
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
 import { playAudioUrl, playSoundEffect, playOpeningDua, stopAllAudio } from "../utils/audioPlayer";
-
-interface QuizQuestion {
-  id: number;
-  arabic: string;
-  transliterationParts: string[];
-  options: string[];
-  hintTone: string;
-  audioUrl: string;
-  isOpening?: boolean;
-  isListenOnly?: boolean;
-}
-
-const SAMPLE_QUESTIONS: QuizQuestion[] = [
-  {
-    id: 0,
-    arabic: "اَ بَ",
-    transliterationParts: ["a", "ba"],
-    options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
-    hintTone: "Rost: Datar — Naik — Turun (3x)",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x_v2.ogg",
-    isOpening: true,
-    isListenOnly: true,
-  },
-  {
-    id: 1,
-    arabic: "اَ بَ",
-    transliterationParts: ["a", "ba"],
-    options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba.ogg",
-  },
-  {
-    id: 2,
-    arabic: "اَ اَ",
-    transliterationParts: ["a", "a"],
-    options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_1_a_a.ogg",
-  },
-  {
-    id: 3,
-    arabic: "بَ بَ",
-    transliterationParts: ["ba", "ba"],
-    options: ["ba", "ba", "a", "a", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_2_ba_ba.ogg",
-  },
-  {
-    id: 4,
-    arabic: "اَ بَ",
-    transliterationParts: ["a", "ba"],
-    options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_3_a_ba.ogg",
-  },
-  {
-    id: 5,
-    arabic: "بَ اَ",
-    transliterationParts: ["ba", "a"],
-    options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_1_ba_a.ogg",
-  },
-  {
-    id: 6,
-    arabic: "اَ بَ",
-    transliterationParts: ["a", "ba"],
-    options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_2_a_ba.ogg",
-  },
-  {
-    id: 7,
-    arabic: "بَ اَ",
-    transliterationParts: ["ba", "a"],
-    options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_3_ba_a.ogg",
-  },
-  {
-    id: 8,
-    arabic: "اَ اَ اَ",
-    transliterationParts: ["a", "a", "a"],
-    options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_1_a_a_a.ogg",
-  },
-  {
-    id: 9,
-    arabic: "بَ بَ بَ",
-    transliterationParts: ["ba", "ba", "ba"],
-    options: ["ba", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_2_ba_ba_ba.ogg",
-  },
-  {
-    id: 10,
-    arabic: "بَ بَ اَ",
-    transliterationParts: ["ba", "ba", "a"],
-    options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
-  },
-  {
-    id: 11,
-    arabic: "اَ بَ اَ",
-    transliterationParts: ["a", "ba", "a"],
-    options: ["a", "ba", "a", "ba", "ba", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_2_a_ba_a.ogg",
-  },
-  {
-    id: 12,
-    arabic: "اَ بَ بَ",
-    transliterationParts: ["a", "ba", "ba"],
-    options: ["a", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_1_a_ba_ba.ogg",
-  },
-  {
-    id: 13,
-    arabic: "بَ اَ بَ",
-    transliterationParts: ["ba", "a", "ba"],
-    options: ["ba", "a", "ba", "ba", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Turun",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_2_ba_a_ba.ogg",
-  },
-  {
-    id: 14,
-    arabic: "ا ب ا ب ا ب",
-    transliterationParts: ["alif", "ba", "alif", "ba", "alif", "ba"],
-    options: ["alif", "ba", "alif", "ba", "alif", "ba", "ta", "tsa"],
-    hintTone: "Rost: Nada Datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b6_bottom_alif_ba.ogg",
-  },
-];
+import { TILAWATI_JILID_1_PAGES, QuizQuestion } from "../data/tilawatiQuizData";
 
 export default function NgajiCeriaQuizPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = parseInt(searchParams.get("hal") || "1", 10);
+  const activePageNum = isNaN(pageParam) || pageParam < 1 || pageParam > 5 ? 1 : pageParam;
+
+  const pageData = TILAWATI_JILID_1_PAGES[activePageNum] || TILAWATI_JILID_1_PAGES[1];
+  const questions: QuizQuestion[] = pageData.questions;
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
-  const question = SAMPLE_QUESTIONS[currentIdx];
-  const totalQuestions = SAMPLE_QUESTIONS.length;
+  const question = questions[currentIdx] || questions[0];
+  const totalQuestions = questions.length;
   const currentStep = currentIdx + 1;
   const progressPercent = Math.round((currentStep / totalQuestions) * 100);
 
   const [isOpening, setIsOpening] = useState(true);
   const [isTaawudzPhase, setIsTaawudzPhase] = useState(true);
 
-  // Auto-play audio when question changes
+  // Reset state when page number changes
+  useEffect(() => {
+    setCurrentIdx(0);
+    setSelectedTokens([]);
+    setStatus("idle");
+    setIsOpening(true);
+    setIsTaawudzPhase(true);
+  }, [activePageNum]);
+
+  // Auto-play audio when question or opening phase changes
   useEffect(() => {
     if (currentIdx === 0 && isOpening) {
-        setIsTaawudzPhase(true);
-        playOpeningDua(() => {
-            setIsTaawudzPhase(false);
-            handlePlayAudio();
-            setIsOpening(false);
-        });
-    } else {
+      setIsTaawudzPhase(true);
+      playOpeningDua(() => {
+        setIsTaawudzPhase(false);
         handlePlayAudio();
+        setIsOpening(false);
+      });
+    } else {
+      handlePlayAudio();
     }
-    
+
     return () => {
-        stopAllAudio();
+      stopAllAudio();
     };
-  }, [currentIdx]);
+  }, [currentIdx, isOpening, activePageNum]);
 
   const handleExit = () => {
     stopAllAudio();
@@ -215,12 +96,19 @@ export default function NgajiCeriaQuizPage() {
 
   const handleNext = () => {
     tapFeedback();
-    if (currentIdx < SAMPLE_QUESTIONS.length - 1) {
+    if (currentIdx < questions.length - 1) {
       setCurrentIdx((prev) => prev + 1);
       setSelectedTokens([]);
       setStatus("idle");
     } else {
-      navigate("/member/ngaji-ceria");
+      // Halaman ini selesai! Navigasi ke halaman selanjutnya jika masih ada
+      if (activePageNum < 5) {
+        stopAllAudio();
+        setSearchParams({ hal: String(activePageNum + 1) });
+      } else {
+        stopAllAudio();
+        navigate("/member/ngaji-ceria/quiz");
+      }
     }
   };
 
@@ -277,11 +165,11 @@ export default function NgajiCeriaQuizPage() {
             <X size={16} />
           </button>
 
-          {/* Progress Bar */}
+          {/* Progress Bar & Page Badge */}
           <div className="flex-1">
             <div className="flex justify-between items-center text-[11px] font-bold mb-1 text-[#8C7A68]">
-              <span>
-                {currentStep} dari {totalQuestions}
+              <span className="font-extrabold text-[#5A3A2A]">
+                Hal {activePageNum} ({currentStep}/{totalQuestions})
               </span>
               <span className="text-[#F58A3A] font-black">{progressPercent}%</span>
             </div>
@@ -327,7 +215,7 @@ export default function NgajiCeriaQuizPage() {
           <div className="w-full flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-[#FCE6DA] text-[#F58A3A] text-xs font-black tracking-wide uppercase border border-[#F58A3A]/20">
-                Tebak Bacaan
+                Tebak Bacaan Hal {activePageNum}
               </span>
               {renderToneBadge()}
             </div>
@@ -509,7 +397,13 @@ export default function NgajiCeriaQuizPage() {
                     : "bg-[#F58A3A] hover:bg-[#E2561A] border-[#C4430E]"
                 }`}
               >
-                {status === "correct" ? "Lanjut Soal Berikutnya →" : "Coba Lagi"}
+                {status === "correct"
+                  ? currentIdx < questions.length - 1
+                    ? "Lanjut Soal Berikutnya →"
+                    : activePageNum < 5
+                    ? `Lanjut Halaman ${activePageNum + 1} →`
+                    : "Selesai Kitab Jilid 1 →"
+                  : "Coba Lagi"}
               </button>
             )}
           </div>
