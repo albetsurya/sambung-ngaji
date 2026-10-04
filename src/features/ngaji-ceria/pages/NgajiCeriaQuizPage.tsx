@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
-import { playAudioUrl, playSoundEffect, playOpeningDua } from "../utils/audioPlayer";
+import { playAudioUrl, playSoundEffect, playOpeningDua, stopAllAudio } from "../utils/audioPlayer";
 
 interface QuizQuestion {
   id: number;
@@ -165,14 +165,14 @@ export default function NgajiCeriaQuizPage() {
     }
     
     return () => {
-        // Auto-stop audio if component unmounts
-        const audio = document.querySelector("audio");
-        if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-        }
+        stopAllAudio();
     };
   }, [currentIdx]);
+
+  const handleExit = () => {
+    stopAllAudio();
+    navigate("/member/ngaji-ceria/quiz");
+  };
 
   const handlePickToken = (token: string) => {
     if (status !== "idle") return;
@@ -234,7 +234,7 @@ export default function NgajiCeriaQuizPage() {
       return (
         <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2EFCF] text-[#2D5A27] text-xs font-black tracking-wide border border-[#2D5A27]/20">
           <span className="w-2 h-2 rounded-full bg-[#2D5A27] animate-pulse" />
-          Rost: Datar
+          {question.hintTone.includes("3x") ? "Rost: Datar (3x)" : "Rost: Datar"}
         </span>
       );
     }
@@ -260,7 +260,7 @@ export default function NgajiCeriaQuizPage() {
       <div className="pt-safe px-4 py-3 border-b border-[#E2D4C0] bg-[#FFF8EE]/90 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-md mx-auto flex items-center gap-3">
           <button
-            onClick={() => navigate("/member/ngaji-ceria/quiz")}
+            onClick={handleExit}
             aria-label="Kembali"
             className="w-9 h-9 rounded-full bg-white border border-[#E2D4C0] flex items-center justify-center text-[#8C7A68] hover:text-[#5A3A2A] active:scale-90 transition-transform shadow-sm"
           >
@@ -291,39 +291,50 @@ export default function NgajiCeriaQuizPage() {
       </div>
 
       {/* Main Interactive Play Area */}
-      <main className="max-w-md mx-auto w-full px-5 py-6 flex-1 flex flex-col items-center">
-        {/* Question Prompt */}
-        <div className="w-full flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-[#FCE6DA] text-[#F58A3A] text-xs font-black tracking-wide uppercase border border-[#F58A3A]/20">
-              Tebak Bacaan
-            </span>
-            {renderToneBadge()}
-          </div>
-          <button
-            onClick={() => setSelectedTokens([])}
-            className="text-xs text-[#8C7A68] flex items-center gap-1 hover:text-[#F58A3A]"
-          >
-            <RefreshCw size={12} />
-            <span>Hapus</span>
-          </button>
-        </div>
-
-        <h2 className="text-xl font-black text-[#5A3A2A] mb-4 text-center">
-          Bisa Kamu Baca?
-        </h2>
-
-        {/* Big Arabic Display Card */}
-        {isTaawudzPhase ? (
-          <div className="w-full bg-[#2D5A27] text-white border-2 border-[#2D5A27] rounded-3xl p-8 shadow-lg flex flex-col items-center justify-center min-h-[300px] mb-6">
-            <p className="text-3xl text-center mb-6 leading-relaxed" dir="rtl">
-              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-            </p>
-            <p className="text-4xl text-center leading-relaxed" dir="rtl">
-              بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+      {isTaawudzPhase ? (
+        <main className="max-w-md mx-auto w-full px-5 py-8 flex-1 flex flex-col items-center justify-center">
+          <div className="w-full bg-[#2D5A27] text-white border-2 border-[#1A3816] rounded-3xl p-8 shadow-xl flex flex-col items-center justify-center text-center space-y-6">
+            <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-white mb-2">
+              <Volume2 size={28} className="animate-pulse text-[#FFCB45]" />
+            </div>
+            <div>
+              <p className="text-2xl font-arabic leading-loose tracking-wide text-[#FFCB45]" dir="rtl">
+                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+              </p>
+              <div className="my-4 border-t border-white/20 w-24 mx-auto" />
+              <p className="text-3xl font-arabic leading-loose tracking-wide text-white" dir="rtl">
+                بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+              </p>
+            </div>
+            <p className="text-xs text-white/80 font-medium pt-2">
+              Mendengarkan Ta'awudz & Basmalah pembuka...
             </p>
           </div>
-        ) : (
+        </main>
+      ) : (
+        <main className="max-w-md mx-auto w-full px-5 py-6 flex-1 flex flex-col items-center">
+          {/* Question Prompt */}
+          <div className="w-full flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-[#FCE6DA] text-[#F58A3A] text-xs font-black tracking-wide uppercase border border-[#F58A3A]/20">
+                Tebak Bacaan
+              </span>
+              {renderToneBadge()}
+            </div>
+            <button
+              onClick={() => setSelectedTokens([])}
+              className="text-xs text-[#8C7A68] flex items-center gap-1 hover:text-[#F58A3A]"
+            >
+              <RefreshCw size={12} />
+              <span>Hapus</span>
+            </button>
+          </div>
+
+          <h2 className="text-xl font-black text-[#5A3A2A] mb-4 text-center">
+            {question.isOpening ? "Judul Halaman (Dibaca 3x)" : "Bisa Kamu Baca?"}
+          </h2>
+
+          {/* Big Arabic Display Card */}
           <div className="w-full bg-white border-2 border-[#E2D4C0] rounded-3xl p-6 shadow-md flex flex-col items-center relative mb-6">
             <button
               onClick={handlePlayAudio}
@@ -351,126 +362,128 @@ export default function NgajiCeriaQuizPage() {
               Sentuh audio untuk mendengarkan lafadz
             </p>
           </div>
-        )}
 
-        {/* Answer Construction Slots */}
-        <div className="w-full min-h-[64px] border-b-2 border-[#E2D4C0] pb-3 flex items-center justify-center gap-2.5 flex-wrap mb-8">
-          {selectedTokens.length === 0 ? (
-            <span className="text-sm font-medium text-[#8C7A68] italic">
-              Pilih bacaan di bawah secara berurutan...
-            </span>
-          ) : (
-            selectedTokens.map((token, idx) => (
-              <button
-                key={`${token}-${idx}`}
-                onClick={() => handleRemoveToken(idx)}
-                className="px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
-              >
-                {token}
-              </button>
-            ))
-          )}
-        </div>
-
-        {/* Options Word Bank */}
-        <div className="w-full flex-1 flex flex-col justify-center">
-          <p className="text-xs font-black text-[#8C7A68] mb-3 text-center">
-            Pilihan Bacaan:
-          </p>
-          <div className="grid grid-cols-4 gap-2.5 w-full">
-            {question.options.map((opt, idx) => {
-              const isUsed =
-                selectedTokens.filter((t) => t === opt).length >=
-                question.options.filter((t) => t === opt).length;
-
-              return (
+          {/* Answer Construction Slots */}
+          <div className="w-full min-h-[64px] border-b-2 border-[#E2D4C0] pb-3 flex items-center justify-center gap-2.5 flex-wrap mb-8">
+            {selectedTokens.length === 0 ? (
+              <span className="text-sm font-medium text-[#8C7A68] italic">
+                Pilih bacaan di bawah secara berurutan...
+              </span>
+            ) : (
+              selectedTokens.map((token, idx) => (
                 <button
-                  key={`${opt}-${idx}`}
-                  disabled={isUsed || status !== "idle"}
-                  onClick={() => handlePickToken(opt)}
-                  className={`h-14 rounded-2xl font-black text-base border-b-4 transition-all duration-150 flex items-center justify-center ${
-                    isUsed
-                      ? "bg-[#E2D4C0]/50 text-[#8C7A68]/40 border-transparent cursor-not-allowed"
-                      : "bg-white text-[#5A3A2A] border-[#E2D4C0] hover:border-[#F58A3A] active:translate-y-1 active:border-b-0 shadow-sm"
-                  }`}
+                  key={`${token}-${idx}`}
+                  onClick={() => handleRemoveToken(idx)}
+                  className="px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
                 >
-                  {opt}
+                  {token}
                 </button>
-              );
-            })}
+              ))
+            )}
           </div>
-        </div>
-      </main>
+
+          {/* Options Word Bank */}
+          <div className="w-full flex-1 flex flex-col justify-center">
+            <p className="text-xs font-black text-[#8C7A68] mb-3 text-center">
+              Pilihan Bacaan:
+            </p>
+            <div className="grid grid-cols-4 gap-2.5 w-full">
+              {question.options.map((opt, idx) => {
+                const isUsed =
+                  selectedTokens.filter((t) => t === opt).length >=
+                  question.options.filter((t) => t === opt).length;
+
+                return (
+                  <button
+                    key={`${opt}-${idx}`}
+                    disabled={isUsed || status !== "idle"}
+                    onClick={() => handlePickToken(opt)}
+                    className={`h-14 rounded-2xl font-black text-base border-b-4 transition-all duration-150 flex items-center justify-center ${
+                      isUsed
+                        ? "bg-[#E2D4C0]/50 text-[#8C7A68]/40 border-transparent cursor-not-allowed"
+                        : "bg-white text-[#5A3A2A] border-[#E2D4C0] hover:border-[#F58A3A] active:translate-y-1 active:border-b-0 shadow-sm"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </main>
+      )}
 
       {/* Bottom Sticky Action / Feedback Drawer */}
-      <footer
-        className={`p-4 pb-safe transition-colors duration-300 border-t ${
-          status === "correct"
-            ? "bg-[#E2EFCF] border-[#2D5A27]/30"
-            : status === "wrong"
-            ? "bg-[#FCEAEA] border-[#D32F2F]/30"
-            : "bg-white border-[#E2D4C0]"
-        }`}
-      >
-        <div className="max-w-md mx-auto">
-          {status === "correct" && (
-            <div className="flex items-center gap-3 mb-3 text-[#2D5A27]">
-              <div className="w-10 h-10 rounded-full bg-[#2D5A27] text-white flex items-center justify-center font-bold shadow-md">
-                <Check size={20} />
+      {!isTaawudzPhase && (
+        <footer
+          className={`p-4 pb-safe transition-colors duration-300 border-t ${
+            status === "correct"
+              ? "bg-[#E2EFCF] border-[#2D5A27]/30"
+              : status === "wrong"
+              ? "bg-[#FCEAEA] border-[#D32F2F]/30"
+              : "bg-white border-[#E2D4C0]"
+          }`}
+        >
+          <div className="max-w-md mx-auto">
+            {status === "correct" && (
+              <div className="flex items-center gap-3 mb-3 text-[#2D5A27]">
+                <div className="w-10 h-10 rounded-full bg-[#2D5A27] text-white flex items-center justify-center font-bold shadow-md">
+                  <Check size={20} />
+                </div>
+                <div>
+                  <p className="font-extrabold text-base leading-none">
+                    Luar Biasa! Jawaban Tepat!
+                  </p>
+                  <p className="text-xs mt-1 text-[#2D5A27]/80">
+                    Lafadz terbaca fasih sesuai irama.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-extrabold text-base leading-none">
-                  Luar Biasa! Jawaban Tepat!
-                </p>
-                <p className="text-xs mt-1 text-[#2D5A27]/80">
-                  Lafadz terbaca fasih sesuai irama.
-                </p>
-              </div>
-            </div>
-          )}
+            )}
 
-          {status === "wrong" && (
-            <div className="flex items-center gap-3 mb-3 text-[#D32F2F]">
-              <div className="w-10 h-10 rounded-full bg-[#D32F2F] text-white flex items-center justify-center font-bold shadow-md">
-                <X size={20} />
+            {status === "wrong" && (
+              <div className="flex items-center gap-3 mb-3 text-[#D32F2F]">
+                <div className="w-10 h-10 rounded-full bg-[#D32F2F] text-white flex items-center justify-center font-bold shadow-md">
+                  <X size={20} />
+                </div>
+                <div>
+                  <p className="font-extrabold text-base leading-none">
+                    Hampir Tepat!
+                  </p>
+                  <p className="text-xs mt-1 text-[#D32F2F]/80">
+                    Periksa urutan bacaan dan coba lagi ya.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-extrabold text-base leading-none">
-                  Hampir Tepat!
-                </p>
-                <p className="text-xs mt-1 text-[#D32F2F]/80">
-                  Periksa urutan bacaan dan coba lagi ya.
-                </p>
-              </div>
-            </div>
-          )}
+            )}
 
-          {status === "idle" ? (
-            <button
-              disabled={selectedTokens.length === 0}
-              onClick={handleCheckAnswer}
-              className={`w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all shadow-lg ${
-                selectedTokens.length > 0
-                  ? "bg-[#F58A3A] hover:bg-[#E2561A] text-white shadow-[#F58A3A]/30 active:scale-[0.98] border-b-4 border-[#C4430E]"
-                  : "bg-[#E2D4C0] text-[#8C7A68] cursor-not-allowed border-b-4 border-transparent"
-              }`}
-            >
-              Periksa Jawaban
-            </button>
-          ) : (
-            <button
-              onClick={status === "correct" ? handleNext : handleRetry}
-              className={`w-full py-4 rounded-2xl font-black text-base text-white tracking-wide transition-all shadow-lg active:scale-[0.98] border-b-4 ${
-                status === "correct"
-                  ? "bg-[#2D5A27] hover:bg-[#1A3816] border-[#1A3816]"
-                  : "bg-[#F58A3A] hover:bg-[#E2561A] border-[#C4430E]"
-              }`}
-            >
-              {status === "correct" ? "Lanjut Soal Berikutnya →" : "Coba Lagi"}
-            </button>
-          )}
-        </div>
-      </footer>
+            {status === "idle" ? (
+              <button
+                disabled={selectedTokens.length === 0}
+                onClick={handleCheckAnswer}
+                className={`w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all shadow-lg ${
+                  selectedTokens.length > 0
+                    ? "bg-[#F58A3A] hover:bg-[#E2561A] text-white shadow-[#F58A3A]/30 active:scale-[0.98] border-b-4 border-[#C4430E]"
+                    : "bg-[#E2D4C0] text-[#8C7A68] cursor-not-allowed border-b-4 border-transparent"
+                }`}
+              >
+                Periksa Jawaban
+              </button>
+            ) : (
+              <button
+                onClick={status === "correct" ? handleNext : handleRetry}
+                className={`w-full py-4 rounded-2xl font-black text-base text-white tracking-wide transition-all shadow-lg active:scale-[0.98] border-b-4 ${
+                  status === "correct"
+                    ? "bg-[#2D5A27] hover:bg-[#1A3816] border-[#1A3816]"
+                    : "bg-[#F58A3A] hover:bg-[#E2561A] border-[#C4430E]"
+                }`}
+              >
+                {status === "correct" ? "Lanjut Soal Berikutnya →" : "Coba Lagi"}
+              </button>
+            )}
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

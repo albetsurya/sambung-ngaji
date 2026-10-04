@@ -3,15 +3,25 @@ import { HIJAIYAH_AUDIO_MAP, TILAWATI_AUDIO_MAP } from "@/features/ngaji-ceria/d
 
 let activeAudio: HTMLAudioElement | null = null;
 
+export function stopAllAudio(): void {
+  try {
+    if (activeAudio) {
+      activeAudio.pause();
+      activeAudio.currentTime = 0;
+      activeAudio = null;
+    }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  } catch (e) {
+    console.warn("stopAllAudio error:", e);
+  }
+}
+
 // Play opening basmalah/taawudz
 export function playOpeningDua(onEnded?: () => void): void {
-  // If there is an opening audio file, play it. Otherwise, use speech synthesis or return.
-  const openingAudio = new Audio("/audio/tilawati/taawudz_basmalah_v2.ogg");
-  openingAudio.play().then(() => {
-    openingAudio.onended = () => {
-      if (onEnded) onEnded();
-    };
-  }).catch(() => {
+  const audio = playAudioUrl("/audio/tilawati/taawudz_basmalah_v2.ogg", onEnded);
+  if (!audio) {
     // If not found, speak it via speech synthesis
     if ("speechSynthesis" in window) {
       const utter = new SpeechSynthesisUtterance("A'udzubillahi minasy syaithanir rajim. Bismillahirrahmanirrahim");
@@ -27,7 +37,7 @@ export function playOpeningDua(onEnded?: () => void): void {
     } else {
       if (onEnded) onEnded();
     }
-  });
+  }
 }
 
 
