@@ -11,6 +11,7 @@ interface BalloonTarget {
   letter: HijaiyahItem;
   balloonSvg: string;
   x: number; // percentage
+  y: number; // percentage
   speed: number;
 }
 
@@ -51,7 +52,9 @@ export default function BalonHijaiyahGamePage() {
       id: `${item.id}-${Date.now()}-${idx}`,
       letter: item,
       balloonSvg: BALLOON_COLORS[idx % BALLOON_COLORS.length],
-      x: 12 + idx * 22, // Distribute horizontally
+      // Menambahkan efek acak posisi agar terlihat bertumpuk (offset)
+      x: 10 + (idx % 2) * 20 + Math.random() * 10,
+      y: 10 + Math.floor(idx / 2) * 30 + Math.random() * 10,
       speed: 1,
     }));
     setBalloons(newBalloons);
@@ -131,17 +134,23 @@ export default function BalonHijaiyahGamePage() {
 
           {/* Balloon Grid */}
           {isPlaying && (
-            <div className="grid grid-cols-2 gap-4 w-full my-auto z-10 py-4">
+            <div className="relative w-full h-[300px] my-auto z-10 py-4">
               {balloons.map((balloon) => (
                 <button
                   key={balloon.id}
                   onClick={() => handlePop(balloon)}
-                  className="relative aspect-[3/4] max-h-[130px] flex items-center justify-center active:scale-90 transition-transform cursor-pointer drop-shadow-md group"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-90"
+                  style={{
+                    left: `${balloon.x}%`,
+                    top: `${balloon.y}%`,
+                    width: "45%",
+                    maxWidth: "120px",
+                  }}
                 >
                   <img
                     src={balloon.balloonSvg}
                     alt="Balon"
-                    className="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform"
+                    className="w-full h-full object-contain filter drop-shadow-md"
                   />
                   {/* Arabic letter on balloon */}
                   <span className="absolute inset-0 flex items-center justify-center font-arabic text-3xl font-black text-[#5A3A2A] pb-3 select-none">

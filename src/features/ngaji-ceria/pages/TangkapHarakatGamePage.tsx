@@ -107,7 +107,7 @@ export default function TangkapHarakatGamePage() {
           yPercent: 0,
         },
       ]);
-    }, 850);
+    }, 750);
 
     // Gravity loop
     const gravityTimer = setInterval(() => {
@@ -115,7 +115,7 @@ export default function TangkapHarakatGamePage() {
         const nextItems: FallingHarakat[] = [];
 
         prev.forEach((item) => {
-          const newY = item.yPercent + 4.5;
+          const newY = item.yPercent + 4.0;
 
           // Cek tabrakan di dasar (y > 75% sampai 92%)
           if (newY >= 75 && newY <= 90 && item.lane === basketLane) {
@@ -126,7 +126,6 @@ export default function TangkapHarakatGamePage() {
             } else {
               setScore((s) => Math.max(0, s - 30));
             }
-            // Item tertangkap (tidak dimasukkan ke nextItems)
             return;
           }
 
@@ -138,7 +137,7 @@ export default function TangkapHarakatGamePage() {
 
         return nextItems;
       });
-    }, 50);
+    }, 40);
 
     return () => {
       clearInterval(spawnTimer);
@@ -152,10 +151,10 @@ export default function TangkapHarakatGamePage() {
   };
 
   return (
-    <NgajiCeriaLayout title="Tangkap Harakat" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
-      <div className="px-4 py-4 space-y-4 bg-[#FFF8EE] min-h-full rounded-t-3xl flex flex-col">
+    <NgajiCeriaLayout title="Tangkap Harakat" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+      <div className="px-4 py-3 bg-[#FFF8EE] h-[calc(100vh-70px)] flex flex-col justify-between overflow-hidden">
         {/* Top Game Bar */}
-        <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">
+        <div className="flex items-center justify-between bg-white p-3 rounded-2xl border-2 border-[#E2D4C0] shadow-sm shrink-0 mb-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-black text-[#8C7A68]">Waktu:</span>
             <span className="text-base font-black text-[#D32F2F]">{timeLeft}d</span>
@@ -174,7 +173,7 @@ export default function TangkapHarakatGamePage() {
         </div>
 
         {!isPlaying && !isGameOver ? (
-          <div className="bg-white rounded-[28px] p-8 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 my-auto">
+          <div className="bg-white rounded-[28px] p-6 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 my-auto max-w-sm mx-auto w-full">
             <div className="w-20 h-20 mx-auto rounded-3xl bg-[#EAF6FB] border-2 border-[#BCE3F5] flex items-center justify-center">
               <span className="font-arabic text-5xl font-black text-[#1C5D79]">بَ</span>
             </div>
@@ -192,7 +191,7 @@ export default function TangkapHarakatGamePage() {
             </button>
           </div>
         ) : isGameOver ? (
-          <div className="bg-white rounded-[28px] p-8 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 my-auto">
+          <div className="bg-white rounded-[28px] p-6 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 my-auto max-w-sm mx-auto w-full">
             <div className="w-16 h-16 rounded-full bg-[#FFCB45] border-2 border-[#B8590C]/20 mx-auto flex items-center justify-center">
               <Trophy size={28} className="text-[#5A3A2A]" />
             </div>
@@ -220,9 +219,9 @@ export default function TangkapHarakatGamePage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col">
-            {/* Arena 3 Lane */}
-            <div className="relative flex-1 bg-gradient-to-b from-[#EBF5FB] to-[#DDF0FA] rounded-3xl border-2 border-[#BCE3F5] overflow-hidden min-h-[340px] shadow-inner">
+          <div className="flex-1 flex flex-col min-h-0 justify-between">
+            {/* Arena 3 Lane (Full Height) */}
+            <div className="relative flex-1 bg-gradient-to-b from-[#EBF5FB] via-[#F2FAFD] to-[#DDF0FA] rounded-3xl border-2 border-[#BCE3F5] overflow-hidden shadow-inner flex flex-col">
               {/* Divider Garis Jalur */}
               <div className="absolute inset-0 grid grid-cols-3 pointer-events-none">
                 <div className="border-r-2 border-dashed border-[#BCE3F5]/60" />
@@ -234,14 +233,14 @@ export default function TangkapHarakatGamePage() {
               {items.map((item) => (
                 <div
                   key={item.uid}
-                  className="absolute transition-all duration-75 flex items-center justify-center"
+                  className="absolute transition-all duration-75 flex items-center justify-center pointer-events-none"
                   style={{
                     left: `${item.lane * 33.33}%`,
                     width: "33.33%",
                     top: `${item.yPercent}%`,
                   }}
                 >
-                  <div className="w-11 h-11 rounded-2xl bg-white border-2 border-[#1C5D79] shadow-md flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#1C5D79] shadow-md flex items-center justify-center">
                     <span className="font-arabic text-2xl font-black text-[#1C5D79] select-none">
                       {item.harakat.symbol}
                     </span>
@@ -249,7 +248,7 @@ export default function TangkapHarakatGamePage() {
                 </div>
               ))}
 
-              {/* Basket Huruf Bergerak di Bawah */}
+              {/* Basket Huruf Bergerak di Bawah Arena */}
               <div
                 className="absolute bottom-3 transition-all duration-150 flex items-center justify-center pointer-events-none"
                 style={{
@@ -269,12 +268,12 @@ export default function TangkapHarakatGamePage() {
             </div>
 
             {/* Kontrol 3 Tombol Tap */}
-            <div className="grid grid-cols-3 gap-3 pt-3">
+            <div className="grid grid-cols-3 gap-3 pt-3 shrink-0">
               {[0, 1, 2].map((lane) => (
                 <button
                   key={lane}
                   onClick={() => moveLane(lane)}
-                  className={`py-4 rounded-2xl font-black text-sm border-2 transition-transform active:scale-95 shadow-md ${
+                  className={`py-3.5 rounded-2xl font-black text-sm border-2 transition-transform active:scale-95 shadow-md ${
                     basketLane === lane
                       ? "bg-[#1C5D79] text-white border-[#103445] shadow-lg"
                       : "bg-white text-[#5A3A2A] border-[#E2D4C0]"

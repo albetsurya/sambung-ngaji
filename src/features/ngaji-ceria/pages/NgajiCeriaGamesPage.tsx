@@ -118,6 +118,15 @@ export default function NgajiCeriaGamesPage() {
           theme={GAME_THEMES.blue}
           onClick={() => navigate("/member/ngaji-ceria/games/tangkap-harakat")}
         />
+
+        <MiniGameCard
+          title="Susun Kata"
+          description="Susun kepingan huruf hijaiyah sesuai dengan urutan lafadz."
+          cover={NGAJI_CERIA_ASSETS.kartuAcak}
+          best={420}
+          theme={GAME_THEMES.peach}
+          onClick={() => navigate("/member/ngaji-ceria/games/susun-kata")}
+        />
       </div>
     </NgajiCeriaLayout>
   );
