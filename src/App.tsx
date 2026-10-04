@@ -186,20 +186,20 @@ const NgajiCeriaQuizListPage = lazy(
 const NgajiCeriaGamesPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
 );
-const BalonHijaiyahGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
+const HijaiyahBurstPage = lazy(
+  () => import("./features/ngaji-ceria/pages/HijaiyahBurstPage"),
 );
-const PasangHurufGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/PasangHurufGamePage"),
+const HijaiyahMatchPage = lazy(
+  () => import("./features/ngaji-ceria/pages/HijaiyahMatchPage"),
 );
-const TebakAyatGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
+const VerseQuestPage = lazy(
+  () => import("./features/ngaji-ceria/pages/VerseQuestPage"),
 );
-const TangkapHarakatGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/TangkapHarakatGamePage"),
+const HarakatRushPage = lazy(
+  () => import("./features/ngaji-ceria/pages/HarakatRushPage"),
 );
-const SusunKataGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/SusunKataGamePage"),
+const WordBuilderPage = lazy(
+  () => import("./features/ngaji-ceria/pages/WordBuilderPage"),
 );
 function PageFallback() {
   return (
@@ -333,7 +333,15 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/balon-hijaiyah"
           element={
             <MemberRoute allowGuest>
-              <BalonHijaiyahGamePage />
+              <HijaiyahBurstPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-burst"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahBurstPage />
             </MemberRoute>
           }
         />
@@ -341,7 +349,15 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/pasang-huruf"
           element={
             <MemberRoute allowGuest>
-              <PasangHurufGamePage />
+              <HijaiyahMatchPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-match"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahMatchPage />
             </MemberRoute>
           }
         />
@@ -349,7 +365,15 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/tebak-ayat"
           element={
             <MemberRoute allowGuest>
-              <TebakAyatGamePage />
+              <VerseQuestPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/verse-quest"
+          element={
+            <MemberRoute allowGuest>
+              <VerseQuestPage />
             </MemberRoute>
           }
         />
@@ -357,7 +381,15 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/tangkap-harakat"
           element={
             <MemberRoute allowGuest>
-              <TangkapHarakatGamePage />
+              <HarakatRushPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/harakat-rush"
+          element={
+            <MemberRoute allowGuest>
+              <HarakatRushPage />
             </MemberRoute>
           }
         />
@@ -365,7 +397,15 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/susun-kata"
           element={
             <MemberRoute allowGuest>
-              <SusunKataGamePage />
+              <WordBuilderPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/word-builder"
+          element={
+            <MemberRoute allowGuest>
+              <WordBuilderPage />
             </MemberRoute>
           }
         />
