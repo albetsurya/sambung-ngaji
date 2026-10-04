@@ -31,6 +31,30 @@ export function playHijaiyahAudio(letterId: string): void {
 /**
  * Play generic chunk audio from a specific jilid
  */
+export function playAudioUrl(url: string, onEnded?: () => void): HTMLAudioElement | null {
+  try {
+    if (activeAudio) {
+      activeAudio.pause();
+      activeAudio.currentTime = 0;
+    }
+    activeAudio = new Audio(url);
+    activeAudio.volume = 0.9;
+    if (onEnded) {
+      activeAudio.onended = onEnded;
+      activeAudio.onerror = onEnded;
+    }
+    activeAudio.play().catch((err) => {
+      console.warn("Failed to play audio url:", err);
+      if (onEnded) onEnded();
+    });
+    return activeAudio;
+  } catch (e) {
+    console.warn("Audio url error:", e);
+    if (onEnded) onEnded();
+    return null;
+  }
+}
+
 export function playJilidChunkAudio(jilid: string, index: number): void {
   try {
     const list = TILAWATI_AUDIO_MAP[jilid];

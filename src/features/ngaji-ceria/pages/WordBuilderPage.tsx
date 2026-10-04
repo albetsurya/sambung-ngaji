@@ -1,56 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
-import { playSoundEffect } from "../utils/audioPlayer";
+import { playAudioUrl, playSoundEffect } from "../utils/audioPlayer";
 import { tapFeedback } from "../../../lib/haptics";
-import { Trophy, Sparkles, Check, X, RefreshCw } from "../../../components/ui/FontAwesomeIcons";
+import { Trophy, Sparkles, Check, X, RefreshCw, Volume2 } from "../../../components/ui/FontAwesomeIcons";
 
 interface WordPuzzle {
   id: number;
   wordArabic: string;
   wordLatin: string;
+  nada: "datar" | "naik" | "turun";
+  audioUrl: string;
   tiles: { id: string; char: string; name: string }[];
 }
 
 const PUZZLE_DATA: WordPuzzle[] = [
   {
     id: 1,
-    wordArabic: "كَتَبَ",
-    wordLatin: "Kataba",
+    wordArabic: "اَ بَ اَ",
+    wordLatin: "a - ba - a",
+    nada: "datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_2_ababa.ogg",
     tiles: [
-      { id: "1-1", char: "كَ", name: "Ka" },
-      { id: "1-2", char: "تَ", name: "Ta" },
-      { id: "1-3", char: "بَ", name: "Ba" },
+      { id: "1-1", char: "اَ", name: "a" },
+      { id: "1-2", char: "بَ", name: "ba" },
+      { id: "1-3", char: "اَ", name: "a" },
     ],
   },
   {
     id: 2,
-    wordArabic: "قَرَأَ",
-    wordLatin: "Qora'a",
+    wordArabic: "اَ بَ بَ",
+    wordLatin: "a - ba - ba",
+    nada: "naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_1_abaaba.ogg",
     tiles: [
-      { id: "2-1", char: "قَ", name: "Qo" },
-      { id: "2-2", char: "رَ", name: "Ro" },
-      { id: "2-3", char: "أَ", name: "A" },
+      { id: "2-1", char: "اَ", name: "a" },
+      { id: "2-2", char: "بَ", name: "ba" },
+      { id: "2-3", char: "بَ", name: "ba" },
     ],
   },
   {
     id: 3,
-    wordArabic: "دَرَسَ",
-    wordLatin: "Darasa",
+    wordArabic: "بَ بَ بَ",
+    wordLatin: "ba - ba - ba",
+    nada: "turun",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris3_2_bababa.ogg",
     tiles: [
-      { id: "3-1", char: "دَ", name: "Da" },
-      { id: "3-2", char: "رَ", name: "Ro" },
-      { id: "3-3", char: "سَ", name: "Sa" },
+      { id: "3-1", char: "بَ", name: "ba" },
+      { id: "3-2", char: "بَ", name: "ba" },
+      { id: "3-3", char: "بَ", name: "ba" },
     ],
   },
   {
     id: 4,
-    wordArabic: "فَتَحَ",
-    wordLatin: "Fataha",
+    wordArabic: "بَ اَ بَ",
+    wordLatin: "ba - a - ba",
+    nada: "naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_2_baaba.ogg",
     tiles: [
-      { id: "4-1", char: "فَ", name: "Fa" },
-      { id: "4-2", char: "تَ", name: "Ta" },
-      { id: "4-3", char: "حَ", name: "Ha" },
+      { id: "4-1", char: "بَ", name: "ba" },
+      { id: "4-2", char: "اَ", name: "a" },
+      { id: "4-3", char: "بَ", name: "ba" },
+    ],
+  },
+  {
+    id: 5,
+    wordArabic: "بَ بَ اَ",
+    wordLatin: "ba - ba - a",
+    nada: "datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_1_babaa.ogg",
+    tiles: [
+      { id: "5-1", char: "بَ", name: "ba" },
+      { id: "5-2", char: "بَ", name: "ba" },
+      { id: "5-3", char: "اَ", name: "a" },
     ],
   },
 ];
@@ -60,6 +82,7 @@ export default function WordBuilderPage() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const puzzle = PUZZLE_DATA[currentIdx];
 
@@ -71,6 +94,21 @@ export default function WordBuilderPage() {
   );
 
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
+
+  const handlePlayAudio = () => {
+    if (isAudioPlaying) return;
+    setIsAudioPlaying(true);
+    tapFeedback();
+    playAudioUrl(puzzle.audioUrl, () => {
+      setIsAudioPlaying(false);
+    });
+  };
+
+  // Auto-play audio on puzzle change
+  useEffect(() => {
+    handlePlayAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIdx]);
 
   const loadPuzzle = (idx: number) => {
     const nextPuzzle = PUZZLE_DATA[idx];
@@ -125,6 +163,31 @@ export default function WordBuilderPage() {
     loadPuzzle(0);
   };
 
+  const renderToneBadge = () => {
+    if (puzzle.nada === "datar") {
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2EFCF] text-[#2D5A27] text-xs font-black tracking-wide border border-[#2D5A27]/20">
+          <span className="w-2 h-2 rounded-full bg-[#2D5A27] animate-pulse" />
+          Rost: Datar
+        </span>
+      );
+    }
+    if (puzzle.nada === "naik") {
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6E6F2] text-[#2B5A7D] text-xs font-black tracking-wide border border-[#2B5A7D]/20">
+          <span className="w-2 h-2 rounded-full bg-[#2B5A7D] animate-pulse" />
+          Rost: Naik
+        </span>
+      );
+    }
+    return (
+      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FCE6DA] text-[#C4430E] text-xs font-black tracking-wide border border-[#C4430E]/20">
+        <span className="w-2 h-2 rounded-full bg-[#C4430E] animate-pulse" />
+        Rost: Turun
+      </span>
+    );
+  };
+
   if (isFinished) {
     return (
       <NgajiCeriaLayout title="Word Builder" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
@@ -169,10 +232,8 @@ export default function WordBuilderPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#E2EFCF] border border-[#BCE3F5]">
-            <span className="text-[11px] font-black text-[#2D5A27]">
-              Lafadz: <span className="underline">{puzzle.wordLatin}</span>
-            </span>
+          <div className="flex items-center gap-2">
+            {renderToneBadge()}
           </div>
 
           <div className="flex items-center gap-2">
@@ -182,13 +243,32 @@ export default function WordBuilderPage() {
         </div>
 
         {/* Word Display & Slot Drop Target */}
-        <div className="bg-white rounded-[28px] p-6 text-center border-2 border-[#E2D4C0] shadow-md space-y-6">
+        <div className="bg-white rounded-[28px] p-6 text-center border-2 border-[#E2D4C0] shadow-md space-y-6 relative">
+          {/* Audio Button */}
+          <button
+            onClick={handlePlayAudio}
+            className={`absolute top-4 right-4 w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+              isAudioPlaying
+                ? "bg-[#F58A3A] text-white scale-110 shadow-lg"
+                : "bg-[#FCE6DA] text-[#F58A3A] hover:bg-[#F58A3A]/20 active:scale-95"
+            }`}
+            title="Dengarkan lafadz"
+          >
+            <Volume2
+              size={20}
+              className={isAudioPlaying ? "animate-pulse" : ""}
+            />
+          </button>
+
           <div>
             <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FFF3E4] text-[#8C4A14] text-[11px] font-black uppercase tracking-wider mb-2">
               <Sparkles size={11} />
-              Susun Huruf Sesuai Urutan
+              Dengarkan & Susun Huruf
             </div>
             <h2 className="font-display font-black text-2xl text-[#5A3A2A]">"{puzzle.wordLatin}"</h2>
+            <p className="text-[11px] text-[#8C7A68] mt-1">
+              Sentuh ikon speaker untuk memutar audio nada Rost
+            </p>
           </div>
 
           {/* Slots (RTL display) */}

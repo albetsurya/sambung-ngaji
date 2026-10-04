@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Volume2,
@@ -8,6 +8,7 @@ import {
   RefreshCw,
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
+import { playAudioUrl, playSoundEffect } from "../utils/audioPlayer";
 
 interface QuizQuestion {
   id: number;
@@ -15,29 +16,105 @@ interface QuizQuestion {
   transliterationParts: string[];
   options: string[];
   hintTone: string;
+  audioUrl: string;
 }
 
 const SAMPLE_QUESTIONS: QuizQuestion[] = [
   {
     id: 1,
-    arabic: "تَ بَ أَ",
-    transliterationParts: ["Ta", "Ba", "A"],
-    options: ["Fa", "Ba", "Tho", "Ta", "Wa", "A", "Zho", "Na"],
+    arabic: "اَ اَ",
+    transliterationParts: ["a", "a"],
+    options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
     hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_1_aa.ogg",
   },
   {
     id: 2,
-    arabic: "بَ تَ ثَ",
-    transliterationParts: ["Ba", "Ta", "Tsa"],
-    options: ["Ta", "Tsa", "Ba", "A", "Kha", "Ra", "Ja", "Da"],
-    hintTone: "Rost: Nada Naik",
+    arabic: "بَ بَ",
+    transliterationParts: ["ba", "ba"],
+    options: ["ba", "ba", "a", "a", "ta", "tsa", "ja", "ha"],
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_2_baba.ogg",
   },
   {
     id: 3,
-    arabic: "جَ حَ خَ",
-    transliterationParts: ["Ja", "Ha", "Kho"],
-    options: ["Kho", "Ha", "Ja", "Za", "Ro", "Da", "Sa", "Sya"],
+    arabic: "اَ بَ",
+    transliterationParts: ["a", "ba"],
+    options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris1_3_aba.ogg",
+  },
+  {
+    id: 4,
+    arabic: "بَ اَ",
+    transliterationParts: ["ba", "a"],
+    options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
+    hintTone: "Rost: Nada Naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_1_baa.ogg",
+  },
+  {
+    id: 5,
+    arabic: "اَ بَ",
+    transliterationParts: ["a", "ba"],
+    options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
+    hintTone: "Rost: Nada Naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_2_aba.ogg",
+  },
+  {
+    id: 6,
+    arabic: "بَ اَ",
+    transliterationParts: ["ba", "a"],
+    options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
+    hintTone: "Rost: Nada Naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris2_3_baa.ogg",
+  },
+  {
+    id: 7,
+    arabic: "اَ اَ اَ",
+    transliterationParts: ["a", "a", "a"],
+    options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
     hintTone: "Rost: Nada Turun",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris3_1_aaa.ogg",
+  },
+  {
+    id: 8,
+    arabic: "بَ بَ بَ",
+    transliterationParts: ["ba", "ba", "ba"],
+    options: ["ba", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
+    hintTone: "Rost: Nada Turun",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris3_2_bababa.ogg",
+  },
+  {
+    id: 9,
+    arabic: "بَ بَ اَ",
+    transliterationParts: ["ba", "ba", "a"],
+    options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_1_babaa.ogg",
+  },
+  {
+    id: 10,
+    arabic: "اَ بَ اَ",
+    transliterationParts: ["a", "ba", "a"],
+    options: ["a", "ba", "a", "ba", "ba", "ta", "tsa", "ha"],
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris4_2_ababa.ogg",
+  },
+  {
+    id: 11,
+    arabic: "اَ بَ بَ",
+    transliterationParts: ["a", "ba", "ba"],
+    options: ["a", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
+    hintTone: "Rost: Nada Naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_1_abaaba.ogg",
+  },
+  {
+    id: 12,
+    arabic: "بَ اَ بَ",
+    transliterationParts: ["ba", "a", "ba"],
+    options: ["ba", "a", "ba", "ba", "a", "ta", "tsa", "ha"],
+    hintTone: "Rost: Nada Naik",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/baris5_2_baaba.ogg",
   },
 ];
 
@@ -49,9 +126,15 @@ export default function NgajiCeriaQuizPage() {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const question = SAMPLE_QUESTIONS[currentIdx];
-  const totalQuestions = 14;
-  const currentStep = currentIdx + 4;
+  const totalQuestions = SAMPLE_QUESTIONS.length;
+  const currentStep = currentIdx + 1;
   const progressPercent = Math.round((currentStep / totalQuestions) * 100);
+
+  // Auto-play audio when question changes
+  useEffect(() => {
+    handlePlayAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIdx]);
 
   const handlePickToken = (token: string) => {
     if (status !== "idle") return;
@@ -75,8 +158,10 @@ export default function NgajiCeriaQuizPage() {
 
     if (isCorrect) {
       setStatus("correct");
+      playSoundEffect("correct");
     } else {
       setStatus("wrong");
+      playSoundEffect("wrong");
     }
   };
 
@@ -92,11 +177,37 @@ export default function NgajiCeriaQuizPage() {
   };
 
   const handlePlayAudio = () => {
+    if (isAudioPlaying) return;
     setIsAudioPlaying(true);
     tapFeedback();
-    setTimeout(() => {
+    playAudioUrl(question.audioUrl, () => {
       setIsAudioPlaying(false);
-    }, 1200);
+    });
+  };
+
+  const renderToneBadge = () => {
+    if (question.hintTone.includes("Datar")) {
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2EFCF] text-[#2D5A27] text-xs font-black tracking-wide border border-[#2D5A27]/20">
+          <span className="w-2 h-2 rounded-full bg-[#2D5A27] animate-pulse" />
+          Rost: Datar
+        </span>
+      );
+    }
+    if (question.hintTone.includes("Naik")) {
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D6E6F2] text-[#2B5A7D] text-xs font-black tracking-wide border border-[#2B5A7D]/20">
+          <span className="w-2 h-2 rounded-full bg-[#2B5A7D] animate-pulse" />
+          Rost: Naik
+        </span>
+      );
+    }
+    return (
+      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FCE6DA] text-[#C4430E] text-xs font-black tracking-wide border border-[#C4430E]/20">
+        <span className="w-2 h-2 rounded-full bg-[#C4430E] animate-pulse" />
+        Rost: Turun
+      </span>
+    );
   };
 
   return (
@@ -143,9 +254,7 @@ export default function NgajiCeriaQuizPage() {
             <span className="px-3 py-1 rounded-full bg-[#FCE6DA] text-[#F58A3A] text-xs font-black tracking-wide uppercase border border-[#F58A3A]/20">
               Tebak Bacaan
             </span>
-            <span className="text-xs font-bold text-[#8C7A68]">
-              {question.hintTone}
-            </span>
+            {renderToneBadge()}
           </div>
           <button
             onClick={() => setSelectedTokens([])}
