@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
-import { TILAWATI_JILID_1_PAGES } from "../data/tilawatiQuizData";
+import { TILAWATI_JILID_1_PAGES, TILAWATI_JILID_2_PAGES } from "../data/tilawatiQuizData";
 import { getFallbackAudioUrl } from "../utils/audioFallback";
 import { Play, Pause, ChevronLeft, ChevronRight, Volume2 } from "../../../components/ui/FontAwesomeIcons";
 
@@ -12,8 +12,8 @@ export default function CekAudioManualPage() {
   // Check if current page is kelipatan 6 (Latihan-latihan bacaan)
   const isKelipatanEnam = hal % 6 === 0;
 
-  // For Jilid 1, we have rich dataset per line
-  const pageData = jilid === 1 ? TILAWATI_JILID_1_PAGES[hal] : null;
+  // Page dataset based on active jilid
+  const pageData = jilid === 1 ? TILAWATI_JILID_1_PAGES[hal] : jilid === 2 ? TILAWATI_JILID_2_PAGES[hal] : null;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function CekAudioManualPage() {
         {/* Content List */}
         {pageData ? (
           <div className="space-y-3 pb-24">
-            {pageData.questions.filter((_, idx) => !(isKelipatanEnam && idx === 0)).map((q, idx) => (
+            {pageData.questions.filter((_: any, idx: number) => !(isKelipatanEnam && idx === 0)).map((q: any, idx: number) => (
               <div 
                 key={q.id} 
                 className={`flex flex-col bg-white rounded-[20px] p-4 border-2 shadow-sm transition-colors ${

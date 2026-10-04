@@ -2709,3 +2709,4531 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
         options: ["'alama", 'wahakama', "ro'afa", 'warohama', 'ghofaro', 'wasyakaro', 'syahada', 'wamajada'],
         hintTone: "Rost: Nada Datar",
         audioUrl: "/audio/tilawati/jilid_1/hal44/h44_b7_bottom.ogg"}]}};
+
+
+export const TILAWATI_JILID_2_PAGES: Record<number, any> = {
+  1: {
+    pageNumber: 1,
+    title: "Jilid 2 Halaman 1",
+    questions: [
+      {
+        id: "j2_h1_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h1_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h1_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h1_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal1/h1_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  2: {
+    pageNumber: 2,
+    title: "Jilid 2 Halaman 2",
+    questions: [
+      {
+        id: "j2_h2_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h2_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h2_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h2_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal2/h2_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  3: {
+    pageNumber: 3,
+    title: "Jilid 2 Halaman 3",
+    questions: [
+      {
+        id: "j2_h3_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h3_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h3_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h3_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal3/h3_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  4: {
+    pageNumber: 4,
+    title: "Jilid 2 Halaman 4",
+    questions: [
+      {
+        id: "j2_h4_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h4_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h4_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h4_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal4/h4_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  5: {
+    pageNumber: 5,
+    title: "Jilid 2 Halaman 5",
+    questions: [
+      {
+        id: "j2_h5_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h5_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h5_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h5_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal5/h5_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  6: {
+    pageNumber: 6,
+    title: "Jilid 2 Halaman 6",
+    questions: [
+      {
+        id: "j2_h6_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h6_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal6/h6_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  7: {
+    pageNumber: 7,
+    title: "Jilid 2 Halaman 7",
+    questions: [
+      {
+        id: "j2_h7_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h7_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h7_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h7_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal7/h7_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  8: {
+    pageNumber: 8,
+    title: "Jilid 2 Halaman 8",
+    questions: [
+      {
+        id: "j2_h8_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h8_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h8_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h8_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal8/h8_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  9: {
+    pageNumber: 9,
+    title: "Jilid 2 Halaman 9",
+    questions: [
+      {
+        id: "j2_h9_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h9_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h9_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h9_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal9/h9_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  10: {
+    pageNumber: 10,
+    title: "Jilid 2 Halaman 10",
+    questions: [
+      {
+        id: "j2_h10_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h10_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h10_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h10_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal10/h10_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  11: {
+    pageNumber: 11,
+    title: "Jilid 2 Halaman 11",
+    questions: [
+      {
+        id: "j2_h11_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h11_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h11_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h11_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal11/h11_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  12: {
+    pageNumber: 12,
+    title: "Jilid 2 Halaman 12",
+    questions: [
+      {
+        id: "j2_h12_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h12_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal12/h12_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  13: {
+    pageNumber: 13,
+    title: "Jilid 2 Halaman 13",
+    questions: [
+      {
+        id: "j2_h13_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h13_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h13_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h13_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal13/h13_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  14: {
+    pageNumber: 14,
+    title: "Jilid 2 Halaman 14",
+    questions: [
+      {
+        id: "j2_h14_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h14_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h14_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h14_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal14/h14_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  15: {
+    pageNumber: 15,
+    title: "Jilid 2 Halaman 15",
+    questions: [
+      {
+        id: "j2_h15_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h15_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h15_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h15_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal15/h15_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  16: {
+    pageNumber: 16,
+    title: "Jilid 2 Halaman 16",
+    questions: [
+      {
+        id: "j2_h16_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h16_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h16_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h16_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal16/h16_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  17: {
+    pageNumber: 17,
+    title: "Jilid 2 Halaman 17",
+    questions: [
+      {
+        id: "j2_h17_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h17_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h17_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h17_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal17/h17_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  18: {
+    pageNumber: 18,
+    title: "Jilid 2 Halaman 18",
+    questions: [
+      {
+        id: "j2_h18_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h18_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal18/h18_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  19: {
+    pageNumber: 19,
+    title: "Jilid 2 Halaman 19",
+    questions: [
+      {
+        id: "j2_h19_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h19_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h19_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h19_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal19/h19_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  20: {
+    pageNumber: 20,
+    title: "Jilid 2 Halaman 20",
+    questions: [
+      {
+        id: "j2_h20_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h20_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h20_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h20_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal20/h20_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  21: {
+    pageNumber: 21,
+    title: "Jilid 2 Halaman 21",
+    questions: [
+      {
+        id: "j2_h21_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h21_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h21_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h21_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal21/h21_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  22: {
+    pageNumber: 22,
+    title: "Jilid 2 Halaman 22",
+    questions: [
+      {
+        id: "j2_h22_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h22_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h22_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h22_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal22/h22_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  23: {
+    pageNumber: 23,
+    title: "Jilid 2 Halaman 23",
+    questions: [
+      {
+        id: "j2_h23_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h23_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h23_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h23_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal23/h23_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  24: {
+    pageNumber: 24,
+    title: "Jilid 2 Halaman 24",
+    questions: [
+      {
+        id: "j2_h24_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h24_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal24/h24_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  25: {
+    pageNumber: 25,
+    title: "Jilid 2 Halaman 25",
+    questions: [
+      {
+        id: "j2_h25_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h25_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h25_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h25_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal25/h25_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  26: {
+    pageNumber: 26,
+    title: "Jilid 2 Halaman 26",
+    questions: [
+      {
+        id: "j2_h26_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h26_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h26_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h26_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal26/h26_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  27: {
+    pageNumber: 27,
+    title: "Jilid 2 Halaman 27",
+    questions: [
+      {
+        id: "j2_h27_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h27_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h27_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h27_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal27/h27_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  28: {
+    pageNumber: 28,
+    title: "Jilid 2 Halaman 28",
+    questions: [
+      {
+        id: "j2_h28_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h28_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h28_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h28_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal28/h28_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  29: {
+    pageNumber: 29,
+    title: "Jilid 2 Halaman 29",
+    questions: [
+      {
+        id: "j2_h29_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h29_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h29_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h29_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal29/h29_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  30: {
+    pageNumber: 30,
+    title: "Jilid 2 Halaman 30",
+    questions: [
+      {
+        id: "j2_h30_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h30_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal30/h30_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  31: {
+    pageNumber: 31,
+    title: "Jilid 2 Halaman 31",
+    questions: [
+      {
+        id: "j2_h31_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h31_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h31_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h31_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal31/h31_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  32: {
+    pageNumber: 32,
+    title: "Jilid 2 Halaman 32",
+    questions: [
+      {
+        id: "j2_h32_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h32_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h32_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h32_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal32/h32_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  33: {
+    pageNumber: 33,
+    title: "Jilid 2 Halaman 33",
+    questions: [
+      {
+        id: "j2_h33_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h33_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h33_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h33_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal33/h33_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  34: {
+    pageNumber: 34,
+    title: "Jilid 2 Halaman 34",
+    questions: [
+      {
+        id: "j2_h34_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h34_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h34_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h34_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal34/h34_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  35: {
+    pageNumber: 35,
+    title: "Jilid 2 Halaman 35",
+    questions: [
+      {
+        id: "j2_h35_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h35_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h35_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h35_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal35/h35_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  36: {
+    pageNumber: 36,
+    title: "Jilid 2 Halaman 36",
+    questions: [
+      {
+        id: "j2_h36_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h36_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal36/h36_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  37: {
+    pageNumber: 37,
+    title: "Jilid 2 Halaman 37",
+    questions: [
+      {
+        id: "j2_h37_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h37_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h37_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h37_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal37/h37_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  38: {
+    pageNumber: 38,
+    title: "Jilid 2 Halaman 38",
+    questions: [
+      {
+        id: "j2_h38_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h38_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h38_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h38_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal38/h38_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  39: {
+    pageNumber: 39,
+    title: "Jilid 2 Halaman 39",
+    questions: [
+      {
+        id: "j2_h39_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h39_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h39_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h39_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal39/h39_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  40: {
+    pageNumber: 40,
+    title: "Jilid 2 Halaman 40",
+    questions: [
+      {
+        id: "j2_h40_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h40_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h40_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h40_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal40/h40_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  41: {
+    pageNumber: 41,
+    title: "Jilid 2 Halaman 41",
+    questions: [
+      {
+        id: "j2_h41_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h41_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h41_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h41_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal41/h41_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  42: {
+    pageNumber: 42,
+    title: "Jilid 2 Halaman 42",
+    questions: [
+      {
+        id: "j2_h42_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h42_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal42/h42_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  43: {
+    pageNumber: 43,
+    title: "Jilid 2 Halaman 43",
+    questions: [
+      {
+        id: "j2_h43_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h43_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h43_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h43_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal43/h43_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+  44: {
+    pageNumber: 44,
+    title: "Jilid 2 Halaman 44",
+    questions: [
+      {
+        id: "j2_h44_q0_3x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b0_header_3x.ogg",
+        arabic: "سَلَمَ - سَلِمَ",
+        transliterationParts: ["Salama", "Salima"],
+        options: ["Salama - Salima", "Salima - Salama"],
+        correctOptionIndex: 0,
+        hintTone: "Judul 3x Rost (Datar-Naik-Turun)"
+      },
+      {
+        id: "j2_h44_q0_1x",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b0_header_1x.ogg",
+        arabic: "سَلِمَ",
+        transliterationParts: ["Salima"],
+        options: ["Salima", "Salama"],
+        correctOptionIndex: 0,
+        hintTone: "1x Evaluasi"
+      },
+      {
+        id: "j2_h44_q1",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b1_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q2",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b2_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q3",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b3_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q4",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b4_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q5",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b5_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q6",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b6_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q7",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b7_line.ogg",
+        arabic: "عَلِمَ - سَلِمَ - رَسِدَ",
+        transliterationParts: ["'Alima", "Salima", "Rasida"],
+        options: ["'Alima - Salima - Rasida", "Salima - 'Alima - Rasida"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      },
+      {
+        id: "j2_h44_q_bottom",
+        type: "audio-choice",
+        audioUrl: "/audio/tilawati/jilid_2/hal44/h44_b7_line.ogg",
+        arabic: "Latihan-latihan bacaan",
+        transliterationParts: ["Latihan bacaan"],
+        options: ["Latihan bacaan"],
+        correctOptionIndex: 0,
+        hintTone: "1x"
+      }
+    ]
+  },
+};
