@@ -18,17 +18,27 @@ interface QuizQuestion {
   hintTone: string;
   audioUrl: string;
   isOpening?: boolean;
+  isListenOnly?: boolean;
 }
 
 const SAMPLE_QUESTIONS: QuizQuestion[] = [
+  {
+    id: 0,
+    arabic: "اَ بَ",
+    transliterationParts: ["a", "ba"],
+    options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
+    hintTone: "Rost: Datar — Naik — Turun (3x)",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x_v2.ogg",
+    isOpening: true,
+    isListenOnly: true,
+  },
   {
     id: 1,
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "ta", "tsa", "ja", "ha", "da", "ro"],
-    hintTone: "Rost: Datar (3x)",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba_3x_v2.ogg",
-    isOpening: true,
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba.ogg",
   },
   {
     id: 2,
@@ -331,7 +341,7 @@ export default function NgajiCeriaQuizPage() {
           </div>
 
           <h2 className="text-xl font-black text-[#5A3A2A] mb-4 text-center">
-            {question.isOpening ? "Judul Halaman (Dibaca 3x)" : "Bisa Kamu Baca?"}
+            {question.isListenOnly ? "Dengarkan Contoh Judul (3x)" : "Bisa Kamu Baca?"}
           </h2>
 
           {/* Big Arabic Display Card */}
@@ -359,57 +369,69 @@ export default function NgajiCeriaQuizPage() {
             </p>
 
             <p className="text-[11px] text-[#8C7A68] mt-1">
-              Sentuh audio untuk mendengarkan lafadz
+              {question.isListenOnly
+                ? "Disimak dulu irama Datar — Naik — Turun"
+                : "Sentuh audio untuk mendengarkan lafadz"}
             </p>
           </div>
 
-          {/* Answer Construction Slots */}
-          <div className="w-full min-h-[64px] border-b-2 border-[#E2D4C0] pb-3 flex items-center justify-center gap-2.5 flex-wrap mb-8">
-            {selectedTokens.length === 0 ? (
-              <span className="text-sm font-medium text-[#8C7A68] italic">
-                Pilih bacaan di bawah secara berurutan...
-              </span>
-            ) : (
-              selectedTokens.map((token, idx) => (
-                <button
-                  key={`${token}-${idx}`}
-                  onClick={() => handleRemoveToken(idx)}
-                  className="px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
-                >
-                  {token}
-                </button>
-              ))
-            )}
-          </div>
-
-          {/* Options Word Bank */}
-          <div className="w-full flex-1 flex flex-col justify-center">
-            <p className="text-xs font-black text-[#8C7A68] mb-3 text-center">
-              Pilihan Bacaan:
-            </p>
-            <div className="grid grid-cols-4 gap-2.5 w-full">
-              {question.options.map((opt, idx) => {
-                const isUsed =
-                  selectedTokens.filter((t) => t === opt).length >=
-                  question.options.filter((t) => t === opt).length;
-
-                return (
-                  <button
-                    key={`${opt}-${idx}`}
-                    disabled={isUsed || status !== "idle"}
-                    onClick={() => handlePickToken(opt)}
-                    className={`h-14 rounded-2xl font-black text-base border-b-4 transition-all duration-150 flex items-center justify-center ${
-                      isUsed
-                        ? "bg-[#E2D4C0]/50 text-[#8C7A68]/40 border-transparent cursor-not-allowed"
-                        : "bg-white text-[#5A3A2A] border-[#E2D4C0] hover:border-[#F58A3A] active:translate-y-1 active:border-b-0 shadow-sm"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
+          {question.isListenOnly ? (
+            <div className="w-full flex-1 flex flex-col items-center justify-center py-6 text-center space-y-3">
+              <div className="px-4 py-3 rounded-2xl bg-[#FFF6D5] border border-[#FFCB45]/40 text-[#5A3A2A] text-sm font-semibold max-w-xs">
+                Judul halaman dibaca 3 kali sebagai contoh irama Rost (Datar, Naik, Turun).
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Answer Construction Slots */}
+              <div className="w-full min-h-[64px] border-b-2 border-[#E2D4C0] pb-3 flex items-center justify-center gap-2.5 flex-wrap mb-8">
+                {selectedTokens.length === 0 ? (
+                  <span className="text-sm font-medium text-[#8C7A68] italic">
+                    Pilih bacaan di bawah secara berurutan...
+                  </span>
+                ) : (
+                  selectedTokens.map((token, idx) => (
+                    <button
+                      key={`${token}-${idx}`}
+                      onClick={() => handleRemoveToken(idx)}
+                      className="px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
+                    >
+                      {token}
+                    </button>
+                  ))
+                )}
+              </div>
+
+              {/* Options Word Bank */}
+              <div className="w-full flex-1 flex flex-col justify-center">
+                <p className="text-xs font-black text-[#8C7A68] mb-3 text-center">
+                  Pilihan Bacaan:
+                </p>
+                <div className="grid grid-cols-4 gap-2.5 w-full">
+                  {question.options.map((opt, idx) => {
+                    const isUsed =
+                      selectedTokens.filter((t) => t === opt).length >=
+                      question.options.filter((t) => t === opt).length;
+
+                    return (
+                      <button
+                        key={`${opt}-${idx}`}
+                        disabled={isUsed || status !== "idle"}
+                        onClick={() => handlePickToken(opt)}
+                        className={`h-14 rounded-2xl font-black text-base border-b-4 transition-all duration-150 flex items-center justify-center ${
+                          isUsed
+                            ? "bg-[#E2D4C0]/50 text-[#8C7A68]/40 border-transparent cursor-not-allowed"
+                            : "bg-white text-[#5A3A2A] border-[#E2D4C0] hover:border-[#F58A3A] active:translate-y-1 active:border-b-0 shadow-sm"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </main>
       )}
 
@@ -458,17 +480,26 @@ export default function NgajiCeriaQuizPage() {
             )}
 
             {status === "idle" ? (
-              <button
-                disabled={selectedTokens.length === 0}
-                onClick={handleCheckAnswer}
-                className={`w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all shadow-lg ${
-                  selectedTokens.length > 0
-                    ? "bg-[#F58A3A] hover:bg-[#E2561A] text-white shadow-[#F58A3A]/30 active:scale-[0.98] border-b-4 border-[#C4430E]"
-                    : "bg-[#E2D4C0] text-[#8C7A68] cursor-not-allowed border-b-4 border-transparent"
-                }`}
-              >
-                Periksa Jawaban
-              </button>
+              question.isListenOnly ? (
+                <button
+                  onClick={handleNext}
+                  className="w-full py-4 rounded-2xl font-black text-base text-white tracking-wide transition-all shadow-lg active:scale-[0.98] border-b-4 bg-[#F58A3A] hover:bg-[#E2561A] border-[#C4430E]"
+                >
+                  Mulai Latihan →
+                </button>
+              ) : (
+                <button
+                  disabled={selectedTokens.length === 0}
+                  onClick={handleCheckAnswer}
+                  className={`w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all shadow-lg ${
+                    selectedTokens.length > 0
+                      ? "bg-[#F58A3A] hover:bg-[#E2561A] text-white shadow-[#F58A3A]/30 active:scale-[0.98] border-b-4 border-[#C4430E]"
+                      : "bg-[#E2D4C0] text-[#8C7A68] cursor-not-allowed border-b-4 border-transparent"
+                  }`}
+                >
+                  Periksa Jawaban
+                </button>
+              )
             ) : (
               <button
                 onClick={status === "correct" ? handleNext : handleRetry}
