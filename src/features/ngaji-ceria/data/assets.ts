@@ -1,5 +1,5 @@
 // Assets import for Ngaji Ceria using 200+ new SVG asset suite
-import * as NEW from "../../../assets/ngaji-ceria-new/ngaji-ceria-tilawati/index";
+import * as NEW from "../../../assets/ngaji-ceria-new/index";
 
 export const NGAJI_CERIA_ASSETS = {
   // HUD Elements
@@ -62,7 +62,8 @@ export const NGAJI_CERIA_ASSETS = {
   qirraPop: NEW.qirraPop,
   qirraMatch: NEW.qirraMatch,
   tebakSurahBaru: NEW.tebakSurahBaru,
-  tangkapHarakat: NEW.balonBintang,
+  tangkapHarakat: NEW.coverTangkapHarakat,
+  susunKata: NEW.coverSusunKata,
   balonMerah: NEW.balonMerah,
   balonBiru: NEW.balonBiru,
   balonKuning: NEW.balonKuning,

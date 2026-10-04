@@ -122,7 +122,7 @@ export default function NgajiCeriaGamesPage() {
         <MiniGameCard
           title="Susun Kata"
           description="Susun kepingan huruf hijaiyah sesuai dengan urutan lafadz."
-          cover={NGAJI_CERIA_ASSETS.kartuAcak}
+          cover={NGAJI_CERIA_ASSETS.susunKata}
           best={420}
           theme={GAME_THEMES.peach}
           onClick={() => navigate("/member/ngaji-ceria/games/susun-kata")}
