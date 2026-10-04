@@ -86,9 +86,24 @@ const PUZZLE_DATA: WordPuzzle[] = [
       { id: "6-3", char: "اَ", name: "a" },
     ],
   },
+  {
+    id: 7,
+    wordArabic: "ا ب ا ب ا ب",
+    wordLatin: "alif - ba - alif - ba - alif - ba",
+    nada: "datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b6_bottom_alif_ba.ogg",
+    tiles: [
+      { id: "7-1", char: "ا", name: "alif" },
+      { id: "7-2", char: "ب", name: "ba" },
+      { id: "7-3", char: "ا", name: "alif" },
+      { id: "7-4", char: "ب", name: "ba" },
+      { id: "7-5", char: "ا", name: "alif" },
+      { id: "7-6", char: "ب", name: "ba" },
+    ],
+  },
 ];
 
-export default function WordBuilderPage() {
+export default function SusunKataGamePage() {
   const navigate = useNavigate();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore] = useState(0);
@@ -201,7 +216,7 @@ export default function WordBuilderPage() {
 
   if (isFinished) {
     return (
-      <NgajiCeriaLayout title="Word Builder" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+      <NgajiCeriaLayout title="Susun Kata" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
         <div className="px-4 py-10 flex flex-col items-center">
           <div className="bg-white rounded-[28px] p-8 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 max-w-sm w-full">
             <div className="w-16 h-16 rounded-full bg-[#FFCB45] border-2 border-[#B8590C]/20 mx-auto flex items-center justify-center">
@@ -232,7 +247,7 @@ export default function WordBuilderPage() {
   }
 
   return (
-    <NgajiCeriaLayout title="Word Builder" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+    <NgajiCeriaLayout title="Susun Kata" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
       <div className="px-4 py-4 space-y-4 bg-[#FFF8EE] min-h-[calc(100vh-70px)] flex flex-col justify-between">
         {/* Top Game Bar */}
         <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">

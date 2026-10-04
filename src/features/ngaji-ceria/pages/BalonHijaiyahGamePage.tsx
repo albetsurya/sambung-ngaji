@@ -23,7 +23,7 @@ const BALLOON_COLORS = [
   NGAJI_CERIA_ASSETS.balonHijau,
 ];
 
-export default function HijaiyahBurstPage() {
+export default function BalonHijaiyahGamePage() {
   const navigate = useNavigate();
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -115,7 +115,7 @@ export default function HijaiyahBurstPage() {
   };
 
   return (
-    <NgajiCeriaLayout title="Hijaiyah Burst" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+    <NgajiCeriaLayout title="Balon Hijaiyah" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
       <div className="px-4 py-4 space-y-4 bg-[#FFF8EE] min-h-full rounded-t-3xl flex flex-col justify-between">
         {/* Top Game Bar */}
         <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">

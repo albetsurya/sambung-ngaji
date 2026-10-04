@@ -186,20 +186,20 @@ const NgajiCeriaQuizListPage = lazy(
 const NgajiCeriaGamesPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
 );
-const HijaiyahBurstPage = lazy(
-  () => import("./features/ngaji-ceria/pages/HijaiyahBurstPage"),
+const BalonHijaiyahGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
 );
-const HijaiyahMatchPage = lazy(
-  () => import("./features/ngaji-ceria/pages/HijaiyahMatchPage"),
+const PasangHurufGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/PasangHurufGamePage"),
 );
-const VerseQuestPage = lazy(
-  () => import("./features/ngaji-ceria/pages/VerseQuestPage"),
+const TebakAyatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
 );
-const HarakatRushPage = lazy(
-  () => import("./features/ngaji-ceria/pages/HarakatRushPage"),
+const TangkapHarakatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TangkapHarakatGamePage"),
 );
-const WordBuilderPage = lazy(
-  () => import("./features/ngaji-ceria/pages/WordBuilderPage"),
+const SusunKataGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/SusunKataGamePage"),
 );
 function PageFallback() {
   return (
@@ -333,7 +333,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/balon-hijaiyah"
           element={
             <MemberRoute allowGuest>
-              <HijaiyahBurstPage />
+              <BalonHijaiyahGamePage />
             </MemberRoute>
           }
         />
@@ -341,7 +341,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/hijaiyah-burst"
           element={
             <MemberRoute allowGuest>
-              <HijaiyahBurstPage />
+              <BalonHijaiyahGamePage />
             </MemberRoute>
           }
         />
@@ -349,7 +349,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/pasang-huruf"
           element={
             <MemberRoute allowGuest>
-              <HijaiyahMatchPage />
+              <PasangHurufGamePage />
             </MemberRoute>
           }
         />
@@ -357,7 +357,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/hijaiyah-match"
           element={
             <MemberRoute allowGuest>
-              <HijaiyahMatchPage />
+              <PasangHurufGamePage />
             </MemberRoute>
           }
         />
@@ -365,7 +365,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/tebak-ayat"
           element={
             <MemberRoute allowGuest>
-              <VerseQuestPage />
+              <TebakAyatGamePage />
             </MemberRoute>
           }
         />
@@ -373,7 +373,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/verse-quest"
           element={
             <MemberRoute allowGuest>
-              <VerseQuestPage />
+              <TebakAyatGamePage />
             </MemberRoute>
           }
         />
@@ -381,7 +381,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/tangkap-harakat"
           element={
             <MemberRoute allowGuest>
-              <HarakatRushPage />
+              <TangkapHarakatGamePage />
             </MemberRoute>
           }
         />
@@ -389,7 +389,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/harakat-rush"
           element={
             <MemberRoute allowGuest>
-              <HarakatRushPage />
+              <TangkapHarakatGamePage />
             </MemberRoute>
           }
         />
@@ -397,7 +397,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/susun-kata"
           element={
             <MemberRoute allowGuest>
-              <WordBuilderPage />
+              <SusunKataGamePage />
             </MemberRoute>
           }
         />
@@ -405,7 +405,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/word-builder"
           element={
             <MemberRoute allowGuest>
-              <WordBuilderPage />
+              <SusunKataGamePage />
             </MemberRoute>
           }
         />

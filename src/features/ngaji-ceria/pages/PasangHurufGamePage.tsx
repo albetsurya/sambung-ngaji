@@ -18,7 +18,7 @@ interface MatchTile {
   isMatched: boolean;
 }
 
-export default function HijaiyahMatchPage() {
+export default function PasangHurufGamePage() {
   const navigate = useNavigate();
   const [tiles, setTiles] = useState<MatchTile[]>([]);
   const [firstIdx, setFirstIdx] = useState<number | null>(null);
@@ -115,7 +115,7 @@ export default function HijaiyahMatchPage() {
   };
 
   return (
-    <NgajiCeriaLayout title="Hijaiyah Match" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+    <NgajiCeriaLayout title="Pasang Huruf" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
       <div className="px-4 py-4 space-y-4 bg-[#FFF8EE] min-h-full rounded-t-3xl">
         {/* Score Bar */}
         <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">
@@ -141,7 +141,7 @@ export default function HijaiyahMatchPage() {
               <img src={NGAJI_CERIA_ASSETS.kartuMatchCocok} alt="Pasang Huruf" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h3 className="font-display font-black text-xl text-[#5A3A2A]">Hijaiyah Match</h3>
+              <h3 className="font-display font-black text-xl text-[#5A3A2A]">Pasang Huruf</h3>
               <p className="text-xs text-[#8C7A68] mt-1 leading-relaxed max-w-xs mx-auto">
                 Buka kartu satu per satu dan temukan pasangan kartu Hijaiyah Arab dan nama Latinnya yang cocok.
               </p>

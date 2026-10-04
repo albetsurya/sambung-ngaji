@@ -84,48 +84,48 @@ export default function NgajiCeriaGamesPage() {
         </p>
 
         <MiniGameCard
-          title="Hijaiyah Burst"
+          title="Balon Hijaiyah"
           description="Pecahkan balon huruf yang benar sebelum waktu habis."
           cover={NGAJI_CERIA_ASSETS.qirraPop}
           best={1200}
           theme={GAME_THEMES.blue}
-          onClick={() => navigate("/member/ngaji-ceria/games/hijaiyah-burst")}
+          onClick={() => navigate("/member/ngaji-ceria/games/balon-hijaiyah")}
         />
 
         <MiniGameCard
-          title="Hijaiyah Match"
+          title="Pasang Huruf"
           description="Cocokkan pasangan kartu huruf hijaiyah Arab dan Latin yang sama."
           cover={NGAJI_CERIA_ASSETS.qirraMatch}
           best={850}
           theme={GAME_THEMES.peach}
-          onClick={() => navigate("/member/ngaji-ceria/games/hijaiyah-match")}
+          onClick={() => navigate("/member/ngaji-ceria/games/pasang-huruf")}
         />
 
         <MiniGameCard
-          title="Verse Quest"
+          title="Tebak Ayat"
           description="Tebak nama surah dari potongan ayat Juz Amma beserta artinya."
           cover={NGAJI_CERIA_ASSETS.tebakSurahBaru}
           best={640}
           theme={GAME_THEMES.lavender}
-          onClick={() => navigate("/member/ngaji-ceria/games/verse-quest")}
+          onClick={() => navigate("/member/ngaji-ceria/games/tebak-ayat")}
         />
 
         <MiniGameCard
-          title="Harakat Rush"
+          title="Tangkap Harakat"
           description="Gerakkan huruf untuk menangkap harakat yang diminta!"
           cover={NGAJI_CERIA_ASSETS.tangkapHarakat}
           best={500}
           theme={GAME_THEMES.blue}
-          onClick={() => navigate("/member/ngaji-ceria/games/harakat-rush")}
+          onClick={() => navigate("/member/ngaji-ceria/games/tangkap-harakat")}
         />
 
         <MiniGameCard
-          title="Word Builder"
+          title="Susun Kata"
           description="Susun kepingan huruf hijaiyah sesuai dengan urutan lafadz."
           cover={NGAJI_CERIA_ASSETS.susunKata}
           best={420}
           theme={GAME_THEMES.peach}
-          onClick={() => navigate("/member/ngaji-ceria/games/word-builder")}
+          onClick={() => navigate("/member/ngaji-ceria/games/susun-kata")}
         />
       </div>
     </NgajiCeriaLayout>

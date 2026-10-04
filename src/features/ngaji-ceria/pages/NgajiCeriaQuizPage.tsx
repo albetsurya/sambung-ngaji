@@ -124,6 +124,14 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     hintTone: "Rost: Nada Turun",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_2_ba_a_ba.ogg",
   },
+  {
+    id: 14,
+    arabic: "ا ب ا ب ا ب",
+    transliterationParts: ["alif", "ba", "alif", "ba", "alif", "ba"],
+    options: ["alif", "ba", "alif", "ba", "alif", "ba", "ta", "tsa"],
+    hintTone: "Rost: Nada Datar",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b6_bottom_alif_ba.ogg",
+  },
 ];
 
 export default function NgajiCeriaQuizPage() {

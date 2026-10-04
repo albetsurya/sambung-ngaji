@@ -37,7 +37,7 @@ interface FallingHarakat {
   yPercent: number; // 0 to 100
 }
 
-export default function HarakatRushPage() {
+export default function TangkapHarakatGamePage() {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -154,7 +154,7 @@ export default function HarakatRushPage() {
   };
 
   return (
-    <NgajiCeriaLayout title="Harakat Rush" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+    <NgajiCeriaLayout title="Tangkap Harakat" hideNav showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
       <div className="px-4 py-3 bg-[#FFF8EE] h-[calc(100vh-70px)] flex flex-col justify-between overflow-hidden">
         {/* Top Game Bar */}
         <div className="flex items-center justify-between bg-white p-3 rounded-2xl border-2 border-[#E2D4C0] shadow-sm shrink-0 mb-3">
@@ -181,7 +181,7 @@ export default function HarakatRushPage() {
               <span className="font-arabic text-5xl font-black text-[#1C5D79]">بَ</span>
             </div>
             <div>
-              <h3 className="font-display font-black text-xl text-[#5A3A2A]">Harakat Rush</h3>
+              <h3 className="font-display font-black text-xl text-[#5A3A2A]">Tangkap Harakat</h3>
               <p className="text-xs text-[#8C7A68] mt-1 leading-relaxed max-w-xs mx-auto">
                 Geser huruf di bawah ke 3 jalur (Kiri, Tengah, Kanan) untuk menangkap harakat yang diminta sebelum waktu habis!
               </p>

@@ -5,7 +5,7 @@ import { JUZ_AMMA_QUIZ_DATA } from "../data/hijaiyah";
 import { tapFeedback } from "../../../lib/haptics";
 import { Check, X, Sparkles, Trophy } from "../../../components/ui/FontAwesomeIcons";
 
-export default function VerseQuestPage() {
+export default function TebakAyatGamePage() {
   const navigate = useNavigate();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function VerseQuestPage() {
 
   if (isFinished) {
     return (
-      <NgajiCeriaLayout title="Verse Quest" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+      <NgajiCeriaLayout title="Tebak Ayat" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
         <div className="px-4 py-10 flex flex-col items-center">
           <div className="bg-white rounded-[28px] p-8 text-center border-2 border-[#E2D4C0] shadow-md space-y-4 max-w-sm w-full">
             <div className="w-16 h-16 rounded-full bg-[#FFCB45] border-2 border-[#B8590C]/20 mx-auto flex items-center justify-center">
@@ -86,7 +86,7 @@ export default function VerseQuestPage() {
   }
 
   return (
-    <NgajiCeriaLayout title="Verse Quest" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
+    <NgajiCeriaLayout title="Tebak Ayat" showBack onBack={() => navigate("/member/ngaji-ceria/games")}>
       <div className="px-4 py-4 space-y-4 bg-[#FBF6EE] min-h-full rounded-t-3xl flex flex-col">
         {/* Progress Header */}
         <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-[#E2D4C0] shadow-sm">
