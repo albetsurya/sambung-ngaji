@@ -42,7 +42,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     id: 3,
     wordArabic: "اَ بَ بَ",
     wordLatin: "a - ba - ba",
-    nada: "naik",
+    nada: "datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_1_a_ba_ba.ogg",
     tiles: [
       { id: "3-1", char: "اَ", name: "a" },
@@ -78,7 +78,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     id: 6,
     wordArabic: "بَ بَ اَ",
     wordLatin: "ba - ba - a",
-    nada: "naik",
+    nada: "datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
     tiles: [
       { id: "6-1", char: "بَ", name: "ba" },

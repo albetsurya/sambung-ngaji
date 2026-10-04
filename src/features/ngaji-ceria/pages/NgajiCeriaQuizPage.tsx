@@ -33,7 +33,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ اَ",
     transliterationParts: ["a", "a"],
     options: ["a", "a", "ba", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_1_a_a.ogg",
   },
   {
@@ -41,7 +41,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ بَ",
     transliterationParts: ["ba", "ba"],
     options: ["ba", "ba", "a", "a", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Naik",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b1_2_ba_ba.ogg",
   },
   {
@@ -57,7 +57,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ اَ",
     transliterationParts: ["ba", "a"],
     options: ["ba", "a", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_1_ba_a.ogg",
   },
   {
@@ -65,7 +65,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ",
     transliterationParts: ["a", "ba"],
     options: ["a", "ba", "a", "ba", "ta", "tsa", "ja", "ha"],
-    hintTone: "Rost: Nada Datar",
+    hintTone: "Rost: Nada Naik",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b2_2_a_ba.ogg",
   },
   {
@@ -81,7 +81,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ اَ اَ",
     transliterationParts: ["a", "a", "a"],
     options: ["a", "a", "a", "ba", "ba", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b3_1_a_a_a.ogg",
   },
   {
@@ -97,7 +97,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "بَ بَ اَ",
     transliterationParts: ["ba", "ba", "a"],
     options: ["ba", "ba", "a", "ba", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b4_1_ba_ba_a.ogg",
   },
   {
@@ -113,7 +113,7 @@ const SAMPLE_QUESTIONS: QuizQuestion[] = [
     arabic: "اَ بَ بَ",
     transliterationParts: ["a", "ba", "ba"],
     options: ["a", "ba", "ba", "a", "a", "ta", "tsa", "ha"],
-    hintTone: "Rost: Nada Naik",
+    hintTone: "Rost: Nada Datar",
     audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b5_1_a_ba_ba.ogg",
   },
   {
