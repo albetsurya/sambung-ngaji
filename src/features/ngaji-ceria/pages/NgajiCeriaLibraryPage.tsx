@@ -268,6 +268,13 @@ export default function NgajiCeriaLibraryPage() {
             ))}
           </div>
         </div>
+        
+        {/* Disclaimer Hak Cipta & Legal */}
+        <div className="pt-6 pb-4 border-t border-[#E2D4C0] text-center">
+          <p className="text-[10px] text-[#8C7A68] leading-relaxed max-w-xs mx-auto">
+            Materi latihan disusun mandiri berdasarkan urutan pokok bahasan umum (fathah, kasrah, sukun, tajwid, ghorib). Teks Al-Qur'an dari sumber domain publik. "Tilawati" adalah merek terdaftar milik Pesantren Al-Qur'an Nurul Falah Surabaya.
+          </p>
+        </div>
       </div>
     </NgajiCeriaLayout>
   );

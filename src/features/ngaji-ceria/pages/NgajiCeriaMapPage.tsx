@@ -39,7 +39,7 @@ export default function NgajiCeriaMapPage() {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[10px] font-black uppercase tracking-wider text-warning">
-              Metode Tilawati • Jilid 1
+              Jilid 1
             </span>
             <h2 className="font-display font-black text-lg text-[#5A3A2A]">
               Jelajah Halaman Belajar

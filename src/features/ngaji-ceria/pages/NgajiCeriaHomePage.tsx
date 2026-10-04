@@ -65,7 +65,7 @@ export default function NgajiCeriaHomePage() {
 
             <div>
               <h3 className="font-display font-black text-lg text-white leading-tight">
-                Lanjutkan Tilawati 1 Hal 2: Ta (ت)
+                Lanjutkan Jilid 1 Hal 2: Ta (ت)
               </h3>
               <p className="text-xs text-white/80 mt-1">
                 Kenali cara pengucapan dan panjang bacaan huruf Ta dengan tepat.
@@ -170,7 +170,7 @@ export default function NgajiCeriaHomePage() {
             </div>
             <div className="min-w-0">
               <span className="text-[9px] font-black uppercase tracking-wider text-[#8C243B]">
-                Latihan Interaktif Tilawati 1-6
+                Latihan Interaktif Jilid 1-6
               </span>
               <h4 className="font-black text-sm text-[#5A3A2A] truncate">
                 Sesi Ngaji Kartu

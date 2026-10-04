@@ -185,7 +185,7 @@ export default function NgajiCeriaQuizPage() {
           </p>
 
           <p className="text-[11px] text-[#8C7A68] mt-1">
-            Sentuh audio untuk mendengarkan lafadz Tilawati
+            Sentuh audio untuk mendengarkan lafadz
           </p>
         </div>
 
@@ -259,7 +259,7 @@ export default function NgajiCeriaQuizPage() {
                   Luar Biasa! Jawaban Tepat!
                 </p>
                 <p className="text-xs mt-1 text-[#2D5A27]/80">
-                  Lafadz terbaca fasih sesuai irama Tilawati.
+                  Lafadz terbaca fasih sesuai irama.
                 </p>
               </div>
             </div>

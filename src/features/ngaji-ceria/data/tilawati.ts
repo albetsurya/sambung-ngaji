@@ -1,3 +1,8 @@
+// Data jilid untuk Ngaji Ceria
+// Disusun mengikuti pokok bahasan umum Metode Tilawati (fathah, kasrah, sukun, tajwid, ghorib)
+// BUKAN salinan isi buku Tilawati. Teks latihan dibuat mandiri; ayat Al-Qur'an diambil dari sumber domain publik.
+// "Tilawati" adalah merk milik Pesantren Al-Qur'an Nurul Falah Surabaya.
+
 export interface TilawatiLesson {
   id: string;
   nomor: number;
@@ -17,7 +22,7 @@ export interface TilawatiJilid {
 export const TILAWATI_DATA: TilawatiJilid[] = [
   {
     id: "jilid-1",
-    nama: "Tilawati Jilid 1",
+    nama: "Jilid 1",
     deskripsi: "Mengenal huruf hijaiyah dengan harakat fathah",
     jumlahHalaman: 40,
     pelajaran: [
@@ -27,37 +32,40 @@ export const TILAWATI_DATA: TilawatiJilid[] = [
   },
   {
     id: "jilid-2",
-    nama: "Tilawati Jilid 2",
+    nama: "Jilid 2",
     deskripsi: "Latihan harakat kasrah dan dhommah",
     jumlahHalaman: 40,
     pelajaran: [],
   },
   {
     id: "jilid-3",
-    nama: "Tilawati Jilid 3",
+    nama: "Jilid 3",
     deskripsi: "Mengenal huruf sambung dan sukun",
     jumlahHalaman: 40,
     pelajaran: [],
   },
   {
     id: "jilid-4",
-    nama: "Tilawati Jilid 4",
+    nama: "Jilid 4",
     deskripsi: "Tajwid dasar dan nun mati",
     jumlahHalaman: 40,
     pelajaran: [],
   },
   {
     id: "jilid-5",
-    nama: "Tilawati Jilid 5",
+    nama: "Jilid 5",
     deskripsi: "Pemantapan tajwid dan surat pendek",
     jumlahHalaman: 40,
     pelajaran: [],
   },
   {
     id: "jilid-6",
-    nama: "Tilawati Jilid 6",
+    nama: "Jilid 6",
     deskripsi: "Ghorib dan musykilat",
     jumlahHalaman: 40,
     pelajaran: [],
   },
 ];
+
+// Alias netral untuk konsumsi baru — TILAWATI_DATA dipertahankan untuk kompatibilitas
+export const JILID_DATA = TILAWATI_DATA;

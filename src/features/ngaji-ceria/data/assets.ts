@@ -36,7 +36,7 @@ export const NGAJI_CERIA_ASSETS = {
   jalurSCurve: NEW.jalurSCurve,
   tombolMulaiNgaji: NEW.tombolMulaiNgaji,
 
-  // Books / Tilawati Jilid
+  // Books / Jilid
   bannerTilawati: NEW.nodeAktif,
   jilidCovers: {
     1: NEW.bukuTilawatiJilid1,

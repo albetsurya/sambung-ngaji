@@ -130,7 +130,7 @@ export default function NgajiCeriaQuizListPage() {
       id: "jilid-1-tebak",
       title: "Kitab Tebak Bacaan Jilid 1",
       subtitle: "Latihan membaca suku kata fathah tunggal (Ta, Ba, A).",
-      level: "Tilawati Jilid 1",
+      level: "Jilid 1",
       coverImage: NGAJI_CERIA_ASSETS.jilidCovers[1],
       totalQuestions: 14,
       completedQuestions: 4,
@@ -141,7 +141,7 @@ export default function NgajiCeriaQuizListPage() {
       id: "jilid-2-sambung",
       title: "Kitab Huruf Sambung Jilid 2",
       subtitle: "Membaca dua huruf bersambung dan harakat kasrah.",
-      level: "Tilawati Jilid 2",
+      level: "Jilid 2",
       coverImage: NGAJI_CERIA_ASSETS.jilidCovers[2],
       totalQuestions: 15,
       completedQuestions: 0,
@@ -152,7 +152,7 @@ export default function NgajiCeriaQuizListPage() {
       id: "jilid-3-mad",
       title: "Kitab Mad & Panjang Jilid 3",
       subtitle: "Mengenal bacaan panjang (Mad Thabi'i) & fathatain.",
-      level: "Tilawati Jilid 3",
+      level: "Jilid 3",
       coverImage: NGAJI_CERIA_ASSETS.jilidCovers[3],
       totalQuestions: 20,
       completedQuestions: 0,
@@ -173,7 +173,7 @@ export default function NgajiCeriaQuizListPage() {
   ];
 
   return (
-    <NgajiCeriaLayout title="Kuis Kartu Tilawati">
+    <NgajiCeriaLayout title="Kuis Kartu">
       <div className="px-4 py-4 space-y-6 bg-[#FFF8EE] min-h-full rounded-t-3xl">
         {/* Banner Section */}
         <section className="relative overflow-hidden rounded-[26px] bg-gradient-to-r from-[#5A3A2A] to-[#3E2518] border-2 border-[#3E2518] p-5 text-white shadow-md">
@@ -194,7 +194,7 @@ export default function NgajiCeriaQuizListPage() {
                 Pilih Kitab Kuis Kartu
               </h2>
               <p className="text-xs text-white/80 leading-tight mt-0.5">
-                Uji kelancaran membaca tajwid & irama Tilawati lewat pilihan kitab di bawah.
+                Uji kelancaran membaca tajwid & irama lewat pilihan kitab di bawah.
               </p>
             </div>
           </div>
@@ -217,6 +217,12 @@ export default function NgajiCeriaQuizListPage() {
             ))}
           </div>
         </section>
+        {/* Disclaimer Hak Cipta & Legal */}
+        <div className="pt-6 pb-4 border-t border-[#E2D4C0] text-center mt-6">
+          <p className="text-[10px] text-[#8C7A68] leading-relaxed max-w-xs mx-auto">
+            Materi latihan disusun mandiri berdasarkan urutan pokok bahasan umum (fathah, kasrah, sukun, tajwid, ghorib). Teks Al-Qur'an dari sumber domain publik. "Tilawati" adalah merek terdaftar milik Pesantren Al-Qur'an Nurul Falah Surabaya.
+          </p>
+        </div>
       </div>
     </NgajiCeriaLayout>
   );
