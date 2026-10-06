@@ -6,6 +6,7 @@ import { ChevronRight, Sparkles, Star, Lock, Play } from "../../../components/ui
 
 interface QuizBookProps {
   id: string;
+  jilid: number;
   title: string;
   subtitle: string;
   level: string;
@@ -128,6 +129,7 @@ export default function NgajiCeriaQuizListPage() {
   const quizBooks = [
     {
       id: "jilid-1-tebak",
+      jilid: 1,
       title: "Kitab Tebak Bacaan Jilid 1",
       subtitle: "Latihan membaca suku kata fathah tunggal (Ta, Ba, A).",
       level: "Jilid 1",
@@ -139,6 +141,7 @@ export default function NgajiCeriaQuizListPage() {
     },
     {
       id: "jilid-2-sambung",
+      jilid: 2,
       title: "Kitab Huruf Sambung Jilid 2",
       subtitle: "Membaca dua huruf bersambung dan harakat kasrah.",
       level: "Jilid 2",
@@ -150,6 +153,7 @@ export default function NgajiCeriaQuizListPage() {
     },
     {
       id: "jilid-3-mad",
+      jilid: 3,
       title: "Kitab Mad & Panjang Jilid 3",
       subtitle: "Mengenal bacaan panjang (Mad Thabi'i) & fathatain.",
       level: "Jilid 3",
@@ -157,10 +161,35 @@ export default function NgajiCeriaQuizListPage() {
       totalQuestions: 20,
       completedQuestions: 0,
       stars: 0,
-      isLocked: true,
+      isLocked: false,
+    },
+    {
+      id: "jilid-4-tajwid",
+      jilid: 4,
+      title: "Kitab Qalqalah Jilid 4",
+      subtitle: "Latihan bacaan tasydid dan penguatan huruf.",
+      level: "Jilid 4",
+      coverImage: NGAJI_CERIA_ASSETS.jilidCovers[4],
+      totalQuestions: 20,
+      completedQuestions: 0,
+      stars: 0,
+      isLocked: false,
+    },
+    {
+      id: "jilid-5-ghunnah",
+      jilid: 5,
+      title: "Kitab Ghunnah Jilid 5",
+      subtitle: "Mengenal bacaan nun dan mim bertasydid.",
+      level: "Jilid 5",
+      coverImage: NGAJI_CERIA_ASSETS.jilidCovers[5],
+      totalQuestions: 20,
+      completedQuestions: 0,
+      stars: 0,
+      isLocked: false,
     },
     {
       id: "tebak-juz-amma",
+      jilid: 0,
       title: "Kitab Tebak Juz 'Amma",
       subtitle: "Tebak nama surah & ayat-ayat pendek juz 30.",
       level: "Pengayaan",
@@ -211,7 +240,7 @@ export default function NgajiCeriaQuizListPage() {
               <div key={book.id} className="pt-4 first:pt-0">
                 <StandaloneQuizBookCard
                   {...book}
-                  onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
+                   onClick={() => navigate(`/member/ngaji-ceria/quiz/play?jilid=${book.jilid}&hal=1`)}
                 />
               </div>
             ))}

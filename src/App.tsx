@@ -189,6 +189,12 @@ const NgajiCeriaGamesPage = lazy(
 const CekAudioManualPage = lazy(
   () => import("./features/ngaji-ceria/pages/CekAudioManualPage"),
 );
+const TilawatiTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiTimelineEditorPage"),
+);
+const TilawatiCloudTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiCloudTimelineEditorPage"),
+);
 const BalonHijaiyahGamePage = lazy(
   () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
 );
@@ -338,6 +344,22 @@ function AppRoutes() {
             <MemberRoute allowGuest>
               <CekAudioManualPage />
             </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/timeline"
+          element={
+            <MemberRoute allowGuest>
+              <TilawatiTimelineEditorPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/cloud-editor"
+          element={
+            <RoleRoute allowed={["SUPER_ADMIN"]}>
+              <TilawatiCloudTimelineEditorPage />
+            </RoleRoute>
           }
         />
         <Route

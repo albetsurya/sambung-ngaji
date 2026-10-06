@@ -9,15 +9,38 @@ import {
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
 import { playAudioUrl, playSoundEffect, playOpeningDua, stopAllAudio } from "../utils/audioPlayer";
-import { TILAWATI_JILID_1_PAGES, QuizQuestion } from "../data/tilawatiQuizData";
+import {
+  TILAWATI_JILID_1_PAGES,
+  TILAWATI_JILID_2_PAGES,
+  TILAWATI_JILID_3_PAGES,
+  TILAWATI_JILID_4_PAGES,
+  TILAWATI_JILID_5_PAGES,
+  QuizQuestion,
+} from "../data/tilawatiQuizData";
+import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
+
+const QUIZ_DATASETS = {
+  1: TILAWATI_JILID_1_PAGES,
+  2: TILAWATI_JILID_2_PAGES,
+  3: TILAWATI_JILID_3_PAGES,
+  4: TILAWATI_JILID_4_PAGES,
+  5: TILAWATI_JILID_5_PAGES,
+} as const;
+type SupportedJilid = keyof typeof QUIZ_DATASETS;
 
 export default function NgajiCeriaQuizPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const jilidParam = parseInt(searchParams.get("jilid") || "1", 10);
+  const activeJilid: SupportedJilid = jilidParam >= 1 && jilidParam <= 5
+    ? jilidParam as SupportedJilid
+    : 1;
+  const activeDataset = QUIZ_DATASETS[activeJilid];
+  const pageCount = Object.keys(activeDataset).length;
   const pageParam = parseInt(searchParams.get("hal") || "1", 10);
-  const activePageNum = isNaN(pageParam) || pageParam < 1 || pageParam > 5 ? 1 : pageParam;
+  const activePageNum = isNaN(pageParam) || pageParam < 1 || pageParam > pageCount ? 1 : pageParam;
 
-  const pageData = TILAWATI_JILID_1_PAGES[activePageNum] || TILAWATI_JILID_1_PAGES[1];
+  const pageData = activeDataset[activePageNum] || activeDataset[1];
   const questions: QuizQuestion[] = pageData.questions;
 
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -102,9 +125,9 @@ export default function NgajiCeriaQuizPage() {
       setStatus("idle");
     } else {
       // Halaman ini selesai! Navigasi ke halaman selanjutnya jika masih ada
-      if (activePageNum < 5) {
+      if (activePageNum < pageCount) {
         stopAllAudio();
-        setSearchParams({ hal: String(activePageNum + 1) });
+        setSearchParams({ jilid: String(activeJilid), hal: String(activePageNum + 1) });
       } else {
         stopAllAudio();
         navigate("/member/ngaji-ceria/quiz");
@@ -120,9 +143,16 @@ export default function NgajiCeriaQuizPage() {
 
   const handlePlayAudio = () => {
     if (isAudioPlaying) return;
+    const audioUrl = getQuestionAudioUrl(
+      question,
+      activeJilid,
+      activePageNum,
+      currentIdx,
+      Boolean(questions[0]?.isOpening),
+    );
     setIsAudioPlaying(true);
     tapFeedback();
-    playAudioUrl(question.audioUrl, () => {
+    playAudioUrl(audioUrl, () => {
       setIsAudioPlaying(false);
     });
   };
@@ -169,7 +199,7 @@ export default function NgajiCeriaQuizPage() {
           <div className="flex-1">
             <div className="flex justify-between items-center text-[11px] font-bold mb-1 text-[#8C7A68]">
               <span className="font-extrabold text-[#5A3A2A]">
-                Hal {activePageNum} ({currentStep}/{totalQuestions})
+                Jilid {activeJilid} · Hal {activePageNum} ({currentStep}/{totalQuestions})
               </span>
               <span className="text-[#F58A3A] font-black">{progressPercent}%</span>
             </div>
@@ -400,9 +430,9 @@ export default function NgajiCeriaQuizPage() {
                 {status === "correct"
                   ? currentIdx < questions.length - 1
                     ? "Lanjut Soal Berikutnya →"
-                    : activePageNum < 5
+                    : activePageNum < pageCount
                     ? `Lanjut Halaman ${activePageNum + 1} →`
-                    : "Selesai Kitab Jilid 1 →"
+                    : `Selesai Kitab Jilid ${activeJilid} →`
                   : "Coba Lagi"}
               </button>
             )}

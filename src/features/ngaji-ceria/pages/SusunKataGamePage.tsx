@@ -21,7 +21,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     wordArabic: "اَ بَ",
     wordLatin: "a - ba",
     nada: "datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal1/h1_b0_header_a_ba.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal1/hal1_header_datar.ogg",
     tiles: [
       { id: "1-1", char: "اَ", name: "a" },
       { id: "1-2", char: "بَ", name: "ba" },
@@ -32,7 +32,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     wordArabic: "اَ بَ تَ",
     wordLatin: "a - ba - ta",
     nada: "datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal2/h2_b0_header_a_ba_ta.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal2/hal2_header_datar.ogg",
     tiles: [
       { id: "2-1", char: "اَ", name: "a" },
       { id: "2-2", char: "بَ", name: "ba" },
@@ -44,7 +44,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     wordArabic: "بَ تَ ثَ",
     wordLatin: "ba - ta - tsa",
     nada: "datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal3/h3_b0_header_ba_ta_tsa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal3/hal3_header_datar.ogg",
     tiles: [
       { id: "3-1", char: "بَ", name: "ba" },
       { id: "3-2", char: "تَ", name: "ta" },
@@ -56,7 +56,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     wordArabic: "جَ حَ",
     wordLatin: "ja - ha",
     nada: "datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal4/h4_b0_header_ja_ha.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal4/hal4_header_datar.ogg",
     tiles: [
       { id: "4-1", char: "جَ", name: "ja" },
       { id: "4-2", char: "حَ", name: "ha" },
@@ -67,7 +67,7 @@ const PUZZLE_DATA: WordPuzzle[] = [
     wordArabic: "خَ بَ ثَ",
     wordLatin: "kha - ba - tsa",
     nada: "datar",
-    audioUrl: "/audio/tilawati/jilid_1/hal5/h5_b0_header_kha_ba_tsa.ogg",
+    audioUrl: "/audio/tilawati/jilid_1/hal5/hal5_header_datar.ogg",
     tiles: [
       { id: "5-1", char: "خَ", name: "kha" },
       { id: "5-2", char: "بَ", name: "ba" },

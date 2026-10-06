@@ -70,6 +70,10 @@ export function playHijaiyahAudio(letterId: string): void {
  * Play generic chunk audio from a specific jilid
  */
 export function playAudioUrl(url: string, onEnded?: () => void): HTMLAudioElement | null {
+  if (!url) {
+    onEnded?.();
+    return null;
+  }
   try {
     if (activeAudio) {
       activeAudio.pause();
