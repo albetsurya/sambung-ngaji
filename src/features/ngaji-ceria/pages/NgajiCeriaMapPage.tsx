@@ -4,6 +4,8 @@ import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { ChevronLeft, Play, Sparkles, Star } from "../../../components/ui/FontAwesomeIcons";
 
+import { useNgajiCeriaStore, NgajiCeriaState } from "../hooks/useNgajiCeriaStore";
+
 interface MapNode {
   pageNumber: number;
   status: "completed" | "active" | "locked";
@@ -12,12 +14,27 @@ interface MapNode {
 
 export default function NgajiCeriaMapPage() {
   const navigate = useNavigate();
+  const stars = useNgajiCeriaStore((state: NgajiCeriaState) => state.stars);
+  const jilid = 1; // Default jilid untuk sekarang
 
-  const nodes: MapNode[] = Array.from({ length: 44 }).map((_, i) => ({
-    pageNumber: i + 1,
-    status: i === 0 ? "completed" : i === 1 ? "active" : "locked",
-    stars: i === 0 ? 3 : 0,
-  }));
+  const nodes: MapNode[] = Array.from({ length: 44 }).map((_, i) => {
+    const pageNum = i + 1;
+    const key = `jilid-${jilid}-hal-${pageNum}`;
+    const starCount = stars[key] || 0;
+    
+    // Status logic: 
+    // - completed jika stars > 0
+    // - active jika page belum selesai tapi page sebelumnya sudah selesai atau page 1
+    // - locked jika page sebelumnya belum selesai
+    const prevKey = `jilid-${jilid}-hal-${pageNum - 1}`;
+    const isPrevCompleted = pageNum === 1 || stars[prevKey] > 0;
+    
+    let status: "completed" | "active" | "locked" = "locked";
+    if (starCount > 0) status = "completed";
+    else if (isPrevCompleted) status = "active";
+    
+    return { pageNumber: pageNum, status, stars: starCount };
+  });
 
   // Alignments for S-Curve feel
   const alignments = [

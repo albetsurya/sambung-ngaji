@@ -122,22 +122,11 @@ export default function NgajiCeriaLibraryPage() {
 
   const extraBooks = [
     {
-      id: "ghorib",
-      nama: "Tilawati Ghorib",
-      deskripsi: "Bacaan asing & musykilat",
-      coverImg: NGAJI_CERIA_ASSETS.bukuGhorib,
-    },
-    {
-      id: "tajwid",
-      nama: "Tilawati Tajwid",
-      deskripsi: "Hukum nun mati & mad",
-      coverImg: NGAJI_CERIA_ASSETS.bukuTajwid,
-    },
-    {
       id: "juz-amma",
       nama: "Juz 'Amma",
       deskripsi: "Hafalan surah pendek",
       coverImg: NGAJI_CERIA_ASSETS.bukuJuzAmma,
+      isNext: true,
     },
   ];
 
@@ -238,30 +227,35 @@ export default function NgajiCeriaLibraryPage() {
         <div className="pt-8 border-t-2 border-[#E2D4C0]">
           <div className="mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#F58A3A]">
-              Kitab Lanjutan
+              Modul Berikutnya
             </span>
             <h3 className="font-black text-base text-[#5A3A2A]">
-              Ghorib, Tajwid & Juz 'Amma
+              Hafalan Juz 'Amma
             </h3>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 justify-items-center">
+          <div className="flex justify-center">
             {extraBooks.map((book) => (
               <div key={book.id} className="flex flex-col items-center text-center">
-                <button
-                  onClick={() => alert(`Membuka ${book.nama}`)}
-                  className="w-[100px] h-[130px] transition-transform hover:scale-105 active:scale-95 drop-shadow-md"
-                >
-                  <img
-                    src={book.coverImg}
-                    alt={book.nama}
-                    className="w-full h-full object-contain"
-                  />
-                </button>
-                <h5 className="font-black text-xs text-[#5A3A2A] mt-2 leading-tight">
+                <div className="relative">
+                  <button
+                    disabled
+                    className="w-[120px] h-[155px] opacity-80 cursor-not-allowed drop-shadow-md"
+                  >
+                    <img
+                      src={book.coverImg}
+                      alt={book.nama}
+                      className="w-full h-full object-contain filter grayscale-[30%]"
+                    />
+                  </button>
+                  <span className="absolute top-2 right-0 px-2 py-0.5 rounded-full bg-[#F58A3A] text-white text-[9px] font-black uppercase tracking-wider shadow">
+                    Segera Hadir
+                  </span>
+                </div>
+                <h5 className="font-black text-sm text-[#5A3A2A] mt-2 leading-tight">
                   {book.nama}
                 </h5>
-                <span className="text-[9px] text-[#8C5A3A] line-clamp-1">
+                <span className="text-[10px] text-[#8C5A3A]">
                   {book.deskripsi}
                 </span>
               </div>

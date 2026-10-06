@@ -1,8 +1,12 @@
+import { useNgajiCeriaStore, NgajiCeriaState } from "./useNgajiCeriaStore";
+
 export function useNgajiCeriaStreak() {
-  // Mockup: 3 hari streak
+  const streakDays = useNgajiCeriaStore((state: NgajiCeriaState) => state.streakDays);
+  const currentStreak = useNgajiCeriaStore((state: NgajiCeriaState) => state.currentStreak);
+  
   return {
-    streakDays: [true, true, true, false, false, false, false],
-    currentStreak: 3,
+    streakDays,
+    currentStreak,
     isLoading: false,
   };
 }

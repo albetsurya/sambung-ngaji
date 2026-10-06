@@ -15,9 +15,11 @@ import {
   TILAWATI_JILID_3_PAGES,
   TILAWATI_JILID_4_PAGES,
   TILAWATI_JILID_5_PAGES,
+  TILAWATI_JILID_6_PAGES,
   QuizQuestion,
 } from "../data/tilawatiQuizData";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
+import { useNgajiCeriaStore, NgajiCeriaState, awardStars, recordActivity } from "../hooks/useNgajiCeriaStore";
 
 const QUIZ_DATASETS = {
   1: TILAWATI_JILID_1_PAGES,
@@ -25,6 +27,7 @@ const QUIZ_DATASETS = {
   3: TILAWATI_JILID_3_PAGES,
   4: TILAWATI_JILID_4_PAGES,
   5: TILAWATI_JILID_5_PAGES,
+  6: TILAWATI_JILID_6_PAGES,
 } as const;
 type SupportedJilid = keyof typeof QUIZ_DATASETS;
 
@@ -32,7 +35,7 @@ export default function NgajiCeriaQuizPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const jilidParam = parseInt(searchParams.get("jilid") || "1", 10);
-  const activeJilid: SupportedJilid = jilidParam >= 1 && jilidParam <= 5
+  const activeJilid: SupportedJilid = jilidParam >= 1 && jilidParam <= 6
     ? jilidParam as SupportedJilid
     : 1;
   const activeDataset = QUIZ_DATASETS[activeJilid];
@@ -124,13 +127,19 @@ export default function NgajiCeriaQuizPage() {
       setSelectedTokens([]);
       setStatus("idle");
     } else {
-      // Halaman ini selesai! Navigasi ke halaman selanjutnya jika masih ada
+      // Halaman ini selesai! Simpan progres dan award stars
+      recordActivity();
+      awardStars(activeJilid, activePageNum, 100); // Mock score 100 untuk sekarang
+
       if (activePageNum < pageCount) {
         stopAllAudio();
         setSearchParams({ jilid: String(activeJilid), hal: String(activePageNum + 1) });
+        setCurrentIdx(0);
+        setSelectedTokens([]);
+        setStatus("idle");
       } else {
         stopAllAudio();
-        navigate("/member/ngaji-ceria/quiz");
+        navigate("/member/ngaji-ceria/map");
       }
     }
   };
