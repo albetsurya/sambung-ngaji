@@ -73,8 +73,8 @@ export function TaarufCvEditor({
     if (!node || !member || busy) return;
     setBusy(kind);
     try {
-      if (kind === "pdf") await exportTaarufPdf(node, member.nama_lengkap);
-      else await exportTaarufPng(node, member.nama_lengkap);
+      if (kind === "pdf") await exportTaarufPdf(node, member.full_name);
+      else await exportTaarufPng(node, member.full_name);
       showToast(kind === "pdf" ? "PDF berhasil diunduh" : "Gambar berhasil diunduh");
     } catch {
       showToast(
@@ -310,7 +310,7 @@ export function TaarufCvEditor({
                 </div>
 
                 
-                {member.foto_url && (
+                {member.photo_url && (
                   <div>
                     <div className="flex items-center justify-between mb-2 px-1">
                       <p className="text-ios-footnote font-medium text-surface-muted">

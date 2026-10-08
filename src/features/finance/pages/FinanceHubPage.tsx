@@ -27,7 +27,7 @@ export const FinanceHubPage: React.FC = () => {
             <EmptyState
               title="Pilih 1 kelompok dulu"
               description="Keuangan bersifat per-kelompok agar tidak tercampur. Pilih kelompok, lalu buka Kas / Shodaqoh / Zakat."
-              action={<Button size="sm" onClick={() => navigate("/kelompok-saya")}>Pilih Kelompok</Button>}
+              action={<Button size="sm" onClick={() => navigate("/my-group")}>Pilih Kelompok</Button>}
             />
           </div>
         ) : (

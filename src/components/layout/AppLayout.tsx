@@ -196,7 +196,6 @@ export function AppLayout({
   showAiChat?: boolean;
 }) {
   const navigate = useNavigate();
-  const [entranceReady, setEntranceReady] = useState(false);
 
   const showAiChatFab = showAiChat && !hideNav;
   const bothFabs = showAiChatFab && !!fab;
@@ -213,11 +212,6 @@ export function AppLayout({
         : "pb-24 md:pb-8";
 
   const softEase = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setEntranceReady(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   useEffect(() => {
     let offset = 16;
@@ -247,32 +241,13 @@ export function AppLayout({
 
       {showFloating &&
         createPortal(
-          <div
-            className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none motion-safe:transition-all motion-safe:duration-[900ms]"
-            style={{
-              opacity: entranceReady ? 1 : 0,
-              transform: entranceReady ? "translateY(0)" : "translateY(6px)",
-              transitionTimingFunction: softEase,
-            }}
-          >
+          <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
             <div
               className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
             >
               <div className="md:hidden flex flex-col items-end gap-2.5">
                 {showAiChatFab && (
-                  <div
-                    className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
-                    style={{
-                      opacity: entranceReady ? 1 : 0,
-                      transform: entranceReady
-                        ? "translateY(0)"
-                        : "translateY(10px)",
-                      filter: entranceReady ? "blur(0px)" : "blur(3px)",
-                      transitionDelay: entranceReady ? "160ms" : "0ms",
-                      transitionTimingFunction: softEase,
-                      willChange: "opacity, transform, filter",
-                    }}
-                  >
+                  <div className="pointer-events-auto">
                     <FloatingActionButton
                       onClick={() => navigate("/ai-chat")}
                       label="Tanya AI"
@@ -281,44 +256,18 @@ export function AppLayout({
                     />
                   </div>
                 )}
-                {fab && (
-                  <div
-                    className="pointer-events-auto motion-safe:transition-all motion-safe:duration-[800ms]"
-                    style={{
-                      opacity: entranceReady ? 1 : 0,
-                      transform: entranceReady
-                        ? "translateY(0)"
-                        : "translateY(10px)",
-                      filter: entranceReady ? "blur(0px)" : "blur(3px)",
-                      transitionDelay: entranceReady ? "80ms" : "0ms",
-                      transitionTimingFunction: softEase,
-                      willChange: "opacity, transform, filter",
-                    }}
-                  >
-                    {fab}
-                  </div>
-                )}
+                {fab && <div className="pointer-events-auto">{fab}</div>}
               </div>
 
               {showAiChatFab && (
-                <div
-                  className="pointer-events-auto hidden md:block motion-safe:transition-all motion-safe:duration-[800ms]"
-                  style={{
-                    opacity: entranceReady ? 1 : 0,
-                    transform: entranceReady
-                      ? "translateY(0)"
-                      : "translateY(6px)",
-                    transitionDelay: entranceReady ? "160ms" : "0ms",
-                    transitionTimingFunction: softEase,
-                  }}
-                >
+                <div className="pointer-events-auto hidden md:block">
                   <button
                     onClick={() => {
                       tapFeedback();
                       navigate("/ai-chat");
                     }}
                     aria-label="Tanya AI"
-                    className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary text-ios-footnote font-semibold transition-all duration-300 ease-out hover:-translate-y-0.5 active:scale-95"
+                    className="hidden md:flex items-center gap-2 h-12 pl-4 pr-5 rounded-full bg-surface-card text-accent border border-accent/30 fab fab-secondary text-ios-footnote font-semibold active:scale-95"
                   >
                     <Sparkles size={18} strokeWidth={2.2} />
                     Tanya AI
@@ -326,19 +275,7 @@ export function AppLayout({
                 </div>
               )}
               {fab && (
-                <div
-                  className="pointer-events-auto hidden md:block motion-safe:transition-all motion-safe:duration-[800ms]"
-                  style={{
-                    opacity: entranceReady ? 1 : 0,
-                    transform: entranceReady
-                      ? "translateY(0)"
-                      : "translateY(6px)",
-                    transitionDelay: entranceReady ? "80ms" : "0ms",
-                    transitionTimingFunction: softEase,
-                  }}
-                >
-                  {fab}
-                </div>
+                <div className="pointer-events-auto hidden md:block">{fab}</div>
               )}
               {!hideNav && (
                 <div className="pointer-events-auto w-full md:hidden">

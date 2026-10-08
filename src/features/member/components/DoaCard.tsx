@@ -80,9 +80,9 @@ export function DoaCard({
           <p className="text-ios-body font-medium text-surface-text truncate">
             {doa.judul}
           </p>
-          {(doa.catatan || doa.sumber) && (
+          {(doa.notes || doa.sumber) && (
             <p className="text-ios-caption text-surface-muted truncate">
-              {[doa.catatan, doa.sumber].filter(Boolean).join(" · ")}
+              {[doa.notes, doa.sumber].filter(Boolean).join(" · ")}
             </p>
           )}
         </button>

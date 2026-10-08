@@ -145,7 +145,7 @@ export default function MembersListPage() {
     const f: MemberFilters = { limit: PAGE_SIZE };
     if (debouncedSearch) f.search = debouncedSearch;
     if (kategori) f.kategori = kategori;
-    if (jenisKelamin) f.jenis_kelamin = jenisKelamin;
+    if (jenisKelamin) f.gender = jenisKelamin;
     if (assignedGroup) f.group_id = assignedGroup;
     return f;
   }, [debouncedSearch, kategori, jenisKelamin, assignedGroup]);
@@ -182,12 +182,14 @@ export default function MembersListPage() {
   const roleByMemberId = useMemo(() => {
     const m = new Map<string, Role>();
     users.forEach((u) => {
-      if (u.member_id && u.status_aktif !== false) m.set(u.member_id, u.role);
+      if (u.member_id && u.is_active !== false) m.set(u.member_id, u.role);
     });
     return m;
   }, [users]);
 
-  const canCreate = role === "SUPER_ADMIN" || role === "ADMIN";
+  const canCreate = role === "SUPER_ADMIN" || role === "ADMIN" || role === "TIM_PNKB";
+  const showAccountBadges = role === "SUPER_ADMIN" || role === "ADMIN" || role === "PENGAWAS";
+  const isTimAbsensi = role === "TIM_ABSENSI";
 
   const activeFilterCount = useMemo(
     () => (jenisKelamin ? 1 : 0) + (kategori ? 1 : 0) + (assignedGroup ? 1 : 0),
@@ -287,9 +289,12 @@ export default function MembersListPage() {
         toggleSelect(id);
         return;
       }
-      navigate(`/jamaah/${id}`);
+      if (role === "TIM_ABSENSI") {
+        return;
+      }
+      navigate(`/members/${id}`);
     },
-    [navigate, selectMode, toggleSelect],
+    [navigate, selectMode, toggleSelect, role],
   );
 
   const handleBulkSubmit = useCallback(async () => {
@@ -303,7 +308,7 @@ export default function MembersListPage() {
       try {
         await memberApi.update(id, {
           group_id: target.group_id,
-          kelompok: target.group_name,
+          group_label: target.group_name,
         });
         ok += 1;
       } catch {
@@ -313,6 +318,8 @@ export default function MembersListPage() {
     }
     await queryClient.invalidateQueries({ queryKey: ["members-paged"] });
     await queryClient.invalidateQueries({ queryKey: ["members"] });
+    await queryClient.invalidateQueries({ queryKey: ["users"] });
+    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     setBulkSaving(false);
     setBulkOpen(false);
     if (failed.length === 0) {
@@ -339,6 +346,8 @@ export default function MembersListPage() {
             onPress={handlePress}
             selectMode={selectMode}
             selected={selectedIds.includes(m.member_id)}
+            showAccountBadges={showAccountBadges}
+            disabledPress={isTimAbsensi}
           />
         );
       }
@@ -352,6 +361,8 @@ export default function MembersListPage() {
             onPress={handlePress}
             selectMode={selectMode}
             selected={selectedIds.includes(m.member_id)}
+            showAccountBadges={showAccountBadges}
+            disabledPress={isTimAbsensi}
           />
         );
       }
@@ -368,6 +379,8 @@ export default function MembersListPage() {
               onPress={handlePress}
               selectMode={selectMode}
               selected={selectedIds.includes(m.member_id)}
+              showAccountBadges={showAccountBadges}
+              disabledPress={isTimAbsensi}
             />
           ))}
         </div>
@@ -382,6 +395,8 @@ export default function MembersListPage() {
       roleByMemberId,
       selectMode,
       selectedIds,
+      showAccountBadges,
+      isTimAbsensi,
     ],
   );
 
@@ -395,7 +410,7 @@ export default function MembersListPage() {
     <AppLayout
       fab={
         !selectMode && canCreate ? (
-          <FloatingActionButton onClick={() => navigate("/jamaah/baru")} label="Tambah Jamaah" />
+          <FloatingActionButton onClick={() => navigate("/members/new")} label="Tambah Jamaah" />
         ) : undefined
       }
       showAiChat={!selectMode}
@@ -527,7 +542,7 @@ export default function MembersListPage() {
             }
             action={
               canCreate && !hasActiveSearch && !kategori && !jenisKelamin ? (
-                <Button onClick={() => navigate("/jamaah/baru")}>
+                <Button onClick={() => navigate("/members/new")}>
                   Tambah Jamaah
                 </Button>
               ) : undefined
@@ -803,7 +818,7 @@ export default function MembersListPage() {
 
                   const exportFilters: MemberFilters = {};
                   if (kategori) exportFilters.kategori = kategori;
-                  if (jenisKelamin) exportFilters.jenis_kelamin = jenisKelamin;
+                  if (jenisKelamin) exportFilters.gender = jenisKelamin;
 
                   const exportData = await memberApi.listForExport(
                     isPNKB
@@ -941,27 +956,36 @@ const JamaahRow = memo(function JamaahRow({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   return (
     <button
       onClick={() => onPress(member.member_id)}
+      disabled={disabledPress && !selectMode}
       className={`w-full flex items-center gap-3 h-16 px-4 text-left transition-colors ${
-        selected ? "bg-accent-soft" : "bg-transparent active:bg-surface-card2"
+        selected
+          ? "bg-accent-soft"
+          : disabledPress && !selectMode
+            ? "cursor-default"
+            : "bg-transparent active:bg-surface-card2"
       }`}
     >
       {selectMode ? (
         <SelectCheckbox selected={selected} />
       ) : (
         <Avatar
-          src={member.foto_url}
-          name={member.nama_lengkap}
-          gender={normalizeGender(member?.jenis_kelamin)}
+          src={member.photo_url}
+          name={member.full_name}
+          gender={normalizeGender(member?.gender)}
         />
       )}
       <div className="flex-1 min-w-0">
@@ -969,13 +993,17 @@ const JamaahRow = memo(function JamaahRow({
           {getDisplayName(member)}
         </p>
         <p className="text-[13px] text-surface-muted truncate">
-          {member.kelompok || "Belum ada kelompok"}
+          {member.group_label || "Belum ada kelompok"}
         </p>
       </div>
       {!selectMode && (
         <>
-          <AccountBadge hasAccount={member.has_user} compact />
-          {role && <RoleBadge role={role} />}
+          {showAccountBadges && (
+            <>
+              <AccountBadge hasAccount={member.has_user} compact />
+              {role && <RoleBadge role={role} />}
+            </>
+          )}
           {member.kategori && (
             <span className="text-ios-footnote text-surface-muted flex-shrink-0">
               {CATEGORY_LABEL[member.kategori]}
@@ -993,12 +1021,16 @@ const JamaahCard = memo(function JamaahCard({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   return (
     <div className="px-4 pb-2">
@@ -1006,15 +1038,15 @@ const JamaahCard = memo(function JamaahCard({
         onClick={() => onPress(member.member_id)}
         className={`flex items-center gap-3 h-[68px] ${
           selected ? "!bg-accent-soft !border-accent/40" : ""
-        }`}
+        } ${disabledPress && !selectMode ? "!cursor-default" : ""}`}
       >
         {selectMode ? (
           <SelectCheckbox selected={selected} />
         ) : (
           <Avatar
-            src={member.foto_url}
-            name={member.nama_lengkap}
-            gender={normalizeGender(member?.jenis_kelamin)}
+            src={member.photo_url}
+            name={member.full_name}
+            gender={normalizeGender(member?.gender)}
           />
         )}
         <div className="flex-1 min-w-0">
@@ -1022,13 +1054,17 @@ const JamaahCard = memo(function JamaahCard({
             {getDisplayName(member)}
           </p>
           <p className="text-ios-caption text-surface-muted truncate">
-            {member.kelompok || "Belum ada kelompok"}
+            {member.group_label || "Belum ada kelompok"}
           </p>
         </div>
         {!selectMode && (
           <>
-            <AccountBadge hasAccount={member.has_user} compact />
-            {role && <RoleBadge role={role} />}
+            {showAccountBadges && (
+              <>
+                <AccountBadge hasAccount={member.has_user} compact />
+                {role && <RoleBadge role={role} />}
+              </>
+            )}
             {member.kategori && <Badge>{CATEGORY_LABEL[member.kategori]}</Badge>}
           </>
         )}
@@ -1044,6 +1080,8 @@ const JamaahGridCard = memo(function JamaahGridCard({
   onPress,
   selectMode = false,
   selected = false,
+  showAccountBadges = true,
+  disabledPress = false,
 }: {
   member: Member;
   role?: Role;
@@ -1051,6 +1089,8 @@ const JamaahGridCard = memo(function JamaahGridCard({
   onPress: (id: string) => void;
   selectMode?: boolean;
   selected?: boolean;
+  showAccountBadges?: boolean;
+  disabledPress?: boolean;
 }) {
   const avatarSize = cols === 2 ? 56 : cols === 3 ? 44 : 36;
   const padding =
@@ -1063,7 +1103,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
       onClick={() => onPress(member.member_id)}
       className={`relative flex flex-col items-center text-center gap-1.5 ${padding} ${
         selected ? "!bg-accent-soft !border-accent/40" : ""
-      }`}
+      } ${disabledPress && !selectMode ? "!cursor-default" : ""}`}
     >
       {selectMode && (
         <span className="absolute top-1.5 right-1.5">
@@ -1071,10 +1111,10 @@ const JamaahGridCard = memo(function JamaahGridCard({
         </span>
       )}
       <Avatar
-        src={member.foto_url}
-        name={member.nama_lengkap}
+        src={member.photo_url}
+        name={member.full_name}
         size={avatarSize}
-        gender={normalizeGender(member?.jenis_kelamin)}
+        gender={normalizeGender(member?.gender)}
       />
       <div className="min-w-0 w-full">
         <p
@@ -1083,7 +1123,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {getDisplayName(member)}
         </p>
         <p className="text-[10px] text-surface-muted truncate mt-0.5">
-          {member.kelompok || "Belum ada kelompok"}
+          {member.group_label || "Belum ada kelompok"}
         </p>
       </div>
       {member.kategori && (
@@ -1093,7 +1133,7 @@ const JamaahGridCard = memo(function JamaahGridCard({
           {CATEGORY_LABEL[member.kategori]}
         </span>
       )}
-      {!selectMode && (
+      {!selectMode && showAccountBadges && (
         <div className="min-h-[26px] flex items-center justify-center gap-1">
           <AccountBadge hasAccount={member.has_user} compact />
           {role && <RoleBadge role={role} />}

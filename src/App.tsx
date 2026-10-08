@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider, useToast } from "./contexts/ToastContext";
@@ -166,6 +166,50 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
+import { NgajiCeriaLayout } from "./features/ngaji-ceria/components/NgajiCeriaLayout";
+
+const NgajiCeriaHomePage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
+);
+const NgajiCeriaLibraryPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaLibraryPage"),
+);
+const NgajiCeriaMapPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaMapPage"),
+);
+const NgajiCeriaQuizPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizPage"),
+);
+const NgajiCeriaQuizListPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizListPage"),
+);
+const NgajiCeriaGamesPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
+);
+const CekAudioManualPage = lazy(
+  () => import("./features/ngaji-ceria/pages/CekAudioManualPage"),
+);
+const TilawatiTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiTimelineEditorPage"),
+);
+const TilawatiCloudTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiCloudTimelineEditorPage"),
+);
+const BalonHijaiyahGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
+);
+const PasangHurufGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/PasangHurufGamePage"),
+);
+const TebakAyatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
+);
+const TangkapHarakatGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/TangkapHarakatGamePage"),
+);
+const SusunKataGamePage = lazy(
+  () => import("./features/ngaji-ceria/pages/SusunKataGamePage"),
+);
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -186,7 +230,19 @@ function HomeRoute() {
   // yang lain menghandle loading di route dalam (jika perlu).
   if (!user) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
+  if (user.role === "TIM_KU") return <Navigate to="/finance/ledger" replace />;
   return <DashboardPage />;
+}
+/** Redirect prefix lama (Indonesia) ke prefix baru (English), query ikut terbawa. */
+function PrefixRedirect({ from, to }: { from: string; to: string }) {
+  const { pathname, search } = useLocation();
+  const rest = pathname.slice(from.length);
+  return <Navigate to={`${to}${rest}${search}`} replace />;
+}
+/** Redirect /jamaah/:id/cv-taaruf lama ke /members/:id/taaruf-cv. */
+function LegacyTaarufCvRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/members/${id}/taaruf-cv`} replace />;
 }
 function AppRoutes() {
   useBackgroundSync();
@@ -196,9 +252,12 @@ function AppRoutes() {
       <div key={location.pathname} className="page-enter">
       <Routes location={location}>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/daftar" element={<PublicRegistrationPage />} />
-        <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
+        <Route path="/register" element={<PublicRegistrationPage />} />
+        <Route path="/register/success" element={<RegistrationSuccessPage />} />
         <Route path="/" element={<HomeRoute />} />
+        {/* Redirect legacy (URL Indonesia lama, mis. dari QR code cetak) */}
+        <Route path="/daftar" element={<PrefixRedirect from="/daftar" to="/register" />} />
+        <Route path="/daftar/*" element={<PrefixRedirect from="/daftar" to="/register" />} />
         <Route
           path="/member"
           element={
@@ -228,6 +287,158 @@ function AppRoutes() {
           element={
             <MemberRoute allowGuest>
               <MemberKiblatPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaHomePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/map"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaMapPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/path"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaLibraryPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/quiz"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaQuizListPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/quiz/play"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaQuizPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaGamesPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio"
+          element={
+            <MemberRoute allowGuest>
+              <CekAudioManualPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/timeline"
+          element={
+            <MemberRoute allowGuest>
+              <TilawatiTimelineEditorPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/cloud-editor"
+          element={
+            <RoleRoute allowed={["SUPER_ADMIN"]}>
+              <TilawatiCloudTimelineEditorPage />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/balon-hijaiyah"
+          element={
+            <MemberRoute allowGuest>
+              <BalonHijaiyahGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-burst"
+          element={
+            <MemberRoute allowGuest>
+              <BalonHijaiyahGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/pasang-huruf"
+          element={
+            <MemberRoute allowGuest>
+              <PasangHurufGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-match"
+          element={
+            <MemberRoute allowGuest>
+              <PasangHurufGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tebak-ayat"
+          element={
+            <MemberRoute allowGuest>
+              <TebakAyatGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/verse-quest"
+          element={
+            <MemberRoute allowGuest>
+              <TebakAyatGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tangkap-harakat"
+          element={
+            <MemberRoute allowGuest>
+              <TangkapHarakatGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/harakat-rush"
+          element={
+            <MemberRoute allowGuest>
+              <TangkapHarakatGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/susun-kata"
+          element={
+            <MemberRoute allowGuest>
+              <SusunKataGamePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/word-builder"
+          element={
+            <MemberRoute allowGuest>
+              <SusunKataGamePage />
             </MemberRoute>
           }
         />
@@ -423,15 +634,15 @@ function AppRoutes() {
             </Route>
           </Route>
           <Route
-            path="/jamaah"
+            path="/members"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MembersListPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/kelompok-saya"
+            path="/my-group"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <GroupHubPage />
@@ -439,51 +650,56 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/kelola-global"
-            element={<Navigate to="/kelompok-saya" replace />}
+            path="/manage-global"
+            element={<Navigate to="/my-group" replace />}
           />
+          <Route path="/kelompok-saya" element={<PrefixRedirect from="/kelompok-saya" to="/my-group" />} />
+          <Route path="/kelola-global" element={<Navigate to="/my-group" replace />} />
           <Route
-            path="/jamaah/baru"
+            path="/members/new"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id"
+            path="/members/:id"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MemberDetailPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id/cv-taaruf"
+            path="/members/:id/taaruf-cv"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <TaarufCvPrintPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id/edit"
+            path="/members/:id/edit"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
           />
+          <Route path="/jamaah/:id/cv-taaruf" element={<LegacyTaarufCvRedirect />} />
+          <Route path="/jamaah/*" element={<PrefixRedirect from="/jamaah" to="/members" />} />
           <Route
-            path="/absensi"
+            path="/attendance"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                 <AttendancePage />
               </RoleRoute>
             }
           />
+          <Route path="/absensi" element={<PrefixRedirect from="/absensi" to="/attendance" />} />
           <Route
-            path="/pengumuman"
+            path="/announcements"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <AnnouncementsPage />
@@ -491,19 +707,21 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/pengumuman/templates"
+            path="/announcements/templates"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <AnnouncementTemplatesPage />
               </RoleRoute>
             }
           />
-          <Route path="/profil-saya" element={<MemberSelfPage />} />
-          <Route path="/profil-saya/edit" element={<MemberEditProfilePage />} />
-          <Route path="/lainnya">
+          <Route path="/pengumuman/*" element={<PrefixRedirect from="/pengumuman" to="/announcements" />} />
+          <Route path="/my-profile" element={<MemberSelfPage />} />
+          <Route path="/my-profile/edit" element={<MemberEditProfilePage />} />
+          <Route path="/profil-saya/*" element={<PrefixRedirect from="/profil-saya" to="/my-profile" />} />
+          <Route path="/more">
             <Route index element={<OthersPage />} />
             <Route
-              path="kelompok"
+              path="groups"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                   <GroupsPage />
@@ -511,7 +729,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="pendaftar"
+              path="registrants"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <PendingMembersPage />
@@ -519,7 +737,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="pendaftar/:submission_id"
+              path="registrants/:submission_id"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <PendingMemberDetailPage />
@@ -527,7 +745,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="permintaan-member"
+              path="member-requests"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <MemberRequestsPage />
@@ -567,15 +785,15 @@ function AppRoutes() {
               }
             />
             <Route
-              path="jadwal"
+              path="schedule"
               element={
-                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI"]}>
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <JadwalPage />
                 </RoleRoute>
               }
             />
             <Route
-              path="petugas-jumat"
+              path="friday-officers"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <FridaySchedulesPage />
@@ -583,7 +801,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="petugas-jumat/cetak"
+              path="friday-officers/print"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <FridayPrintPage />
@@ -591,7 +809,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="import-jamaah"
+              path="import-members"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <MemberImportPage />
@@ -599,7 +817,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="rekap-absensi"
+              path="attendance-recap"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <MemberAttendanceRecapPage />
@@ -607,7 +825,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="rekap-absensi/cetak"
+              path="attendance-recap/print"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <RecapPrintPage />
@@ -615,6 +833,18 @@ function AppRoutes() {
               }
             />
           </Route>
+          {/* Redirect legacy /lainnya/* (segmen ikut diterjemahkan satu per satu) */}
+          <Route path="/lainnya/kelompok" element={<Navigate to="/more/groups" replace />} />
+          <Route path="/lainnya/pendaftar" element={<Navigate to="/more/registrants" replace />} />
+          <Route path="/lainnya/pendaftar/:submission_id" element={<PrefixRedirect from="/lainnya/pendaftar" to="/more/registrants" />} />
+          <Route path="/lainnya/permintaan-member" element={<Navigate to="/more/member-requests" replace />} />
+          <Route path="/lainnya/import-jamaah" element={<Navigate to="/more/import-members" replace />} />
+          <Route path="/lainnya/jadwal" element={<PrefixRedirect from="/lainnya/jadwal" to="/more/schedule" />} />
+          <Route path="/lainnya/rekap-absensi/cetak" element={<PrefixRedirect from="/lainnya/rekap-absensi/cetak" to="/more/attendance-recap/print" />} />
+          <Route path="/lainnya/rekap-absensi" element={<PrefixRedirect from="/lainnya/rekap-absensi" to="/more/attendance-recap" />} />
+          <Route path="/lainnya/petugas-jumat/cetak" element={<PrefixRedirect from="/lainnya/petugas-jumat/cetak" to="/more/friday-officers/print" />} />
+          <Route path="/lainnya/petugas-jumat" element={<PrefixRedirect from="/lainnya/petugas-jumat" to="/more/friday-officers" />} />
+          <Route path="/lainnya/*" element={<PrefixRedirect from="/lainnya" to="/more" />} />
           <Route path="/ai-chat" element={<AiChatPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

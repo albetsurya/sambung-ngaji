@@ -160,7 +160,7 @@ export const ZakatPage: React.FC = () => {
                 </div>
               )}
               {loading ? <GroupedListSkeleton rows={5} />
-                : filteredZakat.length === 0 ? <EmptyState title="Belum ada catatan zakat" description="Catat via tombol +." />
+                : filteredZakat.length === 0 ? <EmptyState title="Belum ada catatan zakat di kelompok ini" description="Belum ada penerimaan zakat yang tercatat di kelompok ini. Catat penerimaan pertama memakai tombol + di bawah." />
                 : (
                   <GroupedList>
                     {filteredZakat.map((z, idx) => (

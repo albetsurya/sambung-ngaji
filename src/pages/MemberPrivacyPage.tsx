@@ -15,7 +15,7 @@ export default function MemberPrivacyPage() {
     <AppLayout hideNav>
       <Header
         title="Kebijakan Privasi"
-        onBack={() => goBack(navigate, "/member/lainnya")}
+        onBack={() => goBack(navigate, "/member/more")}
         backLabel="Kembali"
       />
 

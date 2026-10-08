@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout, Header } from "../components/layout/AppLayout";
+import { usePermission } from "../hooks/usePermission";
 import {
   Calendar,
   Plus,
@@ -44,6 +45,8 @@ function TabFallback() {
 
 export default function JadwalPage() {
   const navigate = useNavigate();
+  const { role } = usePermission();
+  const isTimAbsensi = role === "TIM_ABSENSI";
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const initialTab: TabKey =
@@ -51,11 +54,11 @@ export default function JadwalPage() {
   const [tab, setTab] = useState<TabKey>(initialTab);
 
   return (
-    <AppLayout hideNav>
+    <AppLayout hideNav={!isTimAbsensi}>
       <Header
         title="Kelola Jadwal"
-        onBack={() => navigate(-1)}
-        backLabel="Kembali"
+        onBack={isTimAbsensi ? undefined : () => navigate(-1)}
+        backLabel={isTimAbsensi ? undefined : "Kembali"}
       />
 
       

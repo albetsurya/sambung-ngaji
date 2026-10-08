@@ -18,8 +18,8 @@ export default function QrCodePage() {
 
   const registrationUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/daftar`
-      : "/daftar";
+      ? `${window.location.origin}/register`
+      : "/register";
 
   async function handleCopy() {
     try {

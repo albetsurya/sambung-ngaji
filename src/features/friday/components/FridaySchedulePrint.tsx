@@ -4,8 +4,8 @@ import { FRIDAY_ROLES } from "../utils/friday";
 import { formatDateLongText } from "../../../utils/format";
 
 
-function shortDay(tanggal: string): string {
-  const d = new Date(tanggal + "T00:00:00");
+function shortDay(date: string): string {
+  const d = new Date(date + "T00:00:00");
   if (isNaN(d.getTime())) return "";
   return new Intl.DateTimeFormat("id-ID", { weekday: "short" }).format(d);
 }
@@ -21,8 +21,8 @@ export const FridaySchedulePrint = forwardRef<
   }).format(new Date());
   const period =
     schedules.length > 0
-      ? `${formatDateLongText(schedules[0].tanggal)} - ${formatDateLongText(
-          schedules[schedules.length - 1].tanggal,
+      ? `${formatDateLongText(schedules[0].date)} - ${formatDateLongText(
+          schedules[schedules.length - 1].date,
         )}`
       : "";
 
@@ -75,13 +75,13 @@ export const FridaySchedulePrint = forwardRef<
           </thead>
           <tbody>
             {schedules.map((s, i) => (
-              <tr key={s.tanggal} className={i % 2 === 1 ? "bg-slate-50" : ""}>
+              <tr key={s.date} className={i % 2 === 1 ? "bg-slate-50" : ""}>
                 <td className="px-3 py-2.5 border-b border-slate-100 align-top">
                   <p className="text-[13px] font-bold tabular-nums whitespace-nowrap">
-                    {formatDateLongText(s.tanggal)}
+                    {formatDateLongText(s.date)}
                   </p>
                   <p className="text-[11px] text-slate-400 capitalize">
-                    {shortDay(s.tanggal)}
+                    {shortDay(s.date)}
                   </p>
                 </td>
                 {FRIDAY_ROLES.map((r) => (

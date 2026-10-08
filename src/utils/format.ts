@@ -151,24 +151,24 @@ export function getMemberCategory(
   member: Partial<Member>,
   latestEducation?: Partial<Education>,
 ): MemberCategory | null {
-  if (member.is_nikah) {
-    const age = getMemberAge(member.tanggal_lahir);
+  if (member.is_married) {
+    const age = getMemberAge(member.birth_date);
     return age !== null && age >= 60 ? "ISTIMEWA" : "DEWASA";
   }
 
-  const jenjang = (
-    latestEducation?.jenjang ||
-    member.jenjang_pendidikan ||
+  const level = (
+    latestEducation?.level ||
+    member.education_level ||
     ""
   ).toUpperCase();
 
-  if (jenjang === "PAUD" || jenjang === "TK") return "CABERAWIT";
-  if (jenjang === "SD") return "CABERAWIT";
-  if (jenjang === "SMP") return "PRA_REMAJA";
-  if (jenjang === "SMA" || jenjang === "SMK" || jenjang === "MA")
+  if (level === "PAUD" || level === "TK") return "CABERAWIT";
+  if (level === "SD") return "CABERAWIT";
+  if (level === "SMP") return "PRA_REMAJA";
+  if (level === "SMA" || level === "SMK" || level === "MA")
     return "REMAJA";
 
-  const age = getMemberAge(member.tanggal_lahir);
+  const age = getMemberAge(member.birth_date);
   if (age !== null && age >= 60) return "ISTIMEWA";
   if (age !== null && age < 6) return "BALITA";
   if (age !== null && age < 13) return "CABERAWIT";
@@ -235,11 +235,11 @@ export function formatRp(n: number | null | undefined): string {
 export const fmtRp = formatRp;
 
 export function getDisplayName(member: Member): string {
-  const usia = getMemberAge(member.tanggal_lahir);
-  if (usia === null || usia < 40) return member.nama_lengkap;
+  const usia = getMemberAge(member.birth_date);
+  if (usia === null || usia < 40) return member.full_name;
 
-  const jk = (member.jenis_kelamin || "").toUpperCase();
-  if (jk === "L") return `Pak ${member.nama_lengkap}`;
-  if (jk === "P") return `Bu ${member.nama_lengkap}`;
-  return member.nama_lengkap;
+  const jk = (member.gender || "").toUpperCase();
+  if (jk === "L") return `Pak ${member.full_name}`;
+  if (jk === "P") return `Bu ${member.full_name}`;
+  return member.full_name;
 }

@@ -44,15 +44,15 @@ export default function FridayPrintPage() {
   const upcoming = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal >= today)
-        .sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
+        .filter((s) => s.date >= today)
+        .sort((a, b) => a.date.localeCompare(b.date)),
     [schedules, today],
   );
   const past = useMemo(
     () =>
       schedules
-        .filter((s) => s.tanggal < today)
-        .sort((a, b) => b.tanggal.localeCompare(a.tanggal)),
+        .filter((s) => s.date < today)
+        .sort((a, b) => b.date.localeCompare(a.date)),
     [schedules, today],
   );
 
@@ -86,7 +86,7 @@ export default function FridayPrintPage() {
         subtitle="Jadwal Petugas Sholat Jumat"
         onBack={() => {
           if (window.history.length > 1) navigate(-1);
-          else navigate("/lainnya/petugas-jumat", { replace: true });
+          else navigate("/more/friday-officers", { replace: true });
         }}
         backLabel="Kembali"
         showSyncButton={false}

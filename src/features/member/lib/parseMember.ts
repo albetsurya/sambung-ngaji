@@ -1,23 +1,23 @@
 
 export interface ParsedMember {
   blockIndex: number;
-  nama_lengkap: string;
-  nama_panggilan: string;
-  jenis_kelamin: "L" | "P" | "";
-  tempat_lahir: string;
-  tanggal_lahir: string;
-  no_wa: string;
-  alamat_rumah: string;
-  desa: string;
-  daerah: string;
-  pekerjaan: string;
-  hobi: string;
-  is_muballigh: boolean;
-  is_nikah: boolean;
-  is_kerja: boolean;
-  jenjang_pendidikan: string;
-  sekolah: string;
-  jurusan: string;
+  full_name: string;
+  nickname: string;
+  gender: "L" | "P" | "";
+  birth_place: string;
+  birth_date: string;
+  whatsapp_number: string;
+  home_address: string;
+  village: string;
+  region: string;
+  occupation: string;
+  hobby: string;
+  is_preacher: boolean;
+  is_married: boolean;
+  is_employed: boolean;
+  education_level: string;
+  school: string;
+  major: string;
   warnings: string[];
 }
 
@@ -27,24 +27,24 @@ export interface ParseResult {
 }
 
 type FieldTarget =
-  | "nama_lengkap"
-  | "nama_panggilan"
-  | "jenis_kelamin"
-  | "tempat_lahir"
-  | "tanggal_lahir"
+  | "full_name"
+  | "nickname"
+  | "gender"
+  | "birth_place"
+  | "birth_date"
   | "tempat_tanggal_lahir"
-  | "no_wa"
-  | "alamat_rumah"
-  | "desa"
-  | "daerah"
-  | "pekerjaan"
-  | "hobi"
-  | "is_muballigh"
-  | "is_nikah"
-  | "is_kerja"
-  | "jenjang_pendidikan"
-  | "sekolah"
-  | "jurusan";
+  | "whatsapp_number"
+  | "home_address"
+  | "village"
+  | "region"
+  | "occupation"
+  | "hobby"
+  | "is_preacher"
+  | "is_married"
+  | "is_employed"
+  | "education_level"
+  | "school"
+  | "major";
 
 
 const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
@@ -59,27 +59,27 @@ const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
     ],
   },
   {
-    target: "nama_lengkap",
+    target: "full_name",
     keywords: ["nama lengkap", "nama_lkp", "namalengkap"],
   },
   {
-    target: "nama_panggilan",
+    target: "nickname",
     keywords: ["nama panggilan", "panggilan", "nama panggil"],
   },
   {
-    target: "jenis_kelamin",
+    target: "gender",
     keywords: ["jenis kelamin", "jenis kelmain", "kelamin", "jk", "gender"],
   },
   {
-    target: "tanggal_lahir",
+    target: "birth_date",
     keywords: ["tanggal lahir", "tgl lahir", "tgllahir"],
   },
   {
-    target: "tempat_lahir",
+    target: "birth_place",
     keywords: ["tempat lahir", "tmpt lahir"],
   },
   {
-    target: "no_wa",
+    target: "whatsapp_number",
     keywords: [
       "no whatsapp",
       "no wa",
@@ -95,11 +95,11 @@ const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
     ],
   },
   {
-    target: "alamat_rumah",
+    target: "home_address",
     keywords: ["alamat rumah", "alamat lengkap", "alamat"],
   },
   {
-    target: "jenjang_pendidikan",
+    target: "education_level",
     keywords: [
       "jenjang pendidikan",
       "pendidikan terakhir",
@@ -109,45 +109,45 @@ const FIELD_KEYWORDS: { target: FieldTarget; keywords: string[] }[] = [
     ],
   },
   {
-    target: "sekolah",
+    target: "school",
     keywords: [
       "sekolah pendidikan saat ini terakhir",
       "sekolah pendidikan terakhir",
-      "sekolah",
+      "school",
       "kampus",
       "instansi",
     ],
   },
   {
-    target: "jurusan",
+    target: "major",
     keywords: ["jurusan", "program studi", "prodi"],
   },
   {
-    target: "pekerjaan",
+    target: "occupation",
     keywords: ["pekerjaan", "kerja"],
   },
   {
-    target: "is_kerja",
+    target: "is_employed",
     keywords: ["kesibukan", "aktivitas", "kegiatan"],
   },
   {
-    target: "is_muballigh",
+    target: "is_preacher",
     keywords: ["status muballigh", "muballigh", "mubaligh"],
   },
   {
-    target: "is_nikah",
+    target: "is_married",
     keywords: ["status pernikahan", "status nikah", "sudah menikah", "menikah"],
   },
   {
-    target: "desa",
+    target: "village",
     keywords: ["desa", "kelurahan", "kampung"],
   },
   {
-    target: "daerah",
+    target: "region",
     keywords: ["daerah", "kabupaten", "kota", "kecamatan"],
   },
   {
-    target: "hobi",
+    target: "hobby",
     keywords: ["hobi", "hobby", "kesukaan"],
   },
 ];
@@ -303,20 +303,20 @@ function parseTanggal(raw: string): string {
   return "";
 }
 
-function parseTempatTanggal(raw: string): { tempat: string; tanggal: string } {
-  if (!raw) return { tempat: "", tanggal: "" };
+function parseTempatTanggal(raw: string): { tempat: string; date: string } {
+  if (!raw) return { tempat: "", date: "" };
 
   const commaIdx = raw.lastIndexOf(",");
   if (commaIdx > 0) {
     const tempat = raw.slice(0, commaIdx).trim();
     const tanggalRaw = raw.slice(commaIdx + 1).trim();
-    return { tempat, tanggal: parseTanggal(tanggalRaw) };
+    return { tempat, date: parseTanggal(tanggalRaw) };
   }
 
   const tgl = parseTanggal(raw);
-  if (tgl) return { tempat: "", tanggal: tgl };
+  if (tgl) return { tempat: "", date: tgl };
 
-  return { tempat: raw.trim(), tanggal: "" };
+  return { tempat: raw.trim(), date: "" };
 }
 
 function parseNoWA(raw: string): string {
@@ -375,7 +375,7 @@ function splitIntoBlocks(lines: string[]): string[][] {
     }
 
     const parsed = tryParseField(line);
-    if (parsed?.target === "nama_lengkap") {
+    if (parsed?.target === "full_name") {
       if (currentHasNama) {
         flush();
       }
@@ -391,44 +391,44 @@ function splitIntoBlocks(lines: string[]): string[][] {
 
 
 interface BlockParseState {
-  nama_lengkap: string;
-  nama_panggilan: string;
-  jenis_kelamin: "L" | "P" | "";
-  tempat_lahir: string;
-  tanggal_lahir: string;
-  no_wa: string;
-  alamat_rumah: string;
-  desa: string;
-  daerah: string;
-  pekerjaan: string;
-  hobi: string;
-  is_muballigh: boolean;
-  is_nikah: boolean;
-  is_kerja: boolean;
-  jenjang_pendidikan: string;
-  sekolah: string;
-  jurusan: string;
+  full_name: string;
+  nickname: string;
+  gender: "L" | "P" | "";
+  birth_place: string;
+  birth_date: string;
+  whatsapp_number: string;
+  home_address: string;
+  village: string;
+  region: string;
+  occupation: string;
+  hobby: string;
+  is_preacher: boolean;
+  is_married: boolean;
+  is_employed: boolean;
+  education_level: string;
+  school: string;
+  major: string;
 }
 
 function emptyState(): BlockParseState {
   return {
-    nama_lengkap: "",
-    nama_panggilan: "",
-    jenis_kelamin: "",
-    tempat_lahir: "",
-    tanggal_lahir: "",
-    no_wa: "",
-    alamat_rumah: "",
-    desa: "",
-    daerah: "",
-    pekerjaan: "",
-    hobi: "",
-    is_muballigh: false,
-    is_nikah: false,
-    is_kerja: false,
-    jenjang_pendidikan: "",
-    sekolah: "",
-    jurusan: "",
+    full_name: "",
+    nickname: "",
+    gender: "",
+    birth_place: "",
+    birth_date: "",
+    whatsapp_number: "",
+    home_address: "",
+    village: "",
+    region: "",
+    occupation: "",
+    hobby: "",
+    is_preacher: false,
+    is_married: false,
+    is_employed: false,
+    education_level: "",
+    school: "",
+    major: "",
   };
 }
 
@@ -441,65 +441,65 @@ function assignField(
   if (!value) return;
 
   switch (target) {
-    case "nama_lengkap":
-      state.nama_lengkap = value;
+    case "full_name":
+      state.full_name = value;
       break;
-    case "nama_panggilan":
-      state.nama_panggilan = value;
+    case "nickname":
+      state.nickname = value;
       break;
-    case "jenis_kelamin":
-      state.jenis_kelamin = parseJenisKelamin(value);
+    case "gender":
+      state.gender = parseJenisKelamin(value);
       break;
     case "tempat_tanggal_lahir": {
-      const { tempat, tanggal } = parseTempatTanggal(value);
-      if (tempat && !state.tempat_lahir) state.tempat_lahir = tempat;
-      if (tanggal && !state.tanggal_lahir) state.tanggal_lahir = tanggal;
+      const { tempat, date } = parseTempatTanggal(value);
+      if (tempat && !state.birth_place) state.birth_place = tempat;
+      if (date && !state.birth_date) state.birth_date = date;
       break;
     }
-    case "tempat_lahir":
-      state.tempat_lahir = value;
+    case "birth_place":
+      state.birth_place = value;
       break;
-    case "tanggal_lahir":
-      state.tanggal_lahir = parseTanggal(value);
+    case "birth_date":
+      state.birth_date = parseTanggal(value);
       break;
-    case "no_wa":
-      state.no_wa = parseNoWA(value);
+    case "whatsapp_number":
+      state.whatsapp_number = parseNoWA(value);
       break;
-    case "alamat_rumah":
-      state.alamat_rumah = value;
+    case "home_address":
+      state.home_address = value;
       break;
-    case "desa":
-      state.desa = value;
+    case "village":
+      state.village = value;
       break;
-    case "daerah":
-      state.daerah = value;
+    case "region":
+      state.region = value;
       break;
-    case "pekerjaan":
-      state.pekerjaan = value;
+    case "occupation":
+      state.occupation = value;
       break;
-    case "hobi":
-      state.hobi = value;
+    case "hobby":
+      state.hobby = value;
       break;
-    case "is_muballigh":
-      state.is_muballigh = parseBoolean(value);
+    case "is_preacher":
+      state.is_preacher = parseBoolean(value);
       break;
-    case "is_nikah":
-      state.is_nikah = parseBoolean(value);
+    case "is_married":
+      state.is_married = parseBoolean(value);
       break;
-    case "is_kerja": {
+    case "is_employed": {
       const v = value.toLowerCase();
-      state.is_kerja = v.includes("kerja") && !v.includes("belum");
-      if (!state.pekerjaan) state.pekerjaan = value;
+      state.is_employed = v.includes("kerja") && !v.includes("belum");
+      if (!state.occupation) state.occupation = value;
       break;
     }
-    case "jenjang_pendidikan":
-      state.jenjang_pendidikan = value;
+    case "education_level":
+      state.education_level = value;
       break;
-    case "sekolah":
-      state.sekolah = value;
+    case "school":
+      state.school = value;
       break;
-    case "jurusan":
-      if (value !== "-") state.jurusan = value;
+    case "major":
+      if (value !== "-") state.major = value;
       break;
   }
 }
@@ -554,7 +554,7 @@ export function parseMemberText(text: string): ParseResult {
   blocks.forEach((block, idx) => {
     const state = parseBlock(block);
 
-    if (!state.nama_lengkap) {
+    if (!state.full_name) {
       skipped.push({
         blockPreview: block[0]?.slice(0, 60) || "(empty)",
         reason: "Nama Lengkap tidak ditemukan",
@@ -563,31 +563,31 @@ export function parseMemberText(text: string): ParseResult {
     }
 
     const warnings: string[] = [];
-    if (!state.jenis_kelamin) warnings.push("Jenis kelamin kosong");
-    if (!state.tanggal_lahir) warnings.push("Tanggal lahir kosong");
-    if (!state.no_wa) warnings.push("No. WA kosong");
-    else if (state.no_wa.length < 10 || state.no_wa.length > 15)
+    if (!state.gender) warnings.push("Jenis kelamin kosong");
+    if (!state.birth_date) warnings.push("Tanggal lahir kosong");
+    if (!state.whatsapp_number) warnings.push("No. WA kosong");
+    else if (state.whatsapp_number.length < 10 || state.whatsapp_number.length > 15)
       warnings.push("Format No. WA tidak standar");
 
     members.push({
       blockIndex: idx,
-      nama_lengkap: state.nama_lengkap,
-      nama_panggilan: state.nama_panggilan,
-      jenis_kelamin: state.jenis_kelamin,
-      tempat_lahir: state.tempat_lahir,
-      tanggal_lahir: state.tanggal_lahir,
-      no_wa: state.no_wa,
-      alamat_rumah: state.alamat_rumah,
-      desa: state.desa,
-      daerah: state.daerah,
-      pekerjaan: state.pekerjaan,
-      hobi: state.hobi,
-      is_muballigh: state.is_muballigh,
-      is_nikah: state.is_nikah,
-      is_kerja: state.is_kerja,
-      jenjang_pendidikan: state.jenjang_pendidikan,
-      sekolah: state.sekolah,
-      jurusan: state.jurusan,
+      full_name: state.full_name,
+      nickname: state.nickname,
+      gender: state.gender,
+      birth_place: state.birth_place,
+      birth_date: state.birth_date,
+      whatsapp_number: state.whatsapp_number,
+      home_address: state.home_address,
+      village: state.village,
+      region: state.region,
+      occupation: state.occupation,
+      hobby: state.hobby,
+      is_preacher: state.is_preacher,
+      is_married: state.is_married,
+      is_employed: state.is_employed,
+      education_level: state.education_level,
+      school: state.school,
+      major: state.major,
       warnings,
     });
   });

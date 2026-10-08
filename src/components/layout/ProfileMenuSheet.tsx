@@ -85,13 +85,13 @@ export function ProfileMenuSheet({
       
       <div className="mb-4 flex items-center gap-3.5 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
         <Avatar
-          name={user?.nama || "?"}
+          name={user?.name || "?"}
           size={56}
-          gender={normalizeGender(user?.jenis_kelamin)}
+          gender={normalizeGender(user?.gender)}
         />
         <div className="flex-1 min-w-0">
           <p className="text-ios-body font-semibold text-surface-text truncate">
-            {user?.nama || "Pengguna"}
+            {user?.name || "Pengguna"}
           </p>
           <p className="text-ios-footnote text-surface-muted truncate">
             @{user?.username || "-"}

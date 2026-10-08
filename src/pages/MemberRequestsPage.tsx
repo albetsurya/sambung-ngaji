@@ -148,7 +148,7 @@ export default function MemberRequestsPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-ios-body font-medium text-surface-text truncate">
-                        {r.nama || "-"}
+                        {r.name || "-"}
                       </p>
                       <p className="text-ios-footnote text-surface-muted truncate">
                         {r.created_at ? formatDateShort(r.created_at) : "-"}
@@ -190,7 +190,7 @@ export default function MemberRequestsPage() {
         title="Setujui member?"
         description={
           pendingAction
-            ? `Data member untuk "${pendingAction.nama}" akan dibuat dan akunnya ditautkan.`
+            ? `Data member untuk "${pendingAction.name}" akan dibuat dan akunnya ditautkan.`
             : ""
         }
         confirmLabel="Setujui"
@@ -203,7 +203,7 @@ export default function MemberRequestsPage() {
         title="Tolak permintaan?"
         description={
           rejectTarget
-            ? `Permintaan "${rejectTarget.nama}" akan ditolak.`
+            ? `Permintaan "${rejectTarget.name}" akan ditolak.`
             : ""
         }
         confirmLabel="Tolak"

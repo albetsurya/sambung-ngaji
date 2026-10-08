@@ -182,7 +182,7 @@ function toTransaction(raw: any, idx: number): Transaction {
   return {
     no: raw.no ?? idx + 1,
     cash_id: raw.cash_id ?? (raw as any).kas_id,
-    transaction_date: raw.transaction_date || raw.tanggal || "",
+    transaction_date: raw.transaction_date || raw.date || "",
     account_name: raw.account_name || raw.account || "",
     description: raw.description || raw.keterangan || "",
     transaction_type: credit > debit ? "CREDIT" : "DEBIT",
@@ -297,7 +297,7 @@ export const financeApi = {
     await restPost("/api/v1/finance/cash-ledger", {
       group_id: gid,
       cash_type: cashType,
-      tanggal: data.transaction_date,
+      date: data.transaction_date,
       account_name: data.account_name,
       description: data.description,
       debit: data.debit || 0,
@@ -315,7 +315,7 @@ export const financeApi = {
       group_id: gid,
       cash_id: data.cash_id,
       cash_type: cashType,
-      tanggal: data.transaction_date,
+      date: data.transaction_date,
       account_name: data.account_name,
       description: data.description,
       debit: data.debit || 0,
@@ -581,7 +581,7 @@ export const financeApi = {
       soul_count: data.soul_count ?? data.jumlahJiwa ?? 0,
       total_rice_kg: data.total_rice_kg ?? data.totalBerasKg ?? 0,
       total_money_rp: data.total_money_rp ?? data.totalUangRp ?? 0,
-      transaction_date: data.transaction_date || data.tanggal || "",
+      transaction_date: data.transaction_date || data.date || "",
     });
   },
 };

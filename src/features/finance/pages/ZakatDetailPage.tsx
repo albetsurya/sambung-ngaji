@@ -871,8 +871,8 @@ export const ZakatDetailPage: React.FC = () => {
                 </SectionTitle>
                 {payers.length === 0 ? (
                   <EmptyState
-                    title="Belum ada muzakki"
-                    description="Tambah via tombol +."
+                    title="Belum ada muzakki tercatat"
+                    description="Daftar orang yang berzakat akan tampil di sini. Tambahkan muzakki pertama memakai tombol + di bawah."
                   />
                 ) : (
                   <>
@@ -898,7 +898,7 @@ export const ZakatDetailPage: React.FC = () => {
                                   insetDivider={i !== list.length - 1}
                                   leading={
                                     <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0 font-bold text-ios-body">
-                                      {(m.name || m.nama || "?")
+                                      {(m.name || m.name || "?")
                                         .charAt(0)
                                         .toUpperCase()}
                                     </span>
@@ -907,7 +907,7 @@ export const ZakatDetailPage: React.FC = () => {
                                   <div className="flex items-center justify-between w-full gap-2">
                                     <div className="min-w-0">
                                       <p className="truncate font-medium text-ios-body">
-                                        {m.name || m.nama}
+                                        {m.name || m.name}
                                       </p>
                                       {showJiwa &&
                                         Number(m.family_members_count) > 0 && (
@@ -1088,8 +1088,8 @@ export const ZakatDetailPage: React.FC = () => {
                 <div className="mt-4">
                   {recipients.length === 0 ? (
                     <EmptyState
-                      title="Belum ada mustahik"
-                      description="Tambah via tombol +."
+                      title="Belum ada mustahik tercatat"
+                      description="Daftar penerima zakat akan tampil di sini. Tambahkan mustahik pertama memakai tombol + di bawah agar penyaluran bisa dicatat."
                     />
                   ) : (
                     <>
@@ -1101,7 +1101,7 @@ export const ZakatDetailPage: React.FC = () => {
                             insetDivider={i !== recipients.length - 1}
                             leading={
                               <span className="w-9 h-9 rounded-xl bg-success-soft flex items-center justify-center text-success shrink-0 font-bold text-ios-body">
-                                {(m.name || m.nama || "?")
+                                {(m.name || m.name || "?")
                                   .charAt(0)
                                   .toUpperCase()}
                               </span>
@@ -1109,7 +1109,7 @@ export const ZakatDetailPage: React.FC = () => {
                           >
                             <div className="flex items-center justify-between w-full gap-2">
                               <p className="truncate font-medium text-ios-body">
-                                {m.name || m.nama}
+                                {m.name || m.name}
                               </p>
                               <p className="font-bold shrink-0 tabular-nums">
                                 {m.amount ? formatRp(m.amount) : ""}

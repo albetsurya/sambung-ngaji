@@ -203,7 +203,7 @@ export default function AiUsagePage() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <p className="text-ios-body font-medium text-surface-text truncate">
-                            {u.user_nama}
+                            {u.user_name}
                           </p>
                           <p className="text-ios-caption text-surface-muted truncate">
                             {ROLE_LABEL[u.role] || u.role} ·{" "}

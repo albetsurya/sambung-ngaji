@@ -26,21 +26,21 @@ import {
 import { RoleBadge } from "../ui";
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
-  { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
-  { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
+  { key: "jamaah", label: "Jamaah", to: "/members", icon: Users },
+  { key: "absensi", label: "Absensi", to: "/attendance", icon: CalendarCheck },
   {
     key: "pengumuman",
     label: "Pengumuman",
-    to: "/pengumuman",
+    to: "/announcements",
     icon: Megaphone,
   },
   { key: "kas", label: "Kas", to: "/finance/ledger", icon: Landmark },
   { key: "shodaqoh", label: "Shodaqoh", to: "/finance/monthly-dues", icon: Heart },
   { key: "zakat", label: "Zakat", to: "/finance/zakat", icon: ScrollText },
-  { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
+  { key: "lainnya", label: "Lainnya", to: "/more", icon: MoreHorizontal },
 ];
 const KELOLA_ITEMS = [
-  { label: "Kelola Kelompok", to: "/kelompok-saya", icon: Building2 },
+  { label: "Kelola Kelompok", to: "/my-group", icon: Building2 },
 ];
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },
@@ -48,7 +48,7 @@ const MEMBER_ITEMS = [
   { key: "sholat", label: "Jadwal Sholat", to: "/member/prayer", icon: Calendar },
   { key: "dzikir", label: "Dzikir & Doa", to: "/member/dzikir", icon: RefreshCw },
   { key: "progres", label: "Progres Saya", to: "/member/progres", icon: Sparkles },
-  { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
+  { key: "lainnya", label: "Lainnya", to: "/member/more", icon: MoreHorizontal },
 ];
 export function DesktopSidebar() {
   const location = useLocation();
@@ -57,7 +57,8 @@ export function DesktopSidebar() {
   const { canSeeNav, isGlobal, isSuperAdmin, role, groupId } = usePermission();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const isMemberContext = location.pathname.startsWith("/member");
+  const isMemberContext =
+    location.pathname === "/member" || location.pathname.startsWith("/member/");
   const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
   const visible = isMemberContext
     ? items
@@ -74,7 +75,7 @@ export function DesktopSidebar() {
           {
             key: "kelompok-saya",
             label: "Kelompok Saya",
-            to: "/kelompok-saya",
+            to: "/my-group",
             icon: Building2,
           },
           ...visible.slice(1),
@@ -200,11 +201,11 @@ export function DesktopSidebar() {
         {user ? (
           <div className="flex items-center gap-2.5 p-2 rounded-xl bg-surface-card border border-surface-border">
             <div className="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center font-bold text-ios-footnote shrink-0">
-              {user.nama ? user.nama.charAt(0).toUpperCase() : <UserIcon size={16} />}
+              {user.name ? user.name.charAt(0).toUpperCase() : <UserIcon size={16} />}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-ios-footnote font-semibold text-surface-text truncate">
-                {user.nama || user.username}
+                {user.name || user.username}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
                 <RoleBadge role={user.role} />

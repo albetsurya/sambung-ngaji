@@ -4,7 +4,7 @@ import { Check, Home, Calendar } from "../components/ui/FontAwesomeIcons";
 import { Button } from "../components/ui";
 
 interface SuccessState {
-  nama?: string;
+  name?: string;
   submissionId?: string;
 }
 
@@ -12,11 +12,11 @@ export default function RegistrationSuccessPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state as SuccessState) || {};
-  const { nama, submissionId } = state;
+  const { name, submissionId } = state;
 
   useEffect(() => {
     if (!submissionId) {
-      navigate("/daftar", { replace: true });
+      navigate("/register", { replace: true });
     }
   }, [submissionId, navigate]);
 
@@ -46,7 +46,7 @@ export default function RegistrationSuccessPage() {
             Pendaftaran Diterima
           </h1>
           <p className="text-ios-body text-surface-muted max-w-[300px] mx-auto leading-relaxed">
-            Terima kasih{nama ? `, ${nama}` : ""}! Data Anda sudah kami terima.
+            Terima kasih{name ? `, ${name}` : ""}! Data Anda sudah kami terima.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function RegistrationSuccessPage() {
           <Button
             variant="secondary"
             fullWidth
-            onClick={() => navigate("/daftar", { replace: true })}
+            onClick={() => navigate("/register", { replace: true })}
           >
             Daftar Jamaah Lain
           </Button>

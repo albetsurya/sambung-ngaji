@@ -37,9 +37,9 @@ export default function MemberAttendancePage() {
         .map(
           (a): AttendanceItem => ({
             id: a.attendance_id,
-            date: a.tanggal,
-            label: a.acara || "Pengajian",
-            sublabel: [a.hari, a.tanggal ? formatDateShort(a.tanggal) : "", a.jam]
+            date: a.date,
+            label: a.event || "Pengajian",
+            sublabel: [a.day, a.date ? formatDateShort(a.date) : "", a.time]
               .filter(Boolean)
               .join(" · "),
             status: a.status,

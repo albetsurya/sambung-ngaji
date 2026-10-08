@@ -9,6 +9,7 @@ import {
   LogOut,
   Lock,
   ClipboardList,
+  Megaphone,
   Sparkles,
   QrCode,
   Calendar,
@@ -42,7 +43,7 @@ import { queryKeys } from "../lib/queryClient";
 import type { Group } from "../types";
 import { GroupedListSkeleton } from "../components/ui/Skeleton";
 
-type MenuGroup = "tampilan" | "jamaah" | "jadwal" | "sistem" | "akun";
+type MenuGroup = "tampilan" | "jamaah" | "schedule" | "info" | "sistem" | "akun";
 
 const FOCUS_GROUP_KEY = "superadmin_focus_group";
 
@@ -116,7 +117,7 @@ export default function OthersPage() {
     return allGroups.filter(
       (g) =>
         g.group_name.toLowerCase().includes(s) ||
-        (g.pembina || "").toLowerCase().includes(s),
+        (g.mentor || "").toLowerCase().includes(s),
     );
   }, [allGroups, groupSearch]);
 
@@ -141,7 +142,7 @@ export default function OthersPage() {
         label: "Kelompok Saya",
         description: "Anggota, jadwal, absensi & pendaftar kelompok ini",
         Icon: Building2,
-        to: "/kelompok-saya",
+        to: "/my-group",
         show: isHubUser,
         group: "akun",
         badge: pendingCount > 0 ? pendingCount : undefined,
@@ -152,7 +153,7 @@ export default function OthersPage() {
         label: "Pendaftar",
         description: "Verifikasi pendaftar baru",
         Icon: ClipboardList,
-        to: "/lainnya/pendaftar",
+        to: "/more/registrants",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
         badge: pendingCount > 0 ? pendingCount : undefined,
@@ -163,16 +164,16 @@ export default function OthersPage() {
         label: "Permintaan Member",
         description: "User minta menjadi member",
         Icon: UserPlus,
-        to: "/lainnya/permintaan-member",
+        to: "/more/member-requests",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
       {
-        key: "kelompok",
+        key: "group_label",
         label: "Kelompok",
         description: "Kelola kelompok pengajian",
         Icon: Building2,
-        to: "/lainnya/kelompok",
+        to: "/more/groups",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -181,7 +182,7 @@ export default function OthersPage() {
         label: "Import Jamaah",
         description: "Paste text biodata dari WhatsApp",
         Icon: FileText,
-        to: "/lainnya/import-jamaah",
+        to: "/more/import-members",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
@@ -190,48 +191,59 @@ export default function OthersPage() {
         label: "QR Pendaftaran",
         description: "Bagikan link pendaftaran",
         Icon: QrCode,
-        to: "/lainnya/qr-code",
+        to: "/more/qr-code",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "jamaah",
       },
 
       {
-        key: "jadwal",
+        key: "schedule",
         label: "Kelola Jadwal",
         description: "Kalender, tambah massal, import PDF",
         Icon: Calendar,
-        to: "/lainnya/jadwal",
+        to: "/more/schedule",
         show:
           (isAdminLike || role === "TIM_ABSENSI") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
       {
         key: "rekap-absensi",
         label: "Rekap Absensi",
         description: "Matriks kehadiran bulanan",
         Icon: CalendarCheck,
-        to: "/lainnya/rekap-absensi",
+        to: "/more/attendance-recap",
         show:
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
       {
         key: "petugas-jumat",
         label: "Petugas Jumat",
         description: "Kelola petugas sholat Jumat",
         Icon: Mosque,
-        to: "/lainnya/petugas-jumat",
+        to: "/more/friday-officers",
         show:
           (isAdminLike || role === "TIM_ABSENSI" || role === "PENGAWAS") &&
           !isHubUser &&
           !isSuperAdmin,
-        group: "jadwal",
+        group: "schedule",
       },
 
+      {
+        key: "pengumuman",
+        label: "Pengumuman",
+        description: "Buat & kelola pengumuman jamaah",
+        Icon: Megaphone,
+        to: "/announcements",
+        show:
+          isSuperAdmin ||
+          ((isAdminLike && !isHubUser) || role === "PENGAWAS"),
+        group: "info",
+      },
       {
         key: "finance",
         label: "Keuangan",
@@ -248,7 +260,7 @@ export default function OthersPage() {
         label: "Manajemen User",
         description: "Atur akun & hak akses",
         Icon: KeyRound,
-        to: "/lainnya/users",
+        to: "/more/users",
         show: isAdminLike && !isHubUser && !isSuperAdmin,
         group: "sistem",
       },
@@ -266,7 +278,7 @@ export default function OthersPage() {
         label: "Monitoring AI",
         description: "Statistik pemakaian AI",
         Icon: Sparkles,
-        to: "/lainnya/ai-usage",
+        to: "/more/ai-usage",
         show: isSuperAdmin,
         group: "sistem",
       },
@@ -275,7 +287,7 @@ export default function OthersPage() {
         label: "Audit Log",
         description: "Riwayat aktivitas sistem",
         Icon: ScrollText,
-        to: "/lainnya/audit-log",
+        to: "/more/audit-log",
         show: isSuperAdmin,
         group: "sistem",
       },
@@ -302,6 +314,7 @@ export default function OthersPage() {
 
   const SUPER_SETTING_KEYS = [
     "theme",
+    "pengumuman",
     "finance",
     "ai-usage",
     "audit",
@@ -313,7 +326,8 @@ export default function OthersPage() {
   const GROUP_LABEL: Record<MenuGroup, string> = {
     tampilan: "Pengaturan Aplikasi",
     jamaah: "Jamaah & Kelompok",
-    jadwal: "Jadwal & Absensi",
+    schedule: "Jadwal & Absensi",
+    info: "Informasi",
     sistem: "Sistem & Hak Akses",
     akun: "Akun Saya",
   };
@@ -321,7 +335,8 @@ export default function OthersPage() {
   const GROUP_ORDER: MenuGroup[] = [
     "tampilan",
     "jamaah",
-    "jadwal",
+    "schedule",
+    "info",
     "akun",
     "sistem",
   ];
@@ -392,18 +407,18 @@ export default function OthersPage() {
           <ListRow
             insetDivider={false}
             className="py-3.5"
-            onClick={() => navigate("/profil-saya")}
+            onClick={() => navigate("/my-profile")}
           >
             <div className="flex items-center gap-3">
               <Avatar
-                src={user?.foto_url}
-                name={user?.nama || "?"}
+                src={user?.photo_url}
+                name={user?.name || "?"}
                 size={52}
-                gender={normalizeGender(user?.jenis_kelamin)}
+                gender={normalizeGender(user?.gender)}
               />
               <div className="min-w-0 flex-1">
                 <p className="text-ios-body font-semibold text-surface-text truncate">
-                  {user?.nama}
+                  {user?.name}
                 </p>
                 <p className="text-ios-footnote text-surface-muted truncate">
                   @{user?.username}
@@ -445,8 +460,8 @@ export default function OthersPage() {
                 onClick={() =>
                   navigate(
                     focusGroupId
-                      ? `/kelompok-saya?group_id=${focusGroupId}`
-                      : "/kelompok-saya",
+                      ? `/my-group?group_id=${focusGroupId}`
+                      : "/my-group",
                   )
                 }
                 insetDivider={false}
@@ -568,7 +583,7 @@ export default function OthersPage() {
                 onClick={() => {
                   selectFocusGroup(null);
                   setGroupSheetOpen(false);
-                  navigate("/kelompok-saya");
+                  navigate("/my-group");
                 }}
                 insetDivider={sheetGroups.length > 0}
                 leading={
@@ -594,7 +609,7 @@ export default function OthersPage() {
                   onClick={() => {
                     selectFocusGroup(g.group_id);
                     setGroupSheetOpen(false);
-                    navigate(`/kelompok-saya?group_id=${g.group_id}`);
+                    navigate(`/my-group?group_id=${g.group_id}`);
                   }}
                   insetDivider={i !== sheetGroups.length - 1}
                   leading={
@@ -610,10 +625,10 @@ export default function OthersPage() {
                           {g.group_name}
                         </p>
                         <p className="text-ios-caption text-surface-muted truncate">
-                          {g.pembina
-                            ? `Pembina: ${g.pembina}`
+                          {g.mentor
+                            ? `Pembina: ${g.mentor}`
                             : "Kelola anggota, jadwal & absensi"}
-                          {g.jadwal ? ` · ${g.jadwal}` : ""}
+                          {g.schedule ? ` · ${g.schedule}` : ""}
                         </p>
                       </div>
                       {focusGroupId === g.group_id && (

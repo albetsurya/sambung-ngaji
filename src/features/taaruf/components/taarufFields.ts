@@ -15,7 +15,7 @@ export const TAARUF_FIELDS: TaarufFieldDef[] = [
     label: "Tempat, tanggal lahir",
     wide: true,
     getValue: (m) =>
-      [m.tempat_lahir, m.tanggal_lahir ? formatDateLongText(m.tanggal_lahir) : ""]
+      [m.birth_place, m.birth_date ? formatDateLongText(m.birth_date) : ""]
         .filter(Boolean)
         .join(", "),
   },
@@ -25,51 +25,51 @@ export const TAARUF_FIELDS: TaarufFieldDef[] = [
     getValue: (m) => (m.usia != null ? `${m.usia} tahun` : ""),
   },
   {
-    key: "daerah",
+    key: "region",
     label: "Daerah",
-    getValue: (m) => m.daerah || "",
+    getValue: (m) => m.region || "",
   },
   {
-    key: "desa",
+    key: "village",
     label: "Desa",
-    getValue: (m) => m.desa || "",
+    getValue: (m) => m.village || "",
   },
   {
-    key: "kelompok",
+    key: "group_label",
     label: "Kelompok",
-    getValue: (m) => m.kelompok || "",
+    getValue: (m) => m.group_label || "",
   },
   {
     key: "alamat",
     label: "Alamat rumah",
     wide: true,
-    getValue: (m) => m.alamat_rumah || "",
+    getValue: (m) => m.home_address || "",
   },
   {
     key: "fisik",
     label: "Tinggi / berat badan",
     getValue: (m) =>
       [
-        m.tinggi_badan ? `${m.tinggi_badan} cm` : "",
-        m.berat_badan ? `${m.berat_badan} kg` : "",
+        m.height ? `${m.height} cm` : "",
+        m.weight ? `${m.weight} kg` : "",
       ]
         .filter(Boolean)
         .join(" / "),
   },
   {
-    key: "pekerjaan",
+    key: "occupation",
     label: "Pekerjaan",
-    getValue: (m) => m.pekerjaan || "",
+    getValue: (m) => m.occupation || "",
   },
   {
-    key: "hobi",
+    key: "hobby",
     label: "Hobi",
-    getValue: (m) => m.hobi || "",
+    getValue: (m) => m.hobby || "",
   },
   {
-    key: "no_wa",
+    key: "whatsapp_number",
     label: "No. WhatsApp",
-    getValue: (m) => m.no_wa || "",
+    getValue: (m) => m.whatsapp_number || "",
   },
 ];
 

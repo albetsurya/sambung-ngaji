@@ -1,0 +1,9 @@
+import {
+  TILAWATI_JILID_1_PAGES, TILAWATI_JILID_2_PAGES, TILAWATI_JILID_3_PAGES,
+  TILAWATI_JILID_4_PAGES, TILAWATI_JILID_5_PAGES,
+} from "./tilawatiQuizData";
+import type { PageQuizData } from "./tilawatiQuizTypes";
+export const TILAWATI_PAGE_DATASETS: Record<number, Record<number, PageQuizData>> = {
+  1: TILAWATI_JILID_1_PAGES, 2: TILAWATI_JILID_2_PAGES, 3: TILAWATI_JILID_3_PAGES,
+  4: TILAWATI_JILID_4_PAGES, 5: TILAWATI_JILID_5_PAGES,
+};

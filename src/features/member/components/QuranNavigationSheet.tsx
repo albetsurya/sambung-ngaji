@@ -241,7 +241,7 @@ function SurahRow({
           lineHeight: 1.2,
         }}
       >
-        {surah.nama}
+        {surah.name}
       </p>
     </button>
   );
