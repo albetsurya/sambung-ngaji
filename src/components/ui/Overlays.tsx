@@ -74,6 +74,7 @@ interface ConfirmDialogProps {
   open: boolean;
   title: string;
   description: string;
+  children?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   danger?: boolean;
@@ -86,6 +87,7 @@ export function ConfirmDialog({
   open,
   title,
   description,
+  children,
   confirmLabel = "Ya, lanjutkan",
   danger,
   loading = false,
@@ -109,6 +111,7 @@ export function ConfirmDialog({
               {description}
             </p>
           )}
+          {children && <div className="mt-3 text-left">{children}</div>}
         </div>
         <div className="flex gap-2.5 px-4 pb-4">
           <Button
