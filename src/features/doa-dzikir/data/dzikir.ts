@@ -1,6 +1,6 @@
 export interface DzikirPreset {
   id: string;
-  nama: string;
+  name: string;
   arab: string;
   latin: string;
   arti: string;
@@ -11,7 +11,7 @@ export interface DzikirPreset {
 export const DZIKIR_PRESETS: DzikirPreset[] = [
   {
     id: "subhanallah",
-    nama: "Subhanallah",
+    name: "Subhanallah",
     arab: "\u0633\u064f\u0628\u0652\u062d\u064e\u0627\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u0650",
     latin: "Subhaanallah",
     arti: "Maha Suci Allah",
@@ -21,7 +21,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "alhamdulillah",
-    nama: "Alhamdulillah",
+    name: "Alhamdulillah",
     arab: "\u0627\u0644\u0652\u062d\u064e\u0645\u0652\u062f\u064f \u0644\u0650\u0644\u0651\u064e\u0647\u0650",
     latin: "Alhamdulillah",
     arti: "Segala puji bagi Allah",
@@ -31,7 +31,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "allahuakbar",
-    nama: "Allahu Akbar",
+    name: "Allahu Akbar",
     arab: "\u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u0643\u0652\u0628\u064e\u0631\u064f",
     latin: "Allahu Akbar",
     arti: "Allah Maha Besar",
@@ -41,7 +41,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "tahlil",
-    nama: "Tahlil",
+    name: "Tahlil",
     arab:
       "\u0644\u064e\u0627 \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0651\u064e\u0627 \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0648\u064e\u062d\u0652\u062f\u064e\u0647\u064f \u0644\u064e\u0627 \u0634\u064e\u0631\u0650\u064a\u0643\u064e \u0644\u064e\u0647\u064f",
     latin:
@@ -53,7 +53,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "istighfar",
-    nama: "Istighfar",
+    name: "Istighfar",
     arab: "\u0623\u064e\u0633\u0652\u062a\u064e\u063a\u0652\u0641\u0650\u0631\u064f \u0627\u0644\u0644\u0651\u064e\u0647\u064e",
     latin: "Astaghfirullah",
     arti: "Aku memohon ampun kepada Allah",
@@ -63,7 +63,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "subhanallah-wabihamdihi",
-    nama: "Subhanallah wa Bihamdihi",
+    name: "Subhanallah wa Bihamdihi",
     arab:
       "\u0633\u064f\u0628\u0652\u062d\u064e\u0627\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0648\u064e\u0628\u0650\u062d\u064e\u0645\u0652\u062f\u0650\u0647\u0650",
     latin: "Subhaanallahi wa bihamdihi",
@@ -74,7 +74,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "lailahaillallah",
-    nama: "Laa Ilaaha Illallah",
+    name: "Laa Ilaaha Illallah",
     arab:
       "\u0644\u064e\u0627 \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0651\u064e\u0627 \u0627\u0644\u0644\u0651\u064e\u0647\u064f",
     latin: "Laa ilaaha illallah",
@@ -85,7 +85,7 @@ export const DZIKIR_PRESETS: DzikirPreset[] = [
   },
   {
     id: "hasbunallah",
-    nama: "Hasbunallah",
+    name: "Hasbunallah",
     arab:
       "\u062d\u064e\u0633\u0652\u0628\u064f\u0646\u064e\u0627 \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0648\u064e\u0646\u0650\u0639\u0652\u0645\u064e \u0627\u0644\u0652\u0648\u064e\u0643\u0650\u064a\u0644\u064f",
     latin: "Hasbunallahu wa ni'mal wakiil",

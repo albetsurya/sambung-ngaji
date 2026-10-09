@@ -236,7 +236,7 @@ export default function MemberKiblatPage() {
               <strong>
                 {effectiveBearing !== null
                   ? Math.round(effectiveBearing) + "°"
-                  : "—"}
+                  : "-"}
               </strong>{" "}
               dari utara (bisa pakai kompas aplikasi lain).
             </p>

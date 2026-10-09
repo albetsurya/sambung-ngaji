@@ -6,7 +6,7 @@ import {
   type KasDataResponse,
   type CashType,
 } from "../api/financeApi";
-import { formatRp } from "../../../utils/format";
+import { formatRp, formatDateShort, toTitleCase } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
 import {
@@ -17,6 +17,7 @@ import {
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   Segmented,
   GroupedList,
@@ -42,7 +43,6 @@ import {
   StatusPill,
   HeaderActions,
   SyncHeaderButton,
-  PrintHeaderButton,
   NoGroupEmpty,
   SheetFooter,
 } from "../components/FinanceShared";
@@ -299,9 +299,6 @@ export const FinanceLedgerPage: React.FC = () => {
     amount: 0,
   });
   const [savingTx, setSavingTx] = useState(false);
-  const [isCarrySheetOpen, setIsCarrySheetOpen] = useState(false);
-  const [carryMonth, setCarryMonth] = useState("");
-  const [carryingOver, setCarryingOver] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [actionTx, setActionTx] = useState<Transaction | null>(null);
@@ -450,37 +447,6 @@ export const FinanceLedgerPage: React.FC = () => {
       setDuplicating(false);
     }
   };
-  const handleCarryForward = async () => {
-    if (!carryMonth) {
-      showToast("Pilih bulan target terlebih dahulu", "error");
-      return;
-    }
-    setCarryingOver(true);
-    try {
-      const res = await financeApi.carryForwardBalance(
-        assignedGroup,
-        carryMonth,
-        cashType,
-      );
-      if (res.success) {
-        showToast(
-          res.message || "Saldo awal berhasil dibawa ke bulan berikutnya",
-          "success",
-        );
-        setIsCarrySheetOpen(false);
-        loadData();
-      } else {
-        showToast(res.message || "Gagal membuat saldo awal", "error");
-      }
-    } catch (err: any) {
-      showToast(
-        err instanceof ApiError ? err.message : "Gagal membawa saldo",
-        "error",
-      );
-    } finally {
-      setCarryingOver(false);
-    }
-  };
   const monthOptions = Array.from(
     new Set(
       (kasData?.transactions || [])
@@ -617,11 +583,6 @@ export const FinanceLedgerPage: React.FC = () => {
                 onSync={() => syncSheet(assignedGroup)}
               />
             )}
-            <PrintHeaderButton
-              onClick={() => {
-                navigate(`/finance/ledger/print?mode=rincian`);
-              }}
-            />
           </HeaderActions>
         }
       />
@@ -785,7 +746,21 @@ export const FinanceLedgerPage: React.FC = () => {
             )}
             {recapByMonth.length > 0 && (
               <section>
-                <SectionTitle>Rekap Bulanan</SectionTitle>
+                <div className="px-4 mb-2.5 mt-5 flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
+                    Rekap Bulanan
+                  </p>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/finance/ledger/breakdown?cash=${cashType}&month=${selectedMonth}`,
+                      )
+                    }
+                    className="text-ios-footnote font-semibold text-accent active:scale-[0.97]"
+                  >
+                    Rincian per kategori
+                  </button>
+                </div>
                 <GroupedList>
                   {recapByMonth.slice(0, 6).map(([k, v], idx, arr) => (
                     <ListRow
@@ -842,11 +817,11 @@ export const FinanceLedgerPage: React.FC = () => {
                 <GroupedListSkeleton rows={5} />
               ) : visibleTx.length === 0 ? (
                 <EmptyState
-                  title="Belum ada transaksi"
+                  title="Kas kelompok ini masih kosong"
                   description={
                     searchQuery
-                      ? "Tidak ada transaksi yang cocok dengan pencarian."
-                      : "Catat transaksi pertama memakai tombol + di bawah."
+                      ? "Tidak ada transaksi yang cocok dengan pencarian. Coba kata kunci lain."
+                      : "Belum ada pemasukan atau pengeluaran yang tercatat di kelompok ini. Catat transaksi pertama memakai tombol + di bawah, semua tercatat rapi per kelompok."
                   }
                 />
               ) : (
@@ -875,11 +850,11 @@ export const FinanceLedgerPage: React.FC = () => {
                           <div className="flex items-center justify-between gap-2 w-full">
                             <div className="min-w-0 flex-1">
                               <p className="text-ios-body font-medium text-surface-text truncate">
-                                {t.description || "—"}
+                                {t.description || "-"}
                               </p>
                               <p className="text-ios-caption text-surface-muted truncate">
-                                {t.transaction_date}
-                                {t.account_name ? ` · ${t.account_name}` : ""}
+                                {formatDateShort(t.transaction_date)}
+                                {t.account_name ? ` · ${toTitleCase(t.account_name)}` : ""}
                               </p>
                             </div>
                             <p
@@ -899,24 +874,6 @@ export const FinanceLedgerPage: React.FC = () => {
                   })}
                 </GroupedList>
               )}
-              <div className="px-4 mt-2.5 grid grid-cols-2 gap-2.5">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsCarrySheetOpen(true)}
-                >
-                  Bawa Saldo Awal
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    navigate(`/finance/ledger/print?mode=rekap`);
-                  }}
-                >
-                  Cetak Rekap
-                </Button>
-              </div>
             </section>
           </>
         )}
@@ -927,12 +884,11 @@ export const FinanceLedgerPage: React.FC = () => {
         title={editingTx ? "Edit Transaksi" : "Tambah Transaksi"}
       >
         <form onSubmit={handleSubmitTx}>
-          <Input
+          <DateInput
             label="Tanggal"
-            type="date"
             value={txForm.transaction_date}
-            onChange={(e) =>
-              setTxForm({ ...txForm, transaction_date: e.target.value })
+            onChange={(val) =>
+              setTxForm({ ...txForm, transaction_date: val })
             }
             required
           />
@@ -1035,33 +991,6 @@ export const FinanceLedgerPage: React.FC = () => {
             </Button>
           </div>
         )}
-      </BottomSheet>
-      <BottomSheet
-        open={isCarrySheetOpen}
-        onClose={() => setIsCarrySheetOpen(false)}
-        title="Bawa Saldo Awal"
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleCarryForward();
-          }}
-        >
-          <p className="text-ios-footnote text-surface-muted mb-4 px-1">
-            Saldo akhir bulan ini dicatat otomatis sebagai “SALDO AWAL” di bulan
-            target.
-          </p>
-          <Input
-            label="Bulan Target (YYYY-MM)"
-            type="month"
-            value={carryMonth}
-            onChange={(e) => setCarryMonth(e.target.value)}
-            required
-          />
-          <Button type="submit" fullWidth disabled={carryingOver}>
-            {carryingOver ? "Memproses…" : "Proses Saldo Awal"}
-          </Button>
-        </form>
       </BottomSheet>
       <ConfirmDialog
         open={!!deleteTarget}

@@ -24,7 +24,7 @@ export interface StatusInfo {
 }
 
 export const STATUS_LIST: StatusInfo[] = [
-  { key: "belum", label: "Belum", short: "—", emoji: "○", tone: "neutral" },
+  { key: "belum", label: "Belum", short: "-", emoji: "○", tone: "neutral" },
   { key: "tepat", label: "Tepat Waktu", short: "✓", emoji: "✓", tone: "success" },
   { key: "telat", label: "Telat", short: "!", emoji: "!", tone: "warning" },
   { key: "jamak", label: "Jamak", short: "J", emoji: "J", tone: "accent" },

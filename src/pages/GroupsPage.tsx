@@ -137,8 +137,8 @@ export default function GroupsPage() {
                         {g.group_name}
                       </p>
                       <p className="text-ios-footnote text-surface-muted truncate">
-                        {g.pembina ? `Pembina: ${g.pembina}` : ""}{" "}
-                        {g.jadwal ? `· ${g.jadwal}` : ""}
+                        {g.mentor ? `Pembina: ${g.mentor}` : ""}{" "}
+                        {g.schedule ? `· ${g.schedule}` : ""}
                       </p>
                     </div>
                   </ChevronRow>
@@ -148,8 +148,8 @@ export default function GroupsPage() {
                       {g.group_name}
                     </p>
                     <p className="text-ios-footnote text-surface-muted truncate">
-                      {g.pembina ? `Pembina: ${g.pembina}` : ""}{" "}
-                      {g.jadwal ? `· ${g.jadwal}` : ""}
+                      {g.mentor ? `Pembina: ${g.mentor}` : ""}{" "}
+                      {g.schedule ? `· ${g.schedule}` : ""}
                     </p>
                   </div>
                 )}
@@ -193,9 +193,9 @@ export function GroupSheet({
       group || {
         group_code: "",
         group_name: "",
-        pembina: "",
-        penandatangan: "",
-        jadwal: "Minggu,Selasa,Kamis",
+        mentor: "",
+        signatory: "",
+        schedule: "Minggu,Selasa,Kamis",
       },
     );
   }, [group, open]);
@@ -222,19 +222,19 @@ export function GroupSheet({
       />
       <Input
         label="Pembina"
-        value={form.pembina || ""}
-        onChange={(e) => setForm((f) => ({ ...f, pembina: e.target.value }))}
+        value={form.mentor || ""}
+        onChange={(e) => setForm((f) => ({ ...f, mentor: e.target.value }))}
       />
       <Input
         label="Penandatangan"
-        value={form.penandatangan || ""}
+        value={form.signatory || ""}
         onChange={(e) =>
-          setForm((f) => ({ ...f, penandatangan: e.target.value }))
+          setForm((f) => ({ ...f, signatory: e.target.value }))
         }
       />
       <Input
         label="Jadwal"
-        value={form.jadwal || ""}
+        value={form.schedule || ""}
         onChange={(e) => setForm((f) => ({ ...f, jadwal: e.target.value }))}
         hint="Contoh: Minggu,Selasa,Kamis"
       />

@@ -86,7 +86,7 @@ export default function MemberPuasaPage() {
               </div>
 
               <p className="text-ios-body font-semibold text-accent mb-1">
-                {nextPuasa.puasaList.map((p) => p.nama).join(" + ")}
+                {nextPuasa.puasaList.map((p) => p.name).join(" + ")}
               </p>
 
               <p className="text-[12px] text-accent/70">
@@ -139,7 +139,7 @@ export default function MemberPuasaPage() {
               Hari Ini
             </p>
             <p className="text-ios-body font-semibold text-surface-text">
-              {today.puasaList.map((p) => p.nama).join(" + ")}
+              {today.puasaList.map((p) => p.name).join(" + ")}
             </p>
             <p className="text-ios-caption text-surface-text/70 mt-1 leading-relaxed">
               {today.puasaList[0]?.deskripsi}
@@ -297,7 +297,7 @@ function PuasaLabel({ puasa }: { puasa: PuasaInfo }) {
       }
     >
       <p className={"text-ios-footnote font-semibold " + tone.text}>
-        {puasa.nama}
+        {puasa.name}
       </p>
       <p className="text-ios-caption text-surface-text/70 mt-0.5 leading-relaxed">
         {puasa.deskripsi}

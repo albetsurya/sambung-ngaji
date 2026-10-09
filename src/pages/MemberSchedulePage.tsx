@@ -132,7 +132,7 @@ export default function MemberSchedulePage() {
   const filtered = useMemo(() => {
     return meetings.filter((m) => {
       if (effectiveKategori !== "all") {
-        const targets = normalizeTargets(m.kategori_target);
+        const targets = normalizeTargets(m.target_categories);
         if (targets.length > 0 && !targets.includes(effectiveKategori)) {
           return false;
         }
@@ -358,26 +358,26 @@ function MeetingDetailSheet({
 }) {
   if (!meeting) return null;
 
-  const targets = normalizeTargets(meeting.kategori_target);
+  const targets = normalizeTargets(meeting.target_categories);
 
   return (
     <BottomSheet open={!!meeting} onClose={onClose} title="Detail Jadwal">
       <div className="mb-4 p-4 rounded-2xl bg-accent-soft/60 border border-accent/15">
         <p className="text-[11px] font-medium text-accent uppercase tracking-wide mb-1">
-          {meeting.hari}
+          {meeting.day}
         </p>
         <p className="text-ios-nav font-semibold text-surface-text mb-2">
-          {meeting.acara || "Pengajian"}
+          {meeting.event || "Pengajian"}
         </p>
         <div className="flex items-center gap-3 text-ios-footnote text-surface-muted flex-wrap">
           <span className="inline-flex items-center gap-1.5">
             <Calendar size={12} />
-            {meeting.tanggal}
+            {meeting.date}
           </span>
-          {meeting.jam && (
+          {meeting.time && (
             <span className="inline-flex items-center gap-1.5">
               <Zap size={12} />
-              {meeting.jam}
+              {meeting.time}
             </span>
           )}
         </div>
@@ -408,17 +408,17 @@ function MeetingDetailSheet({
         </div>
       )}
 
-      {meeting.materi && (
+      {meeting.topic && (
         <Card className="mb-3">
           <p className="text-ios-caption text-surface-muted mb-1">Materi</p>
-          <p className="text-ios-body text-surface-text">{meeting.materi}</p>
+          <p className="text-ios-body text-surface-text">{meeting.topic}</p>
         </Card>
       )}
 
-      {meeting.catatan && (
+      {meeting.notes && (
         <Card>
           <p className="text-ios-caption text-surface-muted mb-1">Catatan</p>
-          <p className="text-ios-body text-surface-text">{meeting.catatan}</p>
+          <p className="text-ios-body text-surface-text">{meeting.notes}</p>
         </Card>
       )}
 

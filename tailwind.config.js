@@ -8,9 +8,47 @@ export default {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
+        slideUpStagger: {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        dropdownIn: {
+          from: { opacity: "0", transform: "scale(0.96) translateY(-4px)" },
+          to: { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
+        messageIn: {
+          from: { opacity: "0", transform: "translateY(8px) scale(0.99)" },
+          to: { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        floatSoft: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        typingDot: {
+          "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.4" },
+          "30%": { transform: "translateY(-4px)", opacity: "1" },
+        },
+        drawCheck: {
+          from: { strokeDashoffset: "100" },
+          to: { strokeDashoffset: "0" },
+        },
+        successPop: {
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "60%": { transform: "scale(1.04)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        progressShine: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
       },
       animation: {
         shimmer: "shimmer 1.5s infinite",
+        "stagger-in": "slideUpStagger 0.28s ease-out both",
+        dropdown: "dropdownIn 0.18s ease-out both",
+        "message-in": "messageIn 0.22s ease-out both",
+        "float-soft": "floatSoft 3s ease-in-out infinite",
+        "success-pop": "successPop 0.3s ease-out both",
       },
       colors: {
         "surface-border": "rgba(0, 0, 0, 0.08)",

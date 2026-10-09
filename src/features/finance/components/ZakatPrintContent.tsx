@@ -167,7 +167,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-64">
+                  <th className="border border-slate-300 p-1.5 text-center w-44">
                     JUMLAH
                   </th>
                 </tr>
@@ -254,7 +254,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-64">
+                  <th className="border border-slate-300 p-1.5 text-center w-44">
                     JUMLAH
                   </th>
                 </tr>
@@ -359,7 +359,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                 <th className="border border-slate-300 p-1.5 text-center">
                   URAIAN
                 </th>
-                <th className="border border-slate-300 p-1.5 text-center w-40">
+                <th className="border border-slate-300 p-1.5 text-center w-44">
                   JUMLAH
                 </th>
               </tr>
@@ -414,7 +414,7 @@ export const ZakatPrintContent: React.FC<ZakatPrintContentProps> = ({
                   <th className="border border-slate-300 p-1.5 text-center">
                     URAIAN
                   </th>
-                  <th className="border border-slate-300 p-1.5 text-center w-64">
+                  <th className="border border-slate-300 p-1.5 text-center w-44">
                     JUMLAH
                   </th>
                 </tr>

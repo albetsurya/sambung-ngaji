@@ -258,7 +258,7 @@ function SurahRow({
             lineHeight: 1.2,
           }}
         >
-          {surah.nama}
+          {surah.name}
         </p>
         <p className="text-[11px] text-surface-muted tabular-nums">
           {toArabicNumber(surah.nomor)}

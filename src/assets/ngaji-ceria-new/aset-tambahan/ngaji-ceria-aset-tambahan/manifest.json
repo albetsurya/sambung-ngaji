@@ -1,0 +1,20 @@
+{
+  "01-cover-game": [
+    "coverTangkapHarakat",
+    "coverSusunKata",
+    "coverDetektifSuara",
+    "coverRodaHijaiyah"
+  ],
+  "02-badge-hasil": [
+    "badgeBintang3",
+    "badgeBintang2",
+    "badgeBintang1"
+  ],
+  "03-efek": [
+    "efekPopBalon"
+  ],
+  "04-peti-dan-ikon": [
+    "petiBonusEmas",
+    "iconTimerPasir"
+  ]
+}

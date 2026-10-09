@@ -1,0 +1,3 @@
+export function ScheduleTimeline({ current, total }: { current: number; total: number }) {
+  return <div aria-label="Timeline simulasi harian" className="rounded-2xl border border-emerald-300/20 bg-emerald-500/10 p-3"><div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-emerald-200"><span>Timeline Hari</span><span>{current}/{total} waktu dijaga</span></div><div className="mt-2 flex gap-1">{Array.from({ length: total }, (_, index) => <span key={index} className={`h-3 flex-1 rounded-full ${index < current ? "bg-emerald-300" : index === current ? "animate-pulse bg-amber-300" : "bg-white/10"}`} />)}</div></div>;
+}

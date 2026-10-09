@@ -1,0 +1,1 @@
+export function LogFeed({ entries }: { entries: string[] }) { return <div className="rounded-2xl border border-white/10 bg-black/20 p-3"><p className="mb-2 text-[10px] font-black uppercase tracking-wider text-white/50">Log duel</p><div className="space-y-1 text-[11px] text-white/70">{entries.map((entry, index) => <p key={`${entry}:${index}`}>• {entry}</p>)}</div></div>; }

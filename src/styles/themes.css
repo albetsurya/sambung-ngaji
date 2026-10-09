@@ -222,9 +222,9 @@
 }
 
 /* ========================================================================
-   TikTok preset — monokromatik + glitch hanya di FAB add.
+   TikTok preset - monokromatik + glitch hanya di FAB add.
    - Tombol primer/chip terpilih: solid terbalik (hitam di light,
-     putih di dark) — otomatis dari token --c-accent di atas.
+     putih di dark) - otomatis dari token --c-accent di atas.
    - Badge default: merah solid #FE2C55 (seperti badge TikTok).
    - Input/teks area/select: outline merah hanya saat focus
      (abu saat rest, agar tidak dibaca sebagai error).
@@ -268,7 +268,7 @@
   color: rgb(var(--c-danger));
 }
 
-/* Chip/segmented/tab terpilih: outline abu saja — tanpa fill, tanpa glitch.
+/* Chip/segmented/tab terpilih: outline abu saja - tanpa fill, tanpa glitch.
    Mengecualikan Button, FAB, toast, badge (diatur aturannya sendiri). */
 [data-preset="tiktok"]
   [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
@@ -306,7 +306,7 @@
   border-color: rgb(200 200 200);
 }
 
-/* FAB add — glitch berupa border kiri cyan & border kanan merah
+/* FAB add - glitch berupa border kiri cyan & border kanan merah
    (tanpa border atas/bawah), mengikuti warna mode. */
 [data-preset="tiktok"] .fab-primary {
   background-color: #000000;
@@ -333,7 +333,7 @@
 }
 
 /* ========================================================================
-   Glass preset — kaca frosted modern TANPA mengubah komponen.
+   Glass preset - kaca frosted modern TANPA mengubah komponen.
    Mekanisme: veil gradient tetap (body::before, di atas konten statis tapi
    di bawah header/nav/sheet/toast) + token base bernuansa + aksen indigo.
    Permukaan yang sudah blur (header, bottom-nav, kartu login, sheet,

@@ -43,13 +43,13 @@ export interface ApiResponse<T> {
 export interface User {
   user_id: string;
   username: string;
-  nama: string;
+  name: string;
   role: Role;
   group_id?: string;
   member_id?: string;
-  jenis_kelamin?: string;
-  foto_url?: string;
-  status_aktif?: boolean;
+  gender?: string;
+  photo_url?: string;
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
   last_login_at?: string;
@@ -59,36 +59,36 @@ export interface Member {
   member_id: string;
   group_id?: string;
   group_name?: string;
-  nama_lengkap: string;
-  nama_panggilan?: string;
-  jenis_kelamin?: "L" | "P" | "";
-  tempat_lahir?: string;
-  tanggal_lahir?: string;
-  kelompok?: string;
-  desa?: string;
-  daerah?: string;
-  alamat_rumah?: string;
-  no_wa?: string;
-  is_muballigh?: boolean;
-  is_kerja?: boolean;
-  is_nikah?: boolean;
-  tinggi_badan?: string | number;
-  berat_badan?: string | number;
-  hobi?: string;
-  pekerjaan?: string;
-  foto_url?: string;
+  full_name: string;
+  nickname?: string;
+  gender?: "L" | "P" | "";
+  birth_place?: string;
+  birth_date?: string;
+  group_label?: string;
+  village?: string;
+  region?: string;
+  home_address?: string;
+  whatsapp_number?: string;
+  is_preacher?: boolean;
+  is_employed?: boolean;
+  is_married?: boolean;
+  height?: string | number;
+  weight?: string | number;
+  hobby?: string;
+  occupation?: string;
+  photo_url?: string;
   has_user?: boolean;
-  status_pembinaan?: MonitoringStatus;
-  status_aktif?: boolean;
-  tanggal_masuk?: string;
-  tanggal_keluar?: string;
+  mentoring_status?: MonitoringStatus;
+  is_active?: boolean;
+  joined_date?: string;
+  left_date?: string;
   kategori?: MemberCategory;
   usia?: number | null;
-  jenjang_pendidikan?: string;
-  sekolah?: string;
-  jurusan?: string;
-  tahun_mulai_pendidikan?: string | number;
-  tahun_selesai_pendidikan?: string | number;
+  education_level?: string;
+  school?: string;
+  major?: string;
+  education_start_year?: string | number;
+  education_end_year?: string | number;
   updated_at?: string;
   pendidikan?: Education[];
 }
@@ -96,12 +96,12 @@ export interface Member {
 export interface Education {
   education_id: string;
   member_id: string;
-  jenjang: string;
-  sekolah?: string;
-  jurusan?: string;
-  kelas?: string | number;
-  tahun_mulai?: string | number;
-  tahun_selesai?: string | number;
+  level: string;
+  school?: string;
+  major?: string;
+  grade?: string | number;
+  start_year?: string | number;
+  end_year?: string | number;
   status?: string;
 }
 
@@ -109,23 +109,23 @@ export interface Group {
   group_id: string;
   group_code: string;
   group_name: string;
-  pembina?: string;
-  penandatangan?: string;
-  jadwal?: string;
-  status_aktif?: boolean;
+  mentor?: string;
+  signatory?: string;
+  schedule?: string;
+  is_active?: boolean;
 }
 
 export interface Meeting {
   meeting_id: string;
-  tanggal: string;
-  hari: string;
-  jam: string;
+  date: string;
+  day: string;
+  time: string;
   group_id: string;
-  acara: string;
-  materi?: string;
+  event: string;
+  topic?: string;
   status: string;
-  catatan?: string;
-  kategori_target?: MemberCategory[];
+  notes?: string;
+  target_categories?: MemberCategory[];
   /* "" = semua (UI saja); null = semua (format database, lolos CHECK) */
   gender_target?: "" | "L" | "P" | null;
   send_reminder?: boolean;
@@ -139,7 +139,7 @@ export interface AttendanceRecord {
   meeting_id: string;
   member_id: string;
   status: AttendanceStatus;
-  catatan?: string;
+  notes?: string;
 }
 
 export interface MyAttendanceEntry {
@@ -147,31 +147,31 @@ export interface MyAttendanceEntry {
   meeting_id: string;
   status: AttendanceStatus;
   status_meeting?: string;
-  catatan?: string;
-  tanggal: string;
-  hari: string;
-  acara: string;
-  jam: string;
+  notes?: string;
+  date: string;
+  day: string;
+  event: string;
+  time: string;
   created_at?: string;
 }
 
 export interface MonitoringEntry {
   monitoring_id: string;
   member_id: string;
-  tanggal: string;
-  jenis?: string;
+  date: string;
+  type?: string;
   status: MonitoringStatus;
-  catatan?: string;
-  tindak_lanjut?: string;
+  notes?: string;
+  follow_up?: string;
   created_at?: string;
 }
 
 export interface AnnouncementTemplate {
   template_id: string;
-  nama_template: string;
+  template_name: string;
   kode: string;
-  isi_template: string;
-  status_aktif?: boolean;
+  template_body: string;
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -180,20 +180,20 @@ export interface Announcement {
   announcement_id: string;
   template_id: string;
   group_id: string;
-  tanggal: string;
-  hari: string;
-  jam?: string;
-  acara?: string;
-  materi?: string;
-  catatan?: string;
+  date: string;
+  day: string;
+  time?: string;
+  event?: string;
+  topic?: string;
+  notes?: string;
   generated_text: string;
   status: AnnouncementStatus;
 }
 
 export interface AttentionItem {
   member_id: string;
-  nama_lengkap: string;
-  foto_url?: string;
+  full_name: string;
+  photo_url?: string;
   reasons: string[];
 }
 
@@ -204,9 +204,9 @@ export interface DashboardGeneral {
   rata_rata_kehadiran: number;
   pengajian_terdekat: {
     meeting_id: string;
-    tanggal: string;
-    hari: string;
-    acara?: string;
+    date: string;
+    day: string;
+    event?: string;
   } | null;
   jamaah_perlu_perhatian: AttentionItem[];
   data_belum_lengkap: number;
@@ -237,11 +237,11 @@ export interface DashboardAbsensiCategory {
 export interface DashboardAbsensi {
   pengajian_hari_ini: {
     meeting_id: string;
-    tanggal: string;
-    jam: string;
-    acara: string;
+    date: string;
+    time: string;
+    event: string;
     group_id: string;
-    kategori_target: MemberCategory[];
+    target_categories: MemberCategory[];
   }[];
   jumlah_jamaah: number;
   total_target: number;
@@ -255,24 +255,24 @@ export interface DashboardAbsensi {
 export interface PendingMember {
   submission_id: string;
   group_id?: string;
-  nama_lengkap: string;
-  nama_panggilan?: string;
-  jenis_kelamin: "L" | "P";
-  tempat_lahir?: string;
-  tanggal_lahir?: string;
-  no_wa: string;
-  alamat_rumah?: string;
-  desa?: string;
-  daerah?: string;
-  pekerjaan?: string;
-  hobi?: string;
-  is_nikah: boolean;
-  jenjang_pendidikan?: string;
-  sekolah?: string;
-  jurusan?: string;
-  tahun_mulai_pendidikan?: string;
-  tahun_selesai_pendidikan?: string;
-  foto_url?: string;
+  full_name: string;
+  nickname?: string;
+  gender: "L" | "P";
+  birth_place?: string;
+  birth_date?: string;
+  whatsapp_number: string;
+  home_address?: string;
+  village?: string;
+  region?: string;
+  occupation?: string;
+  hobby?: string;
+  is_married: boolean;
+  education_level?: string;
+  school?: string;
+  major?: string;
+  education_start_year?: string;
+  education_end_year?: string;
+  photo_url?: string;
   username?: string;
   status: PendingStatus;
   submitted_at: string;
@@ -286,7 +286,7 @@ export interface PendingMember {
 export interface AiUsageEntry {
   usage_id: string;
   user_id: string;
-  user_nama: string;
+  user_name: string;
   role: Role;
   provider: string;
   input_tokens: number;
@@ -309,14 +309,14 @@ export interface Streaks {
 
 export interface FridaySchedule {
   friday_id: string;
-  tanggal: string;
-  hari: string;
-  khatib_imam: string;
+  date: string;
+  day: string;
+  sermon_leader: string;
   muadzin: string;
-  penasihat: string;
-  petugas_parkir: string;
-  penata_sandal: string;
-  catatan: string;
+  advisor: string;
+  parking_attendant: string;
+  footwear_attendant: string;
+  notes: string;
   created_by?: string;
   created_at?: string;
   updated_at?: string;

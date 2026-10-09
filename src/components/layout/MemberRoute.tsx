@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { LoadingScreen } from "../ui";
+import { LoadingState } from "../ui/States";
 import { PersonalRoute } from "./PersonalRoute";
 
 export function MemberRoute({
@@ -14,7 +14,7 @@ export function MemberRoute({
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <LoadingScreen label="Memuat..." />;
+    return <LoadingState label="Memuat..." />;
   }
 
   if (!user) {

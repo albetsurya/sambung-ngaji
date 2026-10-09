@@ -539,7 +539,7 @@ function ChatBubble({
   }
   if (isUser) {
     return (
-      <div className="flex justify-end">
+      <div className="flex justify-end anim-message-in">
         <div
           className="selectable max-w-[82%] bg-accent text-white px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
           style={{
@@ -552,7 +552,7 @@ function ChatBubble({
     );
   }
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start anim-message-in">
       <div className="max-w-[82%]">
         <div
           className="selectable bg-surface-card border border-surface-border text-surface-text px-3.5 py-2.5 text-[14.5px] leading-relaxed shadow-sm"
@@ -845,7 +845,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <code
           key={i}
-          className="px-1.5 py-0.5 rounded-md text-[0.9em] font-mono"
+          className="px-1.5 py-0.5 rounded-md text-[0.9em] "
           style={{
             backgroundColor: "rgba(0,0,0,0.1)",
           }}
@@ -896,7 +896,7 @@ function CodeBlock({
         className="flex items-center justify-between px-3 py-1.5 border-b"
         style={{ borderColor: "rgba(0,0,0,0.08)" }}
       >
-        <span className="text-[10px] font-mono opacity-70 uppercase tracking-wide">
+        <span className="text-[10px]  opacity-70 uppercase tracking-wide">
           {language || "code"}
         </span>
         <Button onClick={handleCopy} variant="ghost" size="xs">
@@ -904,7 +904,7 @@ function CodeBlock({
         </Button>
       </div>
       <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
-        <code className="font-mono whitespace-pre">{content}</code>
+        <code className=" whitespace-pre">{content}</code>
       </pre>
     </div>
   );
@@ -962,25 +962,16 @@ function MarkdownTable({
 }
 function TypingIndicator() {
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start anim-message-in">
       <div
         className="bg-surface-card border border-surface-border px-4 py-3 shadow-sm"
         style={{ borderRadius: "0 16px 16px 16px" }}
       >
-        <div className="flex gap-1">
-          <span
-            className="w-2 h-2 rounded-full bg-surface-muted animate-bounce"
-            style={{ animationDelay: "0ms" }}
-          />
-          <span
-            className="w-2 h-2 rounded-full bg-surface-muted animate-bounce"
-            style={{ animationDelay: "150ms" }}
-          />
-          <span
-            className="w-2 h-2 rounded-full bg-surface-muted animate-bounce"
-            style={{ animationDelay: "300ms" }}
-          />
-        </div>
+        <span className="typing-dots" role="status" aria-label="AI sedang mengetik">
+          <span />
+          <span />
+          <span />
+        </span>
       </div>
     </div>
   );

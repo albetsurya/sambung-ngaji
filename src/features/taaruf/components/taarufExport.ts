@@ -29,18 +29,18 @@ function safeFilename(name: string): string {
 }
 
 export function taarufFilename(
-  nama: string,
+  name: string,
   ext: "png" | "pdf",
   prefix = "CV-Taaruf",
 ): string {
   const date = new Date().toISOString().slice(0, 10);
-  const base = prefix ? `${prefix}-${safeFilename(nama)}` : safeFilename(nama);
+  const base = prefix ? `${prefix}-${safeFilename(name)}` : safeFilename(name);
   return `${base}-${date}.${ext}`;
 }
 
 export async function exportTaarufPng(
   node: HTMLElement,
-  nama: string,
+  name: string,
   prefix = "CV-Taaruf",
 ): Promise<void> {
   const canvas = await capture(node);
@@ -50,7 +50,7 @@ export async function exportTaarufPng(
   if (!blob) throw new Error("Gagal membuat gambar");
   const url = URL.createObjectURL(blob);
   try {
-    download(url, taarufFilename(nama, "png", prefix));
+    download(url, taarufFilename(name, "png", prefix));
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
@@ -58,7 +58,7 @@ export async function exportTaarufPng(
 
 export async function exportTaarufPdf(
   node: HTMLElement,
-  nama: string,
+  name: string,
   prefix = "CV-Taaruf",
 ): Promise<void> {
   const canvas = await capture(node);
@@ -118,5 +118,5 @@ export async function exportTaarufPdf(
     }
   }
 
-  pdf.save(taarufFilename(nama, "pdf", prefix));
+  pdf.save(taarufFilename(name, "pdf", prefix));
 }

@@ -16,8 +16,8 @@ export function MemberCalendarView({
     () =>
       meetings.map((m) => ({
         id: m.meeting_id,
-        title: m.acara || "Pengajian",
-        date: m.tanggal,
+        title: m.event || "Pengajian",
+        date: m.date,
         extendedProps: { meeting: m },
       })),
     [meetings],

@@ -5,8 +5,8 @@ import {
   getNextPrayer,
   getPrayerTimesForDate,
   getCurrentPrayer,
-  LATUKAN_LABEL,
 } from "../../ibadah/utils/prayerTimes";
+import { usePrayerLocation } from "../../ibadah/hooks/usePrayerLocation";
 
 interface PrayerTimesCardProps {
   onClick?: () => void;
@@ -16,6 +16,7 @@ interface PrayerTimesCardProps {
 export function PrayerTimesCard({ onClick, to = "/member/prayer" }: PrayerTimesCardProps) {
   const navigate = useNavigate();
   const [now, setNow] = useState<Date>(() => new Date());
+  const { getEffectiveCoords, getDisplayLabel, autoLoading } = usePrayerLocation();
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -30,9 +31,14 @@ export function PrayerTimesCard({ onClick, to = "/member/prayer" }: PrayerTimesC
     }
   }
 
-  const next = getNextPrayer(now);
-  const current = getCurrentPrayer(now);
-  const today = getPrayerTimesForDate(now);
+  const coords = getEffectiveCoords();
+  const lat = coords?.lat ?? -6.9879;
+  const lng = coords?.lng ?? 112.3729;
+  const label = getDisplayLabel();
+
+  const next = getNextPrayer(now, lat, lng);
+  const current = getCurrentPrayer(now, lat, lng);
+  const today = getPrayerTimesForDate(now, lat, lng);
 
   const wajib = today.prayers.filter((p) => p.key !== "sunrise");
 
@@ -45,8 +51,9 @@ export function PrayerTimesCard({ onClick, to = "/member/prayer" }: PrayerTimesC
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-1.5 mb-3">
           <MapPin size={12} className="text-accent/70" />
-          <p className="text-[11px] font-medium text-accent/70 truncate">
-            {LATUKAN_LABEL}
+          <p className="text-[11px] font-medium text-accent/70 truncate flex-1">
+            {label}
+            {autoLoading && <span className="ml-1 animate-pulse">⟳</span>}
           </p>
         </div>
 

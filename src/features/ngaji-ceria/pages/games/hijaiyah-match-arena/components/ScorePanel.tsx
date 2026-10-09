@@ -1,0 +1,3 @@
+export function ScorePanel({ playerScore, aiScore, playerPairs, aiPairs, turn }: { playerScore: number; aiScore: number; playerPairs: number; aiPairs: number; turn: "player" | "ai" }) {
+  return <div className="grid grid-cols-2 gap-2">{(["player", "ai"] as const).map((side) => <div key={side} className={`rounded-2xl border px-3 py-2 ${turn === side ? "border-violet-300 bg-violet-500/20" : "border-white/15 bg-white/5"}`}><p className="text-xs font-bold text-white/70">{side === "player" ? "Kamu" : "AI"}{turn === side ? " · giliran" : ""}</p><p className="text-lg font-black text-white">{side === "player" ? playerScore : aiScore} <span className="text-[10px] font-normal text-white/70">({side === "player" ? playerPairs : aiPairs} pasang)</span></p></div>)}</div>;
+}

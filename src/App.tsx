@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider, useToast } from "./contexts/ToastContext";
@@ -79,6 +79,11 @@ const FinanceHubPage = lazy(() =>
 const KasPrintPreviewPage = lazy(() =>
   import("./features/finance/pages/KasPrintPreviewPage").then((m) => ({
     default: m.KasPrintPreviewPage,
+  })),
+);
+const KasBreakdownPage = lazy(() =>
+  import("./features/finance/pages/KasBreakdownPage").then((m) => ({
+    default: m.KasBreakdownPage,
   })),
 );
 const ShodaqohPrintPreviewPage = lazy(() =>
@@ -166,6 +171,114 @@ const QrCodePage = lazy(() => import("./pages/QrCodePage"));
 const PublicLandingPage = lazy(
   () => import("./pages/PublicLandingPage"),
 );
+import { NgajiCeriaLayout } from "./features/ngaji-ceria/components/NgajiCeriaLayout";
+
+const NgajiCeriaHomePage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaHomePage"),
+);
+const NgajiCeriaLibraryPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaLibraryPage"),
+);
+const NgajiCeriaMapPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaMapPage"),
+);
+const NgajiCeriaQuizPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizPage"),
+);
+const NgajiCeriaQuizListPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaQuizListPage"),
+);
+const NgajiCeriaGamesPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
+);
+const NgajiCeriaLeaderboardPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaLeaderboardPage"),
+);
+const NgajiCeriaProfilePage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaProfilePage"),
+);
+const CekAudioManualPage = lazy(
+  () => import("./features/ngaji-ceria/pages/CekAudioManualPage"),
+);
+const TilawatiTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiTimelineEditorPage"),
+);
+const TilawatiCloudTimelineEditorPage = lazy(
+  () => import("./features/ngaji-ceria/pages/TilawatiCloudTimelineEditorPage"),
+);
+const HijaiyahPopPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-pop/HijaiyahPopPage"),
+);
+const HijaiyahRushPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-rush/HijaiyahRushPage"),
+);
+const ArabicWordlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/arabic-wordle/ArabicWordlePage"),
+);
+const Hijaiyah2048Page = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-2048/Hijaiyah2048Page"),
+);
+const QuranQuizRoyalePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/quran-quiz-royale/QuranQuizRoyalePage"),
+);
+const WudhuFlowPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/wudhu-flow/WudhuFlowPage"),
+);
+const SantriIdlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/santri-idle/SantriIdlePage"),
+);
+const SholatHeroPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/sholat-hero/SholatHeroPage"),
+);
+const AdabRPGPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/adab-rpg/AdabRPGPage"),
+);
+const TajwidArenaPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-arena/TajwidArenaPage"),
+);
+const NurBattlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/nur-battle/NurBattlePage"),
+);
+const MakhrajMasterPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/makhraj-master/MakhrajMasterPage"),
+);
+const HijaiyahBeatsPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-beats/HijaiyahBeatsPage"),
+);
+const TajwidDefensePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-defense/TajwidDefensePage"),
+);
+const GameModeHubPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/GameModeHubPage"),
+);
+const TajwidTetrisPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-tetris/TajwidTetrisPage"),
+);
+const HijaiyahMatchArenaPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-match-arena/HijaiyahMatchArenaPage"),
+);
+const JuzAmmaSpeedrunPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/juz-amma-speedrun/JuzAmmaSpeedrunPage"),
+);
+const HarakatRushPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/harakat-rush/HarakatRushPage"),
+);
+const AyatScramblePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/ayat-scramble/AyatScramblePage"),
+);
+const AyatHunterPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/ayat-hunter/AyatHunterPage"),
+);
+const DoaDungeonPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/doa-dungeon/DoaDungeonPage"),
+);
+const NabiChroniclesPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/nabi-chronicles/NabiChroniclesPage"),
+);
+const MalaikatMissionPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/malaikat-mission/MalaikatMissionPage"),
+);
+import { GameLockGuard } from "./features/ngaji-ceria/components/GameLockGuard";
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -181,10 +294,24 @@ function PageFallback() {
 }
 function HomeRoute() {
   const { user, loading } = useAuth();
-  if (loading) return <LoadingScreen label="Memuat..." />;
+  if (loading) return <PageFallback />;
+  // Langsung tampilkan landing page saat loading, biarkan PageFallback/Suspense
+  // yang lain menghandle loading di route dalam (jika perlu).
   if (!user) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
+  if (user.role === "TIM_KU") return <Navigate to="/finance/ledger" replace />;
   return <DashboardPage />;
+}
+/** Redirect prefix lama (Indonesia) ke prefix baru (English), query ikut terbawa. */
+function PrefixRedirect({ from, to }: { from: string; to: string }) {
+  const { pathname, search } = useLocation();
+  const rest = pathname.slice(from.length);
+  return <Navigate to={`${to}${rest}${search}`} replace />;
+}
+/** Redirect /jamaah/:id/cv-taaruf lama ke /members/:id/taaruf-cv. */
+function LegacyTaarufCvRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/members/${id}/taaruf-cv`} replace />;
 }
 function AppRoutes() {
   useBackgroundSync();
@@ -194,9 +321,12 @@ function AppRoutes() {
       <div key={location.pathname} className="page-enter">
       <Routes location={location}>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/daftar" element={<PublicRegistrationPage />} />
-        <Route path="/daftar/sukses" element={<RegistrationSuccessPage />} />
+        <Route path="/register" element={<PublicRegistrationPage />} />
+        <Route path="/register/success" element={<RegistrationSuccessPage />} />
         <Route path="/" element={<HomeRoute />} />
+        {/* Redirect legacy (URL Indonesia lama, mis. dari QR code cetak) */}
+        <Route path="/daftar" element={<PrefixRedirect from="/daftar" to="/register" />} />
+        <Route path="/daftar/*" element={<PrefixRedirect from="/daftar" to="/register" />} />
         <Route
           path="/member"
           element={
@@ -229,6 +359,349 @@ function AppRoutes() {
             </MemberRoute>
           }
         />
+        <Route
+          path="/member/ngaji-ceria"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaHomePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/map"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaMapPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/path"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaLibraryPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/quiz"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaQuizListPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/quiz/play"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaQuizPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaGamesPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/leaderboard"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaLeaderboardPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/profile"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaProfilePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio"
+          element={
+            <MemberRoute allowGuest>
+              <CekAudioManualPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/timeline"
+          element={
+            <MemberRoute allowGuest>
+              <TilawatiTimelineEditorPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/cek-audio/cloud-editor"
+          element={
+            <RoleRoute allowed={["SUPER_ADMIN"]}>
+              <TilawatiCloudTimelineEditorPage />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-pop"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahPopPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-rush"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="hijaiyah-rush" title="Hijaiyah Rush">
+                <HijaiyahRushPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/arabic-wordle"
+          element={
+            <MemberRoute allowGuest>
+              <ArabicWordlePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-2048"
+          element={
+            <MemberRoute allowGuest>
+              <Hijaiyah2048Page />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/quran-quiz-royale"
+          element={
+            <MemberRoute allowGuest>
+              <QuranQuizRoyalePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/wudhu-flow"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="wudhu-flow" title="Wudhu Flow">
+                <WudhuFlowPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/santri-idle"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="santri-idle" title="Pesantren Life">
+                <SantriIdlePage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/sholat-hero"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="sholat-hero" title="Sholat Hero">
+                <SholatHeroPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/adab-rpg"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="adab-rpg" title="Jejak Santri">
+                <AdabRPGPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-arena"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-arena" title="Tajwid Arena">
+                <TajwidArenaPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/nur-battle"
+          element={
+            <MemberRoute allowGuest>
+              <NurBattlePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/makhraj-master"
+          element={
+            <MemberRoute allowGuest>
+              <MakhrajMasterPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-beats"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahBeatsPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-defense"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-defense" title="Tajwid Defense">
+                <TajwidDefensePage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-tetris"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-tetris" title="Tajwid Tetris">
+                <TajwidTetrisPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-burst"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahPopPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-match-arena"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="hijaiyah-match-arena" title="Hijaiyah Match Arena">
+                <HijaiyahMatchArenaPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-match"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="hijaiyah-match" title="Hijaiyah Match Arena">
+                <HijaiyahMatchArenaPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/juz-amma-speedrun"
+          element={
+            <MemberRoute allowGuest>
+              <JuzAmmaSpeedrunPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/verse-quest"
+          element={
+            <MemberRoute allowGuest>
+              <JuzAmmaSpeedrunPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/harakat-rush"
+          element={
+            <MemberRoute allowGuest>
+              <HarakatRushPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/ayat-scramble"
+          element={
+            <MemberRoute allowGuest>
+              <AyatScramblePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/ayat-hunter"
+          element={
+            <MemberRoute allowGuest>
+              <AyatHunterPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/doa-dungeon"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="doa-dungeon" title="Doa Dungeon">
+                <DoaDungeonPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/nabi-chronicles"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="nabi-chronicles" title="Nabi Chronicles">
+                <NabiChroniclesPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/malaikat-mission"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="malaikat-mission" title="Malaikat Mission">
+                <MalaikatMissionPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/word-builder"
+          element={
+            <MemberRoute allowGuest>
+              <AyatScramblePage />
+            </MemberRoute>
+          }
+        />
+        {(["ritme-ngaji", "quiz-ngaji", "puzzle-huruf", "tajwid-lab"] as const).map((hub) => (
+          <Route
+            key={hub}
+            path={`/member/ngaji-ceria/games/${hub}`}
+            element={
+              <MemberRoute allowGuest>
+                <GameLockGuard gameId={hub} title={hub === "ritme-ngaji" ? "Ritme Ngaji" : hub === "quiz-ngaji" ? "Quiz Ngaji" : hub === "puzzle-huruf" ? "Puzzle Huruf" : "Tajwid Lab"}>
+                  <GameModeHubPage hubOverride={hub} />
+                </GameLockGuard>
+              </MemberRoute>
+            }
+          />
+        ))}
         <Route
           path="/member/tahfidz"
           element={
@@ -411,6 +884,7 @@ function AppRoutes() {
             <Route path="/finance" element={<FinanceLayout />}>
               <Route index element={<FinanceHubPage />} />
               <Route path="ledger" element={<FinanceLedgerPage />} />
+              <Route path="ledger/breakdown" element={<KasBreakdownPage />} />
               <Route path="shodaqoh" element={<Navigate to="/finance/monthly-dues" replace />} />
               <Route path="monthly-dues" element={<MonthlyDuesPage />} />
               <Route path="zakat" element={<ZakatPage />} />
@@ -421,15 +895,15 @@ function AppRoutes() {
             </Route>
           </Route>
           <Route
-            path="/jamaah"
+            path="/members"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MembersListPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/kelompok-saya"
+            path="/my-group"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <GroupHubPage />
@@ -437,51 +911,56 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/kelola-global"
-            element={<Navigate to="/kelompok-saya" replace />}
+            path="/manage-global"
+            element={<Navigate to="/my-group" replace />}
           />
+          <Route path="/kelompok-saya" element={<PrefixRedirect from="/kelompok-saya" to="/my-group" />} />
+          <Route path="/kelola-global" element={<Navigate to="/my-group" replace />} />
           <Route
-            path="/jamaah/baru"
+            path="/members/new"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id"
+            path="/members/:id"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <MemberDetailPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id/cv-taaruf"
+            path="/members/:id/taaruf-cv"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS", "TIM_PNKB", "TIM_ABSENSI"]}>
                 <TaarufCvPrintPage />
               </RoleRoute>
             }
           />
           <Route
-            path="/jamaah/:id/edit"
+            path="/members/:id/edit"
             element={
-              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
+              <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_PNKB"]}>
                 <MemberFormPage />
               </RoleRoute>
             }
           />
+          <Route path="/jamaah/:id/cv-taaruf" element={<LegacyTaarufCvRedirect />} />
+          <Route path="/jamaah/*" element={<PrefixRedirect from="/jamaah" to="/members" />} />
           <Route
-            path="/absensi"
+            path="/attendance"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                 <AttendancePage />
               </RoleRoute>
             }
           />
+          <Route path="/absensi" element={<PrefixRedirect from="/absensi" to="/attendance" />} />
           <Route
-            path="/pengumuman"
+            path="/announcements"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <AnnouncementsPage />
@@ -489,19 +968,21 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/pengumuman/templates"
+            path="/announcements/templates"
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <AnnouncementTemplatesPage />
               </RoleRoute>
             }
           />
-          <Route path="/profil-saya" element={<MemberSelfPage />} />
-          <Route path="/profil-saya/edit" element={<MemberEditProfilePage />} />
-          <Route path="/lainnya">
+          <Route path="/pengumuman/*" element={<PrefixRedirect from="/pengumuman" to="/announcements" />} />
+          <Route path="/my-profile" element={<MemberSelfPage />} />
+          <Route path="/my-profile/edit" element={<MemberEditProfilePage />} />
+          <Route path="/profil-saya/*" element={<PrefixRedirect from="/profil-saya" to="/my-profile" />} />
+          <Route path="/more">
             <Route index element={<OthersPage />} />
             <Route
-              path="kelompok"
+              path="groups"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                   <GroupsPage />
@@ -509,7 +990,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="pendaftar"
+              path="registrants"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <PendingMembersPage />
@@ -517,7 +998,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="pendaftar/:submission_id"
+              path="registrants/:submission_id"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <PendingMemberDetailPage />
@@ -525,7 +1006,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="permintaan-member"
+              path="member-requests"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <MemberRequestsPage />
@@ -565,15 +1046,15 @@ function AppRoutes() {
               }
             />
             <Route
-              path="jadwal"
+              path="schedule"
               element={
-                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI"]}>
+                <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <JadwalPage />
                 </RoleRoute>
               }
             />
             <Route
-              path="petugas-jumat"
+              path="friday-officers"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <FridaySchedulesPage />
@@ -581,7 +1062,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="petugas-jumat/cetak"
+              path="friday-officers/print"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <FridayPrintPage />
@@ -589,7 +1070,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="import-jamaah"
+              path="import-members"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN"]}>
                   <MemberImportPage />
@@ -597,7 +1078,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="rekap-absensi"
+              path="attendance-recap"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <MemberAttendanceRecapPage />
@@ -605,7 +1086,7 @@ function AppRoutes() {
               }
             />
             <Route
-              path="rekap-absensi/cetak"
+              path="attendance-recap/print"
               element={
                 <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "TIM_ABSENSI", "PENGAWAS"]}>
                   <RecapPrintPage />
@@ -613,6 +1094,18 @@ function AppRoutes() {
               }
             />
           </Route>
+          {/* Redirect legacy /lainnya/* (segmen ikut diterjemahkan satu per satu) */}
+          <Route path="/lainnya/kelompok" element={<Navigate to="/more/groups" replace />} />
+          <Route path="/lainnya/pendaftar" element={<Navigate to="/more/registrants" replace />} />
+          <Route path="/lainnya/pendaftar/:submission_id" element={<PrefixRedirect from="/lainnya/pendaftar" to="/more/registrants" />} />
+          <Route path="/lainnya/permintaan-member" element={<Navigate to="/more/member-requests" replace />} />
+          <Route path="/lainnya/import-jamaah" element={<Navigate to="/more/import-members" replace />} />
+          <Route path="/lainnya/jadwal" element={<PrefixRedirect from="/lainnya/jadwal" to="/more/schedule" />} />
+          <Route path="/lainnya/rekap-absensi/cetak" element={<PrefixRedirect from="/lainnya/rekap-absensi/cetak" to="/more/attendance-recap/print" />} />
+          <Route path="/lainnya/rekap-absensi" element={<PrefixRedirect from="/lainnya/rekap-absensi" to="/more/attendance-recap" />} />
+          <Route path="/lainnya/petugas-jumat/cetak" element={<PrefixRedirect from="/lainnya/petugas-jumat/cetak" to="/more/friday-officers/print" />} />
+          <Route path="/lainnya/petugas-jumat" element={<PrefixRedirect from="/lainnya/petugas-jumat" to="/more/friday-officers" />} />
+          <Route path="/lainnya/*" element={<PrefixRedirect from="/lainnya" to="/more" />} />
           <Route path="/ai-chat" element={<AiChatPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -623,7 +1116,7 @@ function AppRoutes() {
 }
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
       <ThemeProvider>
         <AuthProvider>

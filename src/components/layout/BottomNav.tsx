@@ -12,20 +12,28 @@ import {
   RefreshCw,
   Calendar,
   Wallet,
+  Heart,
+  ClipboardList,
 } from "../ui/FontAwesomeIcons";
+
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
-  { key: "jamaah", label: "Jamaah", to: "/jamaah", icon: Users },
-  { key: "absensi", label: "Absensi", to: "/absensi", icon: CalendarCheck },
+  { key: "jamaah", label: "Jamaah", to: "/members", icon: Users },
+  { key: "absensi", label: "Absensi", to: "/attendance", icon: CalendarCheck },
+  { key: "schedule", label: "Jadwal", to: "/more/schedule", icon: Calendar },
   {
     key: "pengumuman",
     label: "Pengumuman",
-    to: "/pengumuman",
+    to: "/announcements",
     icon: Megaphone,
   },
   { key: "keuangan", label: "Keuangan", to: "/finance", icon: Wallet },
-  { key: "lainnya", label: "Lainnya", to: "/lainnya", icon: MoreHorizontal },
+  { key: "kas", label: "Kas", to: "/finance/ledger", icon: Wallet },
+  { key: "shodaqoh", label: "Shodaqoh", to: "/finance/monthly-dues", icon: Heart },
+  { key: "zakat", label: "Zakat", to: "/finance/zakat", icon: ClipboardList },
+  { key: "lainnya", label: "Lainnya", to: "/more", icon: MoreHorizontal },
 ];
+
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },
   { key: "quran", label: "Al-Quran", to: "/member/quran", icon: BookOpen },
@@ -33,15 +41,18 @@ const MEMBER_ITEMS = [
   { key: "dzikir", label: "Dzikir", to: "/member/dzikir", icon: RefreshCw },
   { key: "lainnya", label: "Lainnya", to: "/member/lainnya", icon: MoreHorizontal },
 ];
+
 export function BottomNav() {
   const location = useLocation();
   const { isDevelopment } = useEnvironment();
   const { canSeeNav } = usePermission();
-  const isMemberContext = location.pathname.startsWith("/member");
+  const isMemberContext =
+    location.pathname === "/member" || location.pathname.startsWith("/member/");
   const items = isMemberContext ? MEMBER_ITEMS : ADMIN_ITEMS;
   const visible = isMemberContext
     ? items
     : items.filter((i) => canSeeNav(i.key));
+
   return (
     <div className="relative w-full">
       {isDevelopment && (
@@ -64,7 +75,7 @@ export function BottomNav() {
               key={item.key}
               to={item.to}
               end={item.to === "/" || item.to === "/member"}
-              className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl transition-all duration-200 active:scale-90"
+              className="relative flex-1 flex flex-col items-center justify-center gap-0.5 h-[52px] rounded-2xl active:scale-95 transition-transform"
               onClick={() => tapFeedback()}
             >
               {({ isActive }) => (
@@ -72,12 +83,10 @@ export function BottomNav() {
                   <Icon
                     size={21}
                     strokeWidth={isActive ? 2.4 : 1.9}
-                    className={`transition-colors duration-200 ${
-                      isActive ? "text-accent" : "text-surface-muted"
-                    }`}
+                    className={isActive ? "text-accent" : "text-surface-muted"}
                   />
                   <span
-                    className={`text-ios-tab transition-all duration-200 ${
+                    className={`text-ios-tab ${
                       isActive
                         ? "text-accent font-semibold"
                         : "text-surface-muted"
@@ -85,11 +94,9 @@ export function BottomNav() {
                   >
                     {item.label}
                   </span>
-                  <span
-                    className={`absolute bottom-1 w-1 h-1 rounded-full bg-accent transition-all duration-200 ${
-                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
-                    }`}
-                  />
+                  {isActive && (
+                    <span className="absolute bottom-1 w-1 h-1 rounded-full bg-accent" />
+                  )}
                 </>
               )}
             </NavLink>

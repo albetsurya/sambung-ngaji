@@ -19,7 +19,7 @@ export default function MemberGuidePage() {
     <AppLayout hideNav>
       <Header
         title="Panduan Penggunaan"
-        onBack={() => goBack(navigate, user ? "/member/lainnya" : "/")}
+        onBack={() => goBack(navigate, user ? "/member/more" : "/")}
         backLabel="Kembali"
         right={
           !user ? (

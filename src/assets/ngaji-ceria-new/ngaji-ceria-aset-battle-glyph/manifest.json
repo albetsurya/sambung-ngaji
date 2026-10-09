@@ -1,0 +1,40 @@
+{
+  "01-karakter-battle": [
+    "avatarBoy",
+    "avatarBoyBattle",
+    "avatarQirra",
+    "avatarQirraBattle",
+    "avatarSafa",
+    "avatarSafaBattle",
+    "monsterSlime",
+    "monsterGolem",
+    "monsterPixel"
+  ],
+  "02-glyph-ui": [
+    "iconCheckMark",
+    "iconScissors",
+    "iconGearSettings",
+    "iconUndo",
+    "iconRedo",
+    "iconMergeClips",
+    "iconPlayHeadMarker",
+    "iconPlay",
+    "iconStop",
+    "iconEnergyPetir",
+    "iconPowerSlowmo",
+    "iconPowerShield"
+  ],
+  "03-varian-tema": [
+    "iconRadarScanner",
+    "iconDetektifKacaPembesar",
+    "iconAlkimiaTabung",
+    "tileWordleCorrect",
+    "tileWordlePresent",
+    "tileWordleAbsent",
+    "tileWordleEmpty",
+    "btnArrowLeft",
+    "btnArrowUp",
+    "btnArrowRight",
+    "btnArrowDown"
+  ]
+}

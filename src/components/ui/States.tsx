@@ -111,8 +111,8 @@ export function EmptyState({
   icon?: ReactNode;
 }) {
   return (
-    <div className={STATE_WRAPPER}>
-      <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-4">
+    <div className={`${STATE_WRAPPER} anim-stagger`}>
+      <div className="w-16 h-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-4 anim-float-soft">
         {icon ?? <ClipboardList size={26} className="text-accent" />}
       </div>
       <h3 className="text-ios-nav font-semibold text-surface-text mb-1.5">
@@ -123,7 +123,7 @@ export function EmptyState({
           {description}
         </p>
       )}
-      {action && <div className="mt-5">{action}</div>}
+      {action && <div className="mt-5 anim-stagger" style={{ "--stagger-delay": "90ms" } as React.CSSProperties}>{action}</div>}
     </div>
   );
 }

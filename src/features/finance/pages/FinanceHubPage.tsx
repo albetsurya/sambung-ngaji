@@ -6,7 +6,7 @@ import { usePermission } from "../../../hooks/usePermission";
 import { useFinanceHubBack } from "../hooks/useFinanceBack";
 
 /**
- * Hub Keuangan — ringkas 3 modul (Kas/Shodaqoh/Zakat) dalam 1 pintu.
+ * Hub Keuangan - ringkas 3 modul (Kas/Shodaqoh/Zakat) dalam 1 pintu.
  * Menggantikan 3 item bottom-nav terpisah agar nav max 5 item dan nyaman di mobile.
  */
 export const FinanceHubPage: React.FC = () => {
@@ -27,7 +27,7 @@ export const FinanceHubPage: React.FC = () => {
             <EmptyState
               title="Pilih 1 kelompok dulu"
               description="Keuangan bersifat per-kelompok agar tidak tercampur. Pilih kelompok, lalu buka Kas / Shodaqoh / Zakat."
-              action={<Button size="sm" onClick={() => navigate("/kelompok-saya")}>Pilih Kelompok</Button>}
+              action={<Button size="sm" onClick={() => navigate("/my-group")}>Pilih Kelompok</Button>}
             />
           </div>
         ) : (

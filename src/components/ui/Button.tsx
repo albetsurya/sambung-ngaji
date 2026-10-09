@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { tapFeedback } from "../../lib/haptics";
+import { Loader2 } from "./FontAwesomeIcons";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost" | "danger" | "soft" | "softDanger";
@@ -8,6 +9,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
   iconOnly?: boolean;
+  loading?: boolean;
   children?: ReactNode;
 }
 
@@ -72,17 +74,24 @@ export function Button({
   leftIcon,
   rightIcon,
   iconOnly,
+  loading = false,
   className = "",
   children,
   onClick,
+  disabled,
   ...rest
 }: Props) {
   const s = SIZES[size];
   const stable = `btn btn-${variant} btn-${size}`;
+  const isDisabled = disabled || loading;
+
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+    if (isDisabled) return;
     tapFeedback();
     onClick?.(e);
   };
+
+  const spinner = <Loader2 className="animate-spin" />;
 
   if (iconOnly) {
     const width =
@@ -95,35 +104,39 @@ export function Button({
             : "w-12";
     return (
       <button
+        disabled={isDisabled}
         className={`inline-flex items-center justify-center ${s.height} ${width} rounded-2xl font-semibold transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${className}`}
         onClick={handleClick}
         {...rest}
       >
         <span className={`flex items-center justify-center ${s.iconSize}`}>
-          {children}
+          {loading ? spinner : children}
         </span>
       </button>
     );
   }
 
+  const effectiveLeftIcon = loading ? spinner : leftIcon;
+
   return (
     <button
+      disabled={isDisabled}
       className={`inline-flex items-center justify-center ${s.height} ${s.px} ${s.gap} rounded-2xl font-semibold ${s.text} tracking-[-0.01em] transition-all duration-200 ease-out active:scale-[0.97] disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-bg ${VARIANTS[variant]} ${stable} ${fullWidth ? "w-full" : ""} ${className}`}
-        onClick={handleClick}
-        {...rest}
-      >
-      {leftIcon && (
+      onClick={handleClick}
+      {...rest}
+    >
+      {effectiveLeftIcon && (
         <span
           className={`inline-flex items-center justify-center flex-shrink-0 ${s.iconSize}`}
           aria-hidden="true"
         >
-          {leftIcon}
+          {effectiveLeftIcon}
         </span>
       )}
 
       {children && <span className="truncate">{children}</span>}
 
-      {rightIcon && (
+      {!loading && rightIcon && (
         <span
           className={`inline-flex items-center justify-center flex-shrink-0 ${s.iconSize}`}
           aria-hidden="true"

@@ -216,36 +216,36 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
                     key={m}
                     className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap"
                   >
-                    {v > 0 ? formatRp(v) : "—"}
+                    {v > 0 ? formatRp(v) : "-"}
                   </td>
                 );
               })}
               {!isInfakIr && (
                 <>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.sambung > 0 ? formatRp(r.sambung) : "—"}
+                    {r.sambung > 0 ? formatRp(r.sambung) : "-"}
                   </td>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.jimpitan > 0 ? formatRp(r.jimpitan) : "—"}
+                    {r.jimpitan > 0 ? formatRp(r.jimpitan) : "-"}
                   </td>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.siar > 0 ? formatRp(r.siar) : "—"}
+                    {r.siar > 0 ? formatRp(r.siar) : "-"}
                   </td>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.seribuan > 0 ? formatRp(r.seribuan) : "—"}
+                    {r.seribuan > 0 ? formatRp(r.seribuan) : "-"}
                   </td>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.kafan > 0 ? formatRp(r.kafan) : "—"}
+                    {r.kafan > 0 ? formatRp(r.kafan) : "-"}
                   </td>
                   <td className="border border-slate-300 p-1 text-right  tabular-nums whitespace-nowrap">
-                    {r.ukhro > 0 ? formatRp(r.ukhro) : "—"}
+                    {r.ukhro > 0 ? formatRp(r.ukhro) : "-"}
                   </td>
                 </>
               )}
               <td className="border border-slate-300 p-1 text-right  font-bold text-slate-900 tabular-nums whitespace-nowrap">
                 {(isInfakIr ? r.ir : r.total) > 0
                   ? formatRp(isInfakIr ? r.ir : r.total)
-                  : "—"}
+                  : "-"}
               </td>
             </tr>
           ))}

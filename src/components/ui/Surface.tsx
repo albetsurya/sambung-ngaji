@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { ChevronRight, KeyRound } from "./FontAwesomeIcons";
 import type { Role } from "../../types";
 import { ROLE_LABEL } from "../../hooks/usePermission";
@@ -51,12 +51,14 @@ export function ListRow({
   leading,
   insetDivider = true,
   className = "",
+  style,
 }: {
   children: ReactNode;
   onClick?: () => void;
   leading?: ReactNode;
   insetDivider?: boolean;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <div
@@ -68,6 +70,7 @@ export function ListRow({
             }
           : undefined
       }
+      style={style}
       className={`flex items-center gap-3 min-h-[52px] px-4 py-3 ${
         insetDivider ? "ios-list-divider" : ""
       } ${
@@ -81,7 +84,6 @@ export function ListRow({
     </div>
   );
 }
-
 
 function FemaleHijabIcon({
   size,
@@ -99,15 +101,14 @@ function FemaleHijabIcon({
       className={className}
       aria-hidden="true"
     >
-      
       <path
         d="M12 2.5c-3.2 0-5.5 2.4-5.5 5.6 0 1.1.2 2 .5 2.8-.6.5-1 1.3-1 2.2 0 1.3.9 2.3 2 2.5.4 3.6 2.1 6.4 4 6.4s3.6-2.8 4-6.4c1.1-.2 2-1.2 2-2.5 0-.9-.4-1.7-1-2.2.3-.8.5-1.7.5-2.8 0-3.2-2.3-5.6-5.5-5.6Z"
         fill="currentColor"
         opacity="0.35"
       />
-      
+
       <ellipse cx="12" cy="9.5" rx="2.6" ry="3.2" fill="currentColor" />
-      
+
       <path
         d="M6 22c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5"
         stroke="currentColor"
@@ -130,9 +131,8 @@ function MaleIcon({ size, className }: { size: number; className?: string }) {
       className={className}
       aria-hidden="true"
     >
-      
       <circle cx="12" cy="9" r="4" fill="currentColor" />
-      
+
       <path
         d="M5 22c0-3.3 3.1-6 7-6s7 2.7 7 6"
         stroke="currentColor"
@@ -144,7 +144,6 @@ function MaleIcon({ size, className }: { size: number; className?: string }) {
     </svg>
   );
 }
-
 
 function optimizeAvatarUrl(url: string): string {
   if (!url) return url;
@@ -163,6 +162,7 @@ interface AvatarProps {
 
 export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
   const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const showPhoto = src && !imgError;
 
   const bgClass =
@@ -170,36 +170,52 @@ export function Avatar({ src, name, size = 44, gender = "L" }: AvatarProps) {
       ? "bg-accent-soft text-accent"
       : "bg-surface-card2 text-surface-muted";
 
-  if (showPhoto) {
-    return (
-      <img
-        src={optimizeAvatarUrl(src!)}
-        alt={name}
-        onError={() => setImgError(true)}
-        style={{ width: size, height: size }}
-        className="rounded-full object-cover bg-accent-soft flex-shrink-0 ring-1 ring-surface-border"
-        loading="lazy"
-        decoding="async"
-        referrerPolicy="no-referrer"
-      />
-    );
-  }
+  const softEase = "cubic-bezier(0.22, 1, 0.36, 1)";
 
   return (
     <div
       style={{ width: size, height: size }}
-      className={`rounded-full flex items-center justify-center flex-shrink-0 ${bgClass}`}
+      className={`relative rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${bgClass} ${
+        showPhoto ? "ring-1 ring-surface-border" : ""
+      }`}
       aria-label={name}
     >
-      {gender === "P" ? (
-        <FemaleHijabIcon size={size} />
-      ) : (
-        <MaleIcon size={size} />
+      <span
+        className="absolute inset-0 flex items-center justify-center motion-safe:transition-opacity motion-safe:duration-[500ms]"
+        style={{
+          opacity: showPhoto && imgLoaded ? 0 : 1,
+          transitionTimingFunction: softEase,
+        }}
+        aria-hidden="true"
+      >
+        {gender === "P" ? (
+          <FemaleHijabIcon size={size} />
+        ) : (
+          <MaleIcon size={size} />
+        )}
+      </span>
+
+      {showPhoto && (
+        <img
+          src={optimizeAvatarUrl(src!)}
+          alt={name}
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgError(true)}
+          style={{
+            width: size,
+            height: size,
+            opacity: imgLoaded ? 1 : 0,
+            transitionTimingFunction: softEase,
+          }}
+          className="relative rounded-full object-cover motion-safe:transition-opacity motion-safe:duration-[600ms]"
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+        />
       )}
     </div>
   );
 }
-
 
 const BADGE_COLORS: Record<string, string> = {
   emerald: "bg-accent-soft text-accent",

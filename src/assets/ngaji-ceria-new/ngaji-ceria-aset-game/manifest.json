@@ -1,0 +1,44 @@
+{
+  "01-ikon-sholat": [
+    "iconSholatSubuh",
+    "iconSholatDzuhur",
+    "iconSholatAshar",
+    "iconSholatMaghrib",
+    "iconSholatIsya"
+  ],
+  "02-bangunan-peta": [
+    "buildingMasjid",
+    "buildingKelas",
+    "buildingAsrama",
+    "buildingPerpus",
+    "buildingDapur",
+    "buildingRumah",
+    "mapGerbang",
+    "mapLapangan",
+    "mapRuangTamu",
+    "mapTaman",
+    "mapMalam",
+    "obstaclePohon"
+  ],
+  "03-wudhu": [
+    "stepNiat",
+    "stepCuciTangan",
+    "stepBerkumur",
+    "stepHirupAir",
+    "stepBasuhWajah",
+    "stepBasuhTangan",
+    "stepUsapKepala",
+    "stepUsapTelinga",
+    "stepBasuhKaki",
+    "stepDoaSelesai"
+  ],
+  "04-arcade": [
+    "obstacleBatuRintangan",
+    "obstaclePagar",
+    "obstacleSemak",
+    "obstacleBalokKayu",
+    "cardBackgroundTajwid",
+    "cardBackgroundTajwidPerak",
+    "effectSparkleCorrect"
+  ]
+}

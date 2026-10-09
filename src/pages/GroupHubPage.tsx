@@ -91,7 +91,7 @@ export default function GroupHubPage() {
     description: string;
     Icon: ComponentType<{ size?: number; className?: string }>;
     to: string;
-    section: "jamaah" | "jadwal" | "keuangan";
+    section: "jamaah" | "schedule" | "keuangan";
     badge?: number;
     needsGroup?: boolean;
   }[] = useMemo(() => {
@@ -140,7 +140,7 @@ export default function GroupHubPage() {
           ? "Atur akun & hak akses semua kelompok"
           : "Kelola akun & hak akses kelompok ini",
         Icon: KeyRound,
-        to: "/lainnya/users",
+        to: "/more/users",
         section: "jamaah",
       },
       {
@@ -150,7 +150,7 @@ export default function GroupHubPage() {
           ? `Verifikasi pendaftar semua kelompok (${pendingCount} menunggu)`
           : `Verifikasi pendaftar ${myGroup?.group_name || "kelompok ini"}`,
         Icon: ClipboardList,
-        to: "/lainnya/pendaftar",
+        to: "/more/registrants",
         section: "jamaah",
         badge: pendingCount > 0 ? pendingCount : undefined,
       },
@@ -159,17 +159,17 @@ export default function GroupHubPage() {
         label: "Permintaan Member",
         description: "User minta menjadi member",
         Icon: UserPlus,
-        to: "/lainnya/permintaan-member",
+        to: "/more/member-requests",
         section: "jamaah",
       },
       ...(isGlobalMode
         ? [
             {
-              key: "kelompok",
+              key: "group_label",
               label: "Kelompok",
               description: "Kelola data master kelompok pengajian",
               Icon: Building2,
-              to: "/lainnya/kelompok",
+              to: "/more/groups",
               section: "jamaah" as const,
             },
           ]
@@ -179,7 +179,7 @@ export default function GroupHubPage() {
         label: "Import Jamaah",
         description: "Paste text biodata dari WhatsApp",
         Icon: FileText,
-        to: "/lainnya/import-jamaah",
+        to: "/more/import-members",
         section: "jamaah",
       },
       {
@@ -189,32 +189,32 @@ export default function GroupHubPage() {
           ? "Bagikan link pendaftaran"
           : "Bagikan link pendaftaran kelompok",
         Icon: QrCode,
-        to: "/lainnya/qr-code",
+        to: "/more/qr-code",
         section: "jamaah",
       },
       {
-        key: "jadwal",
+        key: "schedule",
         label: "Kelola Jadwal",
         description: "Kalender, tambah massal & import PDF",
         Icon: Calendar,
-        to: "/lainnya/jadwal",
-        section: "jadwal",
+        to: "/more/schedule",
+        section: "schedule",
       },
       {
         key: "rekap-absensi",
         label: "Rekap Absensi",
         description: "Matriks kehadiran bulanan",
         Icon: CalendarCheck,
-        to: "/lainnya/rekap-absensi",
-        section: "jadwal",
+        to: "/more/attendance-recap",
+        section: "schedule",
       },
       {
         key: "petugas-jumat",
         label: "Petugas Jumat",
         description: "Kelola petugas sholat Jumat",
         Icon: Mosque,
-        to: "/lainnya/petugas-jumat",
-        section: "jadwal",
+        to: "/more/friday-officers",
+        section: "schedule",
       },
     ];
   }, [isGlobalMode, pendingCount, isSuperAdmin, canAccessFinance, myGroup?.group_name]);
@@ -232,7 +232,7 @@ export default function GroupHubPage() {
     setGroupPickerOpen(false);
     const dest = pendingFinanceTo || "/finance";
     setPendingFinanceTo(null);
-    navigate(`/kelompok-saya?group_id=${g.group_id}`, { replace: true });
+    navigate(`/my-group?group_id=${g.group_id}`, { replace: true });
     setTimeout(() => navigate(dest), 50);
   }
   const headerTitle = isSuperAdmin ? "Kelola Kelompok" : "Kelompok Saya";
@@ -246,7 +246,7 @@ export default function GroupHubPage() {
       <Header
         title={headerTitle}
         subtitle={headerSubtitle}
-        onBack={() => navigate("/lainnya")}
+        onBack={() => navigate("/more")}
         backLabel="Lainnya"
       />
       <div className="py-4">
@@ -257,7 +257,7 @@ export default function GroupHubPage() {
               label="Semua"
               onClick={() => {
                 setSuperAdminFocusGroup(null);
-                if (urlGroupId) navigate("/kelompok-saya");
+                if (urlGroupId) navigate("/my-group");
               }}
             />
             {allGroups.map((g) => (
@@ -267,7 +267,7 @@ export default function GroupHubPage() {
                 label={g.group_name}
                 onClick={() => {
                   setSuperAdminFocusGroup(g.group_id);
-                  navigate(`/kelompok-saya?group_id=${g.group_id}`);
+                  navigate(`/my-group?group_id=${g.group_id}`);
                 }}
               />
             ))}
@@ -302,8 +302,8 @@ export default function GroupHubPage() {
                               : myGroup.group_name}
                           </p>
                           <p className="text-ios-caption text-surface-muted truncate">
-                            Pembina: {myGroup.pembina || "-"} ·{" "}
-                            {myGroup.jadwal || ""}
+                            Pembina: {myGroup.mentor || "-"} ·{" "}
+                            {myGroup.schedule || ""}
                           </p>
                         </div>
                       </div>
@@ -315,7 +315,7 @@ export default function GroupHubPage() {
             {[
               { key: "keuangan" as const, label: "Keuangan & SabilKas" },
               { key: "jamaah" as const, label: "Jamaah & Keanggotaan" },
-              { key: "jadwal" as const, label: "Jadwal & Absensi" },
+              { key: "schedule" as const, label: "Jadwal & Absensi" },
             ].map((sec) => {
               const items = menu.filter((m) => m.section === sec.key);
               if (items.length === 0) return null;
@@ -345,7 +345,7 @@ export default function GroupHubPage() {
         title="Pilih Kelompok"
       >
         <p className="text-ios-footnote text-surface-muted mb-3 px-1">
-          Modul keuangan bersifat per-kelompok. Pilih 1 kelompok untuk melanjutkan — data tidak digabung antar kelompok agar tidak miss.
+          Modul keuangan bersifat per-kelompok. Pilih 1 kelompok untuk melanjutkan - data tidak digabung antar kelompok agar tidak miss.
         </p>
         <GroupedList flush>
           {allGroups.map((g, i) => (
@@ -359,7 +359,7 @@ export default function GroupHubPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{g.group_name}</p>
                   <p className="text-ios-caption text-surface-muted truncate">
-                    {g.pembina ? `Pembina: ${g.pembina}` : ""}
+                    {g.mentor ? `Pembina: ${g.mentor}` : ""}
                   </p>
                 </div>
               </ChevronRow>

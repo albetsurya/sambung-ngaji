@@ -228,7 +228,8 @@ export default function LoginPage() {
           <Button
             type="submit"
             fullWidth
-            disabled={submitting || !username || !password}
+            loading={submitting}
+            disabled={!username || !password}
             rightIcon={!submitting ? <ArrowRight size={16} /> : undefined}
           >
             {submitting ? "Memproses..." : "Masuk"}
@@ -239,7 +240,7 @@ export default function LoginPage() {
             Belum punya akun?
           </p>
           <Link
-            to="/daftar"
+            to="/register"
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl border border-accent/30 bg-accent-soft text-accent text-ios-subhead font-semibold transition-all hover:bg-accent-soft/80 active:scale-[0.97]"
           >
             Daftar sekarang

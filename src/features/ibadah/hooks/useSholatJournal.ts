@@ -106,9 +106,9 @@ export function useSholatJournal() {
   }, [storageKey]);
 
   const setStatus = useCallback(
-    (tanggal: string, waktu: WaktuSholat, status: StatusSholat) => {
+    (date: string, waktu: WaktuSholat, status: StatusSholat) => {
       setData((prev) => {
-        const entry = { ...(prev[tanggal] ?? {}) };
+        const entry = { ...(prev[date] ?? {}) };
         if (status === "belum") {
           delete entry[waktu];
         } else {
@@ -116,9 +116,9 @@ export function useSholatJournal() {
         }
         const next = { ...prev };
         if (Object.keys(entry).length === 0) {
-          delete next[tanggal];
+          delete next[date];
         } else {
-          next[tanggal] = entry;
+          next[date] = entry;
         }
         persist(storageKey, next);
         return next;
@@ -128,19 +128,19 @@ export function useSholatJournal() {
   );
 
   const getEntry = useCallback(
-    (tanggal: string): JournalEntry => data[tanggal] ?? {},
+    (date: string): JournalEntry => data[date] ?? {},
     [data],
   );
 
   const getHistory = useCallback(
-    (days: number = 7): { tanggal: string; entry: JournalEntry }[] => {
-      const out: { tanggal: string; entry: JournalEntry }[] = [];
+    (days: number = 7): { date: string; entry: JournalEntry }[] => {
+      const out: { date: string; entry: JournalEntry }[] = [];
       const today = new Date();
       for (let i = 0; i < days; i++) {
         const d = new Date(today);
         d.setDate(d.getDate() - i);
         const iso = isoDate(d);
-        out.push({ tanggal: iso, entry: data[iso] ?? {} });
+        out.push({ date: iso, entry: data[iso] ?? {} });
       }
       return out;
     },
@@ -148,10 +148,10 @@ export function useSholatJournal() {
   );
 
   const resetDate = useCallback(
-    (tanggal: string) => {
+    (date: string) => {
       setData((prev) => {
         const next = { ...prev };
-        delete next[tanggal];
+        delete next[date];
         persist(storageKey, next);
         return next;
       });

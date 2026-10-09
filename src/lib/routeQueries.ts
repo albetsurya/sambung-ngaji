@@ -7,7 +7,7 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     return [queryKeys.dashboard(), ["member-self-dashboard"]];
   }
 
-  if (pathname.startsWith("/jamaah/") && pathname !== "/jamaah/baru") {
+  if (pathname.startsWith("/members/") && pathname !== "/members/new") {
     const parts = pathname.split("/");
     const memberId = parts[2];
     if (memberId && memberId !== "baru") {
@@ -20,7 +20,7 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     }
   }
 
-  if (pathname === "/jamaah" || pathname.startsWith("/jamaah")) {
+  if (pathname === "/members" || pathname.startsWith("/members")) {
     return [
       queryKeys.members(),
       queryKeys.membersPaged(),
@@ -28,7 +28,7 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     ];
   }
 
-  if (pathname.startsWith("/absensi")) {
+  if (pathname.startsWith("/attendance")) {
     return [
       queryKeys.meetings(),
       queryKeys.attendancePage(""),
@@ -36,15 +36,15 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     ];
   }
 
-  if (pathname.startsWith("/pengumuman")) {
+  if (pathname.startsWith("/announcements")) {
     return [queryKeys.announcements()];
   }
 
-  if (pathname.startsWith("/profil-saya")) {
+  if (pathname.startsWith("/my-profile")) {
     return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
-  if (pathname.startsWith("/member")) {
+  if (pathname === "/member" || pathname.startsWith("/member/")) {
     if (pathname.startsWith("/member/petugas-jumat")) {
       return [
         ["member-self-dashboard"],
@@ -55,26 +55,26 @@ export function getQueryKeysForRoute(pathname: string): QueryKey[] {
     return [["member-self-dashboard"], ["member-self-profile"]];
   }
 
-  if (pathname.startsWith("/lainnya/kelompok")) {
+  if (pathname.startsWith("/more/groups")) {
     return [queryKeys.groups()];
   }
-  if (pathname.startsWith("/lainnya/pendaftar")) {
+  if (pathname.startsWith("/more/registrants")) {
     return [queryKeys.pendingMembers(), queryKeys.pendingMembers("PENDING")];
   }
-  if (pathname.startsWith("/lainnya/users")) {
+  if (pathname.startsWith("/more/users")) {
     return [queryKeys.users()];
   }
-  if (pathname.startsWith("/lainnya/audit-log")) {
+  if (pathname.startsWith("/more/audit-log")) {
     return [queryKeys.auditLogs(200)];
   }
-  if (pathname.startsWith("/lainnya/ai-usage")) {
+  if (pathname.startsWith("/more/ai-usage")) {
     return [queryKeys.aiUsage()];
   }
-  if (pathname.startsWith("/lainnya/petugas-jumat")) {
+  if (pathname.startsWith("/more/friday-officers")) {
     return [queryKeys.fridaySchedules()];
   }
 
-  if (pathname === "/lainnya") {
+  if (pathname === "/more") {
     return [];
   }
 

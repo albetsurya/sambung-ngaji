@@ -112,7 +112,7 @@ export function DateInput({
         <input
           type="text"
           inputMode="numeric"
-          placeholder="dd-mm-yyyy"
+          placeholder="DD-MM-YYYY"
           value={display}
           onChange={handleTextChange}
           onFocus={() => setFocused(true)}

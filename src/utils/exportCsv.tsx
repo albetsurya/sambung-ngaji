@@ -31,25 +31,25 @@ export function exportMembersToCsv(members: Member[]) {
 
   var rows = members.map(function (m) {
     return [
-      m.nama_lengkap || "",
-      m.nama_panggilan || "",
-      m.jenis_kelamin === "L"
+      m.full_name || "",
+      m.nickname || "",
+      m.gender === "L"
         ? "Laki-laki"
-        : m.jenis_kelamin === "P"
+        : m.gender === "P"
           ? "Perempuan"
           : "",
-      m.tempat_lahir || "",
-      m.tanggal_lahir || "",
+      m.birth_place || "",
+      m.birth_date || "",
       m.usia || "",
       m.kategori ? CATEGORY_LABEL[m.kategori] : "",
-      m.kelompok || "",
-      m.desa || "",
-      m.daerah || "",
-      m.alamat_rumah || "",
-      m.no_wa || "",
-      m.pekerjaan || "",
-      m.hobi || "",
-      m.status_pembinaan || "",
+      m.group_label || "",
+      m.village || "",
+      m.region || "",
+      m.home_address || "",
+      m.whatsapp_number || "",
+      m.occupation || "",
+      m.hobby || "",
+      m.mentoring_status || "",
     ];
   });
 

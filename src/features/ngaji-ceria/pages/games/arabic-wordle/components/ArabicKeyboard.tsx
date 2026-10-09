@@ -1,0 +1,6 @@
+import { ARABIC_KEYBOARD, type TileStatus } from "../data/word-list";
+
+const colors: Record<TileStatus | "action", string> = { empty: "border-white/15 bg-white/10", correct: "border-emerald-300 bg-emerald-500/60", present: "border-yellow-300 bg-yellow-500/60", absent: "border-slate-600 bg-slate-700", action: "border-cyan-300/30 bg-cyan-500/20" };
+export function ArabicKeyboard({ keyStatuses, onKey, onBackspace, onSubmit, disabled }: { keyStatuses: Record<string, TileStatus>; onKey: (letter: string) => void; onBackspace: () => void; onSubmit: () => void; disabled: boolean }) {
+  return <div className="space-y-1.5" dir="rtl" aria-label="Keyboard Arab">{ARABIC_KEYBOARD.map((row, rowIndex) => <div key={rowIndex} className="flex justify-center gap-1">{row.map((letter) => <button type="button" key={letter} disabled={disabled} onClick={() => onKey(letter)} className={`min-h-9 min-w-7 rounded-lg border px-1 text-sm font-bold text-white sm:min-w-8 ${colors[keyStatuses[letter] ?? "empty"]}`}>{letter}</button>)}</div>)}<div className="flex justify-center gap-2"><button type="button" disabled={disabled} onClick={onBackspace} className={`game-button min-h-9 px-3 text-xs ${colors.action}`}>Hapus</button><button type="button" disabled={disabled} onClick={onSubmit} className={`game-button min-h-9 px-5 text-xs ${colors.action}`}>Tebak</button></div></div>;
+}

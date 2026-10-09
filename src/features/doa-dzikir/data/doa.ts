@@ -12,7 +12,7 @@ export interface DoaEntry {
   sumber?: string;
   dalil?: string;
   keutamaan?: string;
-  catatan?: string;
+  notes?: string;
 }
 
 export interface DoaKategori {

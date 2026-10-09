@@ -8,12 +8,12 @@ export interface PdfTextItem {
 
 export interface ParsedMeetingDraft {
   id: string;
-  acara: string;
-  tanggal: string;
+  event: string;
+  date: string;
   tanggalSelesai?: string;
-  hari: string;
-  jam: string;
-  catatan: string;
+  day: string;
+  time: string;
+  notes: string;
   genderTarget: "" | "L" | "P";
   kategoriTarget: string[];
   confidence: number;
@@ -114,7 +114,7 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
 
   let m = text.match(
     new RegExp(
-      `(\\d{1,2})(?:\\s*[-–]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
+      `(\\d{1,2})(?:\\s*[--]\\s*(\\d{1,2}))?\\s+(${BULAN_ALT})\\s+(\\d{2,4})`,
       "i",
     ),
   );
@@ -138,7 +138,7 @@ function extractTanggal(text: string): { iso: string; isoEnd: string; hari: stri
   if (!result.iso) {
     m = text.match(
       new RegExp(
-        `TGL\\s+(\\d{1,2})(?:\\s*[-–]\\s*\\d{1,2})?\\s*\\/?\\s*[A-Z]*[-\\s]*(${BULAN_ALT})\\s+(\\d{4})`,
+        `TGL\\s+(\\d{1,2})(?:\\s*[--]\\s*\\d{1,2})?\\s*\\/?\\s*[A-Z]*[-\\s]*(${BULAN_ALT})\\s+(\\d{4})`,
         "i",
       ),
     );
@@ -344,12 +344,12 @@ function parseSection(section: RawSection): ParsedMeetingDraft {
 
   return {
     id: cryptoId(),
-    acara,
-    tanggal: tgl.iso,
+    event: acara,
+    date: tgl.iso,
     tanggalSelesai,
-    hari: tgl.hari,
-    jam,
-    catatan,
+    day: tgl.hari,
+    time: jam,
+    notes: catatan,
     genderTarget: detectGenderFromTitle(acara + " " + bodyText),
     kategoriTarget: detectKategoriFromTitle(acara + " " + bodyText),
     confidence,
@@ -416,7 +416,7 @@ function parseLines(lines: string[]): ParsedMeetingDraft[] {
   const sections = splitSections(cleaned);
   const parsed = sections.map(parseSection);
 
-  return parsed.filter((p) => p.acara && p.acara.length >= 3);
+  return parsed.filter((p) => p.event && p.event.length >= 3);
 }
 
 export function parseMeetingsFromPdf(rawItems: any[]): ParsedMeetingDraft[] {
