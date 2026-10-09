@@ -143,6 +143,8 @@ export const MonthlyDuesPage: React.FC = () => {
   const [printMenuOpen, setPrintMenuOpen] = useState(false);
   const [posting, setPosting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showConfirmPost, setShowConfirmPost] = useState(false);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [postStatus, setPostStatus] = useState<
     "unknown" | "posted" | "not-posted"
   >("unknown");
@@ -856,10 +858,10 @@ export const MonthlyDuesPage: React.FC = () => {
                             size="sm"
                             leftIcon={<X size={14} />}
                             disabled={cancelling}
-                            onClick={handleCancelPost}
+                            onClick={() => setShowConfirmCancel(true)}
                             data-testid="btn-cancel-post-card"
                           >
-                            {cancelling ? "Batal…" : "Batal Post"}
+                            {cancelling ? "Batalkan…" : "Batalkan Pindah Kas"}
                           </Button>
                         ) : (
                           <Button
@@ -867,10 +869,10 @@ export const MonthlyDuesPage: React.FC = () => {
                             size="sm"
                             leftIcon={<CheckCircle2 size={14} />}
                             disabled={posting}
-                            onClick={handlePostToKas}
+                            onClick={() => setShowConfirmPost(true)}
                             data-testid="btn-post-kas-card"
                           >
-                            {posting ? "Posting…" : "Post Kas"}
+                            {posting ? "Pindahkan…" : "Pindah ke Kas"}
                           </Button>
                         )}
                         <Button
@@ -2049,6 +2051,103 @@ export const MonthlyDuesPage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
+
+      <ConfirmDialog
+        open={showConfirmPost}
+        title="Pindahkan ke Kas Utama?"
+        description={`Apakah Anda yakin ingin memindahkan penerimaan Shodaqoh bulan ${monthLabel} ke Kas Utama?`}
+        confirmLabel="Pindah ke Kas"
+        loading={posting}
+        onConfirm={async () => {
+          setShowConfirmPost(false);
+          await handlePostToKas();
+        }}
+        onCancel={() => setShowConfirmPost(false)}
+      >
+        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
+          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
+            Rincian Alokasi Transaksi
+          </p>
+          {[
+            { label: "Infak IR", value: allocationTotals.ir },
+            { label: "Uang Sambung", value: allocationTotals.sambung },
+            { label: "Jimpitan", value: allocationTotals.jimpitan },
+            { label: "Siar-Siar", value: allocationTotals.siar },
+            { label: "Seribuan", value: allocationTotals.seribu },
+            { label: "Kafan", value: allocationTotals.kafan },
+            { label: "Ukhro MT", value: allocationTotals.ukhro },
+          ]
+            .filter((a) => a.value > 0)
+            .map((a) => (
+              <div
+                key={a.label}
+                className="flex items-center justify-between text-ios-caption"
+              >
+                <span className="text-surface-text">{a.label}</span>
+                <span className="font-semibold text-surface-text">
+                  {formatRp(a.value)}
+                </span>
+              </div>
+            ))}
+          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
+            <span className="font-bold text-surface-text">Total</span>
+            <span className="font-extrabold text-accent">
+              {formatRp(
+                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
+              )}
+            </span>
+          </div>
+        </div>
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={showConfirmCancel}
+        title="Batalkan Pemindahan ke Kas?"
+        description={`Transaksi pemindahan Shodaqoh bulan ${monthLabel} akan ditarik kembali dari Kas Utama.`}
+        confirmLabel="Batalkan Pindah Kas"
+        danger
+        loading={cancelling}
+        onConfirm={async () => {
+          setShowConfirmCancel(false);
+          await handleCancelPost();
+        }}
+        onCancel={() => setShowConfirmCancel(false)}
+      >
+        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
+          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
+            Rincian Transaksi yang Dibatalkan
+          </p>
+          {[
+            { label: "Infak IR", value: allocationTotals.ir },
+            { label: "Uang Sambung", value: allocationTotals.sambung },
+            { label: "Jimpitan", value: allocationTotals.jimpitan },
+            { label: "Siar-Siar", value: allocationTotals.siar },
+            { label: "Seribuan", value: allocationTotals.seribu },
+            { label: "Kafan", value: allocationTotals.kafan },
+            { label: "Ukhro MT", value: allocationTotals.ukhro },
+          ]
+            .filter((a) => a.value > 0)
+            .map((a) => (
+              <div
+                key={a.label}
+                className="flex items-center justify-between text-ios-caption"
+              >
+                <span className="text-surface-text">{a.label}</span>
+                <span className="font-semibold text-danger">
+                  -{formatRp(a.value)}
+                </span>
+              </div>
+            ))}
+          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
+            <span className="font-bold text-surface-text">Total Ditarik</span>
+            <span className="font-extrabold text-danger">
+              -{formatRp(
+                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
+              )}
+            </span>
+          </div>
+        </div>
+      </ConfirmDialog>
 
       <ConfirmDialog
         open={!!deleteMemberTarget}
