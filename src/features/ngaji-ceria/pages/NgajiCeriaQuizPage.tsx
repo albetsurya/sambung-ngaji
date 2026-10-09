@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Volume2,
@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "../../../components/ui/FontAwesomeIcons";
 import { tapFeedback } from "../../../lib/haptics";
-import { playAudioUrl, playSoundEffect, playOpeningDua, stopAllAudio } from "../utils/audioPlayer";
+import { playSoundEffect, playOpeningDua, stopAllAudio } from "../utils/audioPlayer";
 import {
   TILAWATI_JILID_1_PAGES,
   TILAWATI_JILID_2_PAGES,
@@ -18,8 +18,13 @@ import {
   TILAWATI_JILID_6_PAGES,
   QuizQuestion,
 } from "../data/tilawatiQuizData";
-import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
-import { useNgajiCeriaStore, NgajiCeriaState, awardStars, recordActivity } from "../hooks/useNgajiCeriaStore";
+import { useNgajiCeriaStore, NgajiCeriaState, awardStars } from "../hooks/useNgajiCeriaStore";
+import { useJilidAccess } from "../components/GameLockGuard";
+import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
+import { usePublishedTilawati, useTilawatiAudio } from "../services/tilawatiAudio";
+import { getNgajiActivity } from "../hooks/useNgajiCeriaStore";
+import { soundManager } from "../services/soundManager";
+import { awardProgress } from "./games/_shared/progression";
 
 const QUIZ_DATASETS = {
   1: TILAWATI_JILID_1_PAGES,
@@ -44,12 +49,13 @@ export default function NgajiCeriaQuizPage() {
   const activePageNum = isNaN(pageParam) || pageParam < 1 || pageParam > pageCount ? 1 : pageParam;
 
   const pageData = activeDataset[activePageNum] || activeDataset[1];
-  const questions: QuizQuestion[] = pageData.questions;
+  const published = usePublishedTilawati(activeJilid, activePageNum);
+  const questions: QuizQuestion[] = published?.questions ?? pageData?.questions ?? [];
+  const pageAwarded = useRef(false);
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const question = questions[currentIdx] || questions[0];
   const totalQuestions = questions.length;
@@ -58,23 +64,33 @@ export default function NgajiCeriaQuizPage() {
 
   const [isOpening, setIsOpening] = useState(true);
   const [isTaawudzPhase, setIsTaawudzPhase] = useState(true);
+  const access = useJilidAccess(activeJilid);
+  const tilawatiAudio = useTilawatiAudio({ question, jilid: activeJilid, pageNumber: activePageNum, questionIndex: currentIdx });
+  const isAudioPlaying = tilawatiAudio.isPlaying;
+  useEffect(() => {
+    if (!access.isOpen || access.isComingSoon) return;
+    soundManager.playBgm("quiz", 0.18);
+    return () => soundManager.stopBgm();
+  }, [access.isOpen, access.isComingSoon]);
 
   // Reset state when page number changes
   useEffect(() => {
+    if (!access.isOpen || access.isComingSoon || !question) return;
     setCurrentIdx(0);
     setSelectedTokens([]);
     setStatus("idle");
     setIsOpening(true);
     setIsTaawudzPhase(true);
-  }, [activePageNum]);
+    pageAwarded.current = false;
+  }, [activeJilid, activePageNum]);
 
   // Auto-play audio when question or opening phase changes
   useEffect(() => {
+    if (!access.isOpen || access.isComingSoon || !question) return;
     if (currentIdx === 0 && isOpening) {
       setIsTaawudzPhase(true);
       playOpeningDua(() => {
         setIsTaawudzPhase(false);
-        handlePlayAudio();
         setIsOpening(false);
       });
     } else {
@@ -84,7 +100,7 @@ export default function NgajiCeriaQuizPage() {
     return () => {
       stopAllAudio();
     };
-  }, [currentIdx, isOpening, activePageNum]);
+  }, [currentIdx, isOpening, activePageNum, access.isOpen, access.isComingSoon, tilawatiAudio.url]);
 
   const handleExit = () => {
     stopAllAudio();
@@ -128,8 +144,12 @@ export default function NgajiCeriaQuizPage() {
       setStatus("idle");
     } else {
       // Halaman ini selesai! Simpan progres dan award stars
-      recordActivity();
-      awardStars(activeJilid, activePageNum, 100); // Mock score 100 untuk sekarang
+       if (pageAwarded.current) return;
+       pageAwarded.current = true;
+       awardStars(activeJilid, activePageNum, 100);
+       const stars = getNgajiActivity().stars;
+       const completed = Object.keys(activeDataset).every((page) => stars[`jilid-${activeJilid}-hal-${page}`] > 0);
+       awardProgress("tilawati-quiz", 100, 10, completed ? [`jilid-${activeJilid}-clear`] : []);
 
       if (activePageNum < pageCount) {
         stopAllAudio();
@@ -151,20 +171,23 @@ export default function NgajiCeriaQuizPage() {
   };
 
   const handlePlayAudio = () => {
-    if (isAudioPlaying) return;
-    const audioUrl = getQuestionAudioUrl(
-      question,
-      activeJilid,
-      activePageNum,
-      currentIdx,
-      Boolean(questions[0]?.isOpening),
-    );
-    setIsAudioPlaying(true);
+    if (!question || !access.isOpen || access.isComingSoon) return;
+    if (isAudioPlaying) { tilawatiAudio.stop(); return; }
     tapFeedback();
-    playAudioUrl(audioUrl, () => {
-      setIsAudioPlaying(false);
-    });
+    void tilawatiAudio.play();
   };
+
+  if (!access.isOpen || access.isComingSoon) {
+    return <NgajiCeriaLayout title={`Jilid ${activeJilid}`} showBack onBack={() => navigate("/member/ngaji-ceria/quiz")}>
+      <div className="flex min-h-[70dvh] flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="text-5xl">{access.isComingSoon ? "🎙️" : "🔒"}</div>
+        <span className="rounded-full bg-[#FFF6D5] px-3 py-1 text-xs font-black text-[#8C5A3A]">{access.isComingSoon ? "Segera Hadir" : "Masuk untuk Akses Penuh"}</span>
+        <h1 className="font-display text-2xl font-black text-[#5A3A2A]">{access.isComingSoon ? "Rekaman Audio Menyusul" : `Jilid ${activeJilid} terkunci`}</h1>
+        <p className="max-w-xs text-sm leading-relaxed text-[#8C7A68]">{access.isComingSoon ? "Materi Jilid 6 sedang disiapkan agar pengalaman belajarnya tetap nyaman." : "Masuk atau daftar untuk membuka Jilid 3 sampai 5."}</p>
+        {!access.isLoggedIn && <button type="button" className="game-button bg-[#2D5A27]" onClick={() => navigate("/login")}>Masuk untuk Akses Penuh</button>}
+      </div>
+    </NgajiCeriaLayout>;
+  }
 
   const renderToneBadge = () => {
     if (question.hintTone.includes("Datar")) {
@@ -192,14 +215,14 @@ export default function NgajiCeriaQuizPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8EE] flex flex-col justify-between selection:bg-[#F58A3A]/20">
+    <div onPointerDownCapture={(event) => { if (event.target instanceof Element && event.target.closest("button:not(:disabled)")) soundManager.playSfx("tap", 0.55); }} className="min-h-screen bg-[#FFF8EE] flex flex-col justify-between selection:bg-[#F58A3A]/20">
       {/* Top Header & Progress Bar */}
       <div className="pt-safe px-4 py-3 border-b border-[#E2D4C0] bg-[#FFF8EE]/90 backdrop-blur-md sticky top-0 z-20">
         <div className="max-w-md mx-auto flex items-center gap-3">
           <button
             onClick={handleExit}
             aria-label="Kembali"
-            className="w-9 h-9 rounded-full bg-white border border-[#E2D4C0] flex items-center justify-center text-[#8C7A68] hover:text-[#5A3A2A] active:scale-90 transition-transform shadow-sm"
+            className="min-w-14 h-14 rounded-full bg-white border border-[#E2D4C0] flex items-center justify-center text-[#8C7A68] hover:text-[#5A3A2A] active:scale-90 transition-transform shadow-sm"
           >
             <X size={16} />
           </button>
@@ -260,7 +283,7 @@ export default function NgajiCeriaQuizPage() {
             </div>
             <button
               onClick={() => setSelectedTokens([])}
-              className="text-xs text-[#8C7A68] flex items-center gap-1 hover:text-[#F58A3A]"
+              className="min-h-14 px-3 text-xs text-[#8C7A68] flex items-center gap-1 hover:text-[#F58A3A]"
             >
               <RefreshCw size={12} />
               <span>Hapus</span>
@@ -275,7 +298,7 @@ export default function NgajiCeriaQuizPage() {
           <div className="w-full bg-white border-2 border-[#E2D4C0] rounded-3xl p-6 shadow-md flex flex-col items-center relative mb-6">
             <button
               onClick={handlePlayAudio}
-              className={`absolute top-3 right-3 w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
+              className={`absolute top-3 right-3 w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${
                 isAudioPlaying
                   ? "bg-[#F58A3A] text-white scale-110 shadow-lg"
                   : "bg-[#FCE6DA] text-[#F58A3A] hover:bg-[#F58A3A]/20 active:scale-95"
@@ -321,7 +344,7 @@ export default function NgajiCeriaQuizPage() {
                     <button
                       key={`${token}-${idx}`}
                       onClick={() => handleRemoveToken(idx)}
-                      className="px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
+                      className="min-h-14 px-4 py-2.5 rounded-2xl bg-[#F58A3A] text-white font-black text-base shadow-md border-b-4 border-[#C4430E] active:translate-y-1 transition-all"
                     >
                       {token}
                     </button>

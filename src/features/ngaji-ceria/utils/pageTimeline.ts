@@ -48,8 +48,14 @@ export function visibleSegments(clip: TimelineAudioClip): AudioSegment[] {
     const start = Math.max(clip.trimStart, offset);
     const end = Math.min(clip.trimEnd, offset + length);
     offset += length;
-    return end > start
-      ? [{ sourceUrl: segment.sourceUrl, start: segment.start + start - (offset - length), end: segment.start + end - (offset - length) }]
+    if (end <= start) return [];
+    // Aritmetika float (terutama setelah gabung/gunting berulang) bisa
+    // menghasilkan epsilon negatif seperti -2.2e-16 yang ditolak Web Audio
+    // (offset < 0) dan ffmpeg (-ss negatif). Jepit ke rentang valid.
+    const safeStart = Math.max(0, segment.start + start - (offset - length));
+    const safeEnd = Math.max(safeStart, segment.start + end - (offset - length));
+    return safeEnd > safeStart
+      ? [{ sourceUrl: segment.sourceUrl, start: safeStart, end: safeEnd }]
       : [];
   });
 }
@@ -89,6 +95,16 @@ export function removeTimelineClips(project: PageTimeline, ids: string[]): PageT
     ...project,
     clips: project.clips.filter((clip) => !ids.includes(clip.id)),
     texts: project.texts.map((text) => text.clipId && ids.includes(text.clipId) ? { ...text, clipId: null } : text),
+  };
+}
+
+export function duplicateTimelineClip(project: PageTimeline, id: string, newId = newTimelineId()): PageTimeline {
+  const clip = project.clips.find((item) => item.id === id);
+  if (!clip) return project;
+  const newClip = { ...clip, id: newId, label: `${clip.label} (copy)` };
+  return {
+    ...project,
+    clips: [...project.clips, newClip],
   };
 }
 

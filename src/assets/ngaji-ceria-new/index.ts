@@ -1,5 +1,7 @@
 // Re-export new assets
 export * from "./ngaji-ceria-tilawati/index";
+export * from "./ngaji-ceria-aset-game/index";
+export * from "./ngaji-ceria-aset-battle-glyph/index";
 
 // New Tambahan
 export { default as badgeBintang1 } from './aset-tambahan/ngaji-ceria-aset-tambahan/svg/02-badge-hasil/badgeBintang1.svg';

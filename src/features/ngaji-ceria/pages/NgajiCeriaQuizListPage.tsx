@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { ChevronRight, Sparkles, Star, Lock, Play } from "../../../components/ui/FontAwesomeIcons";
+import { LoginPromptModal } from "../components/LoginPromptModal";
+import { useJilidAccess } from "../components/GameLockGuard";
 
 interface QuizBookProps {
   id: string;
@@ -15,6 +17,8 @@ interface QuizBookProps {
   completedQuestions: number;
   stars: number;
   isLocked?: boolean;
+  /** Bila terisi, kartu terkunci tetap bisa diklik (mis. membuka ajakan login). */
+  onLockedTap?: () => void;
   onClick: () => void;
 }
 
@@ -27,6 +31,7 @@ function StandaloneQuizBookCard({
   completedQuestions,
   stars,
   isLocked = false,
+  onLockedTap,
   onClick,
 }: QuizBookProps) {
   const isCompleted = completedQuestions === totalQuestions;
@@ -36,8 +41,8 @@ function StandaloneQuizBookCard({
     <div className="flex items-center gap-4 group">
       {/* Standalone Book Illustration Card */}
       <button
-        onClick={onClick}
-        disabled={isLocked}
+        onClick={isLocked && onLockedTap ? onLockedTap : onClick}
+        disabled={isLocked && !onLockedTap}
         className={`relative shrink-0 w-24 h-32 transition-all duration-300 group-hover:scale-105 active:scale-95 ${
           isLocked ? "cursor-not-allowed opacity-60 grayscale" : "cursor-pointer drop-shadow-lg"
         }`}
@@ -123,8 +128,20 @@ function StandaloneQuizBookCard({
   );
 }
 
+/** Baris kitab kuis dengan kebijakan akses jilid (tamu J1–2; pengayaan tetap terkunci). */
+function QuizBookEntry({ onOpen, onLocked, ...book }: {
+  onOpen: () => void;
+  onLocked: () => void;
+} & Omit<QuizBookProps, "onClick" | "isLocked" | "onLockedTap"> & { jilid: number; isLocked: boolean }) {
+  const access = useJilidAccess(book.jilid);
+  const locked = book.isLocked || (book.jilid > 0 && !access.isOpen);
+  const canPrompt = book.jilid > 0 && !access.isOpen && !access.isLoggedIn;
+  return <StandaloneQuizBookCard {...book} isLocked={locked} onLockedTap={canPrompt ? onLocked : undefined} onClick={onOpen} />;
+}
+
 export default function NgajiCeriaQuizListPage() {
   const navigate = useNavigate();
+  const [promptOpen, setPromptOpen] = useState(false);
 
   const quizBooks = [
     {
@@ -238,14 +255,16 @@ export default function NgajiCeriaQuizListPage() {
           <div className="space-y-4 divide-y divide-[#E2D4C0] pt-1">
             {quizBooks.map((book) => (
               <div key={book.id} className="pt-4 first:pt-0">
-                <StandaloneQuizBookCard
+                <QuizBookEntry
                   {...book}
-                   onClick={() => navigate(`/member/ngaji-ceria/quiz/play?jilid=${book.jilid}&hal=1`)}
+                  onOpen={() => navigate(`/member/ngaji-ceria/quiz/play?jilid=${book.jilid}&hal=1`)}
+                  onLocked={() => setPromptOpen(true)}
                 />
               </div>
             ))}
           </div>
         </section>
+        <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} />
         {/* Disclaimer Hak Cipta & Legal */}
         <div className="pt-6 pb-4 border-t border-[#E2D4C0] text-center mt-6">
           <p className="text-[10px] text-[#8C7A68] leading-relaxed max-w-xs mx-auto">

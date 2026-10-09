@@ -29,6 +29,12 @@ export const NGAJI_CERIA_NAV_ITEMS = [
     to: "/member/ngaji-ceria/path",
     icon: NGAJI_CERIA_ASSETS.iconPrestasi,
   },
+  {
+    key: "profile",
+    label: "Profil",
+    to: "/member/ngaji-ceria/profile",
+    icon: NGAJI_CERIA_ASSETS.iconProfil,
+  },
 ];
 
 export function NgajiCeriaBottomNav() {
@@ -80,6 +86,7 @@ export function NgajiCeriaBottomNav() {
             </NavLink>
           );
         })}
+
       </nav>
     </div>
   );

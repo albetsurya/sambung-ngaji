@@ -11,7 +11,7 @@ import { usePermission } from "../../../hooks/usePermission";
 import {
   AppLayout,
   Header,
-  FloatingActionButton,
+  FabSpeedDial,
 } from "../../../components/layout/AppLayout";
 import {
   Button,
@@ -38,6 +38,8 @@ import {
   Send,
   CheckCircle2,
   X,
+  Pencil,
+  Camera,
 } from "../../../components/ui/FontAwesomeIcons";
 import { useFinanceSync } from "../hooks/useFinanceSync";
 import { useFinanceBack } from "../hooks/useFinanceBack";
@@ -671,15 +673,36 @@ export const MonthlyDuesPage: React.FC = () => {
   return (
     <AppLayout
       fab={
-        <FloatingActionButton
-          onClick={() => {
-            if (membersList.length > 0) {
-              handleOpenPaymentSheet(membersList[0]);
-            } else {
-              showToast("Belum ada anggota shodaqoh", "warning");
-            }
-          }}
-          label="Input Pembayaran"
+        <FabSpeedDial
+          label="Tambah pembayaran"
+          actions={[
+            {
+              label: "Input manual",
+              icon: <Pencil size={18} strokeWidth={2.2} />,
+              testId: "shod-fab-manual",
+              onClick: () => {
+                if (membersList.length > 0) {
+                  handleOpenPaymentSheet(membersList[0]);
+                } else {
+                  showToast("Belum ada anggota shodaqoh", "warning");
+                }
+              },
+            },
+            {
+              label: "Lewat foto",
+              icon: <Camera size={18} strokeWidth={2.2} />,
+              testId: "shod-fab-photo",
+              onClick: () => {
+                if (membersList.length > 0) {
+                  handleOpenPaymentSheet(membersList[0]);
+                  setPayMethod("upload");
+                  setIsAiSheetOpen(true);
+                } else {
+                  showToast("Belum ada anggota shodaqoh", "warning");
+                }
+              },
+            },
+          ]}
         />
       }
     >

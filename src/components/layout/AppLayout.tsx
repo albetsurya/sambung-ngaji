@@ -294,6 +294,79 @@ export function FloatingActionGroup({ children }: { children: ReactNode }) {
   return <div className="flex flex-col items-end gap-2.5">{children}</div>;
 }
 
+export interface FabSpeedDialAction {
+  label: string;
+  icon: ReactNode;
+  onClick: () => void;
+  testId?: string;
+}
+
+// ponytail: minimal speed-dial FAB; menu berupa tombol kecil + label, tanpa lib tambahan.
+export function FabSpeedDial({
+  label = "Tambah",
+  actions,
+}: {
+  label?: string;
+  actions: FabSpeedDialAction[];
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative flex flex-col items-end">
+      {open && (
+        <button
+          type="button"
+          aria-hidden
+          tabIndex={-1}
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-0 cursor-default bg-transparent"
+        />
+      )}
+      {open && (
+        <div className="relative z-10 mb-2.5 flex flex-col items-end gap-2.5 anim-dropdown">
+          {actions.map((a) => (
+            <div key={a.label} className="flex items-center gap-2.5">
+              <span className="rounded-full border border-surface-border bg-surface-card px-3 py-1.5 text-ios-footnote font-semibold text-surface-text shadow-sm">
+                {a.label}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  tapFeedback();
+                  setOpen(false);
+                  a.onClick();
+                }}
+                aria-label={a.label}
+                data-testid={a.testId}
+                className="w-12 h-12 rounded-2xl flex items-center justify-center bg-surface-card text-accent border border-accent/30 fab fab-secondary motion-safe:transition-all active:scale-95"
+              >
+                {a.icon}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          tapFeedback();
+          setOpen((v) => !v);
+        }}
+        aria-label={label}
+        aria-expanded={open}
+        className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center motion-safe:transition-all motion-safe:duration-[500ms] hover:-translate-y-0.5 active:scale-95 active:translate-y-0 bg-accent text-white fab fab-primary fab-soft"
+        style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+      >
+        <span
+          className={`relative z-10 flex items-center justify-center motion-safe:transition-transform ${open ? "rotate-45" : ""}`}
+        >
+          <Plus size={26} strokeWidth={2.5} />
+        </span>
+      </button>
+    </div>
+  );
+}
+
 export function FloatingActionButton({
   onClick,
   label = "Tambah",

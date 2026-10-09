@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { latinToArabic } from "../utils/translit";
 import { TILAWATI_PAGE_DATASETS } from "../data/tilawatiPageDatasets";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
 import {
-  AudioAsset, AudioSegment, PageTimeline, PublishedTimeline, TimelineAudioClip, TimelineText,
+  AudioAsset, AudioSegment, PageTimeline, TimelineAudioClip, TimelineText,
   clipDuration, clipFromAsset, initialTimeline, mergeTimelineClips, newTimelineId,
   pairTimelineText, removeTimelineClips, reorderTimelineClip, segmentDuration,
-  splitTimelineClip, visibleSegments,
+  splitTimelineClip, duplicateTimelineClip, visibleSegments,
 } from "../utils/pageTimeline";
 import "./TilawatiTimelineEditor.css";
+import { restoreTimelineDraft, tilawatiEditorApi } from "../services/tilawatiEditorApi";
+import { useTimelineDraftSave } from "../hooks/useTimelineDraftSave";
 
 type Selection = { type: "audio" | "text"; id: string } | null;
 type DragData = { type: "asset" | "audio" | "text"; id: string };
@@ -19,13 +22,23 @@ type TouchDrag = {
   moved: boolean;
   ghost: HTMLDivElement;
 };
-type PageResponse = { ok: boolean; message?: string; clips: AudioAsset[]; published?: PublishedTimeline; revision: string };
 const clone = (project: PageTimeline) => JSON.parse(JSON.stringify(project)) as PageTimeline;
 const seconds = (value: number) => `${value.toFixed(3)}s`;
 const kinds = ["header", "demo", "baris", "isi", "footer"] as const;
 
-import { API_BASE_URL } from "../../../constants";
-import { getToken } from "../../../services/api";
+import { SNAP_PX } from "../components/timeline-editor/types";
+
+import { ClipWaveform } from "../components/timeline-editor/ClipWaveform";
+import {
+  buildDragGhost,
+  flashDroppedClip,
+  followPointerWithGhost,
+  placeGhostOnPoint,
+  purgeStrayGhosts,
+  startTouchEdgeScroll,
+  transparentDragPixel,
+  type GhostInfo,
+} from "../components/timeline-editor/dragGhost";
 
 export default function TilawatiCloudTimelineEditorPage() {
   const navigate = useNavigate();
@@ -36,6 +49,7 @@ export default function TilawatiCloudTimelineEditorPage() {
   const [draft, setDraft] = useState<PageTimeline | null>(null);
   const [baseline, setBaseline] = useState("");
   const [revision, setRevision] = useState("");
+  const [loadedPage, setLoadedPage] = useState("");
   const [selection, setSelection] = useState<Selection>(null);
   const [mergeIds, setMergeIds] = useState<string[]>([]);
   const [history, setHistory] = useState<PageTimeline[]>([]);
@@ -47,6 +61,32 @@ export default function TilawatiCloudTimelineEditorPage() {
   const [zoom, setZoom] = useState(32);
   const [cutAt, setCutAt] = useState(0);
   const [playhead, setPlayhead] = useState(0);
+  function snapPlayhead(raw: number): {
+    value: number;
+    snapped: string | null;
+  } {
+    const threshold = SNAP_PX / zoom;
+    let value = raw;
+    let snapped: string | null = null;
+    let bestDist = threshold;
+
+    for (const position of positions) {
+      const dStart = Math.abs(raw - position.start);
+      if (dStart < bestDist) {
+        bestDist = dStart;
+        value = position.start;
+        snapped = "boundary";
+      }
+      const dEnd = Math.abs(raw - position.end);
+      if (dEnd < bestDist) {
+        bestDist = dEnd;
+        value = position.end;
+        snapped = "boundary";
+      }
+    }
+    return { value, snapped };
+  }
+
   const [playing, setPlaying] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<"inspector" | null>(null);
   const dragData = useRef<DragData | null>(null);
@@ -54,10 +94,12 @@ export default function TilawatiCloudTimelineEditorPage() {
   const dragCleanup = useRef<(() => void) | null>(null);
   const context = useRef<AudioContext | null>(null);
   const buffers = useRef(new Map<string, Promise<AudioBuffer>>());
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const activeSources = useRef<AudioBufferSourceNode[]>([]);
   const frame = useRef(0);
   const playToken = useRef(0);
   const dirty = draft !== null && JSON.stringify(draft) !== baseline;
+  const draftSave = useTimelineDraftSave(jilid, hal, draft, revision, !loading && loadedPage === `${jilid}:${hal}`);
 
   function stopPreview() {
     playToken.current += 1;
@@ -73,27 +115,24 @@ export default function TilawatiCloudTimelineEditorPage() {
     setError("");
     setMessage("");
     stopPreview();
-    fetch(`${API_BASE_URL}/v1/tilawati-editor/list?jilid=${jilid}&hal=${hal}`, { signal: controller.signal, cache: "no-store", headers: { Authorization: `Bearer ${getToken()}` } })
-      .then(async (response) => {
-        if (!response.headers.get("content-type")?.includes("application/json")) {
-          throw new Error("Gagal memuat timeline (memerlukan hak akses admin atau API offline). Restart Vite bila endpoint belum tersedia.");
-        }
-        const data = await response.json() as PageResponse;
-        if (!response.ok || !data.ok) throw new Error(data.message || "Gagal membaca halaman.");
-        return data;
-      })
-      .then((data) => {
+    tilawatiEditorApi.list(jilid, hal, controller.signal)
+      .then(async (data) => {
+        const restored = await restoreTimelineDraft(jilid, hal, data.revision, controller.signal);
         if (controller.signal.aborted) return;
         const page = TILAWATI_PAGE_DATASETS[jilid][hal];
         const questions = page.questions.map((question, index) => ({
           ...question,
           audioUrl: getQuestionAudioUrl(question, jilid, hal, index, Boolean(page.questions[0]?.isOpening)),
         }));
-        const project = data.published?.timeline ?? initialTimeline(data.clips, questions);
+        const base = data.published?.timeline ?? initialTimeline(data.clips, questions);
+        const project = restored.draft?.timeline ?? base;
         setAssets(data.clips);
         setDraft(clone(project));
-        setBaseline(JSON.stringify(project));
+        setBaseline(JSON.stringify(base));
         setRevision(data.revision);
+        setLoadedPage(`${jilid}:${hal}`);
+        if (restored.draft) setMessage("Draft terbaru dipulihkan dari penyimpanan lokal/cloud.");
+        if (!data.clips.length) setMessage("Aset master halaman belum tersedia di server. Pastikan direktori frontend/public/audio terpasang pada backend.");
         setHistory([]); setFuture([]); setMergeIds([]); setPlayhead(0);
         const focus = params.get("text");
         setSelection(focus && project.texts.some((text) => String(text.id) === focus)
@@ -117,7 +156,9 @@ export default function TilawatiCloudTimelineEditorPage() {
     dragCleanup.current?.();
     touchDrag.current?.ghost.remove();
     touchDrag.current = null;
-    void context.current?.close();
+    const ctx = context.current;
+    context.current = null;
+    void ctx?.close();
   }, []);
 
   const clips = draft?.clips ?? [];
@@ -260,6 +301,8 @@ export default function TilawatiCloudTimelineEditorPage() {
       const asset = assets.find((item) => item.audioUrl === drag.id);
       if (asset) addAsset(asset, clipId);
     }
+    if (drag.type !== "asset")
+      flashDroppedClip(drag.type === "audio" ? drag.id : clipId);
     dragData.current = null;
   }
   function dropOnText(textId: string) {
@@ -275,16 +318,44 @@ export default function TilawatiCloudTimelineEditorPage() {
     }
     dragData.current = null;
   }
+  function describeDrag(data: DragData): GhostInfo {
+    if (data.type === "audio") {
+      const clip = clips.find((item) => item.id === data.id);
+      return {
+        variant: "clip",
+        title: clip?.label || "Klip audio",
+        sub: clip ? `${clip.kind} · ${seconds(clipDuration(clip))}` : undefined,
+        toneClass: clip ? `te-kind-${clip.kind}` : undefined,
+      };
+    }
+    if (data.type === "asset") {
+      const asset = assets.find((item) => item.audioUrl === data.id);
+      return {
+        variant: "asset",
+        title: asset?.filename || data.id.split("/").pop() || "Audio",
+        sub: asset ? `${asset.type} · ${seconds(asset.duration)}` : undefined,
+        toneClass: asset ? `te-kind-${asset.type}` : undefined,
+      };
+    }
+    const text = texts.find((item) => String(item.id) === data.id);
+    return {
+      variant: "text",
+      title: text ? text.arabic.slice(0, 32) : "Teks",
+      sub: "Teks quiz",
+    };
+  }
   function startDrag(event: React.DragEvent, data: DragData) {
     event.dataTransfer.setData("text/plain", JSON.stringify(data));
     event.dataTransfer.effectAllowed = "move";
     dragData.current = data;
-    const dragImage = document.createElement("div");
-    dragImage.className = "te-native-drag-image";
-    dragImage.textContent = data.type === "asset" ? data.id.split("/").pop() || "Audio" : data.type === "audio" ? "Klip audio" : "Teks";
+    (event.currentTarget as HTMLElement).classList.add("te-native-dragging");
+    purgeStrayGhosts();
+    const dragImage = buildDragGhost(describeDrag(data));
     document.body.appendChild(dragImage);
-    event.dataTransfer.setDragImage(dragImage, 10, 10);
-    window.setTimeout(() => dragImage.remove(), 0);
+    // Gambar drag bawaan OS disembunyikan (hotspot-nya meleset di sebagian
+    // Chromium desktop); ghost mini digerakkan manual agar tepat di kursor.
+    event.dataTransfer.setDragImage(transparentDragPixel(), 0, 0);
+    followPointerWithGhost(dragImage, event.clientX, event.clientY);
   }
   function endDrag(event: React.DragEvent) {
     (event.currentTarget as HTMLElement).classList.remove("te-native-dragging");
@@ -315,23 +386,32 @@ export default function TilawatiCloudTimelineEditorPage() {
     const target = event.target as HTMLElement;
     if (data.type !== "text" && target.closest("button,input,select,textarea")) return;
     touchDrag.current?.ghost.remove();
-    const ghost = document.createElement("div");
-    ghost.className = "te-touch-ghost";
-    ghost.textContent = data.type === "asset" ? data.id.split("/").pop() || "Audio" : data.type === "audio" ? "Klip audio" : "Teks";
-    ghost.style.left = `${event.clientX + 12}px`;
-    ghost.style.top = `${event.clientY + 12}px`;
+    purgeStrayGhosts();
+    const ghost = buildDragGhost(describeDrag(data));
+    ghost.classList.add("is-touch");
+    // Sembunyi sampai benar-benar bergerak (tap untuk seleksi tidak berkedip).
+    ghost.style.visibility = "hidden";
     document.body.appendChild(ghost);
+    placeGhostOnPoint(ghost, event.clientX, event.clientY);
+    let lastX = event.clientX;
+    // Scroll papan hanya saat jari ditempelkan di tepi kiri/kanan.
+    const stopEdge = startTouchEdgeScroll(scrollRef.current, () =>
+      touchDrag.current ? lastX : null,
+    );
     const current: TouchDrag = { data, startX: event.clientX, startY: event.clientY, moved: false, ghost };
     touchDrag.current = current;
     dragData.current = data;
     const move = (pointer: PointerEvent) => {
       if (!touchDrag.current) return;
+      lastX = pointer.clientX;
       const distance = Math.hypot(pointer.clientX - current.startX, pointer.clientY - current.startY);
-      if (distance > 8) current.moved = true;
+      if (distance > 8) {
+        current.moved = true;
+        ghost.style.visibility = "visible";
+      }
       if (!current.moved) return;
       pointer.preventDefault();
-      ghost.style.left = `${pointer.clientX + 12}px`;
-      ghost.style.top = `${pointer.clientY + 12}px`;
+      placeGhostOnPoint(ghost, pointer.clientX, pointer.clientY);
       clearTouchDropTarget();
       const hit = document.elementFromPoint(pointer.clientX, pointer.clientY) as HTMLElement | null;
       const dropTarget = hit?.closest<HTMLElement>("[data-text-id], [data-clip-id], .te-track-audio, .te-unlinked");
@@ -341,6 +421,8 @@ export default function TilawatiCloudTimelineEditorPage() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", finish);
       window.removeEventListener("pointercancel", cancel);
+      window.removeEventListener("dragstart", abortForNative);
+      stopEdge();
       clearTouchDropTarget();
       ghost.remove();
       touchDrag.current = null;
@@ -349,9 +431,23 @@ export default function TilawatiCloudTimelineEditorPage() {
     };
     const finish = (pointer: PointerEvent) => cleanup(pointer);
     const cancel = () => cleanup();
+    // Long-press di sebagian browser memicu drag native HTML5: serahkan sesi
+    // ke sana agar tidak muncul dua ghost (sentuh + native) sekaligus.
+    const abortForNative = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", cancel);
+      window.removeEventListener("dragstart", abortForNative);
+      stopEdge();
+      clearTouchDropTarget();
+      ghost.remove();
+      if (touchDrag.current === current) touchDrag.current = null;
+      // dragData.current sengaja dibiarkan: sesi drag native yang mengambil alih.
+    };
     window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", finish, { once: true });
     window.addEventListener("pointercancel", cancel, { once: true });
+    window.addEventListener("dragstart", abortForNative);
   }
   function handlePointer(event: React.PointerEvent, clip: TimelineAudioClip, action: "left" | "right" | "cut") {
     if (!draft || saving) return;
@@ -389,9 +485,16 @@ export default function TilawatiCloudTimelineEditorPage() {
     stopPreview(); setError("");
     const token = playToken.current;
     try {
-      const ctx = context.current ?? new AudioContext();
-      context.current = ctx;
+      // Konteks yang sudah tertutup (mis. setelah unmount/cleanup) tidak
+      // boleh dipakai lagi: resume()/decode di atasnya melempar
+      // "Cannot resume a closed AudioContext".
+      if (!context.current || context.current.state === "closed") {
+        context.current = new AudioContext();
+      }
+      const ctx = context.current;
       await ctx.resume();
+      // Dibatalkan saat menunggu (navigasi/unmount): berhenti diam-diam.
+      if (token !== playToken.current || context.current !== ctx || ctx.state === "closed") return;
       const scheduledSegments: Array<{ segment: AudioSegment; duration: number }> = [];
       let cursor = 0;
       for (const segment of playClips.flatMap(visibleSegments)) {
@@ -425,10 +528,19 @@ export default function TilawatiCloudTimelineEditorPage() {
       let elapsed = 0;
       const startTime = ctx.currentTime + 0.04;
       scheduledSegments.forEach(({ segment, duration }, index) => {
-        const source = ctx.createBufferSource();
-        source.buffer = audioBuffers[index]; source.connect(ctx.destination);
-        source.start(startTime + elapsed, segment.start, duration);
-        activeSources.current.push(source); elapsed += duration;
+        const buffer = audioBuffers[index];
+        const bufferDuration = buffer.duration;
+        // Jepit offset/durasi ke dalam buffer: sisa noise float negatif atau
+        // offset di ujung file membuat start() melempar RangeError.
+        const safeOffset = Math.min(Math.max(0, segment.start), Math.max(0, bufferDuration - 1e-6));
+        const safeDuration = Math.min(Math.max(0, duration), Math.max(0, bufferDuration - safeOffset));
+        if (safeDuration > 1e-6) {
+          const source = ctx.createBufferSource();
+          source.buffer = buffer; source.connect(ctx.destination);
+          source.start(startTime + elapsed, safeOffset, safeDuration);
+          activeSources.current.push(source);
+        }
+        elapsed += duration;
       });
       setPlaying(true); setPlayhead(displayOffset + startAt);
       const tick = () => {
@@ -439,19 +551,20 @@ export default function TilawatiCloudTimelineEditorPage() {
         frame.current = requestAnimationFrame(tick);
       };
       frame.current = requestAnimationFrame(tick);
-    } catch (err) { setError(err instanceof Error ? err.message : String(err)); }
+    } catch (err) {
+      // Preview yang keburu dibatalkan (token basi) tidak perlu menampilkan error.
+      if (token !== playToken.current) return;
+      setError(err instanceof Error ? err.message : String(err));
+    }
   }
 
   async function saveFinal() {
     if (!draft || saving) return;
     stopPreview(); setSaving(true); setError(""); setMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/v1/tilawati-editor/publish`, {
-        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ jilid, page: hal, timeline: draft, expectedRevision: revision }),
-      });
-      const data = await response.json() as { ok: boolean; message?: string; published: PublishedTimeline; clips: AudioAsset[] };
-      if (!response.ok || !data.ok) throw new Error(data.message || "Gagal menyimpan hasil akhir.");
+      if (!(await draftSave.save(true))) throw new Error("Draft cloud belum tersinkron. Periksa status draft sebelum publish.");
+      const data = await tilawatiEditorApi.publish(jilid, hal, draft, revision);
+       if (!data.published) throw new Error("Respons publish tidak memiliki timeline hasil.");
       setDraft(clone(data.published.timeline)); setBaseline(JSON.stringify(data.published.timeline));
       setRevision(data.published.revision); setAssets(data.clips); setHistory([]); setFuture([]);
       setMessage("Hasil akhir tersimpan permanen. Audio, teks, pasangan, dan urutan halaman telah diperbarui.");
@@ -493,11 +606,12 @@ export default function TilawatiCloudTimelineEditorPage() {
             {Array.from({ length: 44 }, (_, index) => <option key={index} value={index + 1}>Hal {index + 1}</option>)}
           </select>
         </div>
-        <button className="te-btn te-primary" disabled={loading || saving || !draft || !dirty} onClick={saveFinal}>
-          {saving ? "Merender & menyimpan…" : "Simpan Hasil Akhir"}
+        <button className="te-btn" disabled={loading || saving || !draft} onClick={() => void draftSave.save()}>Simpan Draft</button>
+        <button className="te-btn te-primary" disabled={loading || saving || !draft} onClick={saveFinal}>
+          {saving ? "Merender & menyimpan…" : "Publish ke Cloud"}
         </button>
       </header>
-      <div className="te-status" aria-live="polite">{error || message || "Semua aksi edit adalah draft client. File hanya berubah saat Simpan Hasil Akhir."}</div>
+      <div className="te-status" aria-live="polite">{[error, message, draftSave.status].filter(Boolean).join(" · ") || "Draft tersimpan otomatis; publish merender klip audio final."}</div>
       {loading ? <div className="te-empty">Membaca aset halaman…</div> : draft && (
         <fieldset className="te-workspace" disabled={saving}>
           <aside className="te-assets" aria-label="Daftar aset audio dan teks">
@@ -540,12 +654,12 @@ export default function TilawatiCloudTimelineEditorPage() {
               <label className="te-zoom">Zoom <input aria-label="Zoom timeline" type="range" min="8" max="100" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} /></label>
             </div>
             <p className="te-help">Tarik penggaris atas untuk zoom. Tarik penggaris bawah untuk memindahkan garis merah dan menentukan awal preview. Tarik tepi klip untuk trim.</p>
-            <div className="te-scroll">
+            <div className="te-scroll" ref={scrollRef}>
               <div className="te-tracks" style={{ width: timelineWidth }}>
                 <div className="te-ruler" onPointerDown={beginRulerInteraction} aria-label="Penggaris zoom timeline">
                   {Array.from({ length: Math.ceil(total / 5) + 1 }, (_, index) => <span key={index} style={{ left: index * 5 * zoom }}>{index * 5}s</span>)}
                 </div>
-                <div className="te-track-audio">
+                <div className="te-track-audio" onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); dropOnClip(null); }}>
                   {positions.map(({ clip, start }) => (
                     <div key={clip.id} data-clip-id={clip.id} className={`te-clip te-kind-${clip.kind} ${selectedClip?.id === clip.id ? "is-selected" : ""}`}
                       style={{ left: start * zoom, width: clipDuration(clip) * zoom }}
@@ -554,6 +668,7 @@ export default function TilawatiCloudTimelineEditorPage() {
                       draggable onDragStart={(event) => startDrag(event, { type: "audio", id: clip.id })} onDragEnd={endDrag}
                       onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); event.stopPropagation(); dropOnClip(clip.id); }}>
                       <span className="te-clip-title">{clip.label}</span><small>{clip.kind} · {seconds(clipDuration(clip))}</small>
+                      <ClipWaveform clip={clip} />
                       <label className="te-merge-select" onClick={(event) => event.stopPropagation()}><input type="checkbox" checked={mergeIds.includes(clip.id)} aria-label={`Pilih gabung ${clip.label}`}
                         onChange={(event) => setMergeIds((ids) => event.target.checked ? [...ids, clip.id] : ids.filter((id) => id !== clip.id))} /> Gabung</label>
                       {selectedClip?.id === clip.id && <>
@@ -595,7 +710,12 @@ export default function TilawatiCloudTimelineEditorPage() {
               </div>
             </div>
             <div className="te-page-list"><h3>Daftar item draft</h3>
-               {texts.map((text, index) => <button key={String(text.id)} className="te-list-row" onClick={() => { setSelection({ type: "text", id: String(text.id) }); setMobilePanel("inspector"); }}>
+               {texts.map((text, index) => <button key={String(text.id)} data-text-id={String(text.id)} className="te-list-row"
+                 draggable onDragStart={(event) => startDrag(event, { type: "text", id: String(text.id) })} onDragEnd={endDrag}
+                 onPointerDown={(event) => beginTouchDrag(event, { type: "text", id: String(text.id) })}
+                 onDragOver={(event) => event.preventDefault()}
+                 onDrop={(event) => { event.preventDefault(); event.stopPropagation(); dropOnText(String(text.id)); }}
+                 onClick={() => { setSelection({ type: "text", id: String(text.id) }); setMobilePanel("inspector"); }}>
                 <span>{index + 1}. <span dir="rtl" className="te-arabic">{text.arabic}</span></span><small>{clips.find((clip) => clip.id === text.clipId)?.label || "Belum ada audio"} · Edit</small>
               </button>)}
             </div>
@@ -627,7 +747,9 @@ export default function TilawatiCloudTimelineEditorPage() {
               </div>
               <input aria-label="Slider gunting" type="range" min="0" max={clipDuration(selectedClip)} step="0.001" value={Math.min(cutAt, clipDuration(selectedClip))} onChange={(event) => setCutAt(Number(event.target.value))} />
               <div className="te-actions"><button className="te-btn" onClick={() => preview([selectedClip], 0, selectedPosition?.start || 0)}>▶ Preview klip</button>
-                <button className="te-btn" disabled={cutAt <= 0 || cutAt >= clipDuration(selectedClip)} onClick={() => { change(splitTimelineClip(draft, selectedClip.id, cutAt)); setCutAt(0); }}>✂ Gunting</button></div>
+                <button className="te-btn" disabled={cutAt <= 0 || cutAt >= clipDuration(selectedClip)} onClick={() => { change(splitTimelineClip(draft, selectedClip.id, cutAt)); setCutAt(0); }}>✂ Gunting</button>
+                <button className="te-btn" onClick={() => { change(duplicateTimelineClip(draft, selectedClip.id)); }}>⧉ Duplikat</button>
+              </div>
               <p className="te-help">Potongan A dan B tetap di timeline. Teks awal mengikuti A; pasangkan atau tambah teks B sesuai bacaan.</p>
               <label>Pasangkan teks<select value="" onChange={(event) => { if (event.target.value) change(pairTimelineText(draft, event.target.value, selectedClip.id)); }}><option value="">Pilih teks tersedia…</option>
                 {texts.map((text) => <option key={String(text.id)} value={String(text.id)}>{text.arabic}</option>)}</select></label>
@@ -636,7 +758,12 @@ export default function TilawatiCloudTimelineEditorPage() {
             {selectedText && <>
               <h3>Edit teks</h3>
               <label>Teks Arab<textarea aria-label="Teks Arab" dir="rtl" className="te-arabic" rows={3} value={selectedText.arabic} onChange={(event) => editText({ arabic: event.target.value })} /></label>
-              <label>Transliterasi (satu token per baris)<textarea rows={3} value={selectedText.transliterationParts.join("\n")} onChange={(event) => editText({ transliterationParts: event.target.value.split("\n") })} /></label>
+              <label>Transliterasi (satu token per baris, auto-generate Arab)<textarea rows={3} value={selectedText.transliterationParts.join("\n")} onChange={(event) => {
+                const val = event.target.value;
+                const parts = val.split("\n");
+                const autoArabic = parts.map((p) => latinToArabic(p.trim())).filter(Boolean).join(" ");
+                editText({ transliterationParts: parts, arabic: autoArabic || selectedText.arabic });
+              }} /></label>
               <label>Nada / keterangan<input value={selectedText.hintTone} onChange={(event) => editText({ hintTone: event.target.value })} /></label>
               <label>Pasangan klip<select value={selectedText.clipId || ""} onChange={(event) => change(pairTimelineText(draft, String(selectedText.id), event.target.value || null))}><option value="">Tanpa audio</option>
                 {clips.map((clip) => <option key={clip.id} value={clip.id}>{clip.label} · {seconds(clipDuration(clip))}</option>)}</select></label>

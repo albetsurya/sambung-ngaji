@@ -1,0 +1,7 @@
+import { motion } from "framer-motion";
+import type { StoryNode, StoryStats } from "../data/story";
+import { StatBar } from "./StatBar";
+
+export function SceneView({ node, stats, disabled, onChoice }: { node: StoryNode; stats: StoryStats; disabled: boolean; onChoice: (id: string) => void }) {
+  return <motion.div key={node.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3"><div className="rounded-3xl border border-violet-300/25 bg-gradient-to-br from-violet-950/80 to-slate-950 p-5"><p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{node.chapter}</p><p className="mt-4 text-center text-lg font-black leading-relaxed text-white">{node.prompt}</p></div><div className="space-y-2">{node.choices.map((choice, index) => <button type="button" key={choice.id} disabled={disabled} onClick={() => onChoice(choice.id)} className="w-full rounded-2xl border border-white/15 bg-white/5 p-3 text-left text-sm font-semibold leading-relaxed text-white transition-colors hover:bg-violet-500/20 active:scale-[0.98]"><span className="mr-2 text-violet-300">{index + 1}.</span>{choice.text}</button>)}</div><div className="grid gap-2 rounded-2xl border border-white/10 bg-white/5 p-3"><StatBar label="Akhlak" value={stats.akhlak} color="bg-emerald-400" /><StatBar label="Ilmu" value={stats.ilmu} color="bg-cyan-400" /><StatBar label="Sosial" value={stats.sosial} color="bg-pink-400" /></div></motion.div>;
+}

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { TILAWATI_DATA } from "../data/tilawati";
 import { useNgajiCeriaProgress } from "../hooks/useNgajiCeriaProgress";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { Sparkles, Check, Lock, Play } from "../../../components/ui/FontAwesomeIcons";
+import { LoginPromptModal } from "../components/LoginPromptModal";
+import { useJilidAccess } from "../components/GameLockGuard";
+import { parseJilidNumber, tierForRole } from "../data/gameAccess";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface BookCardProps {
   stepNumber: number;
@@ -16,6 +20,9 @@ interface BookCardProps {
   progressPercentage: number;
   coverImg: string;
   isOffset?: boolean;
+  comingSoon?: boolean;
+  /** Bila terisi, kartu terkunci tetap bisa diklik (mis. membuka ajakan login). */
+  onLockedTap?: () => void;
   onClick: () => void;
 }
 
@@ -29,6 +36,8 @@ function StandaloneBookCard({
   progressPercentage,
   coverImg,
   isOffset = false,
+  comingSoon = false,
+  onLockedTap,
   onClick,
 }: BookCardProps) {
   return (
@@ -39,8 +48,8 @@ function StandaloneBookCard({
     >
       {/* 3D Standalone Book Illustration Card (Fixed 140px width & 180px height for 100% uniformity) */}
       <button
-        onClick={onClick}
-        disabled={status === "locked"}
+        onClick={status === "locked" && onLockedTap ? onLockedTap : onClick}
+        disabled={status === "locked" && !onLockedTap}
         className={`relative w-[140px] h-[180px] transition-all duration-300 flex items-center justify-center p-1 group-hover:scale-105 active:scale-95 ${
           status === "locked"
             ? "cursor-not-allowed opacity-60 grayscale"
@@ -56,7 +65,11 @@ function StandaloneBookCard({
 
         {/* Status Badge Top Right */}
         <div className="absolute top-2 right-2 z-10">
-          {status === "completed" ? (
+          {comingSoon ? (
+            <span className="rounded-full bg-[#F58A3A] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-md border-2 border-white">
+              Segera Hadir
+            </span>
+          ) : status === "completed" ? (
             <span className="w-7 h-7 rounded-full bg-[#2D5A27] text-white flex items-center justify-center shadow-md border-2 border-white text-xs">
               <Check size={14} />
             </span>
@@ -115,10 +128,28 @@ function StandaloneBookCard({
   );
 }
 
-export default function NgajiCeriaLibraryPage() {
-  const navigate = useNavigate();
+/** Pembungkus per-jilid yang menerapkan kebijakan akses (tamu J1–2, J6 segera hadir). */
+function JilidBookEntry({ jilidId, onOpen, onLocked, ...card }: {
+  jilidId: string;
+  onOpen: () => void;
+  onLocked: () => void;
+} & Omit<BookCardProps, "onClick" | "status"> & { status: BookCardProps["status"] }) {
+  const access = useJilidAccess(parseJilidNumber(jilidId));
+  if (access.isComingSoon) {
+    return <StandaloneBookCard {...card} status="locked" comingSoon onClick={() => {}} />;
+  }
+  if (!access.isOpen) {
+    return <StandaloneBookCard {...card} status="locked" onLockedTap={onLocked} onClick={() => {}} />;
+  }
+  return <StandaloneBookCard {...card} onClick={onOpen} />;
+}
+
+export default function NgajiCeriaLibraryPage() {  const navigate = useNavigate();
   const { currentJilid, currentPage, progressPercentage } =
     useNgajiCeriaProgress(TILAWATI_DATA);
+  const [promptOpen, setPromptOpen] = useState(false);
+  const { user } = useAuth();
+  const isGuest = tierForRole(user?.role) === "guest";
 
   const extraBooks = [
     {
@@ -142,10 +173,12 @@ export default function NgajiCeriaLibraryPage() {
                 Akses VIP Aktif
               </div>
               <h2 className="font-display text-lg font-black tracking-tight leading-tight text-white">
-                Bebas Akses Semua Jilid!
+                {isGuest ? "Jilid 1–2 Terbuka Untukmu!" : "Bebas Akses Semua Jilid!"}
               </h2>
               <p className="text-xs text-white/80 mt-1 leading-relaxed">
-                Pilih ilustrasi buku di bawah untuk membuka lembar belajar Tilawati.
+                {isGuest
+                  ? "Masuk untuk membuka Jilid 3–5. Pilih ilustrasi buku di bawah untuk mulai belajar."
+                  : "Pilih ilustrasi buku di bawah untuk membuka lembar belajar Tilawati."}
               </p>
             </div>
 
@@ -206,8 +239,9 @@ export default function NgajiCeriaLibraryPage() {
             const isOffset = idx % 2 === 1;
 
             return (
-              <StandaloneBookCard
+              <JilidBookEntry
                 key={jilid.id}
+                jilidId={jilid.id}
                 stepNumber={stepNum}
                 nama={jilid.nama}
                 deskripsi={jilid.deskripsi}
@@ -217,11 +251,13 @@ export default function NgajiCeriaLibraryPage() {
                 progressPercentage={progPercent}
                 coverImg={coverImg}
                 isOffset={isOffset}
-                onClick={() => navigate("/member/ngaji-ceria/map")}
+                onOpen={() => navigate("/member/ngaji-ceria/map")}
+                onLocked={() => setPromptOpen(true)}
               />
             );
           })}
         </div>
+        <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} />
 
         {/* Kitab Lanjutan Section */}
         <div className="pt-8 border-t-2 border-[#E2D4C0]">

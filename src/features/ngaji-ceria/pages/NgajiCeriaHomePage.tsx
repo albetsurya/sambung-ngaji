@@ -2,7 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
+import { DailyMissionsCard } from "../components/DailyMissionsCard";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
+import { useNgajiCeriaProgress } from "../hooks/useNgajiCeriaProgress";
+import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
+import { useNgajiCeriaStore, type NgajiCeriaState } from "../hooks/useNgajiCeriaStore";
 import {
   Sparkles,
   Play,
@@ -18,16 +22,16 @@ export default function NgajiCeriaHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const displayName = user?.name ? user.name.split(" ")[0] : "Hamba Allah";
+  const { currentJilid, currentPage, progressPercentage } = useNgajiCeriaProgress();
+  const { currentStreak, streakDays } = useNgajiCeriaStreak();
+  const stars = useNgajiCeriaStore((state: NgajiCeriaState) => state.stars);
+  const totalStars = Object.values(stars).reduce((total, value) => total + value, 0);
+  const currentJilidNumber = Number(currentJilid.replace("jilid-", "")) || 1;
 
   const days = [
-    { label: "SEN", active: true },
-    { label: "SEL", active: true },
-    { label: "RAB", active: true },
-    { label: "KAM", active: false },
-    { label: "JUM", active: false },
-    { label: "SAB", active: false },
-    { label: "AHD", active: false },
-  ];
+    ["SEN", 1], ["SEL", 2], ["RAB", 3], ["KAM", 4], ["JUM", 5], ["SAB", 6], ["AHD", 0],
+  ] as const;
+  const activeDays = days.map(([label, dayIndex]) => ({ label, active: streakDays[dayIndex] }));
 
   return (
     <NgajiCeriaLayout title="Ngaji Ceria">
@@ -48,7 +52,7 @@ export default function NgajiCeriaHomePage() {
               <Sparkles size={11} /> VIP
             </span>
             <span className="px-2.5 py-1 rounded-full bg-[#FFCB45] text-[#5A3A2A] font-black text-xs border border-[#B8590C]/20 flex items-center gap-1">
-              <Star size={12} className="fill-[#5A3A2A]" /> 5
+              <Star size={12} className="fill-[#5A3A2A]" /> {totalStars}
             </span>
           </div>
         </div>
@@ -58,14 +62,14 @@ export default function NgajiCeriaHomePage() {
           <div className="relative z-10 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase tracking-widest text-[#FFCB45]">
-                TILAWATI 1 • HALAMAN 2
+                TILAWATI {currentJilidNumber} • HALAMAN {currentPage}
               </span>
-              <span className="text-[10px] font-bold text-white/80">1%</span>
+              <span className="text-[10px] font-bold text-white/80">{progressPercentage}%</span>
             </div>
 
             <div>
               <h3 className="font-display font-black text-lg text-white leading-tight">
-                Lanjutkan Jilid 1 Hal 2: Ta (ت)
+                Lanjutkan Jilid {currentJilidNumber} Hal {currentPage}
               </h3>
               <p className="text-xs text-white/80 mt-1">
                 Kenali cara pengucapan dan panjang bacaan huruf Ta dengan tepat.
@@ -74,11 +78,11 @@ export default function NgajiCeriaHomePage() {
 
             {/* Progress bar line */}
             <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-              <div className="bg-[#FFCB45] h-full w-[1%]" />
+              <div className="bg-[#FFCB45] h-full" style={{ width: `${progressPercentage}%` }} />
             </div>
 
             <button
-              onClick={() => navigate("/member/ngaji-ceria/quiz/play")}
+              onClick={() => navigate(`/member/ngaji-ceria/quiz/play?jilid=${currentJilidNumber}&hal=${currentPage}`)}
               className="mt-1 w-full py-3 rounded-2xl bg-[#F58A3A] hover:bg-[#E2561A] text-white font-black text-sm flex items-center justify-center gap-2 shadow-md border-b-4 border-[#A63C0E] active:translate-y-0.5 transition-all"
             >
               <Play size={16} />
@@ -90,7 +94,7 @@ export default function NgajiCeriaHomePage() {
         {/* 4 Main Grid Menus (Ref 1) */}
         <section className="grid grid-cols-4 gap-2.5">
           <button
-            onClick={() => navigate("/member/ngaji-ceria/library")}
+            onClick={() => navigate("/member/ngaji-ceria/path")}
             className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#EFF3EC] border-2 border-[#C5DDB9] active:scale-95 transition-transform shadow-sm gap-1.5"
           >
             <div className="w-10 h-10 rounded-xl bg-[#2D5A27] text-white flex items-center justify-center shadow-sm">
@@ -120,7 +124,7 @@ export default function NgajiCeriaHomePage() {
           </button>
 
           <button
-            onClick={() => alert("Peringkat Santri")}
+            onClick={() => navigate("/member/ngaji-ceria/leaderboard")}
             className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#F3F0FF] border-2 border-[#D7CCFF] active:scale-95 transition-transform shadow-sm gap-1.5"
           >
             <div className="w-10 h-10 rounded-xl bg-[#553894] text-white flex items-center justify-center shadow-sm">
@@ -137,11 +141,11 @@ export default function NgajiCeriaHomePage() {
               <img src={NGAJI_CERIA_ASSETS.apiStreak} className="w-5 h-5" alt="Flame" />
               <h4 className="font-black text-xs text-[#5A3A2A]">Streak Mengaji</h4>
             </div>
-            <span className="text-[10px] font-bold text-[#8C5A3A]">3 Hari Beruntun</span>
+            <span className="text-[10px] font-bold text-[#8C5A3A]">{currentStreak} Hari Beruntun</span>
           </div>
 
           <div className="flex items-center justify-between gap-1">
-            {days.map((day) => (
+            {activeDays.map((day) => (
               <div key={day.label} className="flex flex-col items-center gap-1 flex-1">
                 <div
                   className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
@@ -157,6 +161,9 @@ export default function NgajiCeriaHomePage() {
             ))}
           </div>
         </section>
+
+        {/* Misi Harian & Rewards */}
+        <DailyMissionsCard />
 
         {/* Shortcut Cek Audio Manual */}
         <section

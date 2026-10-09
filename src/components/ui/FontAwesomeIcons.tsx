@@ -216,6 +216,7 @@ export const SkipBack = createIcon(faBackwardStep);
 export const SkipForward = createIcon(faForwardStep);
 
 export const Volume2 = createIcon(faVolumeHigh);
+export const VolumeX = createIcon(faVolumeHigh);
 
 export const AlignLeft = createIcon(faAlignLeft);
 

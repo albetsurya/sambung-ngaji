@@ -7,6 +7,7 @@ import { getTilawatiAudioPageMeta } from "./tilawatiAudioQuestionMap";
 import quizEdits from "./tilawatiQuizEdits.json";
 import timelineEdits from "./tilawatiTimelineEdits.json";
 import type { PublishedTimeline } from "../utils/pageTimeline";
+import { isNgajiCeriaServerAvailable } from "../services/ngajiCeriaApi";
 import { TILAWATI_JILID_1_PAGES as RAW_TILAWATI_JILID_1_PAGES } from "./tilawatiQuizJilid1";
 import { TILAWATI_JILID_2_PAGES as RAW_TILAWATI_JILID_2_PAGES } from "./tilawatiQuizJilid2";
 import { TILAWATI_JILID_3_PAGES as RAW_TILAWATI_JILID_3_PAGES } from "./tilawatiQuizJilid3";
@@ -165,6 +166,7 @@ function groupJilid1Footers(pages: Record<number, PageQuizData>): Record<number,
 }
 
 function applyQuizEdits(jilid: number, pages: Record<number, PageQuizData>): Record<number, PageQuizData> {
+  if (isNgajiCeriaServerAvailable()) return pages;
   return Object.fromEntries(
     Object.entries(pages).map(([pageNumber, page]) => {
       const questions = page.questions
@@ -180,6 +182,7 @@ function applyQuizEdits(jilid: number, pages: Record<number, PageQuizData>): Rec
 }
 
 function applyTimelineEdits(jilid: number, pages: Record<number, PageQuizData>): Record<number, PageQuizData> {
+  if (isNgajiCeriaServerAvailable()) return pages;
   return Object.fromEntries(
     Object.entries(pages).map(([pageNumber, page]) => {
       const edit = TIMELINE_EDITS[`${jilid}:${pageNumber}`];

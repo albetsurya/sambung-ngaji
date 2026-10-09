@@ -81,6 +81,11 @@ const KasPrintPreviewPage = lazy(() =>
     default: m.KasPrintPreviewPage,
   })),
 );
+const KasBreakdownPage = lazy(() =>
+  import("./features/finance/pages/KasBreakdownPage").then((m) => ({
+    default: m.KasBreakdownPage,
+  })),
+);
 const ShodaqohPrintPreviewPage = lazy(() =>
   import("./features/finance/pages/ShodaqohPrintPreviewPage").then((m) => ({
     default: m.ShodaqohPrintPreviewPage,
@@ -186,6 +191,12 @@ const NgajiCeriaQuizListPage = lazy(
 const NgajiCeriaGamesPage = lazy(
   () => import("./features/ngaji-ceria/pages/NgajiCeriaGamesPage"),
 );
+const NgajiCeriaLeaderboardPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaLeaderboardPage"),
+);
+const NgajiCeriaProfilePage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaProfilePage"),
+);
 const CekAudioManualPage = lazy(
   () => import("./features/ngaji-ceria/pages/CekAudioManualPage"),
 );
@@ -195,21 +206,79 @@ const TilawatiTimelineEditorPage = lazy(
 const TilawatiCloudTimelineEditorPage = lazy(
   () => import("./features/ngaji-ceria/pages/TilawatiCloudTimelineEditorPage"),
 );
-const BalonHijaiyahGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/BalonHijaiyahGamePage"),
+const HijaiyahPopPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-pop/HijaiyahPopPage"),
 );
-const PasangHurufGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/PasangHurufGamePage"),
+const HijaiyahRushPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-rush/HijaiyahRushPage"),
 );
-const TebakAyatGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/TebakAyatGamePage"),
+const ArabicWordlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/arabic-wordle/ArabicWordlePage"),
 );
-const TangkapHarakatGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/TangkapHarakatGamePage"),
+const Hijaiyah2048Page = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-2048/Hijaiyah2048Page"),
 );
-const SusunKataGamePage = lazy(
-  () => import("./features/ngaji-ceria/pages/SusunKataGamePage"),
+const QuranQuizRoyalePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/quran-quiz-royale/QuranQuizRoyalePage"),
 );
+const WudhuFlowPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/wudhu-flow/WudhuFlowPage"),
+);
+const SantriIdlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/santri-idle/SantriIdlePage"),
+);
+const SholatHeroPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/sholat-hero/SholatHeroPage"),
+);
+const AdabRPGPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/adab-rpg/AdabRPGPage"),
+);
+const TajwidArenaPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-arena/TajwidArenaPage"),
+);
+const NurBattlePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/nur-battle/NurBattlePage"),
+);
+const MakhrajMasterPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/makhraj-master/MakhrajMasterPage"),
+);
+const HijaiyahBeatsPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-beats/HijaiyahBeatsPage"),
+);
+const TajwidDefensePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-defense/TajwidDefensePage"),
+);
+const GameModeHubPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/GameModeHubPage"),
+);
+const TajwidTetrisPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/tajwid-tetris/TajwidTetrisPage"),
+);
+const HijaiyahMatchArenaPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/hijaiyah-match-arena/HijaiyahMatchArenaPage"),
+);
+const JuzAmmaSpeedrunPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/juz-amma-speedrun/JuzAmmaSpeedrunPage"),
+);
+const HarakatRushPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/harakat-rush/HarakatRushPage"),
+);
+const AyatScramblePage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/ayat-scramble/AyatScramblePage"),
+);
+const AyatHunterPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/ayat-hunter/AyatHunterPage"),
+);
+const DoaDungeonPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/doa-dungeon/DoaDungeonPage"),
+);
+const NabiChroniclesPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/nabi-chronicles/NabiChroniclesPage"),
+);
+const MalaikatMissionPage = lazy(
+  () => import("./features/ngaji-ceria/pages/games/malaikat-mission/MalaikatMissionPage"),
+);
+import { GameLockGuard } from "./features/ngaji-ceria/components/GameLockGuard";
 function PageFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-surface-bg">
@@ -339,6 +408,22 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/member/ngaji-ceria/leaderboard"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaLeaderboardPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/profile"
+          element={
+            <MemberRoute allowGuest>
+              <NgajiCeriaProfilePage />
+            </MemberRoute>
+          }
+        />
+        <Route
           path="/member/ngaji-ceria/cek-audio"
           element={
             <MemberRoute allowGuest>
@@ -363,10 +448,138 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/member/ngaji-ceria/games/balon-hijaiyah"
+          path="/member/ngaji-ceria/games/hijaiyah-pop"
           element={
             <MemberRoute allowGuest>
-              <BalonHijaiyahGamePage />
+              <HijaiyahPopPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-rush"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="hijaiyah-rush" title="Hijaiyah Rush">
+                <HijaiyahRushPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/arabic-wordle"
+          element={
+            <MemberRoute allowGuest>
+              <ArabicWordlePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-2048"
+          element={
+            <MemberRoute allowGuest>
+              <Hijaiyah2048Page />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/quran-quiz-royale"
+          element={
+            <MemberRoute allowGuest>
+              <QuranQuizRoyalePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/wudhu-flow"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="wudhu-flow" title="Wudhu Flow">
+                <WudhuFlowPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/santri-idle"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="santri-idle" title="Pesantren Life">
+                <SantriIdlePage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/sholat-hero"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="sholat-hero" title="Sholat Hero">
+                <SholatHeroPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/adab-rpg"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="adab-rpg" title="Jejak Santri">
+                <AdabRPGPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-arena"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-arena" title="Tajwid Arena">
+                <TajwidArenaPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/nur-battle"
+          element={
+            <MemberRoute allowGuest>
+              <NurBattlePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/makhraj-master"
+          element={
+            <MemberRoute allowGuest>
+              <MakhrajMasterPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/hijaiyah-beats"
+          element={
+            <MemberRoute allowGuest>
+              <HijaiyahBeatsPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-defense"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-defense" title="Tajwid Defense">
+                <TajwidDefensePage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/tajwid-tetris"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="tajwid-tetris" title="Tajwid Tetris">
+                <TajwidTetrisPage />
+              </GameLockGuard>
             </MemberRoute>
           }
         />
@@ -374,15 +587,17 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/hijaiyah-burst"
           element={
             <MemberRoute allowGuest>
-              <BalonHijaiyahGamePage />
+              <HijaiyahPopPage />
             </MemberRoute>
           }
         />
         <Route
-          path="/member/ngaji-ceria/games/pasang-huruf"
+          path="/member/ngaji-ceria/games/hijaiyah-match-arena"
           element={
             <MemberRoute allowGuest>
-              <PasangHurufGamePage />
+              <GameLockGuard gameId="hijaiyah-match-arena" title="Hijaiyah Match Arena">
+                <HijaiyahMatchArenaPage />
+              </GameLockGuard>
             </MemberRoute>
           }
         />
@@ -390,15 +605,17 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/hijaiyah-match"
           element={
             <MemberRoute allowGuest>
-              <PasangHurufGamePage />
+              <GameLockGuard gameId="hijaiyah-match" title="Hijaiyah Match Arena">
+                <HijaiyahMatchArenaPage />
+              </GameLockGuard>
             </MemberRoute>
           }
         />
         <Route
-          path="/member/ngaji-ceria/games/tebak-ayat"
+          path="/member/ngaji-ceria/games/juz-amma-speedrun"
           element={
             <MemberRoute allowGuest>
-              <TebakAyatGamePage />
+              <JuzAmmaSpeedrunPage />
             </MemberRoute>
           }
         />
@@ -406,15 +623,7 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/verse-quest"
           element={
             <MemberRoute allowGuest>
-              <TebakAyatGamePage />
-            </MemberRoute>
-          }
-        />
-        <Route
-          path="/member/ngaji-ceria/games/tangkap-harakat"
-          element={
-            <MemberRoute allowGuest>
-              <TangkapHarakatGamePage />
+              <JuzAmmaSpeedrunPage />
             </MemberRoute>
           }
         />
@@ -422,15 +631,53 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/harakat-rush"
           element={
             <MemberRoute allowGuest>
-              <TangkapHarakatGamePage />
+              <HarakatRushPage />
             </MemberRoute>
           }
         />
         <Route
-          path="/member/ngaji-ceria/games/susun-kata"
+          path="/member/ngaji-ceria/games/ayat-scramble"
           element={
             <MemberRoute allowGuest>
-              <SusunKataGamePage />
+              <AyatScramblePage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/ayat-hunter"
+          element={
+            <MemberRoute allowGuest>
+              <AyatHunterPage />
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/doa-dungeon"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="doa-dungeon" title="Doa Dungeon">
+                <DoaDungeonPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/nabi-chronicles"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="nabi-chronicles" title="Nabi Chronicles">
+                <NabiChroniclesPage />
+              </GameLockGuard>
+            </MemberRoute>
+          }
+        />
+        <Route
+          path="/member/ngaji-ceria/games/malaikat-mission"
+          element={
+            <MemberRoute allowGuest>
+              <GameLockGuard gameId="malaikat-mission" title="Malaikat Mission">
+                <MalaikatMissionPage />
+              </GameLockGuard>
             </MemberRoute>
           }
         />
@@ -438,10 +685,23 @@ function AppRoutes() {
           path="/member/ngaji-ceria/games/word-builder"
           element={
             <MemberRoute allowGuest>
-              <SusunKataGamePage />
+              <AyatScramblePage />
             </MemberRoute>
           }
         />
+        {(["ritme-ngaji", "quiz-ngaji", "puzzle-huruf", "tajwid-lab"] as const).map((hub) => (
+          <Route
+            key={hub}
+            path={`/member/ngaji-ceria/games/${hub}`}
+            element={
+              <MemberRoute allowGuest>
+                <GameLockGuard gameId={hub} title={hub === "ritme-ngaji" ? "Ritme Ngaji" : hub === "quiz-ngaji" ? "Quiz Ngaji" : hub === "puzzle-huruf" ? "Puzzle Huruf" : "Tajwid Lab"}>
+                  <GameModeHubPage hubOverride={hub} />
+                </GameLockGuard>
+              </MemberRoute>
+            }
+          />
+        ))}
         <Route
           path="/member/tahfidz"
           element={
@@ -624,6 +884,7 @@ function AppRoutes() {
             <Route path="/finance" element={<FinanceLayout />}>
               <Route index element={<FinanceHubPage />} />
               <Route path="ledger" element={<FinanceLedgerPage />} />
+              <Route path="ledger/breakdown" element={<KasBreakdownPage />} />
               <Route path="shodaqoh" element={<Navigate to="/finance/monthly-dues" replace />} />
               <Route path="monthly-dues" element={<MonthlyDuesPage />} />
               <Route path="zakat" element={<ZakatPage />} />
@@ -855,7 +1116,7 @@ function AppRoutes() {
 }
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
       <ThemeProvider>
         <AuthProvider>

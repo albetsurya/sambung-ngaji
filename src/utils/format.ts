@@ -234,6 +234,25 @@ export function formatRp(n: number | null | undefined): string {
 }
 export const fmtRp = formatRp;
 
+// ponytail: judul Title Case untuk nama akun/kategori; akronim pendek
+// (IR, MT, FR, RDT) tetap kapital.
+export function toTitleCase(s?: string | null): string {
+  if (!s) return "";
+  return String(s)
+    .split(" ")
+    .map((word) =>
+      word
+        .split("-")
+        .map((p) =>
+          p.length <= 3
+            ? p.toUpperCase()
+            : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(),
+        )
+        .join("-"),
+    )
+    .join(" ");
+}
+
 export function getDisplayName(member: Member): string {
   const usia = getMemberAge(member.birth_date);
   if (usia === null || usia < 40) return member.full_name;

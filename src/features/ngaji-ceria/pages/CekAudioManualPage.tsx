@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { latinToArabic } from "../utils/translit";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import {
   TILAWATI_JILID_1_PAGES,
@@ -10,7 +11,12 @@ import {
 } from "../data/tilawatiQuizData";
 import type { PageQuizData, QuizQuestion } from "../data/tilawatiQuizTypes";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
-import { Play, Pause, ChevronLeft, ChevronRight } from "../../../components/ui/FontAwesomeIcons";
+import {
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+} from "../../../components/ui/FontAwesomeIcons";
 
 const QUIZ_DATASETS: Record<number, Record<number, PageQuizData>> = {
   1: TILAWATI_JILID_1_PAGES,
@@ -53,18 +59,37 @@ type TimelineClip = {
 
 export default function CekAudioManualPage() {
   const navigate = useNavigate();
-  const [jilid, setJilid] = useState(1);
-  const [hal, setHal] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialJilid = Math.min(5, Math.max(1, Number(searchParams.get("jilid")) || 1));
+  const initialHal = Math.min(44, Math.max(1, Number(searchParams.get("hal")) || 1));
+  const [jilid, setJilid] = useState(initialJilid);
+  const [hal, setHal] = useState(initialHal);
+
+  useEffect(() => {
+    const paramJilid = Number(searchParams.get("jilid"));
+    const paramHal = Number(searchParams.get("hal"));
+    if (paramJilid && paramJilid !== jilid) setJilid(Math.min(5, Math.max(1, paramJilid)));
+    if (paramHal && paramHal !== hal) setHal(Math.min(44, Math.max(1, paramHal)));
+  }, [searchParams]);
+
+  const updatePage = (newJilid: number, newHal: number) => {
+    setJilid(newJilid);
+    setHal(newHal);
+    setSearchParams({ jilid: String(newJilid), hal: String(newHal) }, { replace: true });
+  };
   const [playingId, setPlayingId] = useState<number | string | null>(null);
-  const [testedAudio, setTestedAudio] = useState<Record<string, boolean>>(() => {
-    try {
-      const stored = window.localStorage.getItem(AUDIO_TEST_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  });
-  const [editingQuestion, setEditingQuestion] = useState<EditingQuestion | null>(null);
+  const [testedAudio, setTestedAudio] = useState<Record<string, boolean>>(
+    () => {
+      try {
+        const stored = window.localStorage.getItem(AUDIO_TEST_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : {};
+      } catch {
+        return {};
+      }
+    },
+  );
+  const [editingQuestion, setEditingQuestion] =
+    useState<EditingQuestion | null>(null);
   const [editorDraft, setEditorDraft] = useState<EditorDraft | null>(null);
   const [editorSegments, setEditorSegments] = useState<EditorSegment[]>([]);
   const [editorBusy, setEditorBusy] = useState(false);
@@ -77,11 +102,17 @@ export default function CekAudioManualPage() {
   const [timelineEnd, setTimelineEnd] = useState("");
   const [timelineCutPoint, setTimelineCutPoint] = useState("0");
   const [selectedMergeUrls, setSelectedMergeUrls] = useState<string[]>([]);
-  const [draggingTimelineHandle, setDraggingTimelineHandle] = useState<"start" | "end" | "cut" | null>(null);
+  const [draggingTimelineHandle, setDraggingTimelineHandle] = useState<
+    "start" | "end" | "cut" | null
+  >(null);
   const [draggingTimelineUrl, setDraggingTimelineUrl] = useState("");
   const [draggingTextId, setDraggingTextId] = useState("");
-  const [timelineTextLinks, setTimelineTextLinks] = useState<Record<string, string>>({});
-  const [timelineTextAdditions, setTimelineTextAdditions] = useState<QuizQuestion[]>([]);
+  const [timelineTextLinks, setTimelineTextLinks] = useState<
+    Record<string, string>
+  >({});
+  const [timelineTextAdditions, setTimelineTextAdditions] = useState<
+    QuizQuestion[]
+  >([]);
   const selectedTimelineElement = useRef<HTMLButtonElement | null>(null);
 
   // Check if current page is kelipatan 6 (Latihan-latihan bacaan)
@@ -106,8 +137,13 @@ export default function CekAudioManualPage() {
     fetch(`/api/tilawati-editor?action=list&jilid=${jilid}&hal=${hal}`)
       .then(async (response) => {
         const result = await response.json();
-        if (!response.ok || !result.ok) throw new Error(result.message || "Gagal membaca timeline audio");
-        return result as { clips: TimelineClip[]; textLinks?: Record<string, string>; textAdditions?: QuizQuestion[] };
+        if (!response.ok || !result.ok)
+          throw new Error(result.message || "Gagal membaca timeline audio");
+        return result as {
+          clips: TimelineClip[];
+          textLinks?: Record<string, string>;
+          textAdditions?: QuizQuestion[];
+        };
       })
       .then((result) => {
         if (!cancelled) {
@@ -122,7 +158,10 @@ export default function CekAudioManualPage() {
         }
       })
       .catch((error) => {
-        if (!cancelled) setTimelineMessage(error instanceof Error ? error.message : String(error));
+        if (!cancelled)
+          setTimelineMessage(
+            error instanceof Error ? error.message : String(error),
+          );
       })
       .finally(() => {
         if (!cancelled) setTimelineLoading(false);
@@ -152,14 +191,18 @@ export default function CekAudioManualPage() {
     };
   };
 
-  const getQuestionKey = (questionIndex: number) => `${jilid}:${hal}:${questionIndex}`;
+  const getQuestionKey = (questionIndex: number) =>
+    questionIndex === -1 ? `${jilid}:${hal}:page` : `${jilid}:${hal}:${questionIndex}`;
 
   const setAudioTested = (questionIndex: number, tested: boolean) => {
     const key = getQuestionKey(questionIndex);
     setTestedAudio((current) => {
       const next = { ...current, [key]: tested };
       try {
-        window.localStorage.setItem(AUDIO_TEST_STORAGE_KEY, JSON.stringify(next));
+        window.localStorage.setItem(
+          AUDIO_TEST_STORAGE_KEY,
+          JSON.stringify(next),
+        );
       } catch {
         // Persistensi lokal tidak boleh mengganggu pemutaran audio.
       }
@@ -167,7 +210,11 @@ export default function CekAudioManualPage() {
     });
   };
 
-  const openEditor = (question: QuizQuestion, questionIndex: number, audioUrl: string) => {
+  const openEditor = (
+    question: QuizQuestion,
+    questionIndex: number,
+    audioUrl: string,
+  ) => {
     setEditingQuestion({ question, questionIndex, audioUrl });
     setEditorSegments([]);
     setEditorMessage("");
@@ -184,14 +231,22 @@ export default function CekAudioManualPage() {
     if (audioUrl) {
       const audio = new Audio(audioUrl);
       audio.onloadedmetadata = () => {
-        setEditorDraft((current) => current ? { ...current, end: String(audio.duration.toFixed(3)) } : current);
+        setEditorDraft((current) =>
+          current
+            ? { ...current, end: String(audio.duration.toFixed(3)) }
+            : current,
+        );
       };
       audio.load();
     }
   };
 
-  const selectedTimelineClip = timelineClips.find((clip) => clip.audioUrl === selectedTimelineUrl) || null;
-  const timelineTotalDuration = timelineClips.reduce((total, clip) => total + clip.duration, 0);
+  const selectedTimelineClip =
+    timelineClips.find((clip) => clip.audioUrl === selectedTimelineUrl) || null;
+  const timelineTotalDuration = timelineClips.reduce(
+    (total, clip) => total + clip.duration,
+    0,
+  );
 
   const selectTimelineClip = (clip: TimelineClip) => {
     setSelectedTimelineUrl(clip.audioUrl);
@@ -232,14 +287,26 @@ export default function CekAudioManualPage() {
       const element = selectedTimelineElement.current;
       if (!element) return;
       const rect = element.getBoundingClientRect();
-      const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      const ratio = Math.min(
+        1,
+        Math.max(0, (event.clientX - rect.left) / rect.width),
+      );
       const value = ratio * selectedTimelineClip.duration;
       if (draggingTimelineHandle === "start") {
         const end = Number(timelineEnd) || selectedTimelineClip.duration;
-        setTimelineStart(String(Math.min(value, Math.max(0, end - 0.001)).toFixed(3)));
+        setTimelineStart(
+          String(Math.min(value, Math.max(0, end - 0.001)).toFixed(3)),
+        );
       } else if (draggingTimelineHandle === "end") {
         const start = Number(timelineStart) || 0;
-        setTimelineEnd(String(Math.max(value, Math.min(selectedTimelineClip.duration, start + 0.001)).toFixed(3)));
+        setTimelineEnd(
+          String(
+            Math.max(
+              value,
+              Math.min(selectedTimelineClip.duration, start + 0.001),
+            ).toFixed(3),
+          ),
+        );
       } else {
         setTimelineCutPoint(String(value.toFixed(3)));
       }
@@ -251,7 +318,12 @@ export default function CekAudioManualPage() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [draggingTimelineHandle, selectedTimelineClip, timelineEnd, timelineStart]);
+  }, [
+    draggingTimelineHandle,
+    selectedTimelineClip,
+    timelineEnd,
+    timelineStart,
+  ]);
 
   const useTimelineSelection = () => {
     if (!selectedTimelineClip || !editorDraft) return;
@@ -261,7 +333,9 @@ export default function CekAudioManualPage() {
       start: timelineStart,
       end: timelineEnd || String(selectedTimelineClip.duration.toFixed(3)),
     });
-    setEditorMessage(`Klip ${selectedTimelineClip.filename} dipakai sebagai sumber editor.`);
+    setEditorMessage(
+      `Klip ${selectedTimelineClip.filename} dipakai sebagai sumber editor.`,
+    );
   };
 
   const previewTimelineSelection = () => {
@@ -292,14 +366,21 @@ export default function CekAudioManualPage() {
     setEditorMessage("");
   };
 
-  const editorRequest = async (action: string, body: Record<string, unknown>) => {
-    const response = await fetch(`/api/tilawati-editor?action=${encodeURIComponent(action)}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+  const editorRequest = async (
+    action: string,
+    body: Record<string, unknown>,
+  ) => {
+    const response = await fetch(
+      `/api/tilawati-editor?action=${encodeURIComponent(action)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+    );
     const result = await response.json();
-    if (!response.ok || !result.ok) throw new Error(result.message || "Gagal menyimpan perubahan editor");
+    if (!response.ok || !result.ok)
+      throw new Error(result.message || "Gagal menyimpan perubahan editor");
     return result;
   };
 
@@ -330,7 +411,9 @@ export default function CekAudioManualPage() {
       await saveTimelineLayout(currentOrder);
       window.location.reload();
     } catch (error) {
-      setTimelineMessage(error instanceof Error ? error.message : String(error));
+      setTimelineMessage(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   };
 
@@ -340,18 +423,27 @@ export default function CekAudioManualPage() {
     setDraggingTextId("");
     setDraggingTimelineUrl("");
     try {
-      await saveTimelineLayout(timelineClips.map((clip) => clip.audioUrl), nextLinks);
+      await saveTimelineLayout(
+        timelineClips.map((clip) => clip.audioUrl),
+        nextLinks,
+      );
       window.location.reload();
     } catch (error) {
-      setTimelineMessage(error instanceof Error ? error.message : String(error));
+      setTimelineMessage(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   };
 
   const addTimelineText = async () => {
     const arabic = window.prompt("Masukkan teks Arab baru untuk halaman ini:");
     if (!arabic?.trim()) return;
-    const transliteration = window.prompt("Masukkan transliterasi, pisahkan dengan koma:", "") || "";
-    const parts = transliteration.split(",").map((part) => part.trim()).filter(Boolean);
+    const transliteration =
+      window.prompt("Masukkan transliterasi, pisahkan dengan koma:", "") || "";
+    const parts = transliteration
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
     const addition: QuizQuestion = {
       id: `custom-${Date.now()}`,
       arabic: arabic.trim(),
@@ -363,17 +455,25 @@ export default function CekAudioManualPage() {
     };
     const nextAdditions = [...timelineTextAdditions, addition];
     try {
-      await saveTimelineLayout(timelineClips.map((clip) => clip.audioUrl), timelineTextLinks, nextAdditions);
+      await saveTimelineLayout(
+        timelineClips.map((clip) => clip.audioUrl),
+        timelineTextLinks,
+        nextAdditions,
+      );
       window.location.reload();
     } catch (error) {
-      setTimelineMessage(error instanceof Error ? error.message : String(error));
+      setTimelineMessage(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   };
 
   const toggleMergeClip = (audioUrl: string) => {
-    setSelectedMergeUrls((current) => current.includes(audioUrl)
-      ? current.filter((url) => url !== audioUrl)
-      : [...current, audioUrl]);
+    setSelectedMergeUrls((current) =>
+      current.includes(audioUrl)
+        ? current.filter((url) => url !== audioUrl)
+        : [...current, audioUrl],
+    );
   };
 
   const splitSelectedTimelineClip = async () => {
@@ -386,19 +486,30 @@ export default function CekAudioManualPage() {
       });
       window.location.reload();
     } catch (error) {
-      setTimelineMessage(error instanceof Error ? error.message : String(error));
+      setTimelineMessage(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   };
 
   const deleteSelectedTimelineClip = async () => {
     if (!selectedTimelineClip) return;
-    if (!window.confirm(`Hapus klip ${selectedTimelineClip.filename} dari project?`)) return;
+    if (
+      !window.confirm(
+        `Hapus klip ${selectedTimelineClip.filename} dari project?`,
+      )
+    )
+      return;
     setTimelineMessage("Menghapus klip...");
     try {
-      await editorRequest("delete-clip", { audioUrl: selectedTimelineClip.audioUrl });
+      await editorRequest("delete-clip", {
+        audioUrl: selectedTimelineClip.audioUrl,
+      });
       window.location.reload();
     } catch (error) {
-      setTimelineMessage(error instanceof Error ? error.message : String(error));
+      setTimelineMessage(
+        error instanceof Error ? error.message : String(error),
+      );
     }
   };
 
@@ -407,7 +518,11 @@ export default function CekAudioManualPage() {
     const segments = selectedMergeUrls
       .map((url) => timelineClips.find((clip) => clip.audioUrl === url))
       .filter((clip): clip is TimelineClip => Boolean(clip))
-      .map((clip) => ({ sourceAudioUrl: clip.audioUrl, start: "0", end: String(clip.duration) }));
+      .map((clip) => ({
+        sourceAudioUrl: clip.audioUrl,
+        start: "0",
+        end: String(clip.duration),
+      }));
     if (!segments.length) return;
     setEditorBusy(true);
     setEditorMessage("");
@@ -437,7 +552,10 @@ export default function CekAudioManualPage() {
       await editorRequest("save-text", {
         key: editorKey,
         arabic: editorDraft.arabic,
-        transliterationParts: editorDraft.transliteration.split(/[\n,]/).map((part) => part.trim()).filter(Boolean),
+        transliterationParts: editorDraft.transliteration
+          .split(/[\n,]/)
+          .map((part) => part.trim())
+          .filter(Boolean),
         hintTone: editorDraft.hintTone,
       });
       reloadAfterEditorSave();
@@ -457,13 +575,16 @@ export default function CekAudioManualPage() {
     setEditorBusy(true);
     setEditorMessage("");
     try {
-      const segments = action === "merge"
-        ? editorSegments
-        : [{
-            sourceAudioUrl: editorDraft.sourceAudioUrl,
-            start: editorDraft.start,
-            end: editorDraft.end,
-          }];
+      const segments =
+        action === "merge"
+          ? editorSegments
+          : [
+              {
+                sourceAudioUrl: editorDraft.sourceAudioUrl,
+                start: editorDraft.start,
+                end: editorDraft.end,
+              },
+            ];
       await editorRequest(action, {
         key: editorKey,
         sourceAudioUrl: editorDraft.sourceAudioUrl,
@@ -500,7 +621,8 @@ export default function CekAudioManualPage() {
 
   const deleteEditorItem = async () => {
     if (!editingQuestion) return;
-    if (!window.confirm("Hapus item teks dan pemetaan audio ini dari dataset?")) return;
+    if (!window.confirm("Hapus item teks dan pemetaan audio ini dari dataset?"))
+      return;
     setEditorBusy(true);
     setEditorMessage("");
     try {
@@ -517,7 +639,8 @@ export default function CekAudioManualPage() {
   };
 
   const addEditorSegment = () => {
-    if (!editorDraft?.sourceAudioUrl || !editorDraft.start || !editorDraft.end) return;
+    if (!editorDraft?.sourceAudioUrl || !editorDraft.start || !editorDraft.end)
+      return;
     setEditorSegments((segments) => [
       ...segments,
       {
@@ -533,17 +656,23 @@ export default function CekAudioManualPage() {
         .map((q, questionIndex) => ({
           q,
           questionIndex,
-          audioUrl: timelineTextLinks[String(q.id)] || getQuestionAudioUrl(
-            q,
-            jilid,
-            hal,
-            questionIndex,
-            Boolean(pageData.questions[0]?.isOpening),
-          ),
+          audioUrl:
+            timelineTextLinks[String(q.id)] ||
+            getQuestionAudioUrl(
+              q,
+              jilid,
+              hal,
+              questionIndex,
+              Boolean(pageData.questions[0]?.isOpening),
+            ),
         }))
-        .filter(({ questionIndex }) => !(isKelipatanEnam && questionIndex === 0))
+        .filter(
+          ({ questionIndex }) => !(isKelipatanEnam && questionIndex === 0),
+        )
     : [];
-  const testableQuestionRows = questionRows.filter(({ audioUrl }) => Boolean(audioUrl));
+  const testableQuestionRows = questionRows.filter(({ audioUrl }) =>
+    Boolean(audioUrl),
+  );
   const testedCount = testableQuestionRows.filter(
     ({ questionIndex }) => testedAudio[getQuestionKey(questionIndex)],
   ).length;
@@ -551,15 +680,13 @@ export default function CekAudioManualPage() {
   return (
     <NgajiCeriaLayout title="Cek Audio Manual" showBack>
       <div className="p-4 max-w-md mx-auto min-h-screen bg-slate-50/50">
-        
         {/* Jilid Selector Tabs (1 to 5) */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 scrollbar-none">
           {[1, 2, 3, 4, 5].map((j) => (
             <button
               key={j}
               onClick={() => {
-                setJilid(j);
-                setHal(1);
+                updatePage(j, 1);
                 if (audioRef.current) audioRef.current.pause();
                 setPlayingId(null);
               }}
@@ -576,18 +703,22 @@ export default function CekAudioManualPage() {
 
         {/* Header Controls */}
         <div className="flex items-center justify-between mb-4 bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
-          <button 
-            onClick={() => setHal(Math.max(1, hal - 1))}
+          <button
+            onClick={() => updatePage(jilid, Math.max(1, hal - 1))}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition-all"
           >
             <ChevronLeft size={16} />
           </button>
           <div className="text-center">
-            <div className="text-[10px] font-black tracking-widest text-[#00923F] uppercase">TILAWATI JILID {jilid}</div>
-            <div className="font-black text-xl text-slate-800">Halaman {hal}</div>
+            <div className="text-[10px] font-black tracking-widest text-[#00923F] uppercase">
+              TILAWATI JILID {jilid}
+            </div>
+            <div className="font-black text-xl text-slate-800">
+              Halaman {hal}
+            </div>
           </div>
-          <button 
-            onClick={() => setHal(Math.min(44, hal + 1))}
+          <button
+            onClick={() => updatePage(jilid, Math.min(44, hal + 1))}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition-all"
           >
             <ChevronRight size={16} />
@@ -597,284 +728,71 @@ export default function CekAudioManualPage() {
         {pageData && (
           <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-[#00923F]/20 bg-[#00923F]/10 px-4 py-3">
             <div>
-              <div className="text-xs font-black text-[#00662C]">Status uji audio</div>
-              <div className="text-[10px] text-[#00662C]/70">Centang setelah audio dan teks dinyatakan sesuai.</div>
+              <div className="text-xs font-black text-[#00662C]">
+                Status uji halaman
+              </div>
+              <div className="text-[10px] text-[#00662C]/70">
+                Tandai halaman ini jika seluruh audio dan teks sudah final.
+              </div>
             </div>
-            <div className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-black text-[#00923F] shadow-sm">
-              {testedCount}/{testableQuestionRows.length} Lolos
-            </div>
+            <label className="shrink-0 flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-black text-[#00923F] shadow-sm cursor-pointer hover:bg-slate-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={Boolean(testedAudio[`${jilid}:${hal}:page`])}
+                onChange={(event) => setAudioTested(-1, event.target.checked)}
+                className="w-4 h-4 accent-[#00923F]"
+              />
+              Halaman Lolos
+            </label>
           </div>
         )}
 
-        <section className="mb-4 rounded-2xl border-2 border-slate-200 bg-slate-900 p-4 text-white shadow-md">
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-wider text-[#FFCB45]">Timeline halaman</div>
-              <h3 className="text-base font-black">Audio Halaman {hal}</h3>
-              <p className="mt-1 text-[10px] leading-relaxed text-white/65">
-                Klik klip untuk melihat urutan dan durasinya. Gunakan rentang waktu untuk mengambil bagian yang tepat.
-              </p>
+        <section className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-[#00923F]/20 bg-[#00923F]/10 px-4 py-3">
+          <div className="min-w-0">
+            <div className="text-[10px] font-black uppercase tracking-wider text-[#00662C]">
+              Timeline halaman
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-2">
-              <div className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black text-[#FFCB45]">
-                {timelineClips.length} klip
-              </div>
-              <button
-                type="button"
-                onClick={() => navigate(`/member/ngaji-ceria/cek-audio/timeline?jilid=${jilid}&hal=${hal}`)}
-                className="rounded-lg bg-[#FFCB45] px-3 py-2 text-[10px] font-black text-[#5A3A2A] shadow-sm transition hover:bg-[#ffd76b]"
-              >
-                Buka Page Timeline Editor →
-              </button>
-            </div>
+            <h3 className="truncate text-sm font-black text-[#00662C]">
+              Audio Hal {hal} · {timelineClips.length} klip
+            </h3>
           </div>
-
-          {timelineLoading ? (
-            <div className="rounded-xl bg-white/10 p-4 text-center text-xs font-bold text-white/70">Membaca audio halaman...</div>
-          ) : timelineMessage ? (
-            <div className="rounded-xl bg-red-500/20 p-4 text-xs font-bold text-red-100">{timelineMessage}</div>
-          ) : timelineClips.length === 0 ? (
-            <div className="rounded-xl bg-white/10 p-4 text-center text-xs font-bold text-white/70">Belum ada file audio pada halaman ini.</div>
-          ) : (
-            <>
-              <div className="overflow-x-auto rounded-xl bg-black/25 p-2">
-                <div className="flex min-w-max items-stretch gap-1.5">
-                  {timelineClips.map((clip) => {
-                    const width = timelineTotalDuration > 0
-                      ? Math.max(82, (clip.duration / timelineTotalDuration) * 1000)
-                      : 120;
-                    const isSelected = clip.audioUrl === selectedTimelineUrl;
-                    const color = clip.type === "header"
-                      ? "bg-blue-500"
-                      : clip.type === "demo"
-                        ? "bg-purple-500"
-                        : clip.type === "footer"
-                          ? "bg-amber-500"
-                          : clip.type === "baris"
-                            ? "bg-emerald-500"
-                            : "bg-slate-500";
-                    return (
-                      <button
-                        key={clip.audioUrl}
-                        type="button"
-                        onClick={() => selectTimelineClip(clip)}
-                        draggable
-                        onDragStart={() => setDraggingTimelineUrl(clip.audioUrl)}
-                        onDragEnd={() => setDraggingTimelineUrl("")}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={(event) => {
-                          event.preventDefault();
-                          if (draggingTextId) {
-                            void linkTextToAudio(draggingTextId, clip.audioUrl);
-                          } else {
-                            void reorderTimelineClip(clip.audioUrl);
-                          }
-                        }}
-                        ref={isSelected ? selectedTimelineElement : undefined}
-                        style={{ width: `${width}px` }}
-                        className={`relative flex min-h-[76px] shrink-0 flex-col justify-between overflow-hidden rounded-lg border p-2 text-left transition-transform hover:-translate-y-0.5 ${
-                          isSelected
-                            ? "border-[#FFCB45] ring-2 ring-[#FFCB45]"
-                            : "border-white/10"
-                        } ${color}`}
-                      >
-                        {isSelected && (
-                          <>
-                            <span
-                              onPointerDown={(event) => {
-                                event.stopPropagation();
-                                setDraggingTimelineHandle("start");
-                              }}
-                              className="absolute inset-y-0 left-0 z-10 w-3 cursor-ew-resize bg-white/80"
-                              title="Tarik untuk mengubah titik mulai"
-                            />
-                            <span
-                              onPointerDown={(event) => {
-                                event.stopPropagation();
-                                setDraggingTimelineHandle("end");
-                              }}
-                              className="absolute inset-y-0 right-0 z-10 w-3 cursor-ew-resize bg-white/80"
-                              title="Tarik untuk mengubah titik selesai"
-                            />
-                            <span
-                              onPointerDown={(event) => {
-                                event.stopPropagation();
-                                setDraggingTimelineHandle("cut");
-                              }}
-                              style={{ left: `${(Number(timelineCutPoint) / Math.max(selectedTimelineClip?.duration || 1, 0.001)) * 100}%` }}
-                              className="absolute inset-y-0 z-10 w-0.5 cursor-ew-resize bg-[#FFCB45] shadow-[0_0_0_1px_rgba(90,58,42,0.4)]"
-                              title="Tarik untuk memindahkan garis gunting"
-                            />
-                          </>
-                        )}
-                        <span className="text-[9px] font-black uppercase text-white/75">#{clip.sequence} · {clip.type}</span>
-                        <span className="truncate text-[10px] font-black text-white">{clip.filename}</span>
-                        <span className="flex items-center justify-between gap-1 text-[10px] font-bold text-white/80">
-                          <span>{clip.duration.toFixed(2)} detik</span>
-                          <span
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleMergeClip(clip.audioUrl);
-                            }}
-                            className={`rounded px-1.5 py-0.5 text-[9px] font-black ${
-                              selectedMergeUrls.includes(clip.audioUrl) ? "bg-[#FFCB45] text-[#5A3A2A]" : "bg-black/20 text-white"
-                            }`}
-                          >
-                            {selectedMergeUrls.includes(clip.audioUrl) ? "Dipilih" : "+ Gabung"}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {selectedTimelineClip && (
-                <div className="mt-3 rounded-xl border border-white/15 bg-white/10 p-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="truncate text-xs font-black text-[#FFCB45]">{selectedTimelineClip.filename}</div>
-                      <div className="text-[10px] text-white/65">Durasi asli: {selectedTimelineClip.duration.toFixed(3)} detik</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={previewTimelineSelection}
-                      className="shrink-0 rounded-lg bg-white/15 px-2.5 py-1.5 text-[10px] font-black text-white hover:bg-white/25"
-                    >
-                      Preview rentang
-                    </button>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max={selectedTimelineClip.duration}
-                      step="0.001"
-                      value={Math.min(Number(timelineStart) || 0, selectedTimelineClip.duration)}
-                      onChange={(event) => {
-                        const value = Number(event.target.value);
-                        setTimelineStart(String(value));
-                        if (Number(timelineEnd) <= value) setTimelineEnd(String(Math.min(selectedTimelineClip.duration, value + 0.001)));
-                      }}
-                      className="w-full accent-[#FFCB45]"
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max={selectedTimelineClip.duration}
-                      step="0.001"
-                      value={Math.max(Number(timelineEnd) || selectedTimelineClip.duration, Number(timelineStart) || 0)}
-                      onChange={(event) => setTimelineEnd(event.target.value)}
-                      className="w-full accent-[#F58A3A]"
-                    />
-                    <div className="flex items-center justify-between text-[10px] font-black text-white/75">
-                      <span>Mulai {Number(timelineStart || 0).toFixed(3)}s</span>
-                      <span>Selesai {Number(timelineEnd || selectedTimelineClip.duration).toFixed(3)}s</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={useTimelineSelection}
-                    disabled={!editorDraft}
-                    className="mt-3 w-full rounded-xl bg-[#FFCB45] px-3 py-2.5 text-xs font-black text-[#5A3A2A] disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {editorDraft ? "Pakai rentang ini untuk editor" : "Buka Edit pada item target terlebih dahulu"}
-                  </button>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={splitSelectedTimelineClip}
-                      className="rounded-xl bg-[#F58A3A] px-3 py-2.5 text-xs font-black text-white"
-                    >
-                      ✂ Gunting di garis
-                    </button>
-                    <button
-                      type="button"
-                      onClick={deleteSelectedTimelineClip}
-                      className="rounded-xl bg-red-500/90 px-3 py-2.5 text-xs font-black text-white"
-                    >
-                      Hapus klip
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={mergeSelectedTimelineClips}
-                    disabled={!editorDraft || selectedMergeUrls.length < 2 || editorBusy}
-                    className="mt-2 w-full rounded-xl bg-[#2D5A27] px-3 py-2.5 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Gabungkan {selectedMergeUrls.length || "klip yang dipilih"} ke item editor
-                  </button>
-                </div>
-              )}
-
-              <div className="mt-3 rounded-xl border border-white/15 bg-white/10 p-3">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <div>
-                    <div className="text-xs font-black text-[#FFCB45]">Timeline teks</div>
-                    <div className="text-[10px] text-white/65">Panjang blok mengikuti durasi audio yang dipetakan.</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={addTimelineText}
-                      className="rounded-lg bg-[#FFCB45] px-2.5 py-1.5 text-[10px] font-black text-[#5A3A2A]"
-                    >
-                      + Tambah teks
-                    </button>
-                    <span className="text-[10px] font-black text-white/60">Klik blok untuk edit</span>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-lg bg-black/25 p-2">
-                  <div className="flex min-w-max items-stretch gap-1.5">
-                    {questionRows.map(({ q, questionIndex, audioUrl }) => {
-                      const clip = timelineClips.find((item) => item.audioUrl === audioUrl);
-                      const duration = clip?.duration || 1;
-                      const width = timelineTotalDuration > 0
-                        ? Math.max(110, (duration / timelineTotalDuration) * 1000)
-                        : 140;
-                      return (
-                        <button
-                          key={`text-${q.id}-${questionIndex}`}
-                          type="button"
-                          onClick={() => openEditor(q, questionIndex, audioUrl)}
-                          draggable
-                          onDragStart={() => setDraggingTextId(String(q.id))}
-                          onDragEnd={() => setDraggingTextId("")}
-                          onDragOver={(event) => event.preventDefault()}
-                          onDrop={(event) => {
-                            event.preventDefault();
-                            if (draggingTimelineUrl) {
-                              void linkTextToAudio(String(q.id), draggingTimelineUrl);
-                            }
-                          }}
-                          style={{ width: `${width}px` }}
-                          className={`flex min-h-[70px] shrink-0 flex-col justify-between rounded-lg border p-2 text-left ${
-                            audioUrl ? "border-[#FFCB45]/40 bg-[#5A3A2A]" : "border-white/10 bg-white/5"
-                          }`}
-                        >
-                          <span className="text-[9px] font-black text-white/60">Teks #{questionIndex + 1}</span>
-                          <span dir="rtl" className="line-clamp-2 font-arabic text-sm text-white">{q.arabic}</span>
-                          <span className="text-[9px] font-bold text-white/60">
-                            {clip ? `${duration.toFixed(2)} detik` : "Belum ada audio"}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                `/member/ngaji-ceria/cek-audio/timeline?jilid=${jilid}&hal=${hal}`,
+              )
+            }
+            className="shrink-0 rounded-lg bg-[#00923F] px-3 py-2 text-[10px] font-black text-white shadow-sm transition hover:bg-[#007a34] active:scale-95"
+          >
+            Editor Lokal →
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                `/member/ngaji-ceria/cek-audio/cloud-editor?jilid=${jilid}&hal=${hal}`,
+              )
+            }
+            className="shrink-0 rounded-lg bg-[#00662C] px-3 py-2 text-[10px] font-black text-white shadow-sm transition hover:bg-[#004d21] active:scale-95"
+          >
+            Cloud Editor →
+          </button>
         </section>
 
         {editingQuestion && editorDraft && (
           <section className="mb-4 rounded-2xl border-2 border-[#F58A3A]/30 bg-[#FFF8EE] p-4 shadow-sm">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <div className="text-[10px] font-black uppercase tracking-wider text-[#C4430E]">Editor permanen</div>
-                <h3 className="text-base font-black text-[#5A3A2A]">Edit teks & audio item</h3>
+                <div className="text-[10px] font-black uppercase tracking-wider text-[#C4430E]">
+                  Editor permanen
+                </div>
+                <h3 className="text-base font-black text-[#5A3A2A]">
+                  Edit teks & audio item
+                </h3>
                 <p className="mt-1 text-[10px] leading-relaxed text-[#8C5A3A]">
-                  Hasil simpan ditulis ke file project. Jalankan Vite dev server agar endpoint editor tersedia.
+                  Hasil simpan ditulis ke file project. Jalankan Vite dev server
+                  agar endpoint editor tersedia.
                 </p>
               </div>
               <button
@@ -892,17 +810,31 @@ export default function CekAudioManualPage() {
                 Teks Arab
                 <textarea
                   value={editorDraft.arabic}
-                  onChange={(event) => setEditorDraft({ ...editorDraft, arabic: event.target.value })}
+                  onChange={(event) =>
+                    setEditorDraft({
+                      ...editorDraft,
+                      arabic: event.target.value,
+                    })
+                  }
                   rows={3}
                   dir="rtl"
                   className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-right font-arabic text-xl leading-relaxed outline-none focus:border-[#F58A3A]"
                 />
               </label>
               <label className="block text-xs font-black text-[#5A3A2A]">
-                Transliterasi — satu bagian per baris
+                Transliterasi — satu bagian per baris (Auto-generate teks Arab)
                 <textarea
                   value={editorDraft.transliteration}
-                  onChange={(event) => setEditorDraft({ ...editorDraft, transliteration: event.target.value })}
+                  onChange={(event) => {
+                    const val = event.target.value;
+                    const parts = val.split("\n");
+                    const autoArabic = parts.map((p) => latinToArabic(p.trim())).filter(Boolean).join(" ");
+                    setEditorDraft({
+                      ...editorDraft,
+                      transliteration: val,
+                      arabic: autoArabic || editorDraft.arabic,
+                    });
+                  }}
                   rows={3}
                   className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-sm outline-none focus:border-[#F58A3A]"
                 />
@@ -911,7 +843,12 @@ export default function CekAudioManualPage() {
                 Nada / keterangan
                 <input
                   value={editorDraft.hintTone}
-                  onChange={(event) => setEditorDraft({ ...editorDraft, hintTone: event.target.value })}
+                  onChange={(event) =>
+                    setEditorDraft({
+                      ...editorDraft,
+                      hintTone: event.target.value,
+                    })
+                  }
                   className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-sm outline-none focus:border-[#F58A3A]"
                 />
               </label>
@@ -921,25 +858,34 @@ export default function CekAudioManualPage() {
                   Sumber audio dari halaman ini
                   <select
                     value={editorDraft.sourceAudioUrl}
-                    onChange={(event) => selectEditorSourceAudio(event.target.value)}
+                    onChange={(event) =>
+                      selectEditorSourceAudio(event.target.value)
+                    }
                     className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-xs outline-none focus:border-[#F58A3A]"
                   >
                     <option value="">Pilih audio yang tersedia...</option>
                     {timelineClips.map((clip) => (
                       <option key={clip.audioUrl} value={clip.audioUrl}>
-                        #{clip.sequence} · {clip.type} · {clip.filename} · {clip.duration.toFixed(2)} detik
+                        #{clip.sequence} · {clip.type} · {clip.filename} ·{" "}
+                        {clip.duration.toFixed(2)} detik
                       </option>
                     ))}
                   </select>
                   <span className="mt-1 block text-[10px] font-medium text-[#8C5A3A]">
-                    Daftar diambil dari seluruh audio pada Jilid {jilid} Halaman {hal}.
+                    Daftar diambil dari seluruh audio pada Jilid {jilid} Halaman{" "}
+                    {hal}.
                   </span>
                 </label>
                 <label className="text-xs font-black text-[#5A3A2A]">
                   Simpan hasil ke URL audio
                   <input
                     value={editorDraft.outputAudioUrl}
-                    onChange={(event) => setEditorDraft({ ...editorDraft, outputAudioUrl: event.target.value })}
+                    onChange={(event) =>
+                      setEditorDraft({
+                        ...editorDraft,
+                        outputAudioUrl: event.target.value,
+                      })
+                    }
                     placeholder="/audio/tilawati/..."
                     className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-xs outline-none focus:border-[#F58A3A]"
                   />
@@ -954,7 +900,12 @@ export default function CekAudioManualPage() {
                     min="0"
                     step="0.001"
                     value={editorDraft.start}
-                    onChange={(event) => setEditorDraft({ ...editorDraft, start: event.target.value })}
+                    onChange={(event) =>
+                      setEditorDraft({
+                        ...editorDraft,
+                        start: event.target.value,
+                      })
+                    }
                     className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-sm outline-none focus:border-[#F58A3A]"
                   />
                 </label>
@@ -965,7 +916,12 @@ export default function CekAudioManualPage() {
                     min="0"
                     step="0.001"
                     value={editorDraft.end}
-                    onChange={(event) => setEditorDraft({ ...editorDraft, end: event.target.value })}
+                    onChange={(event) =>
+                      setEditorDraft({
+                        ...editorDraft,
+                        end: event.target.value,
+                      })
+                    }
                     className="mt-1 w-full rounded-xl border border-[#E2D4C0] bg-white p-3 text-sm outline-none focus:border-[#F58A3A]"
                   />
                 </label>
@@ -973,14 +929,28 @@ export default function CekAudioManualPage() {
 
               {editorSegments.length > 0 && (
                 <div className="rounded-xl border border-[#E2D4C0] bg-white p-3">
-                  <div className="mb-2 text-xs font-black text-[#5A3A2A]">Segmen gabungan</div>
+                  <div className="mb-2 text-xs font-black text-[#5A3A2A]">
+                    Segmen gabungan
+                  </div>
                   <div className="space-y-1 text-[10px] text-slate-600">
                     {editorSegments.map((segment, index) => (
-                      <div key={`${segment.sourceAudioUrl}-${index}`} className="flex items-center justify-between gap-2">
-                        <span className="truncate">{index + 1}. {segment.sourceAudioUrl} ({segment.start}–{segment.end}s)</span>
+                      <div
+                        key={`${segment.sourceAudioUrl}-${index}`}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <span className="truncate">
+                          {index + 1}. {segment.sourceAudioUrl} ({segment.start}
+                          –{segment.end}s)
+                        </span>
                         <button
                           type="button"
-                          onClick={() => setEditorSegments((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                          onClick={() =>
+                            setEditorSegments((current) =>
+                              current.filter(
+                                (_, itemIndex) => itemIndex !== index,
+                              ),
+                            )
+                          }
                           className="shrink-0 font-black text-red-600"
                         >
                           Hapus
@@ -1009,7 +979,11 @@ export default function CekAudioManualPage() {
                 <button
                   type="button"
                   onClick={() => saveEditorAudio("cut")}
-                  disabled={editorBusy || !editorDraft.sourceAudioUrl || !editorDraft.outputAudioUrl}
+                  disabled={
+                    editorBusy ||
+                    !editorDraft.sourceAudioUrl ||
+                    !editorDraft.outputAudioUrl
+                  }
                   className="rounded-xl bg-[#00923F] px-3 py-2.5 text-xs font-black text-white disabled:opacity-50"
                 >
                   Potong & simpan
@@ -1017,7 +991,11 @@ export default function CekAudioManualPage() {
                 <button
                   type="button"
                   onClick={addEditorSegment}
-                  disabled={editorBusy || !editorDraft.sourceAudioUrl || !editorDraft.end}
+                  disabled={
+                    editorBusy ||
+                    !editorDraft.sourceAudioUrl ||
+                    !editorDraft.end
+                  }
                   className="rounded-xl border border-[#00923F]/30 bg-white px-3 py-2.5 text-xs font-black text-[#00662C] disabled:opacity-50"
                 >
                   Tambah segmen
@@ -1025,7 +1003,11 @@ export default function CekAudioManualPage() {
                 <button
                   type="button"
                   onClick={() => saveEditorAudio("merge")}
-                  disabled={editorBusy || editorSegments.length === 0 || !editorDraft.outputAudioUrl}
+                  disabled={
+                    editorBusy ||
+                    editorSegments.length === 0 ||
+                    !editorDraft.outputAudioUrl
+                  }
                   className="rounded-xl border border-[#F58A3A]/40 bg-white px-3 py-2.5 text-xs font-black text-[#C4430E] disabled:opacity-50"
                 >
                   Gabungkan segmen
@@ -1059,85 +1041,101 @@ export default function CekAudioManualPage() {
             {questionRows.map(({ q, questionIndex, audioUrl }) => {
               const questionKey = getQuestionKey(questionIndex);
               return (
-              <div 
-                key={q.id} 
-                className={`flex flex-col bg-white rounded-[20px] p-4 border-2 shadow-sm transition-colors ${
-                  playingId === q.id ? 'border-[#00923F] bg-[#F2FDF5]' : 'border-slate-100'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">
-                      {isKelipatanEnam
-                        ? questionIndex === pageData.questions.length - 2
-                          ? 'Baris Bawah'
-                          : `Baris ${questionIndex + 1}`
-                        : questionIndex === 0
-                        ? 'Judul (3x Rost)'
-                        : questionIndex === 1
-                        ? 'Judul (Evaluasi 1x)'
-                        : questionIndex === pageData.questions.length - 1
-                        ? 'Baris Bawah'
-                        : `Baris ${questionIndex - 1}`}
+                <div
+                  key={q.id}
+                  className={`flex flex-col bg-white rounded-[20px] p-4 border-2 shadow-sm transition-colors ${
+                    playingId === q.id
+                      ? "border-[#00923F] bg-[#F2FDF5]"
+                      : "border-slate-100"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">
+                        {isKelipatanEnam
+                          ? questionIndex === pageData.questions.length - 2
+                            ? "Baris Bawah"
+                            : `Baris ${questionIndex + 1}`
+                          : questionIndex === 0
+                            ? "Judul (3x Rost)"
+                            : questionIndex === 1
+                              ? "Judul (Evaluasi 1x)"
+                              : questionIndex === pageData.questions.length - 1
+                                ? "Baris Bawah"
+                                : `Baris ${questionIndex - 1}`}
+                      </div>
+                      <div className="font-arabic text-3xl mb-1 leading-normal text-right pr-2 text-slate-800">
+                        {q.arabic}
+                      </div>
+                      <div className="text-xs font-bold text-slate-500">
+                        [{q.transliterationParts.join(" - ")}]
+                      </div>
                     </div>
-                    <div className="font-arabic text-3xl mb-1 leading-normal text-right pr-2 text-slate-800">
-                      {q.arabic}
-                    </div>
-                    <div className="text-xs font-bold text-slate-500">
-                      [{q.transliterationParts.join(" - ")}]
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openEditor(q, questionIndex, audioUrl)}
+                        className="rounded-xl border border-[#F58A3A]/30 bg-[#FFF8EE] px-2.5 py-2 text-[10px] font-black text-[#C4430E]"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (playingId === q.id) {
+                            audioRef.current?.pause();
+                            setPlayingId(null);
+                          } else {
+                            playAudio(q.id, audioUrl);
+                          }
+                        }}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-transform active:scale-90 ${
+                          playingId === q.id
+                            ? "bg-red-500 shadow-md"
+                            : "bg-[#00923F] shadow-md shadow-[#00923F]/20"
+                        }`}
+                      >
+                        {playingId === q.id ? (
+                          <Pause size={16} />
+                        ) : (
+                          <Play size={16} />
+                        )}
+                      </button>
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditor(q, questionIndex, audioUrl)}
-                      className="rounded-xl border border-[#F58A3A]/30 bg-[#FFF8EE] px-2.5 py-2 text-[10px] font-black text-[#C4430E]"
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                    <span
+                      className="font-mono text-slate-400 truncate pr-4 max-w-[200px]"
+                      title={audioUrl}
                     >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (playingId === q.id) {
-                          audioRef.current?.pause();
-                          setPlayingId(null);
-                        } else {
-                          playAudio(q.id, audioUrl);
-                        }
-                      }}
-                      className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-transform active:scale-90 ${
-                        playingId === q.id ? 'bg-red-500 shadow-md' : 'bg-[#00923F] shadow-md shadow-[#00923F]/20'
+                      {audioUrl
+                        ? audioUrl.split("/").pop()
+                        : "Audio belum tersedia"}
+                    </span>
+                    <span className="shrink-0 rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-600">
+                      {q.hintTone.includes("3x") ? "3x Rost" : "1x"}
+                    </span>
+                    <label
+                      className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1 font-black transition-colors ${
+                        audioUrl
+                          ? "cursor-pointer text-[#00662C] hover:bg-[#E2F5E8]"
+                          : "cursor-not-allowed text-slate-400"
                       }`}
+                      title={
+                        audioUrl
+                          ? "Sudah ada audio"
+                          : "Audio belum tersedia"
+                      }
                     >
-                      {playingId === q.id ? <Pause size={16} /> : <Play size={16} />}
-                    </button>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(audioUrl)}
+                        readOnly
+                        className="h-4 w-4 accent-[#00923F]"
+                      />
+                      <span>Ada Audio</span>
+                    </label>
                   </div>
                 </div>
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
-                  <span className="font-mono text-slate-400 truncate pr-4 max-w-[200px]" title={audioUrl}>
-                     {audioUrl ? audioUrl.split('/').pop() : 'Audio belum tersedia'}
-                  </span>
-                  <span className="shrink-0 rounded bg-slate-100 px-2 py-0.5 font-bold text-slate-600">
-                    {q.hintTone.includes("3x") ? "3x Rost" : "1x"}
-                  </span>
-                  <label
-                    className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1 font-black transition-colors ${
-                      audioUrl
-                        ? "cursor-pointer text-[#00662C] hover:bg-[#E2F5E8]"
-                        : "cursor-not-allowed text-slate-400"
-                    }`}
-                    title={audioUrl ? "Tandai audio sudah lolos uji" : "Audio belum tersedia"}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={Boolean(testedAudio[questionKey])}
-                      disabled={!audioUrl}
-                      onChange={(event) => setAudioTested(questionIndex, event.target.checked)}
-                      className="h-4 w-4 accent-[#00923F]"
-                    />
-                    <span>Lolos uji</span>
-                  </label>
-                </div>
-              </div>
               );
             })}
           </div>
@@ -1150,7 +1148,8 @@ export default function CekAudioManualPage() {
               Tilawati Jilid {jilid} - Halaman {hal}
             </h3>
             <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">
-              Audio rekaman master per halaman siap diputar melalui tombol di atas untuk audit dan verifikasi makhraj & irama.
+              Audio rekaman master per halaman siap diputar melalui tombol di
+              atas untuk audit dan verifikasi makhraj & irama.
             </p>
           </div>
         )}

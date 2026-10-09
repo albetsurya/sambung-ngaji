@@ -516,14 +516,14 @@ export default defineConfig({
         "manifest-staging.webmanifest",
       ],
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,glb,woff2,webmanifest}"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/],
         cleanupOutdatedCaches: true,
         // Auto-update: SW baru langsung aktif + kuasai halaman terbuka.
         clientsClaim: true,
         skipWaiting: true,
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
       },
       devOptions: {
         // MATI di dev: SW dev menyajikan CSS/JS basi dan menyulitkan

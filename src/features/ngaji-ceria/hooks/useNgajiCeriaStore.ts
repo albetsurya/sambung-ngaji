@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { activityDate, yesterdayActivityDate } from "../utils/activityDate";
 
 export interface NgajiCeriaState {
   stars: Record<string, number>;
@@ -33,6 +34,7 @@ function loadState(): NgajiCeriaState {
 }
 
 let currentState: NgajiCeriaState = loadState();
+export const getNgajiActivity = () => currentState;
 const listeners = new Set<() => void>();
 
 function emitChange() {
@@ -62,36 +64,30 @@ export function awardStars(jilid: number, page: number, score: number) {
 
 export function recordActivity() {
   const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const today = activityDate(now);
 
   if (currentState.lastPlayedAt === today) return;
 
-  let newStreak = currentState.currentStreak;
-  const newStreakDays = [...currentState.streakDays];
-
-  if (!currentState.lastPlayedAt) {
-    newStreak = 1;
-  } else {
-    const lastDate = new Date(currentState.lastPlayedAt);
-    const diffTime = Math.abs(now.getTime() - lastDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 1) {
-      newStreak += 1;
-    } else {
-      newStreak = 1;
-      newStreakDays.fill(false);
-    }
+  const newStreak = currentState.lastPlayedAt === yesterdayActivityDate(now) ? currentState.currentStreak + 1 : 1;
+  const newStreakDays = Array<boolean>(7).fill(false);
+  for (let daysAgo = 0; daysAgo < Math.min(7, newStreak); daysAgo++) {
+    newStreakDays[(now.getDay() - daysAgo + 7) % 7] = true;
   }
-
-  const dayIndex = now.getDay();
-  newStreakDays[dayIndex] = true;
 
   currentState = {
     ...currentState,
     lastPlayedAt: today,
     currentStreak: newStreak,
     streakDays: newStreakDays,
+  };
+  emitChange();
+}
+
+export function hydrateActivity(lastPlayedAt: string | null, currentStreak: number) {
+  currentState = {
+    ...currentState,
+    lastPlayedAt,
+    currentStreak: Math.max(0, Math.floor(currentStreak)),
   };
   emitChange();
 }

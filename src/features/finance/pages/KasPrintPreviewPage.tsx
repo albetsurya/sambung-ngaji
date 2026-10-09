@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { financeApi, type Transaction } from "../api/financeApi";
+import { groupApi } from "../../../services/domainApi";
 import { formatRp } from "../../../utils/format";
 import { useToast } from "../../../contexts/ToastContext";
 import { usePermission } from "../../../hooks/usePermission";
@@ -11,7 +12,6 @@ import { ApiError } from "../../../services/api";
 
 export const KasPrintPreviewPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cashType } = useParams<{ cashType: string }>();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const { assignedGroup, isSuperAdmin } = usePermission();
@@ -21,23 +21,26 @@ export const KasPrintPreviewPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [initialBalance, setInitialBalance] = useState(0);
   const [endingBalance, setEndingBalance] = useState(0);
+  const [groupName, setGroupName] = useState("");
 
   const month = searchParams.get("bulan") || "";
   const mode = (searchParams.get("mode") as "rincian" | "rekap") || "rincian";
+  const cashType = searchParams.get("cash") === "amil" ? "amil" : "main";
+  const backTarget = searchParams.get("back") || "/finance/ledger";
 
   const loadData = async () => {
     if (!assignedGroup) return;
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await financeApi.getKasTransactions(
-        assignedGroup,
-        cashType as "main" | "amil",
-      );
-      const transactions = res.transactions || [];
-      setTransactions(transactions);
+      const res = await financeApi.getKasTransactions(assignedGroup, cashType);
+      const all = res.transactions || [];
+      const scoped = month
+        ? all.filter((t) => (t.transaction_date || "").slice(0, 7) === month)
+        : all;
+      setTransactions(scoped);
       // Cari saldo awal dan akhir dari data
-      const saldoAwalTx = transactions.find(
+      const saldoAwalTx = scoped.find(
         (t) =>
           String(t.account_name || "")
             .trim()
@@ -46,7 +49,19 @@ export const KasPrintPreviewPage: React.FC = () => {
       setInitialBalance(
         Number(saldoAwalTx?.balance) || Number(saldoAwalTx?.debit) || 0,
       );
-      setEndingBalance(res.ending_balance || 0);
+      const lastScoped = scoped[scoped.length - 1];
+      setEndingBalance(
+        Number(lastScoped?.balance) || res.ending_balance || 0,
+      );
+      try {
+        const groups = await groupApi.list();
+        const g = (groups || []).find(
+          (x: any) => x.group_id === assignedGroup,
+        );
+        setGroupName(g?.group_name || "");
+      } catch {
+        /* abaikan: header kelompok boleh kosong */
+      }
     } catch (err: any) {
       const msg =
         err instanceof ApiError ? err.message : "Gagal memuat data kas";
@@ -59,7 +74,7 @@ export const KasPrintPreviewPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [assignedGroup, cashType]);
+  }, [assignedGroup, cashType, month]);
 
   const cashTypeLabel = cashType === "amil" ? "Kas Amil" : "Kas Utama";
   const monthLabel = month
@@ -98,8 +113,8 @@ export const KasPrintPreviewPage: React.FC = () => {
       <Header
         title={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
         subtitle={monthLabel}
-        onBack={() => navigate(`/finance/ledger?cashType=${cashType}`)}
-        backLabel="Kas"
+        onBack={() => navigate(backTarget)}
+        backLabel="Kembali"
         showSyncButton={false}
       />
       <div className="py-4">
@@ -120,7 +135,7 @@ export const KasPrintPreviewPage: React.FC = () => {
           </div>
         ) : (
           <UnifiedPrintPreview
-            onClose={() => navigate(`/finance/ledger?cashType=${cashType}`)}
+            onClose={() => navigate(backTarget)}
             filename={`${cashType === "amil" ? "Kas-Amil" : "Kas-Utama"}-${monthLabel}`}
             className="max-w-[210mm] text-sm leading-relaxed"
           >
@@ -131,6 +146,8 @@ export const KasPrintPreviewPage: React.FC = () => {
               period_label={monthLabel}
               cash_type_label={cashType === "amil" ? "Kas Amil" : "Kas Utama"}
               mode={mode}
+              group_name={groupName}
+              month_key={month}
             />
           </UnifiedPrintPreview>
         )}

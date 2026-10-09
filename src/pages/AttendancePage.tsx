@@ -26,7 +26,7 @@ import {
 import {
   AppLayout,
   Header,
-  FloatingActionButton,
+  FabSpeedDial,
 } from "../components/layout/AppLayout";
 import {
   Button,
@@ -676,9 +676,22 @@ export default function AttendancePage() {
     <AppLayout
       fab={
         canCreate ? (
-          <FloatingActionButton
-            onClick={() => setSheet({ view: "create-picker" })}
-            label="Tambah Jadwal"
+          <FabSpeedDial
+            label="Tambah jadwal"
+            actions={[
+              {
+                label: "Tambah meeting",
+                icon: <Plus size={18} strokeWidth={2.4} />,
+                testId: "schedule-fab-single",
+                onClick: () => openCreateForm("fab"),
+              },
+              {
+                label: "Tambah meeting massal",
+                icon: <Calendar size={18} strokeWidth={2.4} />,
+                testId: "schedule-fab-bulk",
+                onClick: () => navigate("/more/schedule?tab=bulk"),
+              },
+            ]}
           />
         ) : undefined
       }

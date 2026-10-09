@@ -1,5 +1,6 @@
 // Assets import for Ngaji Ceria using 200+ new SVG asset suite
 import * as NEW from "../../../assets/ngaji-ceria-new/index";
+import ayatHunterCover from "../../../assets/ngaji-ceria-new/games/ayatHunter.svg";
 
 export const NGAJI_CERIA_ASSETS = {
   // HUD Elements
@@ -12,7 +13,7 @@ export const NGAJI_CERIA_ASSETS = {
   hatiKosong: NEW.hatiKosong,
   koinHijaiyah: NEW.koinHijaiyah,
   mahkotaVip: NEW.mahkotaVip,
-  
+
   // Icons & Buttons
   iconBeranda: NEW.iconBeranda,
   iconJelajah: NEW.iconJelajah,
@@ -64,6 +65,25 @@ export const NGAJI_CERIA_ASSETS = {
   tebakSurahBaru: NEW.tebakSurahBaru,
   tangkapHarakat: NEW.coverTangkapHarakat,
   susunKata: NEW.coverSusunKata,
+  // Cover sementara; ganti ke /assets/ngaji-ceria/games/* setelah aset final tersedia.
+  hijaiyahPop: NEW.qirraPop,
+  hijaiyahMatchArena: NEW.qirraMatch,
+  juzAmmaSpeedrun: NEW.tebakSurahBaru,
+  harakatRush: NEW.coverTangkapHarakat,
+  ayatScramble: NEW.coverSusunKata,
+  ayatHunter: ayatHunterCover,
+  hijaiyahRush: NEW.qirraPop,
+  arabicWordle: NEW.coverRodaHijaiyah,
+  hijaiyah2048: NEW.coverRodaHijaiyah,
+  quranQuizRoyale: NEW.tebakSurahBaru,
+  wudhuFlow: NEW.coverRodaHijaiyah,
+  santriIdle: NEW.avatarAnak,
+  sholatHero: NEW.coverRodaHijaiyah,
+  adabRpg: NEW.qirraMatch,
+  tajwidTetris: NEW.coverRodaHijaiyah,
+  doaDungeon: NEW.coverRodaHijaiyah,
+  nabiChronicles: NEW.qirraMatch,
+  malaikatMission: NEW.tebakSurahBaru,
   balonMerah: NEW.balonMerah,
   balonBiru: NEW.balonBiru,
   balonKuning: NEW.balonKuning,
@@ -87,6 +107,41 @@ export const NGAJI_CERIA_ASSETS = {
 
   // Characters / Avatar
   avatarAnak: NEW.avatarAnak,
+  // yusuf, aisyah, fatimah, grr, frosty, chibi boy dihilangkan
+
+  // Map buildings & decor (paket ngaji-ceria-aset-game)
+  buildingMasjid: NEW.buildingMasjid,
+  buildingKelas: NEW.buildingKelas,
+  buildingAsrama: NEW.buildingAsrama,
+  buildingPerpus: NEW.buildingPerpus,
+  buildingDapur: NEW.buildingDapur,
+  buildingRumah: NEW.buildingRumah,
+  mapGerbang: NEW.mapGerbang,
+  mapLapangan: NEW.mapLapangan,
+  mapRuangTamu: NEW.mapRuangTamu,
+  mapTaman: NEW.mapTaman,
+  mapMalam: NEW.mapMalam,
+  obstaclePohon: NEW.obstaclePohon,
+
+  // Wudhu steps
+  stepNiat: NEW.stepNiat,
+  stepCuciTangan: NEW.stepCuciTangan,
+  stepBerkumur: NEW.stepBerkumur,
+  stepHirupAir: NEW.stepHirupAir,
+  stepBasuhWajah: NEW.stepBasuhWajah,
+  stepBasuhTangan: NEW.stepBasuhTangan,
+  stepUsapKepala: NEW.stepUsapKepala,
+  stepUsapTelinga: NEW.stepUsapTelinga,
+  stepBasuhKaki: NEW.stepBasuhKaki,
+  stepDoaSelesai: NEW.stepDoaSelesai,
+
+  // Arcade obstacles & effects
+  obstacleBatu: NEW.obstacleBatuRintangan,
+  obstaclePagar: NEW.obstaclePagar,
+  obstacleSemak: NEW.obstacleSemak,
+  obstacleBalok: NEW.obstacleBalokKayu,
+  sparkleBenar: NEW.effectSparkleCorrect,
+  popBalon: NEW.efekPopBalon,
 
   // Badges / Lencana
   lencanaJilid1: NEW.lencanaJilid1,
@@ -110,4 +165,45 @@ export const NGAJI_CERIA_ASSETS = {
   kartuLengkung: NEW.kartuHuruf,
   lenteraPop: NEW.ornamenBulanSabit,
   tebakSurah: NEW.tebakSurahBaru,
+
+  // --- BATTLE & GLYPH UI ---
+  // Characters
+  avatarBoy: NEW.avatarBoy,
+  avatarBoyBattle: NEW.avatarBoyBattle,
+  avatarQirra: NEW.avatarQirra,
+  avatarQirraBattle: NEW.avatarQirraBattle,
+  avatarSafa: NEW.avatarSafa,
+  avatarSafaBattle: NEW.avatarSafaBattle,
+
+  // Monsters
+  monsterGolem: NEW.monsterGolem,
+  monsterPixel: NEW.monsterPixel,
+  monsterSlime: NEW.monsterSlime,
+
+  // UI Glyphs
+  iconCheckMark: NEW.iconCheckMark,
+  iconEnergyPetir: NEW.iconEnergyPetir,
+  iconGearSettings: NEW.iconGearSettings,
+  iconMergeClips: NEW.iconMergeClips,
+  iconPlay: NEW.iconPlay,
+  iconPlayHeadMarker: NEW.iconPlayHeadMarker,
+  iconPowerShield: NEW.iconPowerShield,
+  iconPowerSlowmo: NEW.iconPowerSlowmo,
+  iconRedo: NEW.iconRedo,
+  iconScissors: NEW.iconScissors,
+  iconStop: NEW.iconStop,
+  iconUndo: NEW.iconUndo,
+
+  // Varian & Tema
+  btnArrowDown: NEW.btnArrowDown,
+  btnArrowLeft: NEW.btnArrowLeft,
+  btnArrowRight: NEW.btnArrowRight,
+  btnArrowUp: NEW.btnArrowUp,
+  iconAlkimiaTabung: NEW.iconAlkimiaTabung,
+  iconDetektifKacaPembesar: NEW.iconDetektifKacaPembesar,
+  iconRadarScanner: NEW.iconRadarScanner,
+  tileWordleAbsent: NEW.tileWordleAbsent,
+  tileWordleCorrect: NEW.tileWordleCorrect,
+  tileWordleEmpty: NEW.tileWordleEmpty,
+  tileWordlePresent: NEW.tileWordlePresent,
 };

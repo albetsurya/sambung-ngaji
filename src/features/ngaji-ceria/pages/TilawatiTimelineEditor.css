@@ -33,16 +33,17 @@
 .te-action-label { margin-left: 4px; }
 .te-zoom { display: flex; gap: 8px; align-items: center; font-size: 12px; }
 .te-scroll { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid #334155; border-radius: 8px; background: #0c1220; }
-.te-tracks { position: relative; min-height: 265px; overflow: hidden; }
+.te-tracks { position: relative; min-height: 309px; overflow: hidden; }
 .te-ruler { height: 32px; position: relative; overflow: hidden; border-bottom: 1px solid #334155; cursor: ew-resize; touch-action: none; }
 .te-ruler span { position: absolute; top: 8px; font-size: 11px; color: #94a3b8; border-left: 1px solid #475569; padding-left: 4px; }
 .te-bottom-ruler { position: relative; height: 30px; overflow: hidden; border-top: 1px solid #334155; background: #111827; cursor: ew-resize; touch-action: none; }
 .te-bottom-ruler > span { position: absolute; top: 8px; border-left: 1px solid #475569; padding-left: 4px; color: #64748b; font-size: 9px; }
-.te-bottom-playhead { position: absolute; top: 0; bottom: 0; width: 14px; margin-left: -7px; border-left: 2px solid #f87171; pointer-events: none; }
+.te-bottom-playhead { position: absolute; top: 0; bottom: 0; width: 14px; margin-left: -7px; pointer-events: none; }
+.te-bottom-playhead::after { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #f87171; }
 .te-bottom-playhead span { position: absolute; top: 7px; left: -7px; color: #f87171; font-size: 11px; }
-.te-track-audio { position: relative; height: 118px; overflow: hidden; }
+.te-track-audio { position: relative; height: 162px; overflow: hidden; }
 .te-track-text { position: relative; height: 115px; overflow: hidden; border-top: 1px solid #334155; }
-.te-clip { position: absolute; top: 12px; height: 95px; padding: 10px 14px; border: 1px solid #5b718e; border-radius: 6px; background: #28567c; cursor: grab; overflow: hidden; }
+.te-clip { position: absolute; top: 12px; height: 139px; padding: 10px 14px; border: 1px solid #5b718e; border-radius: 6px; background: #28567c; cursor: grab; overflow: hidden; }
 .te-kind-header { background: #28567c; }
 .te-kind-demo { background: #614286; }
 .te-kind-footer { background: #85562b; }
@@ -51,6 +52,9 @@
 .te-clip-title { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 12px; font-weight: 700; }
 .te-clip small { display: block; font-size: 11px; margin-top: 6px; white-space: nowrap; }
 .te-merge-select { display: flex; gap: 4px; font-size: 10px; margin-top: 6px; }
+.te-wave { display: block; width: 100%; height: 40px; margin-top: 4px; border-radius: 4px; background: rgb(0 0 0 / 28%); pointer-events: none; }
+.te-wave-loading { animation: te-wave-pulse 1.2s ease-in-out infinite; }
+@keyframes te-wave-pulse { 0%, 100% { opacity: .35; } 50% { opacity: .7; } }
 .te-handle { position: absolute; top: 0; bottom: 0; width: 9px; background: #f8fafc; opacity: .9; cursor: ew-resize; touch-action: none; border: 0; z-index: 5; }
 .te-left { left: 0; }.te-right { right: 0; }
 .te-cut-line { position: absolute; width: 8px; margin: 0 0 0 -4px; padding: 0; top: 0; bottom: 0; appearance: none; background: linear-gradient(90deg, transparent 3px, #fbbf24 3px, #fbbf24 5px, transparent 5px); border: 0; cursor: ew-resize; touch-action: none; z-index: 6; }
@@ -60,11 +64,12 @@
 .te-arabic { font-family: "Amiri", "Noto Naskh Arabic", serif; font-size: 18px; }
 .te-text .te-arabic { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .is-selected { outline: 2px solid #fbbf24; outline-offset: -2px; }
-.te-playhead { position: absolute; top: 22px; bottom: 0; width: 16px; margin-left: -8px; border-left: 2px solid #f87171; pointer-events: auto; cursor: ew-resize; touch-action: none; z-index: 8; }
+.te-playhead { position: absolute; top: 22px; bottom: 0; width: 16px; margin-left: -8px; pointer-events: auto; cursor: ew-resize; touch-action: none; z-index: 8; }
+.te-playhead::after { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: #f87171; pointer-events: none; }
 .te-playhead span { position: absolute; top: -12px; left: -7px; color: #f87171; font-size: 12px; }
-.te-drop-end { position: absolute; top: 12px; width: 75px; height: 95px; border: 1px dashed #64748b; padding: 8px; font-size: 12px; color: #94a3b8; }
+.te-drop-end { position: absolute; top: 12px; width: 75px; height: 139px; border: 1px dashed #64748b; padding: 8px; font-size: 12px; color: #94a3b8; }
 .te-time-readout { padding: 10px 0; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; }
-.te-list-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; text-align: left; padding: 10px 8px; border-bottom: 1px solid #334155; background: transparent; color: #cbd5e1; }
+.te-list-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; text-align: left; padding: 10px 8px; border-bottom: 1px solid #334155; background: transparent; color: #cbd5e1; touch-action: pan-y; }
 .te-list-row small { font-size: 11px; max-width: 40%; color: #94a3b8; }.te-list-row:hover { background: #1e293b; }
 .te-inspector label { display: block; font-size: 12px; margin: 12px 0; color: #cbd5e1; }
 .timeline-editor select, .te-inspector input:not([type=checkbox]):not([type=range]), .te-inspector textarea { display: block; width: 100%; color: #e2e8f0; background: #101826; border: 1px solid #475569; border-radius: 6px; padding: 8px; font-size: 12px; margin-top: 5px; }
@@ -72,14 +77,33 @@
 .te-inspector textarea.te-arabic { font-size: 24px; }
 .te-checkbox { display: flex !important; align-items: center; gap: 6px; }
 .te-detail-bar { position: relative; height: 32px; background: #236657; margin: 10px 0; }
-.te-detail-cut { position: absolute; top: 0; bottom: 0; border-left: 2px solid #fbbf24; color: #fbbf24; }
-.te-detail-play { position: absolute; top: 0; bottom: 0; border-left: 2px solid #f87171; }
+.te-detail-cut { position: absolute; top: 0; bottom: 0; width: 18px; margin-left: -9px; color: #fbbf24; text-align: center; pointer-events: none; }
+.te-detail-cut::after { content: ""; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #fbbf24; pointer-events: none; }
+.te-detail-play { position: absolute; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); background: #f87171; pointer-events: none; }
 .timeline-editor input[type=range] { accent-color: #fbbf24; width: 100%; }
 .te-empty { padding: 50px; text-align: center; color: #94a3b8; }
 .te-mobile-toolbar, .te-mobile-close, .te-mobile-scrim { display: none; }
 .te-mobile-assets { display: none; }
-.te-touch-ghost { position: fixed; z-index: 100; max-width: 180px; pointer-events: none; padding: 8px 10px; border: 1px solid #fbbf24; border-radius: 7px; color: #fef3c7; background: #172132; box-shadow: 0 8px 22px rgb(0 0 0 / 45%); font-size: 11px; font-weight: 800; }
-.te-native-drag-image { position: fixed; top: -1000px; left: -1000px; z-index: -1; padding: 8px 10px; border: 1px solid #fbbf24; border-radius: 7px; color: #fef3c7; background: #172132; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.te-drag-ghost { position: fixed; top: -1000px; left: -1000px; z-index: -1; width: 184px; padding: 8px 10px 9px; border: 1px solid rgb(251 191 36 / 65%); border-radius: 10px; color: #fff8ee; background: #172132; box-shadow: 0 10px 26px rgb(0 0 0 / 50%); overflow: hidden; }
+.te-drag-ghost-wave { height: 26px; border-radius: 5px; margin-bottom: 6px; background: repeating-linear-gradient(90deg, rgb(255 255 255 / 60%) 0 2px, transparent 2px 5px), linear-gradient(180deg, rgb(255 255 255 / 14%), rgb(255 255 255 / 4%)); background-color: rgb(0 0 0 / 30%); overflow: hidden; position: relative; }
+.te-drag-ghost-wave::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 28%) 50%, transparent 80%); animation: te-ghost-shimmer 1400ms ease-in-out infinite; }
+.te-drag-ghost-body strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 800; }
+.te-drag-ghost-body small { display: block; margin-top: 2px; color: #cbd5e1; font-size: 10px; font-variant-numeric: tabular-nums; }
+.te-drag-ghost-badge { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #fbbf24; color: #111827; font-size: 11px; font-weight: 900; }
+.te-drag-ghost.is-touch { z-index: 100; pointer-events: none; transform: rotate(-2deg); transform-origin: 20% 20%; box-shadow: 0 18px 44px rgb(0 0 0 / 60%); animation: te-ghost-pickup 180ms cubic-bezier(.2,.8,.3,1.2); }
+.te-drag-ghost.is-follow { z-index: 100; pointer-events: none; transform: rotate(-2deg); transform-origin: center; box-shadow: 0 18px 44px rgb(0 0 0 / 60%); animation: te-ghost-pickup 180ms cubic-bezier(.2,.8,.3,1.2); }
+@media (pointer: coarse) {
+  .te-drag-ghost { width: 160px; }
+}
+.te-drag-ghost.te-kind-header { background: #28567c; }
+.te-drag-ghost.te-kind-demo { background: #614286; }
+.te-drag-ghost.te-kind-footer { background: #85562b; }
+.te-drag-ghost.te-kind-baris { background: #236657; }
+.te-drag-ghost.te-kind-isi { background: #28567c; }
+@keyframes te-ghost-pickup { from { opacity: 0; transform: rotate(-2deg) scale(0.7); } to { opacity: 1; transform: rotate(-2deg) scale(1); } }
+@keyframes te-ghost-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.te-just-dropped { animation: te-just-dropped 600ms cubic-bezier(.2,.8,.3,1.15) !important; }
+@keyframes te-just-dropped { 0% { transform: scale(0.96); filter: brightness(1.35); } 55% { transform: scale(1.02); } 100% { transform: scale(1); filter: none; } }
 .te-touch-drop { outline: 2px solid #fbbf24 !important; outline-offset: -2px; }
 @media (max-width: 1100px) { .te-workspace { grid-template-columns: 210px minmax(0, 1fr); }.te-inspector { grid-column: 1 / -1; max-height: none; border-top: 1px solid #334155; }.te-header { padding: 12px; } }
 @media (max-width: 650px) {
@@ -108,9 +132,9 @@
   .te-scroll { border-radius: 7px; -webkit-overflow-scrolling: touch; }
   .te-ruler { height: 38px; }
   .te-ruler span { top: 12px; font-size: 10px; }
-  .te-track-audio { height: 106px; }
+  .te-track-audio { height: 150px; }
   .te-track-text { height: 105px; }
-  .te-clip { top: 10px; height: 86px; padding: 8px 12px; }
+  .te-clip { top: 10px; height: 130px; padding: 8px 12px; }
   .te-clip small { margin-top: 4px; }
   .te-linked-texts { min-height: 74px; max-height: 100px; }
   .te-playhead { top: 26px; }

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { ChevronRight, KeyRound } from "./FontAwesomeIcons";
 import type { Role } from "../../types";
 import { ROLE_LABEL } from "../../hooks/usePermission";
@@ -51,12 +51,14 @@ export function ListRow({
   leading,
   insetDivider = true,
   className = "",
+  style,
 }: {
   children: ReactNode;
   onClick?: () => void;
   leading?: ReactNode;
   insetDivider?: boolean;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <div
@@ -68,6 +70,7 @@ export function ListRow({
             }
           : undefined
       }
+      style={style}
       className={`flex items-center gap-3 min-h-[52px] px-4 py-3 ${
         insetDivider ? "ios-list-divider" : ""
       } ${
