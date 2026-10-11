@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { DailyMissionsCard } from "../components/DailyMissionsCard";
+import { CeriaGameLoading } from "../components/CeriaGameLoading";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { useNgajiCeriaProgress } from "../hooks/useNgajiCeriaProgress";
 import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
@@ -21,6 +22,17 @@ import {
 export default function NgajiCeriaHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(() => {
+    // Tampilkan loading splash sekali per sesi tab saat memasuki Ngaji Ceria
+    const hasLoadedThisSession = sessionStorage.getItem("ngaji_ceria_splash_loaded");
+    return !hasLoadedThisSession;
+  });
+
+  const handleLoaded = () => {
+    sessionStorage.setItem("ngaji_ceria_splash_loaded", "true");
+    setIsLoading(false);
+  };
+
   const displayName = user?.name ? user.name.split(" ")[0] : "Hamba Allah";
   const { currentJilid, currentPage, progressPercentage } = useNgajiCeriaProgress();
   const { currentStreak, streakDays } = useNgajiCeriaStreak();
@@ -34,9 +46,11 @@ export default function NgajiCeriaHomePage() {
   const activeDays = days.map(([label, dayIndex]) => ({ label, active: streakDays[dayIndex] }));
 
   return (
-    <NgajiCeriaLayout title="Ngaji Ceria">
-      <div className="px-4 py-4 space-y-5 bg-[#FFF8EE] min-h-full rounded-t-3xl">
-        {/* User Greeting Section */}
+    <>
+      {isLoading && <CeriaGameLoading onLoaded={handleLoaded} />}
+      <NgajiCeriaLayout title="Ngaji Ceria">
+        <div className={`px-4 py-4 space-y-5 bg-[#FFF8EE] min-h-full rounded-t-3xl transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+          {/* User Greeting Section */}
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[11px] font-bold text-[#8C5A3A]">
@@ -212,5 +226,6 @@ export default function NgajiCeriaHomePage() {
         </section>
       </div>
     </NgajiCeriaLayout>
+    </>
   );
 }

@@ -73,7 +73,7 @@ const QUICK_ITEMS: QuickItem[] = [
     key: "jurnal",
     label: "Jurnal",
     Icon: CalendarCheck,
-    to: "/member/sholat-jurnal",
+    to: "/member/ibadah",
     tone: "accent",
   },
   {
