@@ -76,7 +76,7 @@ export default function MemberTahfidzPage() {
       <Header
         title="Tahfidz"
         subtitle="Hafalan Al-Quran pribadi"
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={

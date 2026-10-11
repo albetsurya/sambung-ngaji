@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { ScrollToTop } from "./components/layout/ScrollToTop";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -12,6 +12,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { LoadingScreen } from "./components/ui";
 import { useBackgroundSync } from "./features/member/hooks/useBackgroundSync";
 import { PwaUpdatePrompt } from "./components/ui/PwaUpdatePrompt";
+import { WelcomeOnboarding } from "./components/layout/WelcomeOnboarding";
 import { setRetryNotifier } from "./services/api";
 function ApiRetryWire() {
   const { showToast } = useToast();
@@ -294,9 +295,14 @@ function PageFallback() {
 }
 function HomeRoute() {
   const { user, loading } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem("sambung_ngaji_onboarded");
+  });
+
   if (loading) return <PageFallback />;
-  // Langsung tampilkan landing page saat loading, biarkan PageFallback/Suspense
-  // yang lain menghandle loading di route dalam (jika perlu).
+  if (showOnboarding) {
+    return <WelcomeOnboarding onFinish={() => setShowOnboarding(false)} />;
+  }
   if (!user) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
   if (user.role === "TIM_KU") return <Navigate to="/finance/ledger" replace />;
@@ -329,6 +335,14 @@ function AppRoutes() {
         <Route path="/daftar/*" element={<PrefixRedirect from="/daftar" to="/register" />} />
         <Route
           path="/member"
+          element={
+            <PersonalRoute>
+              <MemberHomePage />
+            </PersonalRoute>
+          }
+        />
+        <Route
+          path="/member/home"
           element={
             <PersonalRoute>
               <MemberHomePage />
@@ -705,15 +719,15 @@ function AppRoutes() {
         <Route
           path="/member/tahfidz"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberTahfidzPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
           path="/member/jadwal"
           element={
-            <MemberRoute allowGuest>
+            <MemberRoute>
               <MemberSchedulePage />
             </MemberRoute>
           }
@@ -721,7 +735,7 @@ function AppRoutes() {
         <Route
           path="/member/petugas-jumat"
           element={
-            <MemberRoute allowGuest>
+            <MemberRoute>
               <MemberFridayPage />
             </MemberRoute>
           }
@@ -729,9 +743,9 @@ function AppRoutes() {
         <Route
           path="/member/tahfidz/surah/:nomor"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberTahfidzSurahPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route
@@ -743,12 +757,16 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/member/sholat-jurnal"
+          path="/member/ibadah"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberSholatJournalPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
+        />
+        <Route
+          path="/member/sholat-jurnal"
+          element={<Navigate to="/member/ibadah" replace />}
         />
         <Route
           path="/member/mood"
@@ -777,9 +795,9 @@ function AppRoutes() {
         <Route
           path="/member/quran/bookmark"
           element={
-            <PersonalRoute>
+            <MemberRoute allowGuest>
               <MemberQuranBookmarkPage />
-            </PersonalRoute>
+            </MemberRoute>
           }
         />
         <Route

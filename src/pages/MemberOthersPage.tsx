@@ -97,7 +97,7 @@ export default function MemberOthersPage() {
       label: "Jurnal Sholat",
       description: "Tracker 5 waktu + streak",
       Icon: ClipboardList,
-      to: "/member/sholat-jurnal",
+      to: "/member/ibadah",
       group: "data",
     },
     {

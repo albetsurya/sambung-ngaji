@@ -74,7 +74,7 @@ export default function MemberSholatJournalPage() {
       <Header
         title="Jurnal Sholat"
         subtitle={formatDateId(today)}
-        onBack={() => goBack(navigate, "/member")}
+        onBack={() => goBack(navigate, "/")}
         backLabel="Kembali"
         showSyncButton={false}
         right={

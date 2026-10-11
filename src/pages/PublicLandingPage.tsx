@@ -1,69 +1,54 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import {
-  Calendar,
-  Mosque,
   BookOpen,
   RefreshCw,
   Compass,
   CalendarCheck,
+  ClipboardList,
+  CloudRain,
+  CircleAlert,
+  GraduationCap,
   Heart,
+  Moon,
+  Mosque,
+  ScrollText,
   Sparkles,
   Info,
   ArrowRight,
   ChevronRight,
 } from "../components/ui/FontAwesomeIcons";
-import { Card } from "../components/ui";
-import { MasukButton } from "../components/ui";
 import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
-import { meetingApi } from "../services/domainApi";
-import { formatDateLongText } from "../utils/format";
 import { MOOD_LIST } from "../features/ai-chat/data/mood";
 
 const FEATURES = [
-  { label: "Jadwal", desc: "Pengajian", Icon: Calendar, to: "/member/jadwal" },
-  { label: "Petugas Jumat", desc: "Info", Icon: Mosque, to: "/member/petugas-jumat" },
+  { label: "Ngaji Ceria", desc: "Tilawati", Icon: GraduationCap, to: "/member/ngaji-ceria" },
+  { label: "Quran", desc: "Baca", Icon: BookOpen, to: "/member/quran" },
   { label: "Sholat", desc: "Waktu", Icon: CalendarCheck, to: "/member/prayer" },
+  { label: "Jurnal Sholat", desc: "Catatan", Icon: ClipboardList, to: "/member/ibadah" },
+  { label: "Jurnal Tahfidz", desc: "Hafalan", Icon: ScrollText, to: "/member/tahfidz" },
   { label: "Doa", desc: "Harian", Icon: Heart, to: "/member/doa" },
   { label: "Dzikir", desc: "Counter", Icon: RefreshCw, to: "/member/dzikir" },
-  { label: "Quran", desc: "Baca", Icon: BookOpen, to: "/member/quran" },
   { label: "Kiblat", desc: "Arah", Icon: Compass, to: "/member/kiblat" },
   { label: "Puasa", desc: "Sunnah", Icon: Sparkles, to: "/member/puasa" },
   { label: "Panduan", desc: "Bantuan", Icon: Info, to: "/member/panduan" },
 ];
 
 const MOOD_TEASER_KEYS = ["sedih", "cemas", "syukur", "lelah", "tenang"];
-
-function todayIso(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+const MOOD_ICONS: Record<string, typeof Heart> = {
+  sedih: CloudRain,
+  cemas: CircleAlert,
+  syukur: Heart,
+  lelah: Moon,
+  tenang: Compass,
+};
+const MOODS = MOOD_TEASER_KEYS.map((key) =>
+  MOOD_LIST.find((mood) => mood.key === key),
+).filter(
+  (mood): mood is (typeof MOOD_LIST)[number] => !!mood,
+);
 
 export default function PublicLandingPage() {
   const navigate = useNavigate();
-
-  const { data: meetings = [] } = useQuery({
-    queryKey: ["public-meetings"],
-    queryFn: () => meetingApi.list().catch(() => []),
-    staleTime: 5 * 60_000,
-  });
-
-  const upcoming = useMemo(() => {
-    const t = todayIso();
-    return meetings
-      .filter((m) => m.date >= t && m.status !== "LIBUR")
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 3);
-  }, [meetings]);
-
-  const moods = useMemo(
-    () =>
-      MOOD_TEASER_KEYS.map((k) => MOOD_LIST.find((m) => m.key === k)).filter(
-        (m): m is (typeof MOOD_LIST)[number] => !!m,
-      ),
-    [],
-  );
 
   return (
     <div className="app-shell min-h-screen bg-surface-bg flex flex-col">
@@ -82,8 +67,18 @@ export default function PublicLandingPage() {
             </span>
           </button>
           <div className="flex items-center gap-1.5 shrink-0">
-            <MasukButton />
-            <MasukButton variant="secondary" />
+            <button
+              onClick={() => navigate("/login?intent=member")}
+              className="h-8 px-3 rounded-xl bg-accent text-white text-[13px] font-semibold whitespace-nowrap transition-all active:scale-[0.97]"
+            >
+              Member
+            </button>
+            <button
+              onClick={() => navigate("/login?intent=ceria")}
+              className="h-8 px-3 rounded-xl border border-surface-border bg-surface-card text-surface-text text-[13px] font-semibold whitespace-nowrap transition-all hover:bg-surface-card2 active:scale-[0.97]"
+            >
+              Ngaji Ceria
+            </button>
           </div>
         </div>
       </header>
@@ -103,14 +98,19 @@ export default function PublicLandingPage() {
             Ketuk satu, dapatkan ayat dan doa penguatnya
           </p>
           <div className="flex items-center justify-between gap-1">
-            {moods.map((m) => (
+            {MOODS.map((m) => (
               <button
                 key={m.key}
                 onClick={() => navigate("/member/mood")}
                 className="flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all active:scale-90 hover:bg-surface-card2"
                 aria-label={m.label}
               >
-                <span className="text-[26px] leading-none">{m.emoji}</span>
+                <span className="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center">
+                  {(() => {
+                    const MoodIcon = MOOD_ICONS[m.key] ?? Heart;
+                    return <MoodIcon size={18} />;
+                  })()}
+                </span>
                 <span className="text-[10px] text-surface-muted font-medium">
                   {m.label}
                 </span>
@@ -127,44 +127,6 @@ export default function PublicLandingPage() {
         </div>
       </div>
 
-      
-      {upcoming.length > 0 && (
-        <div className="px-4 pt-4">
-          <div className="flex items-center justify-between mb-2 px-0.5">
-            <p className="text-ios-footnote font-medium text-surface-muted">
-              Pengajian terdekat
-            </p>
-            <button
-              onClick={() => navigate("/member/jadwal")}
-              className="text-ios-footnote font-semibold text-accent transition-all active:scale-95"
-            >
-              Semua
-            </button>
-          </div>
-          <div className="space-y-2">
-            {upcoming.map((m) => (
-              <Card key={m.meeting_id} className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-accent-soft flex flex-col items-center justify-center flex-shrink-0">
-                  <span className="text-ios-subhead font-bold text-accent leading-none tabular-nums">
-                    {new Date(m.date).getDate()}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-ios-subhead text-surface-text truncate">
-                    {m.event || "Pengajian"}
-                  </p>
-                  <p className="text-ios-caption text-surface-muted truncate">
-                    {m.day} · {formatDateLongText(m.date)}
-                    {m.time ? ` · ${m.time}` : ""}
-                  </p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      
       <div className="px-4 py-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Fitur umum
@@ -194,10 +156,10 @@ export default function PublicLandingPage() {
           })}
         </div>
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/login?intent=member")}
           className="w-full mt-4 rounded-2xl border border-accent/30 bg-accent-soft p-3.5 flex items-center justify-center gap-2 text-ios-body font-semibold text-accent transition-all active:scale-[0.99]"
         >
-          Masuk untuk absensi dan data pribadi
+          Masuk sebagai Member Jamaah
           <ArrowRight size={16} />
         </button>
         <p className="text-ios-caption text-surface-muted text-center pt-4 pb-3">
