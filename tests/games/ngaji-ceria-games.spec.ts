@@ -233,7 +233,7 @@ test("Match Arena menyelesaikan papan dan bisa mengulang", async ({ page }) => {
     await page.waitForTimeout(900);
   }
   await expect(page.getByRole("dialog", { name: "Papan Selesai!" })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => localStorage.getItem("ngajiceria:best:hijaiyah-match-arena:solo"))).not.toBeNull();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("ngajiceria:best:test-super_admin:hijaiyah-match-arena:solo"))).not.toBeNull();
   await page.getByRole("button", { name: "Main Lagi", exact: true }).click();
   await expect(page.locator('[data-game-phase="playing"]')).toBeVisible();
   noErrors();

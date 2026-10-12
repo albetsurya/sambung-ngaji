@@ -517,6 +517,18 @@ export default defineConfig({
       ],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,glb,woff2,webmanifest}"],
+        // Game engines, 3D models, and spreadsheet/PDF vendors are loaded on
+        // demand. Precaching them makes the first PWA install unnecessarily
+        // large and slows updates for users who only use the member module.
+        globIgnores: [
+          "**/*.glb",
+          "**/HarakatRushPage-*.js",
+          "**/BattleScene-*.js",
+          "**/vendor-excel-*.js",
+          "**/vendor-pdf-*.js",
+          "**/tilawatiQuizData-*.js",
+          "**/tilawatiQuizJilid1-*.js",
+        ],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/],
         cleanupOutdatedCaches: true,

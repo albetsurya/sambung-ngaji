@@ -481,19 +481,43 @@ export async function callREST<T>(
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-  });
-
-  const json: ApiResponse<T> = await res.json();
-  if (!json.success) {
-    throw new ApiError(json.message || "REST Request failed", undefined, {
-      statusCode: res.status,
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+      signal: controller.signal,
     });
+
+    let json: ApiResponse<T>;
+    try {
+      json = await res.json();
+    } catch {
+      throw new ApiError("Response server tidak valid", undefined, {
+        retryable: res.status >= 500,
+        statusCode: res.status,
+      });
+    }
+    if (!res.ok || !json.success) {
+      throw new ApiError(json.message || `REST request gagal (${res.status})`, undefined, {
+        statusCode: res.status,
+      });
+    }
+    return json.data;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError(`Request timeout setelah ${REQUEST_TIMEOUT_MS / 1000} detik`, undefined, {
+        retryable: true,
+      });
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
   }
-  return json.data;
 }
 
 export default {

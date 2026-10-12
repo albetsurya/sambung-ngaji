@@ -225,7 +225,10 @@ export default function MemberHomePage() {
 
         <section>
           <button
-            onClick={() => navigate("/member/ngaji-ceria")}
+            onClick={() => {
+              sessionStorage.setItem("trigger_ngaji_ceria_splash", "true");
+              navigate("/member/ngaji-ceria");
+            }}
             className="w-full text-left bg-surface-card border border-surface-border rounded-3xl p-4 flex items-center gap-3 transition-all active:scale-[0.98] shadow-sm"
           >
             <span className="w-11 h-11 rounded-2xl bg-accent-soft flex items-center justify-center flex-shrink-0">
@@ -367,7 +370,7 @@ function SchedulePreviewCard({
     return { from: isoDate(from), to: isoDate(to) };
   }, []);
 
-  const { data: meetings = [], isLoading } = useQuery({
+  const { data: meetings = [], isLoading, error, refetch } = useQuery({
     queryKey: ["member-schedule", range],
     queryFn: () => meetingApi.list({ from: range.from, to: range.to }),
     staleTime: 2 * 60_000,
@@ -389,6 +392,20 @@ function SchedulePreviewCard({
   }, [meetings, userKategori]);
 
   if (isLoading) return <MeetingCardSkeleton />;
+
+  if (error) {
+    return (
+      <button
+        type="button"
+        onClick={() => void refetch()}
+        className="w-full rounded-3xl border border-danger/20 bg-danger-soft/40 p-4 text-left transition-all active:scale-[0.98]"
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-danger/80">Jadwal Pengajian</p>
+        <p className="mt-1 text-ios-body font-medium text-surface-text">Jadwal belum dapat dimuat</p>
+        <p className="mt-0.5 text-ios-caption text-danger">Ketuk untuk mencoba lagi</p>
+      </button>
+    );
+  }
 
   return (
     <button

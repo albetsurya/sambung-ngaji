@@ -241,11 +241,11 @@ export function AppLayout({
 
       {showFloating &&
         createPortal(
-          <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe pointer-events-none">
+          <div className="fixed bottom-0 left-0 right-0 md:left-64 z-40 pb-safe">
             <div
               className={`app-shell floating-dock px-3 md:px-8 ${containerPadding} flex flex-col items-end md:justify-start gap-2.5 md:gap-3 md:flex-row-reverse md:items-center`}
             >
-              <div className="md:hidden flex flex-col items-end gap-2.5">
+              <div className="md:hidden flex flex-col items-end gap-2.5 pointer-events-auto">
                 {showAiChatFab && (
                   <div className="pointer-events-auto">
                     <FloatingActionButton

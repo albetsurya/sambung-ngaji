@@ -5,6 +5,7 @@ import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { ChevronRight, Sparkles, Star, Lock, Play } from "../../../components/ui/FontAwesomeIcons";
 import { LoginPromptModal } from "../components/LoginPromptModal";
 import { useJilidAccess } from "../components/GameLockGuard";
+import { useNgajiCeriaStore } from "../hooks/useNgajiCeriaStore";
 
 interface QuizBookProps {
   id: string;
@@ -142,6 +143,7 @@ function QuizBookEntry({ onOpen, onLocked, ...book }: {
 export default function NgajiCeriaQuizListPage() {
   const navigate = useNavigate();
   const [promptOpen, setPromptOpen] = useState(false);
+  const starsByPage = useNgajiCeriaStore((state) => state.stars);
 
   const quizBooks = [
     {
@@ -257,6 +259,12 @@ export default function NgajiCeriaQuizListPage() {
               <div key={book.id} className="pt-4 first:pt-0">
                 <QuizBookEntry
                   {...book}
+                  completedQuestions={book.jilid > 0
+                    ? Math.min(book.totalQuestions, Object.entries(starsByPage).filter(([key, stars]) => key.startsWith(`jilid-${book.jilid}-hal-`) && stars > 0).length)
+                    : 0}
+                  stars={book.jilid > 0
+                    ? Math.max(0, ...Object.entries(starsByPage).filter(([key, stars]) => key.startsWith(`jilid-${book.jilid}-hal-`) && stars > 0).map(([, stars]) => stars))
+                    : 0}
                   onOpen={() => navigate(`/member/ngaji-ceria/quiz/play?jilid=${book.jilid}&hal=1`)}
                   onLocked={() => setPromptOpen(true)}
                 />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { GamePhase } from "./types";
-import { getNgajiActivity, hydrateActivity, recordActivity } from "../../../hooks/useNgajiCeriaStore";
+import { getNgajiActivity, getNgajiCeriaScope, hydrateActivity, recordActivity } from "../../../hooks/useNgajiCeriaStore";
 import { activityDate } from "../../../utils/activityDate";
 import { getToken } from "../../../../../services/api";
 import { isNgajiCeriaServerAvailable, ngajiCeriaApi, type ServerNgajiProgress, type ServerProgressEvent } from "../../../services/ngajiCeriaApi";
@@ -34,6 +34,7 @@ export interface PendingReward {
 const REWARD_EVENT = "ngajiceria:reward-queued";
 const PENDING_EVENTS_KEY = "ngajiceria:progress-events:v1";
 let fallbackPendingEvents: ServerProgressEvent[] | null = null;
+let fallbackPendingScope = "";
 const rewardQueue: PendingReward[] = [];
 let rewardSeq = 0;
 
@@ -96,6 +97,7 @@ export const LEADERBOARD_GAME_IDS = ["ayat-hunter", "doa-dungeon", "nabi-chronic
 
 const emptyDaily = (): DailyProgress => ({ date: activityDate(), gamesPlayed: 0, totalScore: 0, claimedMissions: [] });
 let fallbackProgress: GameProgress | null = null;
+let fallbackProgressScope = "";
 const DEFAULT_ENTRIES = [
   { name: "Alya", score: 760 },
   { name: "Rafi", score: 540 },
@@ -105,10 +107,16 @@ const DEFAULT_ENTRIES = [
 function progressEvent() { window.dispatchEvent(new CustomEvent(PROGRESS_EVENT)); }
 function leaderboardEvent() { window.dispatchEvent(new CustomEvent(LEADERBOARD_EVENT)); }
 
+function scopedKey(base: string): string {
+  const scope = getNgajiCeriaScope();
+  return scope === "guest" ? base : `${base}:${encodeURIComponent(scope)}`;
+}
+
 export function getProgress(): GameProgress {
-  let parsed: Partial<GameProgress> | null = fallbackProgress;
+  const scope = getNgajiCeriaScope();
+  let parsed: Partial<GameProgress> | null = fallbackProgressScope === scope ? fallbackProgress : null;
   try {
-    if (!parsed) parsed = JSON.parse(window.localStorage.getItem(PROGRESS_KEY) ?? "null");
+    if (!parsed) parsed = JSON.parse(window.localStorage.getItem(scopedKey(PROGRESS_KEY)) ?? "null");
   } catch { /* Storage tidak tersedia; gunakan saldo sesi. */ }
   const daily = parsed?.daily?.date === activityDate() ? parsed.daily : emptyDaily();
   return {
@@ -135,10 +143,15 @@ function stringList(value: unknown): string[] {
 }
 
 export function saveProgress(progress: GameProgress): void {
+  const scope = getNgajiCeriaScope();
   try {
-    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    window.localStorage.setItem(scopedKey(PROGRESS_KEY), JSON.stringify(progress));
     fallbackProgress = null;
-  } catch { fallbackProgress = progress; }
+    fallbackProgressScope = scope;
+  } catch {
+    fallbackProgress = progress;
+    fallbackProgressScope = scope;
+  }
   progressEvent();
 }
 
@@ -166,16 +179,21 @@ export function applyServerProgress(server: ServerNgajiProgress): GameProgress {
 }
 
 function readPendingEvents(): ServerProgressEvent[] {
-  if (fallbackPendingEvents) return fallbackPendingEvents;
+  const scope = getNgajiCeriaScope();
+  if (fallbackPendingEvents && fallbackPendingScope === scope) return fallbackPendingEvents;
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(PENDING_EVENTS_KEY) ?? "[]") as ServerProgressEvent[];
+    const parsed = JSON.parse(window.localStorage.getItem(scopedKey(PENDING_EVENTS_KEY)) ?? "[]") as ServerProgressEvent[];
     return Array.isArray(parsed) ? parsed : [];
-  } catch { return []; }
+  } catch {
+    fallbackPendingScope = scope;
+    return [];
+  }
 }
 
 function writePendingEvents(events: ServerProgressEvent[]): void {
-  try { window.localStorage.setItem(PENDING_EVENTS_KEY, JSON.stringify(events)); fallbackPendingEvents = null; }
-  catch { fallbackPendingEvents = events; }
+  const scope = getNgajiCeriaScope();
+  try { window.localStorage.setItem(scopedKey(PENDING_EVENTS_KEY), JSON.stringify(events)); fallbackPendingEvents = null; }
+  catch { fallbackPendingEvents = events; fallbackPendingScope = scope; }
 }
 
 function queueProgressEvent(event: ServerProgressEvent): void {
@@ -267,7 +285,12 @@ export function awardProgress(gameId: string, score: number, baseXp: number, ach
   return next;
 }
 
-function leaderboardKey(gameId: string) { return `ngajiceria:leaderboard:${gameId}:v1`; }
+function leaderboardKey(gameId: string) {
+  const scope = getNgajiCeriaScope();
+  return scope === "guest"
+    ? `ngajiceria:leaderboard:${gameId}:v1`
+    : `ngajiceria:leaderboard:${encodeURIComponent(scope)}:${gameId}:v1`;
+}
 
 export function getLeaderboard(gameId: string): LeaderboardEntry[] {
   try {

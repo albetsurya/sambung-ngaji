@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { API_BASE_URL } from "../constants";
 import type { ApiResponse } from "../types";
 import { ApiError, getToken } from "./api";
@@ -10,6 +10,7 @@ const baseURL = API_BASE_URL.endsWith("/api")
 export const apiClient = axios.create({
   baseURL,
   timeout: 45000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +18,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = getToken();
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -53,8 +54,8 @@ export async function restGet<T>(
   return res.data.data;
 }
 
-export async function restPost<T>(url: string, data?: any): Promise<T> {
-  const res = await apiClient.post<ApiResponse<T>>(url, data);
+export async function restPost<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  const res = await apiClient.post<ApiResponse<T>>(url, data, config);
   return res.data.data;
 }
 

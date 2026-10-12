@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Cemas</title>
+  <defs>
+    <clipPath id="cemas-c"><rect width="512" height="512" rx="116"/></clipPath>
+    <linearGradient id="cemas-bg" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#3B3FC4"/>
+      <stop offset="1" stop-color="#1B1F6B"/>
+    </linearGradient>
+    <linearGradient id="cemas-sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cemas-w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D8D4FF"/>
+    </linearGradient>
+    <linearGradient id="cemas-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="1" stop-color="#FFC247"/>
+    </linearGradient>
+    <filter id="cemas-s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0A0C40" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#cemas-c)">
+    <rect width="512" height="512" fill="url(#cemas-bg)"/>
+    <circle cx="132" cy="132" r="5" fill="#fff" opacity="0.7"/>
+    <g transform="translate(-14 8)">
+      <path transform="translate(2 -6)" d="M314 179 A100 100 0 1 0 314 333 A85 85 0 0 1 314 179Z" fill="url(#cemas-w)" filter="url(#cemas-s)"/>
+      <path d="M374 140 Q374 170 404 170 Q374 170 374 200 Q374 170 344 170 Q374 170 374 140Z" fill="url(#cemas-gold)" stroke="url(#cemas-gold)" stroke-width="8" stroke-linejoin="round"/>
+      <circle cx="392" cy="276" r="8" fill="url(#cemas-gold)"/>
+    </g>
+    <rect width="512" height="512" fill="url(#cemas-sheen)"/>
+  </g>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#fff" stroke-opacity="0.16" stroke-width="3"/>
+</svg>

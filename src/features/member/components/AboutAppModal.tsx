@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Modal } from "../../../components/ui";
+import { AppLogoIcon } from "../../../components/ui/AppLogoIcon";
 import {
-  Landmark,
   Users,
   CalendarCheck,
   Heart,
@@ -26,9 +26,7 @@ export function AboutAppModal({ open, onClose }: AboutAppModalProps) {
   return (
     <Modal open={open} onClose={onClose} title="Tentang Aplikasi">
       <div className="flex flex-col items-center text-center mb-6">
-        <div className="w-20 h-20 rounded-3xl bg-accent flex items-center justify-center shadow-lg shadow-accent/30 mb-4">
-          <Landmark size={40} className="text-white" />
-        </div>
+        <AppLogoIcon size={80} className="rounded-3xl shadow-lg shadow-accent/30 mb-4" />
         <h3 className="text-[20px] font-bold text-surface-text mb-1 tracking-[-0.02em]">
           Sambung Ngaji
         </h3>

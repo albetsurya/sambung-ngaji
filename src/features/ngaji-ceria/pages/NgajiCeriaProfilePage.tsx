@@ -9,6 +9,8 @@ import { Home, LogOut, User } from "../../../components/ui/FontAwesomeIcons";
 import { ModalPanel } from "./games/_shared/ModalPanel";
 import { useNgajiCeriaStore } from "../hooks/useNgajiCeriaStore";
 import { getTilawatiDataset } from "../data/tilawatiPageDatasets";
+import { Avatar } from "../../../components/ui";
+import { normalizeGender } from "../../../utils/format";
 import "./games/_shared/games.css";
 
 /**
@@ -46,14 +48,19 @@ export default function NgajiCeriaProfilePage() {
     }
   };
 
+  const leaveModulePath = user?.member_id ? "/member" : "/";
+
   return <NgajiCeriaLayout title="Profil Santri" showBack onBack={() => navigate("/member/ngaji-ceria")}>
     <div className="space-y-4 rounded-t-3xl bg-[#FBF8F1] px-4 py-4">
       {/* Kartu Identitas Santri */}
       <section aria-label="Kartu identitas santri" className="rounded-3xl border-2 border-[#E2D4C0] bg-white p-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-3xl border-[3px] border-white bg-[#FFF6D5] shadow-md">
-            <img src={NGAJI_CERIA_ASSETS.avatarAnak} alt={`Avatar ${displayName}`} draggable={false} className="h-full w-full object-contain" />
-          </div>
+          <Avatar
+            src={user?.photo_url}
+            name={displayName}
+            size={80}
+            gender={normalizeGender(user?.gender)}
+          />
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-display text-lg font-black text-[#5A3A2A]">{displayName}</h2>
             <p className="truncate text-xs font-bold text-[#8C7A68]">
@@ -118,14 +125,16 @@ export default function NgajiCeriaProfilePage() {
 
       {/* Pengaturan & Sesi */}
       <section aria-label="Pengaturan dan sesi" className="space-y-2">
-        <button type="button" onClick={() => navigate("/member")}
+        <button type="button" onClick={() => navigate(leaveModulePath)}
           className="flex w-full items-center gap-3 rounded-2xl border-2 border-[#E2D4C0] bg-white p-3 text-left transition hover:bg-[#FFF6EA] active:scale-[0.99]">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4FF] text-[#2E7CC2]">
             <Home size={18} />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-black text-[#5A3A2A]">Keluar Modul</span>
-            <span className="block truncate text-xs font-bold text-[#8C7A68]">Kembali ke beranda anggota</span>
+            <span className="block truncate text-xs font-bold text-[#8C7A68]">
+              {user?.member_id ? "Kembali ke beranda anggota" : "Kembali ke halaman utama"}
+            </span>
           </span>
         </button>
         {user ? (

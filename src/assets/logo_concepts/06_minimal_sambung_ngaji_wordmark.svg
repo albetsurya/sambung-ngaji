@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1CCAA8"/><stop offset="1" stop-color="#3178F6"/></linearGradient></defs>
+  <rect width="900" height="260" rx="34" fill="#FFFFFF"/>
+  <rect x="30" y="30" width="200" height="200" rx="48" fill="#101827"/>
+  <path d="M159 70c-17-14-37-21-60-21-45 0-77 27-77 65 0 34 26 50 72 62 30 7 42 15 42 29 0 15-15 25-37 25-24 0-46-10-64-28l-31 34c24 25 56 38 94 38 50 0 85-27 85-69 0-36-26-54-74-66-29-7-40-13-40-25 0-12 12-20 31-20 18 0 34 6 48 18z" fill="url(#g)" transform="translate(43 13) scale(.78)"/>
+  <text x="270" y="125" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="750" fill="#101827">Sambung Ngaji</text>
+  <text x="273" y="171" font-family="Inter, Arial, sans-serif" font-size="23" letter-spacing="3" fill="#687786">BELAJAR • TERHUBUNG • BERTUMBUH</text>
+</svg>

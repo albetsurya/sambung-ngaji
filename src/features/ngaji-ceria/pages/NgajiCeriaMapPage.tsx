@@ -15,6 +15,7 @@ export default function NgajiCeriaMapPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [promptOpen, setPromptOpen] = useState(false);
+  const [progressionLockOpen, setProgressionLockOpen] = useState(false);
   const { user } = useAuth();
   const tier = tierForRole(user?.role);
   const stars = useNgajiCeriaStore((state: NgajiCeriaState) => state.stars);
@@ -74,14 +75,22 @@ export default function NgajiCeriaMapPage() {
         <div className="pointer-events-none absolute inset-y-8 left-1/2 w-1 -translate-x-1/2 border-r-4 border-dashed border-[#E2D4C0]" />
         {nodes.map((node, index) => <div key={node.pageNumber} className={`relative z-10 flex flex-col items-center ${alignments[index % alignments.length]}`}>
           {node.status === "active" && <div className="absolute -top-10 z-20 flex animate-bounce flex-col items-center"><div className="h-10 w-10 overflow-hidden rounded-full border-2 border-white bg-[#FFCB45] p-0.5 shadow-md"><img src={NGAJI_CERIA_ASSETS.avatarAnak} alt="Avatar" className="h-full w-full object-cover" /></div><div className="-mt-1 h-2 w-2 rotate-45 bg-[#5A3A2A]" /></div>}
-          <button type="button" onClick={() => node.status === "locked" ? setPromptOpen(true) : navigate(`/member/ngaji-ceria/quiz/play?jilid=${jilid}&hal=${node.pageNumber}`)} className={`relative flex h-20 w-20 flex-col items-center justify-center rounded-full border-4 shadow-md transition-all active:scale-95 ${node.status === "completed" ? "border-[#E29A12] bg-[#FFCB45] text-[#5A3A2A]" : node.status === "active" ? "animate-pulse border-[#C4430E] bg-[#F58A3A] text-white" : "cursor-not-allowed border-[#C8B8A2] bg-[#E2D4C0] text-[#9A8B78]"}`}>
+          <button type="button" onClick={() => node.status === "locked" ? (access.isLoggedIn ? setProgressionLockOpen(true) : setPromptOpen(true)) : navigate(`/member/ngaji-ceria/quiz/play?jilid=${jilid}&hal=${node.pageNumber}`)} className={`relative flex h-20 w-20 flex-col items-center justify-center rounded-full border-4 shadow-md transition-all active:scale-95 ${node.status === "completed" ? "border-[#E29A12] bg-[#FFCB45] text-[#5A3A2A]" : node.status === "active" ? "animate-pulse border-[#C4430E] bg-[#F58A3A] text-white" : "cursor-not-allowed border-[#C8B8A2] bg-[#E2D4C0] text-[#9A8B78]"}`}>
             <span className="text-xl font-black leading-none">{node.pageNumber}</span>
-            {node.status === "completed" ? <div className="mt-1 flex gap-0.5">{[1, 2, 3].map((item) => <Star key={item} size={9} className="fill-[#5A3A2A] text-[#5A3A2A]" />)}</div> : node.status === "locked" ? <span className="mt-0.5 text-[10px] font-bold">🔒 Terkunci</span> : null}
+            {node.status === "completed" ? <div className="mt-1 flex gap-0.5">{[1, 2, 3].map((item) => <Star key={item} size={9} className={item <= node.stars ? "fill-[#5A3A2A] text-[#5A3A2A]" : "text-[#8C7A68]/50"} />)}</div> : node.status === "locked" ? <span className="mt-0.5 text-[10px] font-bold">🔒 Terkunci</span> : null}
           </button>
           <div className="mt-2 text-center"><span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black ${node.status === "active" ? "bg-[#F58A3A] text-white" : node.status === "completed" ? "bg-[#E2EFCF] text-[#2D5A27]" : "bg-[#E2D4C0]/50 text-[#8C7A68]"}`}>Halaman {node.pageNumber}</span></div>
         </div>)}
       </div>}
       <LoginPromptModal open={promptOpen} onClose={() => setPromptOpen(false)} />
+      {progressionLockOpen && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-5 py-6" onClick={() => setProgressionLockOpen(false)}>
+        <div role="dialog" aria-modal="true" aria-label="Halaman masih terkunci" onClick={(event) => event.stopPropagation()} className="w-full max-w-sm rounded-3xl border-2 border-[#E2D4C0] bg-[#FBF8F1] p-6 text-center text-[#5A3A2A] shadow-2xl">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF6D5] px-3 py-1 text-xs font-black text-[#8C5A3A]">🔒 Materi Bertahap</span>
+          <h2 className="mt-3 font-display text-xl font-black">Selesaikan halaman sebelumnya</h2>
+          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#5A3A2A]/70">Lanjutkan dari halaman aktif untuk membuka materi berikutnya.</p>
+          <button type="button" onClick={() => setProgressionLockOpen(false)} className="game-button mt-4 w-full bg-[#F58A3A]">Mengerti</button>
+        </div>
+      </div>}
     </div>
   </NgajiCeriaLayout>;
 }
