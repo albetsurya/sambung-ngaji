@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, GraduationCap, Heart, ArrowRight, Check } from '../ui/FontAwesomeIcons';
 import { Button } from '../ui';
@@ -9,7 +9,7 @@ const SLIDES = [
     title: 'Selamat Datang di Sambung Ngaji',
     desc: 'Pusat ibadah dan pembelajaran digital dalam genggamanmu.',
     icon: BookOpen,
-    color: 'bg-blue-500',
+    color: 'bg-blue-500 text-blue-600',
     lightColor: 'bg-blue-50'
   },
   {
@@ -17,7 +17,7 @@ const SLIDES = [
     title: 'Belajar Ngaji Jadi Seru',
     desc: 'Metode Tilawati yang interaktif dengan game-game menarik untuk semua usia.',
     icon: GraduationCap,
-    color: 'bg-green-500',
+    color: 'bg-green-500 text-green-600',
     lightColor: 'bg-green-50'
   },
   {
@@ -25,7 +25,7 @@ const SLIDES = [
     title: 'Pantau Ibadah Harian',
     desc: 'Catat progres tahfidz, jurnal sholat, dan temukan ketenangan melalui mood tracker.',
     icon: Heart,
-    color: 'bg-purple-500',
+    color: 'bg-purple-500 text-purple-600',
     lightColor: 'bg-purple-50'
   }
 ];
@@ -57,8 +57,8 @@ export function WelcomeOnboarding({ onFinish }: { onFinish: () => void }) {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="flex flex-col items-center"
           >
-            <div className={`w-24 h-24 rounded-3xl ${activeSlide.lightColor} flex items-center justify-center mb-8`}>
-              <Icon size={40} className={`text-${activeSlide.color.split('-')[1]}-500`} />
+            <div className={`w-24 h-24 rounded-3xl ${activeSlide.lightColor} flex items-center justify-center mb-8 shadow-sm`}>
+              <Icon size={40} className={activeSlide.color.split(' ')[1]} />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-4 leading-tight">
               {activeSlide.title}

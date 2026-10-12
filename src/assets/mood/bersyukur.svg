@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Bersyukur</title>
+  <defs>
+    <clipPath id="bersyukur-c"><rect width="512" height="512" rx="116"/></clipPath>
+    <linearGradient id="bersyukur-bg" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#3DDC84"/>
+      <stop offset="1" stop-color="#0FA968"/>
+    </linearGradient>
+    <linearGradient id="bersyukur-sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bersyukur-w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E4FFE9"/>
+    </linearGradient>
+    <linearGradient id="bersyukur-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="1" stop-color="#FFC247"/>
+    </linearGradient>
+    <filter id="bersyukur-s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#04503A" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#bersyukur-c)">
+    <rect width="512" height="512" fill="url(#bersyukur-bg)"/>
+    <ellipse cx="256" cy="414" rx="116" ry="20" fill="#000" opacity="0.12"/>
+    <path d="M256 404 V292" stroke="#fff" stroke-width="22" stroke-linecap="round" fill="none"/>
+    <g filter="url(#bersyukur-s)">
+      <path transform="translate(256 292) scale(-0.86 0.86)" d="M0 0 C10 -60 70 -100 130 -96 C134 -36 90 20 0 0 Z" fill="url(#bersyukur-w)"/>
+      <path transform="translate(256 292)" d="M0 0 C10 -60 70 -100 130 -96 C134 -36 90 20 0 0 Z" fill="url(#bersyukur-gold)"/>
+    </g>
+    <rect width="512" height="512" fill="url(#bersyukur-sheen)"/>
+  </g>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#fff" stroke-opacity="0.16" stroke-width="3"/>
+</svg>

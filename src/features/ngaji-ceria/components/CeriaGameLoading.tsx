@@ -42,7 +42,12 @@ export function CeriaGameLoading({
   }, [durationMs, onLoaded]);
 
   return (
-    <div className="fixed inset-0 z-[120] bg-[#FFF8EE] flex flex-col items-center justify-between p-6 select-none font-sans overflow-hidden">
+    <div
+      className="fixed inset-0 z-[120] bg-[#FFF8EE] flex flex-col items-center justify-between p-6 select-none font-sans overflow-hidden"
+      role="status"
+      aria-live="polite"
+      aria-busy={progress < 100}
+    >
       {/* Top Banner Asset Overlay */}
       <div
         className="absolute inset-x-0 top-0 h-24 pointer-events-none opacity-40 bg-repeat-x bg-top"

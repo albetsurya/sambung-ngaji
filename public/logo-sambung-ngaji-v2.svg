@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254">
+  <title>Sambung Ngaji</title>
+  <defs>
+    <linearGradient id="ring" gradientUnits="userSpaceOnUse" x1="260" y1="400" x2="1000" y2="960">
+      <stop offset="0" stop-color="#E4FFB0"/>
+      <stop offset="0.12" stop-color="#00F5F0"/>
+      <stop offset="0.5" stop-color="#0A97FF"/>
+      <stop offset="0.8" stop-color="#00C2FF"/>
+      <stop offset="1" stop-color="#00F5FF"/>
+    </linearGradient>
+    <linearGradient id="mint" gradientUnits="userSpaceOnUse" x1="455" y1="306" x2="760" y2="306">
+      <stop offset="0" stop-color="#4DFFB8"/>
+      <stop offset="1" stop-color="#4DFFB8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="swoosh" gradientUnits="userSpaceOnUse" x1="500" y1="950" x2="1000" y2="450">
+      <stop offset="0" stop-color="#0A5CFF" stop-opacity="0.2"/>
+      <stop offset="0.55" stop-color="#0536FF"/>
+      <stop offset="1" stop-color="#0A5CFF" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFA000"/>
+      <stop offset="1" stop-color="#FFFF55"/>
+    </linearGradient>
+    <linearGradient id="star" x1="0.2" y1="1" x2="0.8" y2="0">
+      <stop offset="0" stop-color="#FF9E00"/>
+      <stop offset="0.55" stop-color="#FFC41A"/>
+      <stop offset="1" stop-color="#FFF44D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Latar -->
+  <rect width="1254" height="1254" fill="#011A5E"/>
+
+  <!-- Cincin utama: "i" yang menyambung ke lengkungan -->
+  <path d="M335 484 V610 A304 304 0 1 0 640 306 H530"
+        fill="none" stroke="url(#ring)" stroke-width="152" stroke-linecap="round"/>
+
+  <!-- Highlight mint di ujung lengan atas -->
+  <path d="M530 306 H760" fill="none" stroke="url(#mint)" stroke-width="143" stroke-linecap="round"/>
+
+  <!-- Lengkungan biru tua yang menyatu (konvergensi) -->
+  <path d="M660 388 C760 410 900 450 970 560 C1005 620 1012 690 1005 745
+           C960 880 840 940 700 950 C600 965 500 960 430 938
+           C560 945 700 900 770 800 C800 760 820 725 826 700
+           C850 600 800 450 660 388 Z"
+        fill="url(#swoosh)"/>
+
+  <!-- Titik (kepala huruf i) -->
+  <circle cx="335" cy="296" r="79" fill="url(#gold)"/>
+
+  <!-- Bintang empat sudut -->
+  <path d="M626 508 Q642 588 722 606 Q642 624 626 700 Q610 624 529 606 Q610 588 626 508 Z" fill="url(#star)"/>
+</svg>

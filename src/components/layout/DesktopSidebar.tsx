@@ -24,6 +24,7 @@ import {
   ScrollText,
 } from "../ui/FontAwesomeIcons";
 import { RoleBadge } from "../ui";
+import { AppLogoIcon } from "../ui/AppLogoIcon";
 const ADMIN_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/", icon: Home },
   { key: "jamaah", label: "Jamaah", to: "/members", icon: Users },
@@ -86,9 +87,7 @@ export function DesktopSidebar() {
     <aside className="hidden md:flex flex-col fixed top-0 bottom-0 left-0 w-64 border-r border-surface-border bg-surface-card z-30 select-none">
       <div className="flex items-center justify-between h-16 px-5 border-b border-surface-border">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(isMemberContext ? "/member" : "/")}>
-          <div className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-lg shadow-sm shadow-accent/30">
-            S
-          </div>
+          <AppLogoIcon size={36} className="rounded-xl shadow-sm shadow-accent/30 shrink-0" />
           <div className="flex flex-col">
             <span className="font-bold text-ios-body text-surface-text tracking-tight leading-tight">
               Sambung Ngaji

@@ -85,6 +85,7 @@ export function ProfileMenuSheet({
       
       <div className="mb-4 flex items-center gap-3.5 p-3.5 rounded-2xl bg-surface-card2 border border-surface-border">
         <Avatar
+          src={user?.photo_url}
           name={user?.name || "?"}
           size={56}
           gender={normalizeGender(user?.gender)}

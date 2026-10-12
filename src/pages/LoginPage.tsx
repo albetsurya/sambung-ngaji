@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import {
   useLocation,
   useSearchParams,
@@ -23,64 +23,11 @@ import { useTheme } from "../contexts/ThemeContext";
 import { Button } from "../components/ui";
 import { ApiError } from "../services/api";
 import { useEnvironment } from "../hooks/useEnvironment";
+import { AppLogoIcon } from "../components/ui/AppLogoIcon";
+import { GoogleLoginButton } from "../features/auth/components/GoogleLoginButton";
+
 function AppIcon({ size = 44 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 512 512"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="appicon-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#0EA5E9" />
-          <stop offset="50%" stopColor="#6366F1" />
-          <stop offset="100%" stopColor="#8B5CF6" />
-        </linearGradient>
-        <linearGradient id="appicon-shine" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.28" />
-          <stop offset="60%" stopColor="#ffffff" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect width="512" height="512" rx="120" fill="url(#appicon-bg)" />
-      <rect width="512" height="256" rx="120" fill="url(#appicon-shine)" />
-      <g transform="translate(0, 8)">
-        <rect
-          x="128"
-          y="120"
-          width="256"
-          height="288"
-          rx="28"
-          fill="#ffffff"
-          opacity="0.18"
-        />
-        <rect x="148" y="100" width="216" height="288" rx="24" fill="#ffffff" />
-      </g>
-      <g fill="url(#appicon-bg)">
-        <circle cx="192" cy="176" r="18" />
-        <circle cx="192" cy="240" r="18" />
-        <circle cx="192" cy="304" r="18" />
-      </g>
-      <g
-        stroke="#ffffff"
-        strokeWidth="10"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      >
-        <path d="M186 176 l5 5 l10 -12" />
-        <path d="M186 240 l5 5 l10 -12" />
-        <path d="M186 304 l5 5 l10 -12" />
-      </g>
-      <g fill="#CBD5E1">
-        <rect x="232" y="168" width="108" height="16" rx="8" />
-        <rect x="232" y="232" width="88" height="16" rx="8" />
-        <rect x="232" y="296" width="98" height="16" rx="8" />
-      </g>
-    </svg>
-  );
+  return <AppLogoIcon size={size} />;
 }
 
 type LoginIntent = "ceria" | "member";
@@ -118,7 +65,7 @@ function parseLoginIntent(value: string | null): LoginIntent | null {
 }
 
 export default function LoginPage() {
-  const { login, user, loading } = useAuth();
+  const { login, loginWithGoogle, user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -128,8 +75,11 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [oauthSubmitting, setOauthSubmitting] = useState(false);
+  const loginInFlight = useRef(false);
   const intent = parseLoginIntent(searchParams.get("intent"));
   const loginConfig = intent ? LOGIN_INTENTS[intent] : null;
+  const googleClientId = (import.meta.env.VITE_GOOGLE_CLIENT_ID || "").trim();
 
   if (!loading && user) {
     const from =
@@ -154,6 +104,8 @@ export default function LoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (loginInFlight.current) return;
+    loginInFlight.current = true;
     setError("");
     setSubmitting(true);
     try {
@@ -168,7 +120,28 @@ export default function LoginPage() {
           : "Gagal masuk. Periksa koneksi Anda.",
       );
     } finally {
+      loginInFlight.current = false;
       setSubmitting(false);
+    }
+  }
+
+  async function handleGoogleCredential(credential: string) {
+    if (loginInFlight.current) return;
+    loginInFlight.current = true;
+    setError("");
+    setOauthSubmitting(true);
+    try {
+      await loginWithGoogle(credential);
+      window.location.replace("/member/ngaji-ceria");
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Gagal masuk dengan Google. Coba lagi.",
+      );
+    } finally {
+      loginInFlight.current = false;
+      setOauthSubmitting(false);
     }
   }
   return (
@@ -195,7 +168,9 @@ export default function LoginPage() {
               className="absolute inset-0 rounded-[26px] blur-2xl pointer-events-none"
               style={{
                 background:
-                  "linear-gradient(135deg, #0EA5E9 0%, #6366F1 50%, #8B5CF6 100%)",
+                  theme === "dark"
+                    ? "linear-gradient(135deg, #011A5E 0%, #0A97FF 52%, #00F5F0 100%)"
+                    : "linear-gradient(135deg, #DDF4FF 0%, #7DD3FC 52%, #5EEAD4 100%)",
                 opacity: 0.55,
               }}
             />
@@ -314,7 +289,7 @@ export default function LoginPage() {
                    required
                    className="w-full min-h-[48px] rounded-2xl border border-surface-border bg-surface-bg/60 pl-10 pr-12 text-[16px] text-surface-text placeholder:text-surface-muted/60 transition-all focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10"
                  />
-                 <Button
+              <Button
                    variant="ghost"
                    size="xs"
                    iconOnly
@@ -340,14 +315,38 @@ export default function LoginPage() {
                type="submit"
                fullWidth
                loading={submitting}
-               disabled={!username || !password}
+                disabled={!username || !password || oauthSubmitting}
                rightIcon={!submitting ? <ArrowRight size={16} /> : undefined}
-             >
-               {submitting ? "Memproses..." : "Masuk"}
-             </Button>
-             <button
-               type="button"
-               onClick={changeIntent}
+              >
+                {submitting ? "Memproses..." : "Masuk"}
+              </Button>
+              {intent === "ceria" && googleClientId && (
+                <div className="mt-5 pt-1 space-y-3.5">
+                  <div className="flex items-center gap-3 text-ios-caption text-surface-muted">
+                    <span className="h-px flex-1 bg-surface-border" />
+                    <span>atau</span>
+                    <span className="h-px flex-1 bg-surface-border" />
+                  </div>
+                  <div className="w-full flex justify-center py-0.5 overflow-hidden">
+                    <GoogleLoginButton
+                      clientId={googleClientId}
+                      theme={theme}
+                      disabled={submitting || oauthSubmitting}
+                      onCredential={handleGoogleCredential}
+                      onError={setError}
+                    />
+                  </div>
+                  <p className="text-center text-ios-caption text-surface-muted px-2 leading-relaxed">
+                    {oauthSubmitting
+                      ? "Memproses akun Google…"
+                      : "Masuk atau daftar Ngaji Ceria langsung dengan akun Google Anda."}
+                  </p>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={changeIntent}
+                disabled={submitting || oauthSubmitting}
                className="w-full mt-3 min-h-[40px] rounded-2xl text-ios-footnote font-semibold text-accent transition-colors hover:bg-accent-soft"
              >
                <ChevronLeft size={14} className="mr-1" />
@@ -356,16 +355,32 @@ export default function LoginPage() {
            </form>
          )}
         <div className="mt-6 text-center">
-          <p className="text-ios-footnote text-surface-muted mb-3">
-            Belum punya akun?
-          </p>
-          <Link
-            to="/register"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl border border-accent/30 bg-accent-soft text-accent text-ios-subhead font-semibold transition-all hover:bg-accent-soft/80 active:scale-[0.97]"
-          >
-            Daftar sekarang
-            <ArrowRight size={14} />
-          </Link>
+          {intent && (
+            <>
+              <p className="text-ios-footnote text-surface-muted mb-3">
+                Belum punya akun?
+              </p>
+              <div className="flex flex-col gap-2 max-w-[240px] mx-auto">
+                {intent === "ceria" ? (
+                  <Link
+                    to="/register/ngaji-ceria"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-2xl border border-accent/30 bg-accent-soft text-accent text-ios-subhead font-semibold transition-all hover:bg-accent-soft/80 active:scale-[0.97]"
+                  >
+                    Daftar Akun Santri
+                    <ArrowRight size={14} />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-2xl border border-accent/30 bg-accent-soft text-accent text-ios-subhead font-semibold transition-all hover:bg-accent-soft/80 active:scale-[0.97]"
+                  >
+                    Daftar Jamaah
+                    <ArrowRight size={14} />
+                  </Link>
+                )}
+              </div>
+            </>
+          )}
           <div className="mt-3">
             <Link
               to="/"

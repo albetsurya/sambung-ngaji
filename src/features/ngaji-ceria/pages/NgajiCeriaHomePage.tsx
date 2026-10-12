@@ -23,15 +23,18 @@ export default function NgajiCeriaHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(() => {
-    // Tampilkan loading splash sekali per sesi tab saat memasuki Ngaji Ceria
-    const hasLoadedThisSession = sessionStorage.getItem("ngaji_ceria_splash_loaded");
-    return !hasLoadedThisSession;
+    // Tampilkan loading splash HANYA jika masuk dari landing / home luar
+    // Penanda sengaja tidak dihapus di sini karena React StrictMode dapat
+    // menjalankan initializer state lebih dari sekali pada development.
+    return sessionStorage.getItem("trigger_ngaji_ceria_splash") === "true";
   });
 
-  const handleLoaded = () => {
-    sessionStorage.setItem("ngaji_ceria_splash_loaded", "true");
-    setIsLoading(false);
-  };
+  React.useEffect(() => {
+    if (!isLoading) return;
+    sessionStorage.removeItem("trigger_ngaji_ceria_splash");
+  }, [isLoading]);
+
+  const finishLoading = React.useCallback(() => setIsLoading(false), []);
 
   const displayName = user?.name ? user.name.split(" ")[0] : "Hamba Allah";
   const { currentJilid, currentPage, progressPercentage } = useNgajiCeriaProgress();
@@ -47,7 +50,7 @@ export default function NgajiCeriaHomePage() {
 
   return (
     <>
-      {isLoading && <CeriaGameLoading onLoaded={handleLoaded} />}
+      {isLoading && <CeriaGameLoading durationMs={1500} onLoaded={finishLoading} />}
       <NgajiCeriaLayout title="Ngaji Ceria">
         <div className={`px-4 py-4 space-y-5 bg-[#FFF8EE] min-h-full rounded-t-3xl transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
           {/* User Greeting Section */}
@@ -128,7 +131,7 @@ export default function NgajiCeriaHomePage() {
           </button>
 
           <button
-            onClick={() => alert("Laporan Perkembangan Santri")}
+             onClick={() => navigate("/member/ngaji-ceria/profile")}
             className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#FFF6EC] border-2 border-[#FCDCB8] active:scale-95 transition-transform shadow-sm gap-1.5"
           >
             <div className="w-10 h-10 rounded-xl bg-[#8C4A14] text-white flex items-center justify-center shadow-sm">

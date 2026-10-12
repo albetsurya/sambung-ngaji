@@ -1,6 +1,7 @@
 import { getProgress, pushReward, saveProgress, applyServerProgress } from "../pages/games/_shared/progression";
 import { getToken } from "../../../services/api";
 import { isNgajiCeriaServerAvailable, ngajiCeriaApi } from "../services/ngajiCeriaApi";
+import { getNgajiCeriaScope } from "../hooks/useNgajiCeriaStore";
 
 export interface DailyMission {
   id: string;
@@ -46,7 +47,8 @@ function getClaimedToday(): string[] {
   try {
     // Klaim versi lama memakai tanggal UTC; pertahankan agar upgrade tidak memberi hadiah dua kali.
     const dateKey = new Date().toISOString().slice(0, 10);
-    const raw = localStorage.getItem(`${CLAIM_KEY}:${dateKey}`);
+    const scope = getNgajiCeriaScope();
+    const raw = localStorage.getItem(`${CLAIM_KEY}:${scope}:${dateKey}`);
     legacy = raw ? JSON.parse(raw) : [];
   } catch { /* Klaim tetap dapat dibaca dari progress baru. */ }
   return [...new Set([

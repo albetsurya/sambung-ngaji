@@ -10,9 +10,31 @@ export interface NgajiCeriaState {
 
 const STORAGE_KEY = "ngaji-ceria-progress";
 
-function loadState(): NgajiCeriaState {
+function getUserScope(): string {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const cached = JSON.parse(localStorage.getItem("sambung_ngaji_cached_user") || "null") as { user_id?: unknown } | null;
+    if (typeof cached?.user_id === "string" && cached.user_id.trim()) {
+      return cached.user_id.trim();
+    }
+  } catch {
+    // Guest scope remains the safe fallback when the cached identity is invalid.
+  }
+  return "guest";
+}
+
+export function getNgajiCeriaScope(): string {
+  return getUserScope();
+}
+
+function scopedStorageKey(scope: string): string {
+  // Keep the guest key stable for backwards compatibility. Authenticated data
+  // must never share that key with another account.
+  return scope === "guest" ? STORAGE_KEY : `${STORAGE_KEY}:${encodeURIComponent(scope)}`;
+}
+
+function loadState(scope: string): NgajiCeriaState {
+  try {
+    const raw = localStorage.getItem(scopedStorageKey(scope));
     if (raw) {
       const parsed = JSON.parse(raw);
       return {
@@ -33,13 +55,24 @@ function loadState(): NgajiCeriaState {
   };
 }
 
-let currentState: NgajiCeriaState = loadState();
-export const getNgajiActivity = () => currentState;
+let currentScope = getUserScope();
+let currentState: NgajiCeriaState = loadState(currentScope);
+export const getNgajiActivity = () => {
+  ensureScope();
+  return currentState;
+};
 const listeners = new Set<() => void>();
+
+function ensureScope(): void {
+  const nextScope = getUserScope();
+  if (nextScope === currentScope) return;
+  currentScope = nextScope;
+  currentState = loadState(currentScope);
+}
 
 function emitChange() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentState));
+    localStorage.setItem(scopedStorageKey(currentScope), JSON.stringify(currentState));
   } catch {
     // localStorage full or disabled
   }
@@ -47,6 +80,7 @@ function emitChange() {
 }
 
 export function awardStars(jilid: number, page: number, score: number) {
+  ensureScope();
   const key = `jilid-${jilid}-hal-${page}`;
   const currentStars = currentState.stars[key] || 0;
   let earnedStars = 1;
@@ -63,6 +97,7 @@ export function awardStars(jilid: number, page: number, score: number) {
 }
 
 export function recordActivity() {
+  ensureScope();
   const now = new Date();
   const today = activityDate(now);
 
@@ -84,6 +119,7 @@ export function recordActivity() {
 }
 
 export function hydrateActivity(lastPlayedAt: string | null, currentStreak: number) {
+  ensureScope();
   currentState = {
     ...currentState,
     lastPlayedAt,
@@ -98,10 +134,12 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot() {
+  ensureScope();
   return currentState;
 }
 
 export function useNgajiCeriaStore<T>(selector: (state: NgajiCeriaState) => T): T {
+  ensureScope();
   const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   return selector(state);
 }

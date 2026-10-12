@@ -157,6 +157,9 @@ const MemberRequestsPage = lazy(() => import("./pages/MemberRequestsPage"));
 const PublicRegistrationPage = lazy(
   () => import("./pages/PublicRegistrationPage"),
 );
+const NgajiCeriaRegisterPage = lazy(
+  () => import("./features/ngaji-ceria/pages/NgajiCeriaRegisterPage"),
+);
 const RegistrationSuccessPage = lazy(
   () => import("./pages/RegistrationSuccessPage"),
 );
@@ -304,6 +307,7 @@ function HomeRoute() {
     return <WelcomeOnboarding onFinish={() => setShowOnboarding(false)} />;
   }
   if (!user) return <PublicLandingPage />;
+  if (user.role === "MEMBER" && !user.member_id) return <PublicLandingPage />;
   if (user.role === "MEMBER") return <Navigate to="/member" replace />;
   if (user.role === "TIM_KU") return <Navigate to="/finance/ledger" replace />;
   return <DashboardPage />;
@@ -322,12 +326,16 @@ function LegacyTaarufCvRedirect() {
 function AppRoutes() {
   useBackgroundSync();
   const location = useLocation();
+  // ponytail: key diambil dari segmen rute pertama (/member/ngaji-ceria, /finance, dll)
+  // agar layout shared (NgajiCeriaLayout, BottomNav) tidak di-remount saat navigasi antar tab.
+  const routeKey = "/" + location.pathname.split("/").slice(1, 3).join("/");
   return (
-    <Suspense fallback={<PageFallback />}>
-      <div key={location.pathname} className="page-enter">
-      <Routes location={location}>
+  <Suspense fallback={<PageFallback />}>
+    <div key={routeKey} className="page-enter">
+    <Routes location={location}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<PublicRegistrationPage />} />
+        <Route path="/register/ngaji-ceria" element={<NgajiCeriaRegisterPage />} />
         <Route path="/register/success" element={<RegistrationSuccessPage />} />
         <Route path="/" element={<HomeRoute />} />
         {/* Redirect legacy (URL Indonesia lama, mis. dari QR code cetak) */}

@@ -91,7 +91,7 @@ function formatCarrySummary(
   if (!items.length) return "";
   const months = items.map((it) => formatCarryMonth(it.month)).join(", ");
   const total = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
-  return `Susulan ${months} · ${formatRp(total)}`;
+  return `Infak IR ${months} · ${formatRp(total)}`;
 }
 
 export const MonthlyDuesPage: React.FC = () => {
@@ -623,7 +623,7 @@ export const MonthlyDuesPage: React.FC = () => {
       `Target: ${formatRp(dashboard?.target || 0)}`,
       `Terkumpul: ${formatRp(dashboard?.received || 0)} (${dashboard?.paidCount || 0} lunas / ${dashboard?.unpaidCount || 0} belum)`,
       `- Rincian -`,
-      `Susulan IR: ${formatRp(allocationTotals.ir)}`,
+      `Infak IR: ${formatRp(allocationTotals.ir)}`,
       `Uang Sambung: ${formatRp(allocationTotals.sambung)}`,
       `Jimpitan: ${formatRp(allocationTotals.jimpitan)}`,
       `Siar-Siar: ${formatRp(allocationTotals.siar)}`,
@@ -934,7 +934,7 @@ export const MonthlyDuesPage: React.FC = () => {
                   </div>
                   <GroupedList>
                     {[
-                      { label: "Susulan IR", value: allocationTotals.ir },
+                      { label: "Infak IR", value: allocationTotals.ir },
                       {
                         label: "Uang Sambung",
                         value: allocationTotals.sambung,
@@ -1361,8 +1361,8 @@ export const MonthlyDuesPage: React.FC = () => {
 
               <section className="rounded-2xl border border-surface-border bg-surface-card p-3.5">
                 <div className="flex items-center justify-between mb-2.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-surface-muted">
-                    Susulan IR
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-surface-muted mb-2.5">
+                    Infak IR
                   </p>
                   <button
                     type="button"
@@ -1380,7 +1380,7 @@ export const MonthlyDuesPage: React.FC = () => {
                 {carryovers.length === 0 ? (
                   <div className="rounded-xl bg-surface-card2 border border-dashed border-surface-border px-3 py-4 text-center">
                     <p className="text-ios-caption text-surface-muted">
-                      Tidak ada susulan. Ketuk “+ Tambah bulan” bila ada
+                      Tidak ada Infak IR. Ketuk “+ Tambah bulan” bila ada
                       tunggakan.
                     </p>
                   </div>
@@ -1449,7 +1449,7 @@ export const MonthlyDuesPage: React.FC = () => {
                     ))}
                     <div className="flex items-center justify-between rounded-xl bg-accent-soft border border-accent/20 px-3.5 py-2.5">
                       <span className="text-ios-caption font-semibold text-surface-muted">
-                        Total susulan
+                        Total Infak IR
                       </span>
                       <span className="font-display text-ios-body font-extrabold text-accent tabular-nums">
                         {formatRp(carryoverTotal)}
@@ -1863,7 +1863,7 @@ export const MonthlyDuesPage: React.FC = () => {
                                     </p>
                                     {irMonths ? (
                                       <p className="text-ios-caption text-accent truncate font-medium">
-                                        Susulan: {irMonths}
+                                        Infak IR: {irMonths}
                                       </p>
                                     ) : null}
                                   </>
@@ -1903,7 +1903,7 @@ export const MonthlyDuesPage: React.FC = () => {
                   </GroupedList>
                   <p className="px-1 py-2 text-ios-caption text-surface-muted">
                     Ketuk bulan yang sudah bayar untuk melihat rinciannya. Baris
-                    IR mencantumkan bulan susulan yang dibayar.
+                    Infak IR mencantumkan bulan susulan yang dibayar.
                   </p>
                   <Button
                     fullWidth
@@ -1933,7 +1933,7 @@ export const MonthlyDuesPage: React.FC = () => {
                 (x) => x.member_id === paymentDetail.member_id,
               );
               const rows: Array<[string, number]> = [
-                ["Susulan IR", Number(paymentDetail.carryover_ir) || 0],
+                ["Infak IR", Number(paymentDetail.carryover_ir) || 0],
                 ["Uang Sambung", Number(paymentDetail.connecting_fund) || 0],
                 ["Jimpitan", Number(paymentDetail.community_dues) || 0],
                 ["Siar-Siar", Number(paymentDetail.outreach_fund) || 0],
