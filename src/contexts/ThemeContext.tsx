@@ -252,9 +252,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     requestAnimationFrame(() => {
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta && metaColor) {
+      const metas = document.querySelectorAll('meta[name="theme-color"]');
+      if (metas.length > 0) {
+        metas.forEach((m) => {
+          m.setAttribute("content", metaColor);
+        });
+      } else {
+        const meta = document.createElement("meta");
+        meta.setAttribute("name", "theme-color");
         meta.setAttribute("content", metaColor);
+        document.head.appendChild(meta);
       }
     });
   }, [theme, preset]);
