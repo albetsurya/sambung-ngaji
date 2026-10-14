@@ -12,10 +12,12 @@ import { usePermission } from "../../../hooks/usePermission";
 import {
   AppLayout,
   Header,
+  FloatingActionButton,
 } from "../../../components/layout/AppLayout";
 import {
   Button,
   Input,
+  Select,
   DateInput,
   FilterChip,
   Segmented,
@@ -39,6 +41,10 @@ import {
   NoGroupEmpty,
   SheetFooter,
 } from "../components/FinanceShared";
+import {
+  cashAccountOptions,
+  isShodaqohPostedAccount,
+} from "../components/cashAccounts";
 import { ApiError } from "../../../services/api";
 
 type BreakdownTab = "overview" | "in" | "out";
@@ -160,11 +166,15 @@ export const KasBreakdownPage: React.FC = () => {
     [expenseTx],
   );
 
-  // Ganti tab: reset ke semua kategori tab baru.
+  // Ganti tab: reset ke kategori tab baru, KECUALI akun pindahan shodaqoh
+  // (jurnal otomatis posting tidak dicentang default agar tidak tercampur
+  // transaksi manual; user bisa mengetuk chip-nya untuk menyertakan).
   // Ganti bulan/jenis kas: pilihan dipertahankan, yang tak ada bulan ini dibuang.
   useEffect(() => {
     const pool = tab === "out" ? expenseAccounts : incomeAccounts;
-    setSelectedAccounts(new Set(pool));
+    setSelectedAccounts(
+      new Set(pool.filter((a) => !isShodaqohPostedAccount(a))),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
   useEffect(() => {
@@ -251,6 +261,27 @@ export const KasBreakdownPage: React.FC = () => {
     }
   };
 
+  // Tanggal default transaksi baru mengikuti bulan yang sedang dirinci:
+  // bulan berjalan = hari ini, bulan lain = tanggal 1 bulan tersebut.
+  const defaultTxDate = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (!activeMonth) return today;
+    if (activeMonth === today.slice(0, 7)) return today;
+    return `${activeMonth}-01`;
+  };
+
+  const handleOpenAddSheet = () => {
+    setEditingTx(null);
+    setTxForm({
+      transaction_date: defaultTxDate(),
+      account_name: "",
+      description: "",
+      transaction_type: tab === "out" ? "CREDIT" : "DEBIT",
+      amount: 0,
+    });
+    setIsTxSheetOpen(true);
+  };
+
   const handleOpenEditSheet = (tx: Transaction) => {
     setEditingTx(tx);
     const deb = Number(tx.debit) || 0;
@@ -268,9 +299,12 @@ export const KasBreakdownPage: React.FC = () => {
 
   const handleSubmitTx = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingTx?.cash_id) return;
     if (!txForm.description.trim()) {
       showToast("Keterangan wajib diisi", "error");
+      return;
+    }
+    if (!txForm.account_name.trim()) {
+      showToast("Kategori wajib dipilih", "error");
       return;
     }
     if (txForm.amount <= 0) {
@@ -281,20 +315,36 @@ export const KasBreakdownPage: React.FC = () => {
     try {
       const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
       const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
-      await financeApi.editTransaction(
-        assignedGroup,
-        {
-          cash_id: editingTx.cash_id,
-          transaction_date: txForm.transaction_date,
-          account_name: txForm.account_name,
-          description: txForm.description,
-          transaction_type: txForm.transaction_type,
-          debit: deb,
-          credit: kre,
-        },
-        cashType,
-      );
-      showToast("Transaksi berhasil diperbarui", "success");
+      if (editingTx?.cash_id) {
+        await financeApi.editTransaction(
+          assignedGroup,
+          {
+            cash_id: editingTx.cash_id,
+            transaction_date: txForm.transaction_date,
+            account_name: txForm.account_name,
+            description: txForm.description,
+            transaction_type: txForm.transaction_type,
+            debit: deb,
+            credit: kre,
+          },
+          cashType,
+        );
+        showToast("Transaksi berhasil diperbarui", "success");
+      } else {
+        await financeApi.addTransaction(
+          assignedGroup,
+          {
+            transaction_date: txForm.transaction_date,
+            account_name: txForm.account_name,
+            description: txForm.description,
+            transaction_type: txForm.transaction_type,
+            debit: deb,
+            credit: kre,
+          },
+          cashType,
+        );
+        showToast("Transaksi berhasil ditambahkan", "success");
+      }
       setIsTxSheetOpen(false);
       setEditingTx(null);
       setSelectMode(false);
@@ -354,7 +404,8 @@ export const KasBreakdownPage: React.FC = () => {
     }
   };
 
-  const backToBreakdown = `/finance/ledger/breakdown?cash=${cashType}&month=${activeMonth || "latest"}`;  const printUrl = (mode: "rincian" | "rekap") =>
+  const backToBreakdown = `/finance/ledger/breakdown?cash=${cashType}&month=${activeMonth || "latest"}`;
+  const printUrl = (mode: "rincian" | "rekap") =>
     `/finance/ledger/print?mode=${mode}&cash=${cashType}&bulan=${activeMonth}&back=${encodeURIComponent(backToBreakdown)}`;
 
   const overview = useMemo(() => {
@@ -401,9 +452,20 @@ export const KasBreakdownPage: React.FC = () => {
   const selectedCount = shownList.filter((t, idx) =>
     selectedIds.has(txKey(t, idx)),
   ).length;
+  const accountOptions = useMemo(
+    () => cashAccountOptions(allTx, txForm.account_name),
+    [allTx, txForm.account_name],
+  );
 
   return (
-    <AppLayout>
+    <AppLayout
+      fab={
+        <FloatingActionButton
+          onClick={handleOpenAddSheet}
+          label="Tambah Transaksi"
+        />
+      }
+    >
       <Header
         title="Rincian Kas"
         subtitle={`${cashType === "amil" ? "Kas Amil" : "Kas Utama"} · ${activeMonth ? monthLabel(activeMonth) : "-"}`}
@@ -756,8 +818,11 @@ export const KasBreakdownPage: React.FC = () => {
               <p className="text-ios-caption text-surface-muted leading-relaxed">
                 Total dihitung dari kategori yang dipilih pada chip. Baris
                 “SALDO AWAL” tidak dihitung sebagai pemasukan maupun
-                pengeluaran. Ketuk baris untuk edit/duplikat/hapus, atau pakai
-                tombol Pilih untuk menandai beberapa transaksi.
+                pengeluaran. Kategori pindahan shodaqoh (Infak IR, Uang
+                Sambung, Jimpitan, Siar-Siar, Seribuan, Kafan, Ukhro MT, Dana
+                Kesehatan) otomatis tidak dicentang — ketuk chip-nya bila
+                ingin menyertakan. Ketuk baris untuk edit/duplikat/hapus,
+                atau pakai tombol Pilih untuk menandai beberapa transaksi.
               </p>
             </Card>
           </>
@@ -867,7 +932,7 @@ export const KasBreakdownPage: React.FC = () => {
       <BottomSheet
         open={isTxSheetOpen}
         onClose={() => setIsTxSheetOpen(false)}
-        title="Edit Transaksi"
+        title={editingTx ? "Edit Transaksi" : "Tambah Transaksi"}
       >
         <form onSubmit={handleSubmitTx}>
           <DateInput
@@ -892,14 +957,22 @@ export const KasBreakdownPage: React.FC = () => {
               ]}
             />
           </div>
-          <Input
+          <Select
             label="Akun / Kategori"
-            placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
             value={txForm.account_name}
             onChange={(e) =>
               setTxForm({ ...txForm, account_name: e.target.value })
             }
-          />
+            required
+            data-testid="bd-tx-account-select"
+          >
+            <option value="">— Pilih kategori —</option>
+            {accountOptions.map((a) => (
+              <option key={a} value={a}>
+                {toTitleCase(a)}
+              </option>
+            ))}
+          </Select>
           <Input
             label="Keterangan"
             placeholder="Uraian transaksi"

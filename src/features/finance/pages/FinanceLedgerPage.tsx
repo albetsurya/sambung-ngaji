@@ -17,6 +17,7 @@ import {
 import {
   Button,
   Input,
+  Select,
   DateInput,
   FilterChip,
   Segmented,
@@ -46,6 +47,7 @@ import {
   NoGroupEmpty,
   SheetFooter,
 } from "../components/FinanceShared";
+import { cashAccountOptions } from "../components/cashAccounts";
 import { ApiError } from "../../../services/api";
 const KasArusChart: React.FC<{
   data: Array<[string, { debet: number; kredit: number; count: number }]>;
@@ -357,6 +359,10 @@ export const FinanceLedgerPage: React.FC = () => {
       showToast("Keterangan wajib diisi", "error");
       return;
     }
+    if (!txForm.account_name.trim()) {
+      showToast("Kategori wajib dipilih", "error");
+      return;
+    }
     if (txForm.amount <= 0) {
       showToast("Jumlah nominal harus lebih besar dari 0", "error");
       return;
@@ -560,6 +566,10 @@ export const FinanceLedgerPage: React.FC = () => {
   const visibleTx = showAllTx
     ? filteredTransactions
     : [...filteredTransactions].slice(-5).reverse();
+  const accountOptions = useMemo(
+    () => cashAccountOptions(allTx, txForm.account_name),
+    [allTx, txForm.account_name],
+  );
   return (
     <AppLayout
       fab={
@@ -906,14 +916,22 @@ export const FinanceLedgerPage: React.FC = () => {
               ]}
             />
           </div>
-          <Input
+          <Select
             label="Akun / Kategori"
-            placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
             value={txForm.account_name}
             onChange={(e) =>
               setTxForm({ ...txForm, account_name: e.target.value })
             }
-          />
+            required
+            data-testid="tx-account-select"
+          >
+            <option value="">— Pilih kategori —</option>
+            {accountOptions.map((a) => (
+              <option key={a} value={a}>
+                {toTitleCase(a)}
+              </option>
+            ))}
+          </Select>
           <Input
             label="Keterangan"
             placeholder="Uraian transaksi"
