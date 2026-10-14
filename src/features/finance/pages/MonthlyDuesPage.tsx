@@ -95,6 +95,52 @@ function formatCarrySummary(
   return `Infak IR ${months} · ${formatRp(total)}`;
 }
 
+/* Kotak rincian jurnal pindah ke kas: dipakai modal pindah & batal pindah. */
+function PostRincianBox({
+  title,
+  rows,
+  total,
+  totalLabel,
+  accentClass,
+  negative = false,
+}: {
+  title: string;
+  rows: Array<{ label: string; value: number }>;
+  total: number;
+  totalLabel: string;
+  accentClass: string;
+  negative?: boolean;
+}) {
+  return (
+    <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2">
+      <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
+        {title}
+      </p>
+      {rows.map((a) => (
+        <div
+          key={a.label}
+          className="flex items-center justify-between text-ios-caption"
+        >
+          <span className="text-surface-text">{a.label}</span>
+          <span
+            className={`font-semibold ${negative ? "text-danger" : "text-surface-text"}`}
+          >
+            {negative ? "-" : ""}
+            {formatRp(a.value)}
+          </span>
+        </div>
+      ))}
+      <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
+        <span className="font-bold text-surface-text">{totalLabel}</span>
+        <span className={`font-extrabold ${accentClass}`}>
+          {negative ? "-" : ""}
+          {formatRp(total)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export const MonthlyDuesPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -586,6 +632,32 @@ export const MonthlyDuesPage: React.FC = () => {
     }
     return t;
   })();
+  // Pratinjau jurnal pindah ke kas — MENCERMINKAN backend DuePostToCash:
+  // pemasukan = 7 pos (Kafan hanya di sini), pengeluaran = tanpa Kafan
+  // (Uang Sambung fix 840rb, Dana Kesehatan fix 105rb). Ubah bersama backend
+  // bila aturan posting berubah.
+  const POST_SAMBUNG_EXPENSE = 840000;
+  const POST_KESEHATAN_EXPENSE = 105000;
+  const postIncomeRows = [
+    { label: "Infak IR", value: allocationTotals.ir },
+    { label: "Uang Sambung", value: allocationTotals.sambung },
+    { label: "Jimpitan", value: allocationTotals.jimpitan },
+    { label: "Siar-Siar", value: allocationTotals.siar },
+    { label: "Seribuan", value: allocationTotals.seribu },
+    { label: "Kafan", value: allocationTotals.kafan },
+    { label: "Ukhro MT", value: allocationTotals.ukhro },
+  ].filter((a) => a.value > 0);
+  const postExpenseRows = [
+    { label: "Infak IR", value: allocationTotals.ir },
+    { label: "Uang Sambung", value: POST_SAMBUNG_EXPENSE },
+    { label: "Jimpitan", value: allocationTotals.jimpitan },
+    { label: "Siar-Siar", value: allocationTotals.siar },
+    { label: "Seribuan", value: allocationTotals.seribu },
+    { label: "Ukhro MT", value: allocationTotals.ukhro },
+    { label: "Dana Kesehatan", value: POST_KESEHATAN_EXPENSE },
+  ].filter((a) => a.value > 0);
+  const postIncomeTotal = postIncomeRows.reduce((s, a) => s + a.value, 0);
+  const postExpenseTotal = postExpenseRows.reduce((s, a) => s + a.value, 0);
   const yearlyYear = (selectedMonth || "").slice(0, 4);
   const yearlyMaxMonth = (() => {
     if (!yearlyYear) return 0;
@@ -2087,43 +2159,34 @@ export const MonthlyDuesPage: React.FC = () => {
         description={`Apakah Anda yakin ingin memindahkan penerimaan Shodaqoh bulan ${monthLabel} ke Kas Utama?`}
         confirmLabel="Pindah ke Kas"
         loading={posting}
+        wide
         onConfirm={async () => {
           setShowConfirmPost(false);
           await handlePostToKas();
         }}
         onCancel={() => setShowConfirmPost(false)}
       >
-        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
-          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
-            Rincian Alokasi Transaksi
-          </p>
-          {[
-            { label: "Infak IR", value: allocationTotals.ir },
-            { label: "Uang Sambung", value: allocationTotals.sambung },
-            { label: "Jimpitan", value: allocationTotals.jimpitan },
-            { label: "Siar-Siar", value: allocationTotals.siar },
-            { label: "Seribuan", value: allocationTotals.seribu },
-            { label: "Kafan", value: allocationTotals.kafan },
-            { label: "Ukhro MT", value: allocationTotals.ukhro },
-          ]
-            .filter((a) => a.value > 0)
-            .map((a) => (
-              <div
-                key={a.label}
-                className="flex items-center justify-between text-ios-caption"
-              >
-                <span className="text-surface-text">{a.label}</span>
-                <span className="font-semibold text-surface-text">
-                  {formatRp(a.value)}
-                </span>
-              </div>
-            ))}
-          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
-            <span className="font-bold text-surface-text">Total</span>
-            <span className="font-extrabold text-accent">
-              {formatRp(
-                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
-              )}
+        <div className="space-y-2.5 mt-1">
+          <PostRincianBox
+            title={`Pemasukan · ${monthLabel}`}
+            rows={postIncomeRows}
+            total={postIncomeTotal}
+            totalLabel="Total Masuk"
+            accentClass="text-success"
+          />
+          <PostRincianBox
+            title="Pengeluaran"
+            rows={postExpenseRows}
+            total={postExpenseTotal}
+            totalLabel="Total Keluar"
+            accentClass="text-danger"
+          />
+          <div className="flex items-center justify-between text-ios-footnote px-1">
+            <span className="font-bold text-surface-text">Net Kas</span>
+            <span
+              className={`font-extrabold ${postIncomeTotal - postExpenseTotal >= 0 ? "text-success" : "text-danger"}`}
+            >
+              {formatRp(postIncomeTotal - postExpenseTotal)}
             </span>
           </div>
         </div>
@@ -2136,43 +2199,36 @@ export const MonthlyDuesPage: React.FC = () => {
         confirmLabel="Batalkan Pindah Kas"
         danger
         loading={cancelling}
+        wide
         onConfirm={async () => {
           setShowConfirmCancel(false);
           await handleCancelPost();
         }}
         onCancel={() => setShowConfirmCancel(false)}
       >
-        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
-          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
-            Rincian Transaksi yang Dibatalkan
-          </p>
-          {[
-            { label: "Infak IR", value: allocationTotals.ir },
-            { label: "Uang Sambung", value: allocationTotals.sambung },
-            { label: "Jimpitan", value: allocationTotals.jimpitan },
-            { label: "Siar-Siar", value: allocationTotals.siar },
-            { label: "Seribuan", value: allocationTotals.seribu },
-            { label: "Kafan", value: allocationTotals.kafan },
-            { label: "Ukhro MT", value: allocationTotals.ukhro },
-          ]
-            .filter((a) => a.value > 0)
-            .map((a) => (
-              <div
-                key={a.label}
-                className="flex items-center justify-between text-ios-caption"
-              >
-                <span className="text-surface-text">{a.label}</span>
-                <span className="font-semibold text-danger">
-                  -{formatRp(a.value)}
-                </span>
-              </div>
-            ))}
-          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
-            <span className="font-bold text-surface-text">Total Ditarik</span>
-            <span className="font-extrabold text-danger">
-              -{formatRp(
-                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
-              )}
+        <div className="space-y-2.5 mt-1">
+          <PostRincianBox
+            title={`Pemasukan Ditarik · ${monthLabel}`}
+            rows={postIncomeRows}
+            total={postIncomeTotal}
+            totalLabel="Total Masuk Ditarik"
+            accentClass="text-danger"
+            negative
+          />
+          <PostRincianBox
+            title="Pengeluaran Ditarik"
+            rows={postExpenseRows}
+            total={postExpenseTotal}
+            totalLabel="Total Keluar Ditarik"
+            accentClass="text-danger"
+            negative
+          />
+          <div className="flex items-center justify-between text-ios-footnote px-1">
+            <span className="font-bold text-surface-text">Net Ditarik</span>
+            <span
+              className={`font-extrabold ${postIncomeTotal - postExpenseTotal >= 0 ? "text-danger" : "text-success"}`}
+            >
+              {formatRp(postExpenseTotal - postIncomeTotal)}
             </span>
           </div>
         </div>
