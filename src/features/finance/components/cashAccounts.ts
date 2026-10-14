@@ -25,10 +25,10 @@ export function normalizeAccountName(name: unknown): string {
 /* Kata kunci pelengkap: akun legacy dari spreadsheet memakai varian nama */
 /* ("Pemasukan/Setor Uang Sambung", "Infak IR", "Infak Seribuan", dsb)   */
 /* sehingga pencocokan persis saja tidak cukup. "INFAQ JAMAAH" manual    */
-/* tidak ikut tercocok (tidak mengandung kata kunci di bawah).           */
+/* dan "Infak Sambung" (beda dengan "Uang Sambung") tidak ikut tercocok. */
 const SHODAQOH_ACCOUNT_KEYWORDS = [
   "SHODAQOH",
-  "SAMBUNG",
+  "UANG SAMBUNG",
   "JIMPITAN",
   "SIAR",
   "SERIBU",

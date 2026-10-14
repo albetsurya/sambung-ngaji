@@ -79,6 +79,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   danger?: boolean;
   loading?: boolean;
+  wide?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -91,6 +92,7 @@ export function ConfirmDialog({
   confirmLabel = "Ya, lanjutkan",
   danger,
   loading = false,
+  wide = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -101,7 +103,7 @@ export function ConfirmDialog({
         className="absolute inset-0 bg-black/30 backdrop-blur-sm anim-fade-fast"
         onClick={loading ? undefined : onCancel}
       />
-      <div className="relative w-full max-w-[300px] sm:max-w-sm bg-surface-card surface-shift rounded-[24px] border border-surface-border overflow-hidden shadow-2xl anim-pop">
+      <div className={`relative w-full ${wide ? "max-w-sm sm:max-w-md" : "max-w-[300px] sm:max-w-sm"} bg-surface-card surface-shift rounded-[24px] border border-surface-border overflow-hidden shadow-2xl anim-pop`}>
         <div className="px-5 pt-5 pb-4 text-center">
           <h3 className="text-[17px] font-semibold text-surface-text tracking-[-0.01em]">
             {title}

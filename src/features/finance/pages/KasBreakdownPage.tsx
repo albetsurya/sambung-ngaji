@@ -958,7 +958,7 @@ export const KasBreakdownPage: React.FC = () => {
             />
           </div>
           <Select
-            label="Akun / Kategori"
+            label="Kategori Transaksi"
             value={txForm.account_name}
             onChange={(e) =>
               setTxForm({ ...txForm, account_name: e.target.value })

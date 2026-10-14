@@ -16,6 +16,7 @@ import {
 import {
   Button,
   Input,
+  Select,
   DateInput,
   FilterChip,
   Segmented,
@@ -92,6 +93,52 @@ function formatCarrySummary(
   const months = items.map((it) => formatCarryMonth(it.month)).join(", ");
   const total = items.reduce((s, it) => s + (Number(it.amount) || 0), 0);
   return `Infak IR ${months} · ${formatRp(total)}`;
+}
+
+/* Kotak rincian jurnal pindah ke kas: dipakai modal pindah & batal pindah. */
+function PostRincianBox({
+  title,
+  rows,
+  total,
+  totalLabel,
+  accentClass,
+  negative = false,
+}: {
+  title: string;
+  rows: Array<{ label: string; value: number }>;
+  total: number;
+  totalLabel: string;
+  accentClass: string;
+  negative?: boolean;
+}) {
+  return (
+    <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2">
+      <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
+        {title}
+      </p>
+      {rows.map((a) => (
+        <div
+          key={a.label}
+          className="flex items-center justify-between text-ios-caption"
+        >
+          <span className="text-surface-text">{a.label}</span>
+          <span
+            className={`font-semibold ${negative ? "text-danger" : "text-surface-text"}`}
+          >
+            {negative ? "-" : ""}
+            {formatRp(a.value)}
+          </span>
+        </div>
+      ))}
+      <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
+        <span className="font-bold text-surface-text">{totalLabel}</span>
+        <span className={`font-extrabold ${accentClass}`}>
+          {negative ? "-" : ""}
+          {formatRp(total)}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export const MonthlyDuesPage: React.FC = () => {
@@ -585,6 +632,32 @@ export const MonthlyDuesPage: React.FC = () => {
     }
     return t;
   })();
+  // Pratinjau jurnal pindah ke kas — MENCERMINKAN backend DuePostToCash:
+  // pemasukan = 7 pos (Kafan hanya di sini), pengeluaran = tanpa Kafan
+  // (Uang Sambung fix 840rb, Dana Kesehatan fix 105rb). Ubah bersama backend
+  // bila aturan posting berubah.
+  const POST_SAMBUNG_EXPENSE = 840000;
+  const POST_KESEHATAN_EXPENSE = 105000;
+  const postIncomeRows = [
+    { label: "Infak IR", value: allocationTotals.ir },
+    { label: "Uang Sambung", value: allocationTotals.sambung },
+    { label: "Jimpitan", value: allocationTotals.jimpitan },
+    { label: "Siar-Siar", value: allocationTotals.siar },
+    { label: "Seribuan", value: allocationTotals.seribu },
+    { label: "Kafan", value: allocationTotals.kafan },
+    { label: "Ukhro MT", value: allocationTotals.ukhro },
+  ].filter((a) => a.value > 0);
+  const postExpenseRows = [
+    { label: "Infak IR", value: allocationTotals.ir },
+    { label: "Uang Sambung", value: POST_SAMBUNG_EXPENSE },
+    { label: "Jimpitan", value: allocationTotals.jimpitan },
+    { label: "Siar-Siar", value: allocationTotals.siar },
+    { label: "Seribuan", value: allocationTotals.seribu },
+    { label: "Ukhro MT", value: allocationTotals.ukhro },
+    { label: "Dana Kesehatan", value: POST_KESEHATAN_EXPENSE },
+  ].filter((a) => a.value > 0);
+  const postIncomeTotal = postIncomeRows.reduce((s, a) => s + a.value, 0);
+  const postExpenseTotal = postExpenseRows.reduce((s, a) => s + a.value, 0);
   const yearlyYear = (selectedMonth || "").slice(0, 4);
   const yearlyMaxMonth = (() => {
     if (!yearlyYear) return 0;
@@ -1294,40 +1367,24 @@ export const MonthlyDuesPage: React.FC = () => {
                   Informasi Pembayaran
                 </p>
                 <div className="space-y-3">
-                  <div>
-                    <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
-                      Anggota
-                    </p>
-                    <div className="rounded-xl border border-surface-border overflow-hidden">
-                      <div className="max-h-40 overflow-y-auto divide-y divide-surface-border">
-                        {membersList.map((m) => {
-                          const active =
-                            m.member_id === selectedMember.member_id;
-                          return (
-                            <button
-                              key={m.member_id}
-                              type="button"
-                              onClick={() => handleOpenPaymentSheet(m)}
-                              className={`w-full text-left px-3.5 py-2.5 text-ios-body transition-colors active:bg-surface-card2 ${
-                                active
-                                  ? "bg-accent-soft text-accent font-semibold"
-                                  : "text-surface-text hover:bg-surface-card2"
-                              }`}
-                            >
-                              <span className="inline-flex items-center gap-2">
-                                {active && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                                )}
-                                <span className="truncate">
-                                  {m.member_name}
-                                </span>
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
+                  <Select
+                    label="Anggota"
+                    value={selectedMember.member_id}
+                    onChange={(e) => {
+                      const m = membersList.find(
+                        (x) => x.member_id === e.target.value,
+                      );
+                      if (m) handleOpenPaymentSheet(m);
+                    }}
+                    required
+                    data-testid="shod-payment-member-select"
+                  >
+                    {membersList.map((m) => (
+                      <option key={m.member_id} value={m.member_id}>
+                        {m.member_name}
+                      </option>
+                    ))}
+                  </Select>
                   <DateInput
                     label="Tanggal Pembayaran"
                     value={paymentForm.payment_date}
@@ -1507,38 +1564,24 @@ export const MonthlyDuesPage: React.FC = () => {
             Pilih anggota, tempel foto catatan/bukti transfer, ekstrak dengan
             AI, lalu lanjutkan ke form manual untuk review sebelum disimpan.
           </p>
-          <div>
-            <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
-              Anggota
-            </p>
-            <div className="rounded-xl border border-surface-border overflow-hidden">
-              <div className="max-h-40 overflow-y-auto divide-y divide-surface-border">
-                {membersList.map((m) => {
-                  const active =
-                    selectedMember?.member_id === m.member_id;
-                  return (
-                    <button
-                      key={m.member_id}
-                      type="button"
-                      onClick={() => setSelectedMember(m)}
-                      className={`w-full text-left px-3.5 py-2.5 text-ios-body transition-colors active:bg-surface-card2 ${
-                        active
-                          ? "bg-accent-soft text-accent font-semibold"
-                          : "text-surface-text hover:bg-surface-card2"
-                      }`}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        {active && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                        )}
-                        <span className="truncate">{m.member_name}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+          <Select
+            label="Anggota"
+            value={selectedMember?.member_id || ""}
+            onChange={(e) => {
+              const m = membersList.find(
+                (x) => x.member_id === e.target.value,
+              );
+              if (m) setSelectedMember(m);
+            }}
+            required
+            data-testid="shod-ai-member-select"
+          >
+            {membersList.map((m) => (
+              <option key={m.member_id} value={m.member_id}>
+                {m.member_name}
+              </option>
+            ))}
+          </Select>
           <DateInput
             label="Tanggal Pembayaran"
             value={paymentForm.payment_date}
@@ -2116,43 +2159,34 @@ export const MonthlyDuesPage: React.FC = () => {
         description={`Apakah Anda yakin ingin memindahkan penerimaan Shodaqoh bulan ${monthLabel} ke Kas Utama?`}
         confirmLabel="Pindah ke Kas"
         loading={posting}
+        wide
         onConfirm={async () => {
           setShowConfirmPost(false);
           await handlePostToKas();
         }}
         onCancel={() => setShowConfirmPost(false)}
       >
-        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
-          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
-            Rincian Alokasi Transaksi
-          </p>
-          {[
-            { label: "Infak IR", value: allocationTotals.ir },
-            { label: "Uang Sambung", value: allocationTotals.sambung },
-            { label: "Jimpitan", value: allocationTotals.jimpitan },
-            { label: "Siar-Siar", value: allocationTotals.siar },
-            { label: "Seribuan", value: allocationTotals.seribu },
-            { label: "Kafan", value: allocationTotals.kafan },
-            { label: "Ukhro MT", value: allocationTotals.ukhro },
-          ]
-            .filter((a) => a.value > 0)
-            .map((a) => (
-              <div
-                key={a.label}
-                className="flex items-center justify-between text-ios-caption"
-              >
-                <span className="text-surface-text">{a.label}</span>
-                <span className="font-semibold text-surface-text">
-                  {formatRp(a.value)}
-                </span>
-              </div>
-            ))}
-          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
-            <span className="font-bold text-surface-text">Total</span>
-            <span className="font-extrabold text-accent">
-              {formatRp(
-                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
-              )}
+        <div className="space-y-2.5 mt-1">
+          <PostRincianBox
+            title={`Pemasukan · ${monthLabel}`}
+            rows={postIncomeRows}
+            total={postIncomeTotal}
+            totalLabel="Total Masuk"
+            accentClass="text-success"
+          />
+          <PostRincianBox
+            title="Pengeluaran"
+            rows={postExpenseRows}
+            total={postExpenseTotal}
+            totalLabel="Total Keluar"
+            accentClass="text-danger"
+          />
+          <div className="flex items-center justify-between text-ios-footnote px-1">
+            <span className="font-bold text-surface-text">Net Kas</span>
+            <span
+              className={`font-extrabold ${postIncomeTotal - postExpenseTotal >= 0 ? "text-success" : "text-danger"}`}
+            >
+              {formatRp(postIncomeTotal - postExpenseTotal)}
             </span>
           </div>
         </div>
@@ -2165,43 +2199,36 @@ export const MonthlyDuesPage: React.FC = () => {
         confirmLabel="Batalkan Pindah Kas"
         danger
         loading={cancelling}
+        wide
         onConfirm={async () => {
           setShowConfirmCancel(false);
           await handleCancelPost();
         }}
         onCancel={() => setShowConfirmCancel(false)}
       >
-        <div className="bg-surface-card2 border border-surface-border rounded-xl p-3 space-y-2 mt-1">
-          <p className="text-[10px] font-semibold uppercase text-surface-muted mb-1 tracking-wider">
-            Rincian Transaksi yang Dibatalkan
-          </p>
-          {[
-            { label: "Infak IR", value: allocationTotals.ir },
-            { label: "Uang Sambung", value: allocationTotals.sambung },
-            { label: "Jimpitan", value: allocationTotals.jimpitan },
-            { label: "Siar-Siar", value: allocationTotals.siar },
-            { label: "Seribuan", value: allocationTotals.seribu },
-            { label: "Kafan", value: allocationTotals.kafan },
-            { label: "Ukhro MT", value: allocationTotals.ukhro },
-          ]
-            .filter((a) => a.value > 0)
-            .map((a) => (
-              <div
-                key={a.label}
-                className="flex items-center justify-between text-ios-caption"
-              >
-                <span className="text-surface-text">{a.label}</span>
-                <span className="font-semibold text-danger">
-                  -{formatRp(a.value)}
-                </span>
-              </div>
-            ))}
-          <div className="pt-2 mt-2 border-t border-surface-border flex items-center justify-between text-ios-footnote">
-            <span className="font-bold text-surface-text">Total Ditarik</span>
-            <span className="font-extrabold text-danger">
-              -{formatRp(
-                Object.values(allocationTotals).reduce((s, v) => s + v, 0),
-              )}
+        <div className="space-y-2.5 mt-1">
+          <PostRincianBox
+            title={`Pemasukan Ditarik · ${monthLabel}`}
+            rows={postIncomeRows}
+            total={postIncomeTotal}
+            totalLabel="Total Masuk Ditarik"
+            accentClass="text-danger"
+            negative
+          />
+          <PostRincianBox
+            title="Pengeluaran Ditarik"
+            rows={postExpenseRows}
+            total={postExpenseTotal}
+            totalLabel="Total Keluar Ditarik"
+            accentClass="text-danger"
+            negative
+          />
+          <div className="flex items-center justify-between text-ios-footnote px-1">
+            <span className="font-bold text-surface-text">Net Ditarik</span>
+            <span
+              className={`font-extrabold ${postIncomeTotal - postExpenseTotal >= 0 ? "text-danger" : "text-success"}`}
+            >
+              {formatRp(postExpenseTotal - postIncomeTotal)}
             </span>
           </div>
         </div>
