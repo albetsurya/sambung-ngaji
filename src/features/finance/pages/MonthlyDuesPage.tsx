@@ -16,6 +16,7 @@ import {
 import {
   Button,
   Input,
+  Select,
   DateInput,
   FilterChip,
   Segmented,
@@ -1294,40 +1295,24 @@ export const MonthlyDuesPage: React.FC = () => {
                   Informasi Pembayaran
                 </p>
                 <div className="space-y-3">
-                  <div>
-                    <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
-                      Anggota
-                    </p>
-                    <div className="rounded-xl border border-surface-border overflow-hidden">
-                      <div className="max-h-40 overflow-y-auto divide-y divide-surface-border">
-                        {membersList.map((m) => {
-                          const active =
-                            m.member_id === selectedMember.member_id;
-                          return (
-                            <button
-                              key={m.member_id}
-                              type="button"
-                              onClick={() => handleOpenPaymentSheet(m)}
-                              className={`w-full text-left px-3.5 py-2.5 text-ios-body transition-colors active:bg-surface-card2 ${
-                                active
-                                  ? "bg-accent-soft text-accent font-semibold"
-                                  : "text-surface-text hover:bg-surface-card2"
-                              }`}
-                            >
-                              <span className="inline-flex items-center gap-2">
-                                {active && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                                )}
-                                <span className="truncate">
-                                  {m.member_name}
-                                </span>
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
+                  <Select
+                    label="Anggota"
+                    value={selectedMember.member_id}
+                    onChange={(e) => {
+                      const m = membersList.find(
+                        (x) => x.member_id === e.target.value,
+                      );
+                      if (m) handleOpenPaymentSheet(m);
+                    }}
+                    required
+                    data-testid="shod-payment-member-select"
+                  >
+                    {membersList.map((m) => (
+                      <option key={m.member_id} value={m.member_id}>
+                        {m.member_name}
+                      </option>
+                    ))}
+                  </Select>
                   <DateInput
                     label="Tanggal Pembayaran"
                     value={paymentForm.payment_date}
@@ -1507,38 +1492,24 @@ export const MonthlyDuesPage: React.FC = () => {
             Pilih anggota, tempel foto catatan/bukti transfer, ekstrak dengan
             AI, lalu lanjutkan ke form manual untuk review sebelum disimpan.
           </p>
-          <div>
-            <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
-              Anggota
-            </p>
-            <div className="rounded-xl border border-surface-border overflow-hidden">
-              <div className="max-h-40 overflow-y-auto divide-y divide-surface-border">
-                {membersList.map((m) => {
-                  const active =
-                    selectedMember?.member_id === m.member_id;
-                  return (
-                    <button
-                      key={m.member_id}
-                      type="button"
-                      onClick={() => setSelectedMember(m)}
-                      className={`w-full text-left px-3.5 py-2.5 text-ios-body transition-colors active:bg-surface-card2 ${
-                        active
-                          ? "bg-accent-soft text-accent font-semibold"
-                          : "text-surface-text hover:bg-surface-card2"
-                      }`}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        {active && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                        )}
-                        <span className="truncate">{m.member_name}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+          <Select
+            label="Anggota"
+            value={selectedMember?.member_id || ""}
+            onChange={(e) => {
+              const m = membersList.find(
+                (x) => x.member_id === e.target.value,
+              );
+              if (m) setSelectedMember(m);
+            }}
+            required
+            data-testid="shod-ai-member-select"
+          >
+            {membersList.map((m) => (
+              <option key={m.member_id} value={m.member_id}>
+                {m.member_name}
+              </option>
+            ))}
+          </Select>
           <DateInput
             label="Tanggal Pembayaran"
             value={paymentForm.payment_date}
