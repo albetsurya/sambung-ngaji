@@ -338,11 +338,11 @@ export const financeApi = {
   },
   deleteTransaction: async (
     groupId: string | null | undefined,
-    kasId: string,
+    cashId: string,
     cashType: CashType = "main",
   ): Promise<KasDataResponse> => {
     const gid = requireGroup(groupId);
-    await restDelete("/api/v1/finance/cash-ledger", { group_id: gid, kas_id: kasId });
+    await restDelete("/api/v1/finance/cash-ledger", { group_id: gid, cash_id: cashId });
     return financeApi.getKasTransactions(gid, cashType);
   },
   carryForwardBalance: async (

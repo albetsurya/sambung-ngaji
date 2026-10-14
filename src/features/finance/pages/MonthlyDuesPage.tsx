@@ -164,7 +164,6 @@ export const MonthlyDuesPage: React.FC = () => {
     useState<DueMember | null>(null);
   const [paymentDetail, setPaymentDetail] = useState<any | null>(null);
   const [reversing, setReversing] = useState(false);
-  const [payMethod, setPayMethod] = useState<"manual" | "upload">("manual");
   const [visibleCount, setVisibleCount] = useState(3);
   const overviewTopRef = useRef<HTMLDivElement>(null);
   const skipScrollRef = useRef(true);
@@ -313,7 +312,6 @@ export const MonthlyDuesPage: React.FC = () => {
 
   const handleOpenPaymentSheet = async (member: DueMember, existing?: any) => {
     setSelectedMember(member);
-    setPayMethod("manual");
     if (existing) {
       setPaymentForm({
         payment_id: existing.payment_id || "",
@@ -378,6 +376,26 @@ export const MonthlyDuesPage: React.FC = () => {
       /* noop */
     }
     setIsPaymentSheetOpen(true);
+  };
+
+  // Sheet upload foto terpisah: hanya pilih anggota + foto, tanpa form manual.
+  // Hasil AI ditampung di paymentForm/carryovers lalu direview di sheet manual.
+  const handleOpenAiSheet = (member: DueMember) => {
+    setSelectedMember(member);
+    setPaymentForm({
+      payment_id: "",
+      payment_date: new Date().toISOString().slice(0, 10),
+      connecting_fund: 0,
+      community_dues: 0,
+      outreach_fund: 0,
+      thousand_fund: 0,
+      funeral_fund: 0,
+      ukhro_mt: 0,
+      notes: "",
+    });
+    setCarryovers([]);
+    setAiPhotoUrl("");
+    setIsAiSheetOpen(true);
   };
 
   const carryoverTotal = carryovers.reduce(
@@ -503,7 +521,7 @@ export const MonthlyDuesPage: React.FC = () => {
             "warning",
           );
         }
-        setIsAiSheetOpen(false);
+        // Sheet tetap terbuka agar user bisa review lalu lanjut ke form manual.
       } else {
         showToast(res.message || "Gagal membaca foto", "error");
       }
@@ -696,9 +714,7 @@ export const MonthlyDuesPage: React.FC = () => {
               testId: "shod-fab-photo",
               onClick: () => {
                 if (membersList.length > 0) {
-                  handleOpenPaymentSheet(membersList[0]);
-                  setPayMethod("upload");
-                  setIsAiSheetOpen(true);
+                  handleOpenAiSheet(membersList[0]);
                 } else {
                   showToast("Belum ada anggota shodaqoh", "warning");
                 }
@@ -1278,38 +1294,6 @@ export const MonthlyDuesPage: React.FC = () => {
                   Informasi Pembayaran
                 </p>
                 <div className="space-y-3">
-                  <Segmented<"manual" | "upload">
-                    ariaLabel="Metode input"
-                    value={payMethod}
-                    onChange={setPayMethod}
-                    size="sm"
-                    options={[
-                      { value: "manual", label: "Manual" },
-                      { value: "upload", label: "Upload Bukti" },
-                    ]}
-                  />
-                  {payMethod === "upload" && (
-                    <div className="flex items-center justify-between gap-3 rounded-xl bg-accent-soft border border-accent/20 px-3 py-2.5">
-                      <div className="min-w-0">
-                        <p className="text-ios-footnote font-semibold text-surface-text">
-                          Punya foto bukti transfer?
-                        </p>
-                        <p className="text-ios-caption text-surface-muted mt-0.5">
-                          Scan dengan AI untuk isi otomatis
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setIsAiSheetOpen(true)}
-                      >
-                        <span className="inline-flex items-center gap-1.5">
-                          <Sparkles size={13} /> Scan
-                        </span>
-                      </Button>
-                    </div>
-                  )}
                   <div>
                     <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
                       Anggota
@@ -1507,16 +1491,6 @@ export const MonthlyDuesPage: React.FC = () => {
                   cancelTestId="btn-cancel-shodaqoh-payment"
                   submitTestId="btn-submit-shodaqoh-payment"
                 />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  fullWidth
-                  onClick={() => setIsAiSheetOpen(true)}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <Sparkles size={14} /> Scan Foto (AI OCR)
-                  </span>
-                </Button>
               </section>
             </div>
           </form>
@@ -1526,21 +1500,105 @@ export const MonthlyDuesPage: React.FC = () => {
       <BottomSheet
         open={isAiSheetOpen}
         onClose={() => setIsAiSheetOpen(false)}
-        title="Scan Foto via AI"
+        title="Bayar Lewat Foto"
       >
-        <p className="text-ios-footnote text-surface-muted mb-4 px-1">
-          Tempel Base64 atau URL foto catatan shodaqoh untuk diekstraksi
-          nominalnya otomatis.
-        </p>
-        <Input
-          label="Foto (Base64 / URL)"
-          placeholder="data:image/jpeg;base64,…"
-          value={aiPhotoUrl}
-          onChange={(e) => setAiPhotoUrl(e.target.value)}
-        />
-        <Button fullWidth disabled={aiExtracting} onClick={handleAiExtract}>
-          {aiExtracting ? "Mengekstraksi…" : "Ekstrak Foto"}
-        </Button>
+        <div data-testid="shodaqoh-ai-overlay" className="space-y-4">
+          <p className="text-ios-footnote text-surface-muted px-1">
+            Pilih anggota, tempel foto catatan/bukti transfer, ekstrak dengan
+            AI, lalu lanjutkan ke form manual untuk review sebelum disimpan.
+          </p>
+          <div>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-1.5 px-1">
+              Anggota
+            </p>
+            <div className="rounded-xl border border-surface-border overflow-hidden">
+              <div className="max-h-40 overflow-y-auto divide-y divide-surface-border">
+                {membersList.map((m) => {
+                  const active =
+                    selectedMember?.member_id === m.member_id;
+                  return (
+                    <button
+                      key={m.member_id}
+                      type="button"
+                      onClick={() => setSelectedMember(m)}
+                      className={`w-full text-left px-3.5 py-2.5 text-ios-body transition-colors active:bg-surface-card2 ${
+                        active
+                          ? "bg-accent-soft text-accent font-semibold"
+                          : "text-surface-text hover:bg-surface-card2"
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        {active && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                        )}
+                        <span className="truncate">{m.member_name}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <DateInput
+            label="Tanggal Pembayaran"
+            value={paymentForm.payment_date}
+            onChange={(val) =>
+              setPaymentForm({
+                ...paymentForm,
+                payment_date: val,
+              })
+            }
+            required
+            data-testid="shod-ai-payment-date"
+          />
+          <Input
+            label="Foto (Base64 / URL)"
+            placeholder="data:image/jpeg;base64,…"
+            value={aiPhotoUrl}
+            onChange={(e) => setAiPhotoUrl(e.target.value)}
+            data-testid="shod-ai-photo-input"
+          />
+          <Button
+            fullWidth
+            disabled={aiExtracting || !selectedMember}
+            onClick={handleAiExtract}
+            data-testid="btn-shod-ai-extract"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <Sparkles size={14} />{" "}
+              {aiExtracting ? "Mengekstraksi…" : "Ekstrak Foto"}
+            </span>
+          </Button>
+          {paymentTotal > 0 && (
+            <div className="rounded-xl bg-accent-soft border border-accent/20 px-3.5 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-ios-caption font-semibold text-surface-muted">
+                  Hasil Ekstraksi AI
+                </span>
+                <span className="font-display text-ios-body font-extrabold text-accent tabular-nums">
+                  {formatRp(paymentTotal)}
+                </span>
+              </div>
+              {carryoverTotal > 0 && (
+                <p className="text-ios-caption text-accent font-medium mt-1">
+                  Termasuk Infak IR {formatRp(carryoverTotal)} — pilih bulannya
+                  di form berikutnya
+                </p>
+              )}
+              <Button
+                fullWidth
+                className="mt-2.5"
+                onClick={() => {
+                  setIsAiSheetOpen(false);
+                  setIsPaymentSheetOpen(true);
+                }}
+                data-testid="btn-shod-ai-continue"
+              >
+                Lanjut ke Form Manual
+              </Button>
+            </div>
+          )}
+        </div>
       </BottomSheet>
 
       <BottomSheet
