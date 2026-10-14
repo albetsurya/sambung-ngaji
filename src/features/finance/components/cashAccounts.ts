@@ -22,9 +22,34 @@ export function normalizeAccountName(name: unknown): string {
   return String(name ?? "").trim().toUpperCase();
 }
 
+/* Kata kunci pelengkap: akun legacy dari spreadsheet memakai varian nama */
+/* ("Pemasukan/Setor Uang Sambung", "Infak IR", "Infak Seribuan", dsb)   */
+/* sehingga pencocokan persis saja tidak cukup. "INFAQ JAMAAH" manual    */
+/* tidak ikut tercocok (tidak mengandung kata kunci di bawah).           */
+const SHODAQOH_ACCOUNT_KEYWORDS = [
+  "SHODAQOH",
+  "SAMBUNG",
+  "JIMPITAN",
+  "SIAR",
+  "SERIBU",
+  "KAFAN",
+  "UKHRO",
+  "KESEHATAN",
+] as const;
+
 export function isShodaqohPostedAccount(name: unknown): boolean {
   const key = normalizeAccountName(name);
-  return (SHODAQOH_POSTED_ACCOUNTS as readonly string[]).includes(key);
+  if (!key) return false;
+  if ((SHODAQOH_POSTED_ACCOUNTS as readonly string[]).includes(key))
+    return true;
+  if (
+    (SHODAQOH_ACCOUNT_KEYWORDS as readonly string[]).some((k) =>
+      key.includes(k),
+    )
+  )
+    return true;
+  // "Infak IR" / "Infaq IR" tanpa kata Shodaqoh.
+  return /\bIR\b/.test(key);
 }
 
 /* Akun sistem: tidak ditawarkan di select tambah/edit. */
