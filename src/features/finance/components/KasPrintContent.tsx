@@ -303,13 +303,13 @@ export const KasPrintContent: React.FC<KasPrintContentProps> = ({
       )}
       <div className="mt-12 flex justify-between text-center text-xs">
         <div>
-          <p className="text-slate-600 mb-12">Bendahara / Tim Keuangan</p>
+          <p className="text-slate-600 mb-12">TIM KU</p>
           <p className="font-bold underline uppercase">
             ( ........................................ )
           </p>
         </div>
         <div>
-          <p className="text-slate-600 mb-12">Mengetahui, Ketua / Pembina</p>
+          <p className="text-slate-600 mb-12">Mengetahui, KI Kelompok</p>
           <p className="font-bold underline uppercase">
             ( ........................................ )
           </p>
