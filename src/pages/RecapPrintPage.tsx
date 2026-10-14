@@ -167,7 +167,7 @@ export default function RecapPrintPage() {
 
       <div className="px-4 py-4 space-y-3 pb-8">
         {!isReadonly && (
-          <section className="rounded-2xl border border-surface-border bg-surface-card p-3">
+          <section className="rounded-2xl border border-surface-border bg-surface-card p-3 no-print">
             <div className="flex gap-2">
               <Button
                 variant="secondary"
@@ -207,9 +207,9 @@ export default function RecapPrintPage() {
               </Button>
             </div>
           </section>
-        )}
+          )}
 
-        <section className="rounded-2xl border border-surface-border bg-surface-card p-3">
+          <section className="rounded-2xl border border-surface-border bg-surface-card p-3 no-print">
           <div className="grid grid-cols-2 gap-2">
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-surface-muted mb-1 px-0.5">
@@ -285,7 +285,7 @@ export default function RecapPrintPage() {
               </Button>
             </div>
           </div>
-        </section>
+          </section>
 
         {dataQuery.isLoading ? (
           <RecapTableSkeleton rows={8} />
@@ -351,6 +351,8 @@ export default function RecapPrintPage() {
                     style={{
                       width: baseSize.w * zoom,
                       height: baseSize.h * zoom,
+                      transform: `scale(${zoom})`,
+                      transformOrigin: "top left",
                     }}
                   >
                     <section
@@ -360,8 +362,6 @@ export default function RecapPrintPage() {
                       style={{
                         width: `${sheetWidthMm}mm`,
                         minWidth: `${sheetWidthMm}mm`,
-                        transform: `scale(${zoom})`,
-                        transformOrigin: "top left",
                         fontFamily:
                           'Helvetica, "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif',
                       }}
