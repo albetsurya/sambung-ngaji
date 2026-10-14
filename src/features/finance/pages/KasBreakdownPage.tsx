@@ -16,11 +16,14 @@ import {
 import {
   Button,
   Input,
+  DateInput,
   FilterChip,
   Segmented,
   GroupedList,
   ListRow,
+  ChevronRow,
   BottomSheet,
+  ConfirmDialog,
   EmptyState,
   ErrorState,
   Card,
@@ -176,10 +179,29 @@ export const KasBreakdownPage: React.FC = () => {
   // Pilihan baris tidak dibawa pindah tab/bulan.
   useEffect(() => {
     setSelectedIds(new Set());
+    setSelectMode(false);
   }, [tab, activeMonth, cashType]);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
+  // Mode pilih (centang banyak) vs mode aksi (ketuk = sheet edit/hapus/duplikat).
+  // Default mode aksi agar konsisten dengan halaman Kas; mode pilih hanya aktif
+  // lewat tombol "Pilih" dan otomatis mati saat pindah tab/bulan/jenis kas.
+  const [selectMode, setSelectMode] = useState(false);
+  const [actionTx, setActionTx] = useState<Transaction | null>(null);
+  const [isTxSheetOpen, setIsTxSheetOpen] = useState(false);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [txForm, setTxForm] = useState({
+    transaction_date: new Date().toISOString().slice(0, 10),
+    account_name: "",
+    description: "",
+    transaction_type: "DEBIT" as "DEBIT" | "CREDIT",
+    amount: 0,
+  });
+  const [savingTx, setSavingTx] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
 
   const txKey = (t: Transaction, idx: number) => t.cash_id || `row-${idx}`;
   const toggleSelect = (key: string) =>
@@ -229,8 +251,110 @@ export const KasBreakdownPage: React.FC = () => {
     }
   };
 
-  const backToBreakdown = `/finance/ledger/breakdown?cash=${cashType}&month=${activeMonth || "latest"}`;
-  const printUrl = (mode: "rincian" | "rekap") =>
+  const handleOpenEditSheet = (tx: Transaction) => {
+    setEditingTx(tx);
+    const deb = Number(tx.debit) || 0;
+    const kre = Number(tx.credit) || 0;
+    setTxForm({
+      transaction_date:
+        tx.transaction_date || new Date().toISOString().slice(0, 10),
+      account_name: tx.account_name || "",
+      description: tx.description || "",
+      transaction_type: deb > 0 ? "DEBIT" : "CREDIT",
+      amount: deb > 0 ? deb : kre,
+    });
+    setIsTxSheetOpen(true);
+  };
+
+  const handleSubmitTx = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTx?.cash_id) return;
+    if (!txForm.description.trim()) {
+      showToast("Keterangan wajib diisi", "error");
+      return;
+    }
+    if (txForm.amount <= 0) {
+      showToast("Jumlah nominal harus lebih besar dari 0", "error");
+      return;
+    }
+    setSavingTx(true);
+    try {
+      const deb = txForm.transaction_type === "DEBIT" ? txForm.amount : 0;
+      const kre = txForm.transaction_type === "CREDIT" ? txForm.amount : 0;
+      await financeApi.editTransaction(
+        assignedGroup,
+        {
+          cash_id: editingTx.cash_id,
+          transaction_date: txForm.transaction_date,
+          account_name: txForm.account_name,
+          description: txForm.description,
+          transaction_type: txForm.transaction_type,
+          debit: deb,
+          credit: kre,
+        },
+        cashType,
+      );
+      showToast("Transaksi berhasil diperbarui", "success");
+      setIsTxSheetOpen(false);
+      setEditingTx(null);
+      setSelectMode(false);
+      setSelectedIds(new Set());
+      loadData();
+    } catch (err: any) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyimpan transaksi",
+        "error",
+      );
+    } finally {
+      setSavingTx(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget?.cash_id) return;
+    setDeleting(true);
+    try {
+      await financeApi.deleteTransaction(
+        assignedGroup,
+        deleteTarget.cash_id,
+        cashType,
+      );
+      showToast("Transaksi berhasil dihapus", "success");
+      setDeleteTarget(null);
+      setSelectMode(false);
+      setSelectedIds(new Set());
+      loadData();
+    } catch (err: any) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menghapus transaksi",
+        "error",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDuplicateTx = async (tx?: Transaction | null) => {
+    const target = tx || editingTx;
+    if (!target?.cash_id) return;
+    setDuplicating(true);
+    try {
+      await financeApi.duplicateTransaction(assignedGroup, target, cashType);
+      showToast("Transaksi berhasil diduplikat", "success");
+      setSelectMode(false);
+      setSelectedIds(new Set());
+      loadData();
+    } catch (err: any) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menduplikat transaksi",
+        "error",
+      );
+    } finally {
+      setDuplicating(false);
+    }
+  };
+
+  const backToBreakdown = `/finance/ledger/breakdown?cash=${cashType}&month=${activeMonth || "latest"}`;  const printUrl = (mode: "rincian" | "rekap") =>
     `/finance/ledger/print?mode=${mode}&cash=${cashType}&bulan=${activeMonth}&back=${encodeURIComponent(backToBreakdown)}`;
 
   const overview = useMemo(() => {
@@ -456,34 +580,46 @@ export const KasBreakdownPage: React.FC = () => {
                     />
                   ))}
                 </div>
-                {selectedCount > 0 ? (
-                  <div className="px-4 mt-1.5 flex items-center justify-between gap-2">
-                    <p className="text-ios-footnote font-semibold text-accent truncate">
-                      {selectedCount} dipilih · {formatRp(selectedTotal)}
-                    </p>
-                    <div className="flex items-center gap-3 shrink-0">
+                {/* Mode aksi (default): ketuk baris = sheet edit/hapus/duplikat.
+                    Mode pilih: ketuk baris = centang untuk hitung subtotal. */}
+                <div className="px-4 mt-1.5 flex items-center justify-between gap-2">
+                  <p
+                    className={`truncate ${selectMode ? "text-ios-footnote font-semibold text-accent" : "text-ios-footnote text-surface-muted"}`}
+                  >
+                    {selectMode
+                      ? selectedCount > 0
+                        ? `${selectedCount} dipilih · ${formatRp(selectedTotal)}`
+                        : "Ketuk baris untuk memilih"
+                      : `${shownList.length} transaksi · ketuk untuk aksi`}
+                  </p>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {selectMode ? (
+                      <>
+                        <button
+                          onClick={() => setSelectedIds(new Set())}
+                          className="text-ios-footnote font-semibold text-surface-muted active:scale-[0.97]"
+                        >
+                          Bersihkan
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectMode(false);
+                            setSelectedIds(new Set());
+                          }}
+                          className="text-ios-footnote font-semibold text-accent active:scale-[0.97]"
+                        >
+                          Selesai
+                        </button>
+                      </>
+                    ) : (
                       <button
-                        onClick={() => setSelectedIds(new Set())}
-                        className="text-ios-footnote font-semibold text-surface-muted active:scale-[0.97]"
-                      >
-                        Bersihkan
-                      </button>
-                      <button
-                        onClick={() =>
-                          setSortDir((d) => (d === "desc" ? "asc" : "desc"))
-                        }
+                        onClick={() => setSelectMode(true)}
                         className="text-ios-footnote font-semibold text-accent active:scale-[0.97]"
-                        aria-label="Ubah urutan tanggal"
+                        data-testid="btn-bd-select-mode"
                       >
-                        {sortDir === "desc" ? "Terbaru ↓" : "Terlama ↑"}
+                        Pilih
                       </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="px-4 mt-1.5 flex items-center justify-between gap-2">
-                    <p className="text-ios-footnote text-surface-muted">
-                      {shownList.length} transaksi
-                    </p>
+                    )}
                     <button
                       onClick={() =>
                         setSortDir((d) => (d === "desc" ? "asc" : "desc"))
@@ -494,7 +630,7 @@ export const KasBreakdownPage: React.FC = () => {
                       {sortDir === "desc" ? "Terbaru ↓" : "Terlama ↑"}
                     </button>
                   </div>
-                )}
+                </div>
                 {shownList.length === 0 ? (
                   <EmptyState
                     title="Tidak ada rincian"
@@ -517,10 +653,15 @@ export const KasBreakdownPage: React.FC = () => {
                         <ListRow
                           key={`${t.cash_id || `row-${idx}`}-${checked ? "on" : "off"}`}
                           insetDivider={true}
-                          onClick={() => toggleSelect(txKey(t, idx))}
-                          className={checked ? "bg-accent-soft" : ""}
+                          onClick={() =>
+                            selectMode
+                              ? toggleSelect(txKey(t, idx))
+                              : setActionTx(t)
+                          }
+                          data-testid="bd-tx-item"
+                          className={selectMode && checked ? "bg-accent-soft" : ""}
                           style={
-                            checked
+                            selectMode && checked
                               ? {
                                   backgroundColor:
                                     "rgb(var(--c-accent-light))",
@@ -528,36 +669,62 @@ export const KasBreakdownPage: React.FC = () => {
                               : undefined
                           }
                           leading={
-                            <span
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${
-                                checked
-                                  ? "bg-accent border-accent text-white"
-                                  : "bg-surface-card border-surface-border text-transparent"
-                              }`}
-                            >
-                              <Check size={15} strokeWidth={2.5} />
-                            </span>
+                            selectMode ? (
+                              <span
+                                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-2 ${
+                                  checked
+                                    ? "bg-accent border-accent text-white"
+                                    : "bg-surface-card border-surface-border text-transparent"
+                                }`}
+                              >
+                                <Check size={15} strokeWidth={2.5} />
+                              </span>
+                            ) : undefined
                           }
                         >
-                          <div className="flex items-center justify-between gap-2 w-full">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-ios-body font-medium text-surface-text truncate">
-                                {t.description || "-"}
-                              </p>
-                              <p className="text-ios-caption text-surface-muted truncate">
-                                {formatDateShort(t.transaction_date)}
-                                {t.account_name ? ` · ${toTitleCase(t.account_name)}` : ""}
+                          {selectMode ? (
+                            <div className="flex items-center justify-between gap-2 w-full">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-ios-body font-medium text-surface-text truncate">
+                                  {t.description || "-"}
+                                </p>
+                                <p className="text-ios-caption text-surface-muted truncate">
+                                  {formatDateShort(t.transaction_date)}
+                                  {t.account_name ? ` · ${toTitleCase(t.account_name)}` : ""}
+                                </p>
+                              </div>
+                              <p
+                                className={`text-ios-subhead font-bold shrink-0 ${
+                                  isOut ? "text-danger" : "text-success"
+                                }`}
+                              >
+                                {isOut ? "−" : "+"}
+                                {formatRp(nominal)}
                               </p>
                             </div>
-                            <p
-                              className={`text-ios-subhead font-bold shrink-0 ${
-                                isOut ? "text-danger" : "text-success"
-                              }`}
-                            >
-                              {isOut ? "−" : "+"}
-                              {formatRp(nominal)}
-                            </p>
-                          </div>
+                          ) : (
+                            <ChevronRow>
+                              <div className="flex items-center justify-between gap-2 w-full">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-ios-body font-medium text-surface-text truncate">
+                                    {t.description || "-"}
+                                  </p>
+                                  <p className="text-ios-caption text-surface-muted truncate">
+                                    {formatDateShort(t.transaction_date)}
+                                    {t.account_name ? ` · ${toTitleCase(t.account_name)}` : ""}
+                                  </p>
+                                </div>
+                                <p
+                                  className={`text-ios-subhead font-bold shrink-0 ${
+                                    isOut ? "text-danger" : "text-success"
+                                  }`}
+                                >
+                                  {isOut ? "−" : "+"}
+                                  {formatRp(nominal)}
+                                </p>
+                              </div>
+                            </ChevronRow>
+                          )}
                         </ListRow>
                       );
                     })}
@@ -589,7 +756,8 @@ export const KasBreakdownPage: React.FC = () => {
               <p className="text-ios-caption text-surface-muted leading-relaxed">
                 Total dihitung dari kategori yang dipilih pada chip. Baris
                 “SALDO AWAL” tidak dihitung sebagai pemasukan maupun
-                pengeluaran.
+                pengeluaran. Ketuk baris untuk edit/duplikat/hapus, atau pakai
+                tombol Pilih untuk menandai beberapa transaksi.
               </p>
             </Card>
           </>
@@ -624,6 +792,152 @@ export const KasBreakdownPage: React.FC = () => {
           />
         </form>
       </BottomSheet>
+      {/* Sheet aksi per transaksi (pemasukan & pengeluaran): detail + edit/duplikat/hapus */}
+      <BottomSheet
+        open={!!actionTx}
+        onClose={() => setActionTx(null)}
+        title={actionTx?.description || "Aksi Transaksi"}
+      >
+        {actionTx && (
+          <div className="grid gap-2.5" data-testid="bd-tx-action-overlay">
+            <div className="rounded-xl bg-surface-card2 border border-surface-border px-3.5 py-2.5 mb-1">
+              <p className="text-ios-caption text-surface-muted">
+                {formatDateShort(actionTx.transaction_date)}
+                {actionTx.account_name
+                  ? ` · ${toTitleCase(actionTx.account_name)}`
+                  : ""}
+              </p>
+              <p
+                className={`text-ios-nav font-display font-extrabold mt-0.5 ${
+                  (Number(actionTx.debit) || 0) > 0
+                    ? "text-success"
+                    : "text-danger"
+                }`}
+              >
+                {(Number(actionTx.debit) || 0) > 0 ? "+" : "−"}
+                {formatRp(
+                  (Number(actionTx.debit) || 0) > 0
+                    ? Number(actionTx.debit)
+                    : Number(actionTx.credit),
+                )}
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              fullWidth
+              data-testid="btn-bd-action-edit"
+              onClick={() => {
+                const t = actionTx;
+                setActionTx(null);
+                handleOpenEditSheet(t);
+              }}
+            >
+              Edit Transaksi
+            </Button>
+            <Button
+              variant="secondary"
+              fullWidth
+              data-testid="btn-bd-action-duplicate"
+              disabled={duplicating}
+              onClick={async () => {
+                const t = actionTx;
+                setActionTx(null);
+                await handleDuplicateTx(t);
+              }}
+            >
+              {duplicating ? "Menduplikat…" : "Duplikat Transaksi"}
+            </Button>
+            <Button
+              variant="softDanger"
+              fullWidth
+              data-testid="btn-bd-action-delete"
+              onClick={() => {
+                setDeleteTarget(actionTx);
+                setActionTx(null);
+              }}
+            >
+              Hapus Transaksi
+            </Button>
+            <Button variant="ghost" fullWidth onClick={() => setActionTx(null)}>
+              Batal
+            </Button>
+          </div>
+        )}
+      </BottomSheet>
+      <BottomSheet
+        open={isTxSheetOpen}
+        onClose={() => setIsTxSheetOpen(false)}
+        title="Edit Transaksi"
+      >
+        <form onSubmit={handleSubmitTx}>
+          <DateInput
+            label="Tanggal"
+            value={txForm.transaction_date}
+            onChange={(val) =>
+              setTxForm({ ...txForm, transaction_date: val })
+            }
+            required
+          />
+          <div className="mb-4">
+            <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-1">
+              Jenis Transaksi
+            </p>
+            <Segmented<"DEBIT" | "CREDIT">
+              ariaLabel="Jenis transaksi"
+              value={txForm.transaction_type}
+              onChange={(v) => setTxForm({ ...txForm, transaction_type: v })}
+              options={[
+                { value: "DEBIT", label: "Penerimaan" },
+                { value: "CREDIT", label: "Pengeluaran" },
+              ]}
+            />
+          </div>
+          <Input
+            label="Akun / Kategori"
+            placeholder="Contoh: Infaq Jamaah, Listrik, Konsumsi"
+            value={txForm.account_name}
+            onChange={(e) =>
+              setTxForm({ ...txForm, account_name: e.target.value })
+            }
+          />
+          <Input
+            label="Keterangan"
+            placeholder="Uraian transaksi"
+            value={txForm.description}
+            onChange={(e) =>
+              setTxForm({ ...txForm, description: e.target.value })
+            }
+            required
+          />
+          <Input
+            label="Nominal (Rp)"
+            type="number"
+            placeholder="0"
+            value={txForm.amount || ""}
+            onChange={(e) =>
+              setTxForm({ ...txForm, amount: Number(e.target.value) })
+            }
+            required
+          />
+          <SheetFooter
+            onCancel={() => setIsTxSheetOpen(false)}
+            submitLabel="Simpan"
+            saving={savingTx}
+            cancelTestId="btn-bd-cancel-tx"
+            submitTestId="btn-bd-submit-tx"
+          />
+        </form>
+      </BottomSheet>
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Hapus transaksi?"
+        description={`“${deleteTarget?.description}” (${deleteTarget ? formatRp(Number(deleteTarget.debit) || Number(deleteTarget.credit)) : ""}) akan dihapus permanen.`}
+        confirmLabel="Ya, hapus"
+        danger
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </AppLayout>
   );
 };
