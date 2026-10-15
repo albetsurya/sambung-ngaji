@@ -46,18 +46,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
   }, [payments, selectedMonth]);
   const hasSub = susulanMonths.length > 0;
   const rowSpan = hasSub ? 2 : 1;
-  let sumIr = 0;
-  const sumSusulanByMonth: Record<string, number> = {};
-  susulanMonths.forEach((m) => {
-    sumSusulanByMonth[m] = 0;
-  });
-  let sumSambung = 0;
-  let sumJimpitan = 0;
-  let sumSiar = 0;
-  let sumSeribuan = 0;
-  let sumKafan = 0;
-  let sumUkhro = 0;
-  let sumTotal = 0;
   const rows = useMemo(() => {
     return members.map((m, idx) => {
       const p = paymentMap.get(m.member_id);
@@ -78,17 +66,6 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
         if (selectedMonth && it.month > selectedMonth) return;
         susulanMap[it.month] = (susulanMap[it.month] || 0) + amt;
       });
-      sumIr += ir;
-      susulanMonths.forEach((mm) => {
-        sumSusulanByMonth[mm] += susulanMap[mm] || 0;
-      });
-      sumSambung += sambung;
-      sumJimpitan += jimpitan;
-      sumSiar += siar;
-      sumSeribuan += seribuan;
-      sumKafan += kafan;
-      sumUkhro += ukhro;
-      sumTotal += total;
       return {
         idx,
         m,
@@ -105,6 +82,38 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
       };
     });
   }, [members, payments, susulanMonths, selectedMonth]);
+  // Total diturunkan murni dari rows (tanpa efek samping di dalam useMemo)
+  // agar tidak me-reset ke 0 saat memo ter-cache / render ganda StrictMode.
+  const totals = useMemo(() => {
+    const t = {
+      ir: 0,
+      sambung: 0,
+      jimpitan: 0,
+      siar: 0,
+      seribuan: 0,
+      kafan: 0,
+      ukhro: 0,
+      total: 0,
+      susulan: {} as Record<string, number>,
+    };
+    susulanMonths.forEach((mm) => {
+      t.susulan[mm] = 0;
+    });
+    rows.forEach((r) => {
+      t.ir += r.ir;
+      susulanMonths.forEach((mm) => {
+        t.susulan[mm] += r.susulanMap[mm] || 0;
+      });
+      t.sambung += r.sambung;
+      t.jimpitan += r.jimpitan;
+      t.siar += r.siar;
+      t.seribuan += r.seribuan;
+      t.kafan += r.kafan;
+      t.ukhro += r.ukhro;
+      t.total += r.total;
+    });
+    return t;
+  }, [rows, susulanMonths]);
   return (
     <>
       <div className="text-center border-b-2 border-slate-800 pb-3 mb-4">
@@ -263,33 +272,33 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
                 key={m}
                 className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap"
               >
-                {formatRp(sumSusulanByMonth[m] || 0)}
+                {formatRp(totals.susulan[m] || 0)}
               </td>
             ))}
             {!isInfakIr && (
               <>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumSambung)}
+                  {formatRp(totals.sambung)}
                 </td>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumJimpitan)}
+                  {formatRp(totals.jimpitan)}
                 </td>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumSiar)}
+                  {formatRp(totals.siar)}
                 </td>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumSeribuan)}
+                  {formatRp(totals.seribuan)}
                 </td>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumKafan)}
+                  {formatRp(totals.kafan)}
                 </td>
                 <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
-                  {formatRp(sumUkhro)}
+                  {formatRp(totals.ukhro)}
                 </td>
               </>
             )}
             <td className="border border-slate-400 p-1 text-right  text-emerald-800 font-bold tabular-nums whitespace-nowrap">
-              {formatRp(isInfakIr ? sumIr : sumTotal)}
+              {formatRp(isInfakIr ? totals.ir : totals.total)}
             </td>
           </tr>
         </tfoot>

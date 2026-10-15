@@ -71,6 +71,20 @@ const PRINT_STYLE_OVERRIDES = `
 [data-print-root="true"] [class~="text-xl"] {
   font-size: calc(var(--print-fs) * 1.667) !important;
 }
+@media print {
+  body.printing-finance {
+    visibility: hidden !important;
+  }
+  body.printing-finance [data-print-root="true"] {
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
 `;
 export interface UnifiedPrintPreviewProps {
   filename: string;
@@ -112,41 +126,22 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
     return () => ro.disconnect();
   }, [fontSize, orientation, children]);
   const printArea = useCallback(() => {
-    const area = printRef.current;
-    if (!area) {
-      window.print();
-      return;
-    }
+    // @page dinamis mengikuti orientasi + margin 0: kotak cetak sama persis
+    // dengan lembar pratinjau (210/297mm) sehingga jumlah halaman identik.
+    // Pola visibility: seluruh body disembunyikan kecuali lembar cetak.
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-finance-print-page", "true");
+    styleEl.textContent = `@page { size: A4 ${orientation}; margin: 0; }`;
+    document.head.appendChild(styleEl);
     document.body.classList.add("printing-finance");
-    const prevTransform = area.style.transform;
-    const prevOrigin = area.style.transformOrigin;
     const restore = () => {
       document.body.classList.remove("printing-finance");
-      area.style.display = "";
-      area.style.position = "";
-      area.style.left = "";
-      area.style.top = "";
-      area.style.zIndex = "";
-      area.style.background = "";
-      area.style.width = "";
-      area.style.height = "";
-      area.style.transform = prevTransform;
-      area.style.transformOrigin = prevOrigin;
+      styleEl.remove();
     };
-    area.style.display = "block";
-    area.style.position = "fixed";
-    area.style.left = "-9999px";
-    area.style.top = "0";
-    area.style.zIndex = "999998";
-    area.style.background = "white";
-    area.style.width = "100%";
-    area.style.height = "100%";
-    area.style.transform = "none";
-    void area.offsetHeight;
     window.addEventListener("afterprint", restore, { once: true });
     window.print();
     setTimeout(restore, 2000);
-  }, []);
+  }, [orientation]);
   const sheetSizeMm = useMemo(() => {
     const sizes: Record<PrintOrientation, { w: number; h: number }> = {
       portrait: { w: 210, h: 297 },
@@ -154,6 +149,22 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
     };
     return sizes[orientation];
   }, [orientation]);
+  // Tinggi 1 halaman dalam px layout (tanpa zoom): dasar garis batas halaman
+  // di pratinjau. Selama isi tidak melewati garis, cetakan = 1 halaman.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const pageHpx = (baseSize.w * sheetSizeMm.h) / sheetSizeMm.w;
+  const pageCount = Math.max(1, Math.ceil(baseSize.h / pageHpx));
+  useLayoutEffect(() => {
+    if (sheetIdx > pageCount - 1) setSheetIdx(pageCount - 1);
+  }, [pageCount, sheetIdx]);
+  const gotoPage = (idx: number) => {
+    const clamped = Math.max(0, Math.min(pageCount - 1, idx));
+    setSheetIdx(clamped);
+    scrollRef.current?.scrollTo({
+      top: Math.max(0, clamped * pageHpx * zoom - 16),
+      behavior: "smooth",
+    });
+  };
   return (
     <div className="px-4 space-y-3 pb-8">
       <style>{PRINT_STYLE_OVERRIDES}</style>
@@ -238,7 +249,7 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
           </div>
         </div>
       </section>
-      <div className="overflow-auto rounded-xl border border-surface-border bg-slate-100 p-4">
+      <div ref={scrollRef} className="overflow-auto rounded-xl border border-surface-border bg-slate-100 p-4">
         <div className="flex min-h-[70vh] min-w-max items-center justify-center">
           <div
             className="flex-shrink-0 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-md"
@@ -250,7 +261,7 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
             <div
               ref={printRef}
               data-print-root="true"
-              className={`bg-white text-slate-900 p-8 ${className}`}
+              className={`relative bg-white text-slate-900 p-8 ${className}`}
               style={
                 {
                   fontSize: `${fontSize}pt`,
@@ -267,6 +278,20 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
               }
             >
               {children}
+              {Array.from({ length: pageCount - 1 }).map((_, i) => (
+                <div
+                  key={i}
+                  aria-hidden
+                  data-print-breaks="true"
+                  className="no-print absolute left-0 right-0 z-30 pointer-events-none"
+                  style={{ top: (i + 1) * pageHpx }}
+                >
+                  <div className="border-t-2 border-dashed border-danger" />
+                  <span className="absolute right-2 -top-2.5 rounded-full bg-danger px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                    Halaman {i + 2}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -277,20 +302,21 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
           size="xs"
           iconOnly
           disabled={sheetIdx <= 0}
-          onClick={() => setSheetIdx((idx) => idx - 1)}
+          onClick={() => gotoPage(sheetIdx - 1)}
           aria-label="Lembar sebelumnya"
           className="border border-surface-border bg-surface-card"
         >
           <ChevronLeft size={16} />
         </Button>
         <p className="text-ios-footnote font-medium text-surface-text tabular-nums">
-          Lembar {sheetIdx + 1}
+          Lembar {sheetIdx + 1} / {pageCount}
         </p>
         <Button
           variant="ghost"
           size="xs"
           iconOnly
-          onClick={() => setSheetIdx((idx) => idx + 1)}
+          disabled={sheetIdx >= pageCount - 1}
+          onClick={() => gotoPage(sheetIdx + 1)}
           aria-label="Lembar berikutnya"
           className="border border-surface-border bg-surface-card"
         >
