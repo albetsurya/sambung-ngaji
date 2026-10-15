@@ -155,9 +155,12 @@ export const ShodaqohPrintPreviewPage: React.FC = () => {
           </div>
         ) : (
           <UnifiedPrintPreview
+            key={printVariant}
             onClose={() => navigate("/finance/monthly-dues")}
             filename={`Matriks-Shodaqoh-${periodLabel}`}
             className="max-w-[297mm] min-h-[210mm] text-xs leading-tight"
+            defaultOrientation="landscape"
+            defaultFontSize="11"
           >
             <ShodaqohPrintContent
               members={yearlyMembers.length > 0 ? yearlyMembers : membersList}

@@ -135,9 +135,12 @@ export const KasPrintPreviewPage: React.FC = () => {
           </div>
         ) : (
           <UnifiedPrintPreview
+            key={mode}
             onClose={() => navigate(backTarget)}
             filename={`${cashType === "amil" ? "Kas-Amil" : "Kas-Utama"}-${monthLabel}`}
             className="max-w-[210mm] text-sm leading-relaxed"
+            defaultOrientation="portrait"
+            defaultFontSize={mode === "rekap" ? "11" : "7"}
           >
             <KasPrintContent
               transactions={transactions}

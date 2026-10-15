@@ -93,6 +93,8 @@ export interface UnifiedPrintPreviewProps {
   showExport?: boolean;
   exportFilename?: string;
   className?: string;
+  defaultOrientation?: PrintOrientation;
+  defaultFontSize?: PrintFontSize;
 }
 export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
   filename,
@@ -101,9 +103,12 @@ export const UnifiedPrintPreview: React.FC<UnifiedPrintPreviewProps> = ({
   showExport = true,
   exportFilename,
   className = "",
+  defaultOrientation = "portrait",
+  defaultFontSize = "7",
 }) => {
-  const [fontSize, setFontSize] = useState<PrintFontSize>("7");
-  const [orientation, setOrientation] = useState<PrintOrientation>("portrait");
+  const [fontSize, setFontSize] = useState<PrintFontSize>(defaultFontSize);
+  const [orientation, setOrientation] =
+    useState<PrintOrientation>(defaultOrientation);
   const [sheetIdx, setSheetIdx] = useState(0);
   const [zoom, setZoom] = useState(() =>
     typeof window !== "undefined" &&
