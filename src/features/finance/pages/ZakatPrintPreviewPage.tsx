@@ -18,6 +18,12 @@ export const ZakatPrintPreviewPage: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const mode = (searchParams.get("mode") as "kwitansi" | "rekap") || "kwitansi";
   const detailPath = id ? `/finance/zakat/${id}` : "/finance/zakat";
+  const transactionMonthLabel = data?.transaction_date
+    ? new Date(`${data.transaction_date.slice(0, 7)}-01`).toLocaleDateString(
+        "id-ID",
+        { month: "long", year: "numeric" },
+      )
+    : "Periode tidak ditentukan";
   const goBack = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate(detailPath, { replace: true });
@@ -113,9 +119,7 @@ export const ZakatPrintPreviewPage: React.FC = () => {
         ) : (
           <UnifiedPrintPreview
             onClose={goBack}
-            filename={`Kwitansi-Zakat-${
-              data?.title || data?.categories?.join("-") || "zakat"
-            }`}
+            filename={`Cetak laporan - Zakat - ${transactionMonthLabel}`}
             className="max-w-[210mm] leading-relaxed"
           >
             <ZakatPrintContent zakat={data} mode={mode} />

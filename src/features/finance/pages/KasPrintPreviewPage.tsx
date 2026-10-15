@@ -84,6 +84,7 @@ export const KasPrintPreviewPage: React.FC = () => {
         1,
       ).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
     : "Semua Periode";
+  const reportLabel = mode === "rekap" ? "Cetak per kategori" : "Cetak per transaksi";
 
   if (!assignedGroup) {
     return (
@@ -135,9 +136,12 @@ export const KasPrintPreviewPage: React.FC = () => {
           </div>
         ) : (
           <UnifiedPrintPreview
+            key={mode}
             onClose={() => navigate(backTarget)}
-            filename={`${cashType === "amil" ? "Kas-Amil" : "Kas-Utama"}-${monthLabel}`}
+            filename={`${reportLabel} - ${cashTypeLabel} - ${monthLabel}`}
             className="max-w-[210mm] text-sm leading-relaxed"
+            defaultOrientation="portrait"
+            defaultFontSize={mode === "rekap" ? "11" : "7"}
           >
             <KasPrintContent
               transactions={transactions}

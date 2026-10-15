@@ -835,7 +835,9 @@ export const MonthlyDuesPage: React.FC = () => {
                 <button
                   className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
                   onClick={() => {
-                    navigate(`/finance/monthly-dues/print?variant=shodaqoh`);
+                    navigate(
+                      `/finance/monthly-dues/print?variant=shodaqoh&bulan=${encodeURIComponent(selectedMonth)}`,
+                    );
                     setPrintMenuOpen(false);
                   }}
                   data-testid="btn-print-shodaqoh"
@@ -845,7 +847,9 @@ export const MonthlyDuesPage: React.FC = () => {
                 <button
                   className="w-full text-left px-3 py-2.5 rounded-xl text-ios-body active:bg-surface-card2"
                   onClick={() => {
-                    navigate(`/finance/monthly-dues/print?variant=infak-ir`);
+                    navigate(
+                      `/finance/monthly-dues/print?variant=infak-ir&bulan=${encodeURIComponent(selectedMonth)}`,
+                    );
                     setPrintMenuOpen(false);
                   }}
                   data-testid="btn-print-infak-ir"

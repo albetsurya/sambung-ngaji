@@ -73,8 +73,16 @@ export function TaarufCvEditor({
     if (!node || !member || busy) return;
     setBusy(kind);
     try {
-      if (kind === "pdf") await exportTaarufPdf(node, member.full_name);
-      else await exportTaarufPng(node, member.full_name);
+      const periodLabel = new Date().toLocaleDateString("id-ID", {
+        month: "long",
+        year: "numeric",
+      });
+      const filename = `Cetak CV Taaruf - ${member.full_name} - ${periodLabel}`;
+      if (kind === "pdf") {
+        await exportTaarufPdf(node, filename, "", { includeDate: false });
+      } else {
+        await exportTaarufPng(node, filename, "", { includeDate: false });
+      }
       showToast(kind === "pdf" ? "PDF berhasil diunduh" : "Gambar berhasil diunduh");
     } catch {
       showToast(

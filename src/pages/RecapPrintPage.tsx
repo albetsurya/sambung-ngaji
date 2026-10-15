@@ -133,6 +133,7 @@ export default function RecapPrintPage() {
     setExporting(kind);
     try {
       const label = kategori || "semua";
+      const filenameBase = `Pratinjau Cetakan - Rekap Kehadiran Bulanan - ${monthLabel} - ${label}`;
       if (kind === "pdf")
         await exportRecapPDF(
           matrix,
@@ -140,8 +141,9 @@ export default function RecapPrintPage() {
           label,
           Number(fontSize),
           orientation,
+          filenameBase,
         );
-      else await exportRecapExcel(matrix, monthLabel, label);
+      else await exportRecapExcel(matrix, monthLabel, label, filenameBase);
     } catch (err) {
       showToast(
         err instanceof ApiError ? err.message : "Gagal export rekap",

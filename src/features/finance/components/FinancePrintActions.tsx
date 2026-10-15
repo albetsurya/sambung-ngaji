@@ -8,15 +8,18 @@ import {
 import { exportTaarufPdf } from "../../../features/taaruf/components/taarufExport";
 import { exportElementToExcel } from "../lib/exportElementToExcel";
 import { useToast } from "../../../contexts/ToastContext";
+import type { PrintOrientation } from "./UnifiedPrintPreview";
 
 interface FinancePrintActionsProps {
   exportRef: RefObject<HTMLDivElement | null>;
   filename: string;
+  orientation: PrintOrientation;
 }
 
 export const FinancePrintActions: React.FC<FinancePrintActionsProps> = ({
   exportRef,
   filename,
+  orientation,
 }) => {
   const { showToast } = useToast();
   const [busy, setBusy] = useState<"pdf" | "excel" | null>(null);
@@ -27,7 +30,12 @@ export const FinancePrintActions: React.FC<FinancePrintActionsProps> = ({
     setBusy(kind);
     try {
       if (kind === "pdf") {
-        await exportTaarufPdf(node, filename, "SabilKas");
+        await exportTaarufPdf(node, filename, "", {
+          margin: 0,
+          ignoreTransform: true,
+          orientation,
+          includeDate: false,
+        });
       } else {
         await exportElementToExcel(node, filename);
       }
@@ -76,7 +84,7 @@ export const FinancePrintActions: React.FC<FinancePrintActionsProps> = ({
         </Button>
       </div>
       <p className="text-ios-caption text-surface-muted text-center">
-        Hasil unduhan sama persis dengan pratinjau di atas.
+        PDF mengikuti ukuran, orientasi, dan spasi sel pada pratinjau.
       </p>
     </>
   );

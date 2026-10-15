@@ -58,6 +58,18 @@ export default function FridayPrintPage() {
 
   const data = scope === "upcoming" ? upcoming : past;
   const scopeLabel = scope === "upcoming" ? "Mendatang" : "Riwayat";
+  const periodLabel = (() => {
+    if (!data.length) return "Periode tidak ditentukan";
+    const dates = data.map((item) => item.date).sort();
+    const start = new Date(`${dates[0].slice(0, 7)}-01`);
+    const end = new Date(`${dates[dates.length - 1].slice(0, 7)}-01`);
+    const format = (date: Date) =>
+      date.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+    return start.getTime() === end.getTime()
+      ? format(start)
+      : `${format(start)} - ${format(end)}`;
+  })();
+  const exportFilename = `Cetak Jadwal - ${scopeLabel} - ${periodLabel}`;
 
   async function handleExport(kind: "pdf" | "png") {
     const node = exportRef.current;
@@ -65,9 +77,9 @@ export default function FridayPrintPage() {
     setBusy(kind);
     try {
       if (kind === "pdf") {
-        await exportTaarufPdf(node, scopeLabel, "Jadwal-Petugas-Jumat");
+        await exportTaarufPdf(node, exportFilename, "", { includeDate: false });
       } else {
-        await exportTaarufPng(node, scopeLabel, "Jadwal-Petugas-Jumat");
+        await exportTaarufPng(node, exportFilename, "", { includeDate: false });
       }
       showToast(
         kind === "pdf" ? "PDF berhasil diunduh" : "Gambar berhasil diunduh",

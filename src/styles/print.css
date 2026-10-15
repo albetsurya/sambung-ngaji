@@ -9,7 +9,7 @@
     height: 100%;
     overflow: visible !important;
     -webkit-print-color-adjust: exact !important; /* Forces printing of background colors and images */
-    color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   @page {
@@ -48,14 +48,17 @@
     padding: 0 !important;
   }
 
-  /* Table specific styles for print */
-  table {
+  /* Aturan tabel legacy di bawah ini TIDAK berlaku saat mencetak lembar
+     finance (body.printing-finance) agar hasil cetak identik 1:1 dengan
+     pratinjau: lebar kolom, padding, dan warna header mengikuti layar. */
+  /* Table specific styles for print (non-finance sheets only) */
+  body:not(.printing-finance) table {
     border-collapse: collapse;
     width: 100%;
     table-layout: fixed; /* Ensures column widths are respected */
   }
 
-  th, td {
+  body:not(.printing-finance) th, body:not(.printing-finance) td {
     vertical-align: middle !important; /* Crucial for vertical alignment */
     padding: 2mm 1mm !important; /* Consistent padding for print */
     border: 0.1mm solid rgb(203, 213, 225) !important; /* Standardize cell borders */
@@ -64,7 +67,7 @@
     line-height: 1.2 !important; /* Consistent line height */
   }
 
-  thead th {
+  body:not(.printing-finance) thead th {
     background-color: rgb(51, 65, 85) !important; /* Header background color */
     color: white !important;
     font-weight: bold !important;
@@ -72,7 +75,7 @@
   }
 
   /* Prevent row breaks across pages */
-  tr {
+  body:not(.printing-finance) tr {
     page-break-inside: avoid;
     break-inside: avoid;
   }
