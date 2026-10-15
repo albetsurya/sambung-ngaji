@@ -45,7 +45,21 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
     return sorted.slice(-3);
   }, [payments, selectedMonth]);
   const hasSub = susulanMonths.length > 0;
-  const rowSpan = hasSub ? 2 : 1;
+  const headerRowSpan = hasSub ? 2 : 1;
+  const variableColumnCount = susulanMonths.length + (isInfakIr ? 0 : 6);
+  const nameColumnWidth = isInfakIr
+    ? hasSub
+      ? 30
+      : 80
+    : hasSub
+      ? 22
+      : 27;
+  const totalColumnWidth = isInfakIr ? 8 : hasSub ? 9 : 12;
+  const noColumnWidth = 5;
+  const variableColumnWidth = variableColumnCount
+    ? (100 - noColumnWidth - nameColumnWidth - totalColumnWidth) /
+      variableColumnCount
+    : 0;
   const rows = useMemo(() => {
     return members.map((m, idx) => {
       const p = paymentMap.get(m.member_id);
@@ -116,7 +130,7 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
   }, [rows, susulanMonths]);
   return (
     <>
-      <div className="text-center border-b-2 border-slate-800 pb-3 mb-4">
+      <div className="print-shodaqoh-header text-center border-b-2 border-slate-800 pb-3 mb-4">
         <h1 className="text-[1.4em] font-bold uppercase tracking-wide leading-tight">
           {isInfakIr
             ? "REKAPITULASI INFAK IR BULANAN"
@@ -126,20 +140,43 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
           PERIODE: {periodLabel.toUpperCase()}
         </p>
       </div>
-      <table className="w-full text-[0.9em] border-collapse border border-slate-400">
+      <table className="print-shodaqoh-table w-full text-[0.9em] border-collapse border border-slate-400">
+        <colgroup>
+          <col style={{ width: `${noColumnWidth}%` }} />
+          <col style={{ width: `${nameColumnWidth}%` }} />
+          {hasSub &&
+            susulanMonths.map((month) => (
+              <col
+                key={`sub-col-${month}`}
+                style={{ width: `${variableColumnWidth}%` }}
+              />
+            ))}
+          {!isInfakIr &&
+            ["sambung", "jimpitan", "siar", "seribuan", "kafan", "ukhro"].map(
+              (column) => (
+                <col
+                  key={`main-col-${column}`}
+                  style={{ width: `${variableColumnWidth}%` }}
+                />
+              ),
+            )}
+          <col style={{ width: `${totalColumnWidth}%` }} />
+        </colgroup>
         <thead>
           <tr className="bg-slate-100 text-slate-900 font-bold border-b border-slate-400 text-center">
             <th
-              rowSpan={rowSpan}
-              className="border border-slate-400 p-1 w-6 align-middle"
+              rowSpan={headerRowSpan}
+              className="print-shodaqoh-merged-header border border-slate-400 p-1 w-6 align-middle whitespace-nowrap"
             >
-              NO
+              <span className="print-shodaqoh-header-label">NO</span>
             </th>
             <th
-              rowSpan={rowSpan}
-              className="border border-slate-400 p-1 text-left min-w-[120px] align-middle"
+              rowSpan={headerRowSpan}
+              className="print-shodaqoh-merged-header border border-slate-400 p-1 text-left min-w-[120px] align-middle whitespace-nowrap"
             >
-              NAMA ANGGOTA
+              <span className="print-shodaqoh-header-label">
+                NAMA ANGGOTA
+              </span>
             </th>
             {hasSub && (
               <th
@@ -152,48 +189,50 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
             {!isInfakIr && (
               <>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[70px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[70px] align-middle whitespace-nowrap"
                 >
-                  SAMBUNG
+                  <span className="print-shodaqoh-header-label">SAMBUNG</span>
                 </th>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
                 >
-                  JIMPITAN
+                  <span className="print-shodaqoh-header-label">JIMPITAN</span>
                 </th>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
                 >
-                  SIAR-SIAR
+                  <span className="print-shodaqoh-header-label">SIAR-SIAR</span>
                 </th>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
                 >
-                  SERIBUAN
+                  <span className="print-shodaqoh-header-label">SERIBUAN</span>
                 </th>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[64px] align-middle whitespace-nowrap"
                 >
-                  KAFAN
+                  <span className="print-shodaqoh-header-label">KAFAN</span>
                 </th>
                 <th
-                  rowSpan={rowSpan}
-                  className="border border-slate-400 p-1 min-w-[70px] align-middle whitespace-nowrap"
+                  rowSpan={headerRowSpan}
+                  className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[70px] align-middle whitespace-nowrap"
                 >
-                  UKHRO MT
+                  <span className="print-shodaqoh-header-label">UKHRO MT</span>
                 </th>
               </>
             )}
             <th
-              rowSpan={rowSpan}
-              className="border border-slate-400 p-1 min-w-[80px] align-middle whitespace-nowrap"
+              rowSpan={headerRowSpan}
+              className="print-shodaqoh-merged-header border border-slate-400 p-1 min-w-[80px] align-middle whitespace-nowrap"
             >
-              {isInfakIr ? "TOTAL IR" : "TOTAL"}
+              <span className="print-shodaqoh-header-label">
+                {isInfakIr ? "TOTAL IR" : "TOTAL"}
+              </span>
             </th>
           </tr>
           {hasSub && (
@@ -260,50 +299,50 @@ export const ShodaqohPrintContent: React.FC<ShodaqohPrintContentProps> = ({
           ))}
         </tbody>
         <tfoot>
-          <tr className="font-bold bg-slate-100 border-t-2 border-slate-400">
+          <tr className="print-shodaqoh-total-row font-bold bg-slate-100 border-t-2 border-slate-400">
             <td
               colSpan={2}
-              className="border border-slate-400 p-1.5 text-right uppercase"
+              className="print-shodaqoh-total-cell border border-slate-400 p-1.5 text-right uppercase"
             >
               JUMLAH TOTAL
             </td>
             {susulanMonths.map((m) => (
               <td
                 key={m}
-                className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap"
+                className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap"
               >
                 {formatRp(totals.susulan[m] || 0)}
               </td>
             ))}
             {!isInfakIr && (
               <>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.sambung)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.jimpitan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.siar)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.seribuan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.kafan)}
                 </td>
-                <td className="border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
+                <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  tabular-nums whitespace-nowrap">
                   {formatRp(totals.ukhro)}
                 </td>
               </>
             )}
-            <td className="border border-slate-400 p-1 text-right  text-emerald-800 font-bold tabular-nums whitespace-nowrap">
+            <td className="print-shodaqoh-total-cell border border-slate-400 p-1 text-right  text-emerald-800 font-bold tabular-nums whitespace-nowrap">
               {formatRp(isInfakIr ? totals.ir : totals.total)}
             </td>
           </tr>
         </tfoot>
       </table>
-      <div className="mt-8 flex justify-between text-center text-[1em]">
+      <div className="print-shodaqoh-signature mt-8 flex justify-between text-center text-[1em]">
         <div>
           <p className="text-slate-600 mb-10">Penerima / Tim KU</p>
           <p className="font-bold underline uppercase">

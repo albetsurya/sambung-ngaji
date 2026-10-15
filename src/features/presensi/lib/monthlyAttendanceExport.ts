@@ -111,6 +111,7 @@ export async function exportRecapPDF(
   kategoriLabel: string,
   fontSize = 7,
   orientation: "portrait" | "landscape" = "portrait",
+  filenameBase = `Rekap Kehadiran Bulanan - ${monthLabel} - ${kategoriLabel}`,
 ) {
   const doc = new jsPDF({ orientation });
   doc.setFontSize(14);
@@ -199,7 +200,7 @@ export async function exportRecapPDF(
       }
     },
   });
-  doc.save(`rekap-absensi-${monthLabel}-${kategoriLabel}.pdf`);
+  doc.save(`${filenameBase}.pdf`);
 }
 /* ---------------- Excel ---------------- */
 const EXCEL_BORDER = {
@@ -212,6 +213,7 @@ export async function exportRecapExcel(
   matrix: RecapMatrix,
   monthLabel: string,
   kategoriLabel: string,
+  filenameBase = `Rekap Kehadiran Bulanan - ${monthLabel} - ${kategoriLabel}`,
 ) {
   const wb = new ExcelJS.Workbook();
   wb.creator = "SabilKas";
@@ -352,7 +354,7 @@ export async function exportRecapExcel(
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `rekap-absensi-${monthLabel}-${kategoriLabel}.xlsx`;
+  a.download = `${filenameBase}.xlsx`;
   document.body.appendChild(a);
   a.click();
   a.remove();

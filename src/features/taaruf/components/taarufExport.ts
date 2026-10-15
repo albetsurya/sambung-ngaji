@@ -2,13 +2,30 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
 
-async function capture(node: HTMLElement): Promise<HTMLCanvasElement> {
-  return html2canvas(node, {
-    scale: 2,
-    backgroundColor: "#ffffff",
-    useCORS: true,
-    logging: false,
-  });
+async function capture(
+  node: HTMLElement,
+  options: { ignoreTransform?: boolean } = {},
+): Promise<HTMLCanvasElement> {
+  const previousTransform = node.style.transform;
+  const previousTransformOrigin = node.style.transformOrigin;
+  if (options.ignoreTransform) {
+    node.style.transform = "none";
+    node.style.transformOrigin = "top left";
+    void node.offsetHeight;
+  }
+  try {
+    return await html2canvas(node, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      logging: false,
+    });
+  } finally {
+    if (options.ignoreTransform) {
+      node.style.transform = previousTransform;
+      node.style.transformOrigin = previousTransformOrigin;
+    }
+  }
 }
 
 function download(href: string, filename: string) {
@@ -23,25 +40,33 @@ function download(href: string, filename: string) {
 function safeFilename(name: string): string {
   const clean = name
     .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-zA-Z0-9-_]/g, "");
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
   return clean || "cv-taaruf";
+}
+
+interface ExportFilenameOptions {
+  includeDate?: boolean;
 }
 
 export function taarufFilename(
   name: string,
   ext: "png" | "pdf",
   prefix = "CV-Taaruf",
+  options: ExportFilenameOptions = {},
 ): string {
-  const date = new Date().toISOString().slice(0, 10);
   const base = prefix ? `${prefix}-${safeFilename(name)}` : safeFilename(name);
-  return `${base}-${date}.${ext}`;
+  const suffix = options.includeDate === false
+    ? ""
+    : `-${new Date().toISOString().slice(0, 10)}`;
+  return `${base}${suffix}.${ext}`;
 }
 
 export async function exportTaarufPng(
   node: HTMLElement,
   name: string,
   prefix = "CV-Taaruf",
+  options: ExportFilenameOptions = {},
 ): Promise<void> {
   const canvas = await capture(node);
   const blob = await new Promise<Blob | null>((res) =>
@@ -50,7 +75,7 @@ export async function exportTaarufPng(
   if (!blob) throw new Error("Gagal membuat gambar");
   const url = URL.createObjectURL(blob);
   try {
-    download(url, taarufFilename(name, "png", prefix));
+    download(url, taarufFilename(name, "png", prefix, options));
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   }
@@ -60,11 +85,19 @@ export async function exportTaarufPdf(
   node: HTMLElement,
   name: string,
   prefix = "CV-Taaruf",
+  options: {
+    margin?: number;
+    ignoreTransform?: boolean;
+    orientation?: "portrait" | "landscape";
+    includeDate?: boolean;
+  } = {},
 ): Promise<void> {
-  const canvas = await capture(node);
+  const canvas = await capture(node, options);
   const imgData = canvas.toDataURL("image/png");
 
-  const landscape = canvas.width > canvas.height;
+  const landscape = options.orientation
+    ? options.orientation === "landscape"
+    : canvas.width > canvas.height;
   const pdf = new jsPDF({
     unit: "mm",
     format: "a4",
@@ -72,7 +105,7 @@ export async function exportTaarufPdf(
   });
   const pageW = landscape ? 297 : 210;
   const pageH = landscape ? 210 : 297;
-  const margin = 10;
+  const margin = Math.max(0, options.margin ?? 10);
   const contentW = pageW - margin * 2;
   const contentH = pageH - margin * 2;
 
@@ -118,5 +151,5 @@ export async function exportTaarufPdf(
     }
   }
 
-  pdf.save(taarufFilename(name, "pdf", prefix));
+  pdf.save(taarufFilename(name, "pdf", prefix, options));
 }
