@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Butuh Tenang</title>
+  <defs>
+    <clipPath id="butuhtenang-c"><rect width="512" height="512" rx="116"/></clipPath>
+    <linearGradient id="butuhtenang-bg" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#4FE3B0"/>
+      <stop offset="1" stop-color="#12A89A"/>
+    </linearGradient>
+    <linearGradient id="butuhtenang-sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="butuhtenang-w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DFFBF1"/>
+    </linearGradient>
+    <linearGradient id="butuhtenang-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="1" stop-color="#FFC247"/>
+    </linearGradient>
+    <filter id="butuhtenang-s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#04594F" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#butuhtenang-c)">
+    <rect width="512" height="512" fill="url(#butuhtenang-bg)"/>
+    <g transform="translate(0 -24)">
+      <path d="M270 173 A22 22 0 1 0 270 207 A18 18 0 0 1 270 173Z" fill="url(#butuhtenang-gold)"/>
+      <g filter="url(#butuhtenang-s)">
+        <rect x="112" y="262" width="24" height="130" rx="12" fill="url(#butuhtenang-w)" opacity="0.9"/>
+        <rect x="376" y="262" width="24" height="130" rx="12" fill="url(#butuhtenang-w)" opacity="0.9"/>
+        <path d="M156 340 A100 100 0 0 1 356 340 Z" fill="url(#butuhtenang-w)"/>
+        <rect x="132" y="348" width="248" height="44" rx="22" fill="url(#butuhtenang-w)"/>
+      </g>
+      <path d="M236 340 V318 C236 296 276 296 276 318 V340 Z" fill="#12A89A" opacity="0.85"/>
+    </g>
+    <rect width="512" height="512" fill="url(#butuhtenang-sheen)"/>
+  </g>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#fff" stroke-opacity="0.16" stroke-width="3"/>
+</svg>

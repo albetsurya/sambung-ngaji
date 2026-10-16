@@ -1,0 +1,15 @@
+{
+  "1:1:0": {
+    "audioMappingComplete": true,
+    "arabic": "اَ بَ",
+    "transliterationParts": [
+      "a",
+      "ba"
+    ],
+    "hintTone": "Rost: Datar — Naik — Turun (3x)"
+  },
+  "1:1:14": {
+    "audioUrl": "/audio/tilawati/jilid_1/hal1/hal1_footer.ogg",
+    "audioMappingComplete": true
+  }
+}

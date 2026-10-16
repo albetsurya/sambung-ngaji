@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254">
+  <title>Sambung Ngaji — Mode Terang</title>
+  <defs>
+    <linearGradient id="background-light" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E8F4FF"/>
+    </linearGradient>
+    <linearGradient id="ring-light" gradientUnits="userSpaceOnUse" x1="260" y1="400" x2="1000" y2="960">
+      <stop offset="0" stop-color="#0C65E8"/>
+      <stop offset="0.12" stop-color="#00AFA7"/>
+      <stop offset="0.5" stop-color="#087DDE"/>
+      <stop offset="0.8" stop-color="#154BD4"/>
+      <stop offset="1" stop-color="#008FC9"/>
+    </linearGradient>
+    <linearGradient id="mint-light" gradientUnits="userSpaceOnUse" x1="455" y1="306" x2="760" y2="306">
+      <stop offset="0" stop-color="#00A88F"/>
+      <stop offset="1" stop-color="#00A88F" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="swoosh-light" gradientUnits="userSpaceOnUse" x1="500" y1="950" x2="1000" y2="450">
+      <stop offset="0" stop-color="#5573D9" stop-opacity="0.18"/>
+      <stop offset="0.55" stop-color="#2343B7"/>
+      <stop offset="1" stop-color="#2B7FE5" stop-opacity="0.42"/>
+    </linearGradient>
+    <linearGradient id="gold-light" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D97706"/>
+      <stop offset="1" stop-color="#FACC15"/>
+    </linearGradient>
+    <linearGradient id="star-light" x1="0.2" y1="1" x2="0.8" y2="0">
+      <stop offset="0" stop-color="#D97706"/>
+      <stop offset="0.55" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#FDE047"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1254" height="1254" fill="url(#background-light)"/>
+  <rect x="18" y="18" width="1218" height="1218" rx="92" fill="none" stroke="#D2E6FA" stroke-width="20"/>
+  <path d="M335 484 V610 A304 304 0 1 0 640 306 H530" fill="none" stroke="url(#ring-light)" stroke-width="152" stroke-linecap="round"/>
+  <path d="M530 306 H760" fill="none" stroke="url(#mint-light)" stroke-width="143" stroke-linecap="round"/>
+  <path d="M660 388 C760 410 900 450 970 560 C1005 620 1012 690 1005 745
+           C960 880 840 940 700 950 C600 965 500 960 430 938
+           C560 945 700 900 770 800 C800 760 820 725 826 700
+           C850 600 800 450 660 388 Z" fill="url(#swoosh-light)"/>
+  <circle cx="335" cy="296" r="79" fill="url(#gold-light)"/>
+  <path d="M626 508 Q642 588 722 606 Q642 624 626 700 Q610 624 529 606 Q610 588 626 508 Z" fill="url(#star-light)"/>
+</svg>

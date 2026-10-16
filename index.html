@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, interactive-widget=resizes-content"
+    />
+
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#FFFFFF"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0F172A"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/apple-touch-icon-180x180.png"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Sambung Ngaji" />
+
+    <meta property="og:title" content="Sambung Ngaji" />
+    <meta
+      property="og:description"
+      content="Aplikasi Sambung Ngaji: biodata jamaah, absensi, monitoring, dan pengumuman."
+    />
+    <meta
+      property="og:image"
+      content="https://sambung-ngaji.vercel.app/og-image.png"
+    />
+    <meta property="og:url" content="https://sambung-ngaji.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sambung Ngaji" />
+    <meta
+      name="twitter:description"
+      content="Aplikasi Sambung Ngaji: biodata jamaah, absensi, monitoring, dan pengumuman."
+    />
+    <meta
+      name="twitter:image"
+      content="https://sambung-ngaji.vercel.app/og-image.png"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=El+Messiri:wght@400;500;600;700&family=Fustat:wght@200;300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&family=Lateef:wght@200;300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@200;300;400;500;600;700&family=Readex+Pro:wght@200;300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Sambung Ngaji</title>
+
+    <script>
+      (function () {
+        var host = window.location.hostname || "";
+        var isDev =
+          host === "localhost" ||
+          host === "127.0.0.1" ||
+          host.indexOf("-dev") !== -1;
+        var isStaging = host.indexOf("-staging") !== -1;
+        if (!isDev && !isStaging) return;
+
+        var ORIGIN = isStaging
+          ? "https://sambung-ngaji-staging.vercel.app" ||
+            "https://sambung-ngaji-stag.vercel.app"
+          : "https://sambung-ngaji-dev.vercel.app";
+
+        var suffix = isStaging ? "-staging" : "-dev";
+        var badge = isStaging ? "STAGING" : "DEV";
+        var themeColor = isStaging ? "#F59E0B" : "#DC2626";
+
+        var setHref = function (selector, href) {
+          var el = document.querySelector(selector);
+          if (el) el.setAttribute("href", href);
+        };
+        var setContent = function (selector, content) {
+          var el = document.querySelector(selector);
+          if (el) el.setAttribute("content", content);
+        };
+
+        setHref(
+          'link[rel="icon"][type="image/svg+xml"]',
+          "/favicon" + suffix + ".svg",
+        );
+        setHref(
+          'link[rel="apple-touch-icon"]',
+          "/favicon" + suffix + "-180x180.png",
+        );
+        setHref('link[rel="manifest"]', "/manifest" + suffix + ".webmanifest");
+
+        document.title = "Sambung Ngaji (" + badge + ")";
+        setContent(
+          'meta[name="apple-mobile-web-app-title"]',
+          "Sambung Ngaji " + badge,
+        );
+        setContent('meta[property="og:title"]', "Sambung Ngaji (" + badge + ")");
+        setContent('meta[property="og:url"]', ORIGIN + "/");
+        setContent(
+          'meta[property="og:image"]',
+          ORIGIN + "/og-image" + suffix + ".png",
+        );
+        setContent('meta[name="twitter:title"]', "Sambung Ngaji (" + badge + ")");
+        setContent(
+          'meta[name="twitter:image"]',
+          ORIGIN + "/og-image" + suffix + ".png",
+        );
+      })();
+    </script>
+  </head>
+  <body class="bg-surface-bg">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

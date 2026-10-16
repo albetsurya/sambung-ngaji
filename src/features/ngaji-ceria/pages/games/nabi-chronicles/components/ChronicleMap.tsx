@@ -1,0 +1,3 @@
+export function ChronicleMap({ current, total }: { current: number; total: number }) {
+  return <div aria-label="Peta chapter Nabi Chronicles" className="flex gap-1 overflow-x-auto rounded-2xl border border-amber-300/20 bg-black/15 p-2">{Array.from({ length: total }, (_, index) => <div key={index} className={`flex h-9 min-w-9 items-center justify-center rounded-xl border text-xs font-black ${index < current ? "border-amber-300 bg-amber-500/30 text-amber-100" : index === current ? "border-orange-300 bg-orange-500/30 text-orange-100" : "border-white/10 bg-white/5 text-white/40"}`}>{index + 1}</div>)}</div>;
+}

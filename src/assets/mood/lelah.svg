@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Lelah</title>
+  <defs>
+    <clipPath id="lelah-c"><rect width="512" height="512" rx="116"/></clipPath>
+    <linearGradient id="lelah-bg" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#7C6CFF"/>
+      <stop offset="1" stop-color="#4B3BD6"/>
+    </linearGradient>
+    <linearGradient id="lelah-sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lelah-w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E6DFFF"/>
+    </linearGradient>
+    <linearGradient id="lelah-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="1" stop-color="#FFC247"/>
+    </linearGradient>
+    <filter id="lelah-s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#1E1470" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#lelah-c)">
+    <rect width="512" height="512" fill="url(#lelah-bg)"/>
+    <path transform="translate(-30 20)" d="M314 179 A100 100 0 1 0 314 333 A85 85 0 0 1 314 179Z" fill="url(#lelah-w)" filter="url(#lelah-s)"/>
+    <polyline points="300 118 358 118 300 188 358 188" fill="none" stroke="url(#lelah-gold)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="364 222 398 222 364 264 398 264" fill="none" stroke="url(#lelah-gold)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <rect width="512" height="512" fill="url(#lelah-sheen)"/>
+  </g>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#fff" stroke-opacity="0.16" stroke-width="3"/>
+</svg>

@@ -1,0 +1,111 @@
+/* src/styles/print.css */
+
+@media print {
+  /* General print settings */
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important; /* Forces printing of background colors and images */
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    size: A4 portrait; /* Default to A4 portrait, can be overridden by JS for landscape */
+    margin: 10mm;
+  }
+
+  /* Hide UI elements that should not be printed */
+  .no-print,
+  header,
+  nav,
+  aside,
+  footer,
+  .fab-group,
+  .recap-print-controls {
+    display: none !important;
+  }
+
+  /* Ensure the main content is visible */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    display: block !important;
+  }
+
+  .app-shell {
+    box-shadow: none !important;
+    border: none !important;
+    min-height: auto !important;
+    max-width: none !important; /* Allow it to expand to full print width */
+    margin: 0 !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+
+  /* Aturan tabel legacy di bawah ini TIDAK berlaku saat mencetak lembar
+     finance (body.printing-finance) agar hasil cetak identik 1:1 dengan
+     pratinjau: lebar kolom, padding, dan warna header mengikuti layar. */
+  /* Table specific styles for print (non-finance sheets only) */
+  body:not(.printing-finance) table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed; /* Ensures column widths are respected */
+  }
+
+  body:not(.printing-finance) th, body:not(.printing-finance) td {
+    vertical-align: middle !important; /* Crucial for vertical alignment */
+    padding: 2mm 1mm !important; /* Consistent padding for print */
+    border: 0.1mm solid rgb(203, 213, 225) !important; /* Standardize cell borders */
+    color: rgb(15, 23, 42) !important; /* Ensure text color is dark */
+    background-color: transparent !important;
+    line-height: 1.2 !important; /* Consistent line height */
+  }
+
+  body:not(.printing-finance) thead th {
+    background-color: rgb(51, 65, 85) !important; /* Header background color */
+    color: white !important;
+    font-weight: bold !important;
+    text-align: center !important;
+  }
+
+  /* Prevent row breaks across pages */
+  body:not(.printing-finance) tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Ensure sheet-scale element correctly fits the page without scaling */
+  .sheet-scale {
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    transform: none !important; /* Remove any scaling */
+    box-shadow: none !important;
+    border: none !important;
+    background-color: white !important;
+    padding: 0 !important;
+    overflow: hidden !important; /* Keep content within bounds */
+  }
+
+  /* Specific styles for elements inside the sheet-scale */
+  .sheet-scale h2 {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+  }
+  .sheet-scale p {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  .sheet-scale .text-\[10px\] {
+    font-size: 10px !important;
+  }
+  .sheet-scale .text-\[15px\] {
+    font-size: 15px !important;
+  }
+}

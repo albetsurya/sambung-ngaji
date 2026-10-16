@@ -1,0 +1,7 @@
+import { ACHIEVEMENT_LABELS, getRank, type GameProgress } from "./progression";
+
+export function ProgressPanel({ progress }: { progress: GameProgress }) {
+  const rank = getRank(progress.xp);
+  const progressToNext = rank.nextXp ? Math.min(100, Math.round(((progress.xp - rank.minXp) / (rank.nextXp - rank.minXp)) * 100)) : 100;
+  return <div className="rounded-2xl border border-cyan-300/20 bg-cyan-500/10 p-3 text-left"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] uppercase tracking-widest text-cyan-200/70">Progres Ngaji Ceria</p><p className="mt-1 text-base font-black text-white">{rank.title}</p></div><p className="text-right text-xs font-bold text-cyan-100">{progress.xp} XP<br /><span className="text-white/50">{progress.achievements.length} achievement</span></p></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-cyan-400" style={{ width: `${progressToNext}%` }} /></div><p className="mt-2 text-[10px] leading-relaxed text-white/60">{rank.nextXp ? `${rank.nextXp - progress.xp} XP lagi menuju ${getRank(rank.nextXp).title}.` : "Rank tertinggi tercapai."}</p><div className="mt-3 flex flex-wrap gap-1">{progress.achievements.slice(-3).map((id) => <span key={id} title={ACHIEVEMENT_LABELS[id]?.description} className="rounded-full border border-amber-300/25 bg-amber-400/10 px-2 py-1 text-[10px] font-bold text-amber-100">✦ {ACHIEVEMENT_LABELS[id]?.title ?? id}</span>)}</div></div>;
+}

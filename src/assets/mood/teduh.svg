@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>Teduh</title>
+  <defs>
+    <clipPath id="teduh-c"><rect width="512" height="512" rx="116"/></clipPath>
+    <linearGradient id="teduh-bg" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#4D9BFF"/>
+      <stop offset="1" stop-color="#19C6B7"/>
+    </linearGradient>
+    <linearGradient id="teduh-sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.26"/>
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="teduh-w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D6F5F2"/>
+    </linearGradient>
+    <linearGradient id="teduh-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="1" stop-color="#FFC247"/>
+    </linearGradient>
+    <filter id="teduh-s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0A4C7A" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+  <g clip-path="url(#teduh-c)">
+    <rect width="512" height="512" fill="url(#teduh-bg)"/>
+    <circle cx="256" cy="246" r="124" fill="#FFE9A6" opacity="0.22"/>
+    <circle cx="256" cy="246" r="80" fill="url(#teduh-gold)"/>
+    <path d="M0 322 C70 282 150 282 224 318 S390 350 512 290 V512 H0Z" fill="#fff" opacity="0.38"/>
+    <path d="M0 384 C90 344 170 356 256 386 S430 412 512 366 V512 H0Z" fill="url(#teduh-w)"/>
+    <rect width="512" height="512" fill="url(#teduh-sheen)"/>
+  </g>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#fff" stroke-opacity="0.16" stroke-width="3"/>
+</svg>

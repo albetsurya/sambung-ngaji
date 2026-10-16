@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254">
+  <title>Sambung Ngaji — Mode Gelap</title>
+  <defs>
+    <linearGradient id="background-dark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#011A5E"/>
+      <stop offset="1" stop-color="#071D70"/>
+    </linearGradient>
+    <linearGradient id="ring-dark" gradientUnits="userSpaceOnUse" x1="260" y1="400" x2="1000" y2="960">
+      <stop offset="0" stop-color="#F0FFB8"/>
+      <stop offset="0.12" stop-color="#00FFF0"/>
+      <stop offset="0.5" stop-color="#22B2FF"/>
+      <stop offset="0.8" stop-color="#0A82FF"/>
+      <stop offset="1" stop-color="#00E9FF"/>
+    </linearGradient>
+    <linearGradient id="mint-dark" gradientUnits="userSpaceOnUse" x1="455" y1="306" x2="760" y2="306">
+      <stop offset="0" stop-color="#5CFFD0"/>
+      <stop offset="1" stop-color="#5CFFD0" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="swoosh-dark" gradientUnits="userSpaceOnUse" x1="500" y1="950" x2="1000" y2="450">
+      <stop offset="0" stop-color="#0A5CFF" stop-opacity="0.2"/>
+      <stop offset="0.55" stop-color="#1839E8"/>
+      <stop offset="1" stop-color="#1B9BFF" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="gold-dark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF9D00"/>
+      <stop offset="1" stop-color="#FFF265"/>
+    </linearGradient>
+    <linearGradient id="star-dark" x1="0.2" y1="1" x2="0.8" y2="0">
+      <stop offset="0" stop-color="#FF9B00"/>
+      <stop offset="0.55" stop-color="#FFCB2E"/>
+      <stop offset="1" stop-color="#FFF45A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1254" height="1254" fill="url(#background-dark)"/>
+  <rect x="18" y="18" width="1218" height="1218" rx="92" fill="none" stroke="#24469C" stroke-opacity="0.45" stroke-width="20"/>
+  <path d="M335 484 V610 A304 304 0 1 0 640 306 H530" fill="none" stroke="url(#ring-dark)" stroke-width="152" stroke-linecap="round"/>
+  <path d="M530 306 H760" fill="none" stroke="url(#mint-dark)" stroke-width="143" stroke-linecap="round"/>
+  <path d="M660 388 C760 410 900 450 970 560 C1005 620 1012 690 1005 745
+           C960 880 840 940 700 950 C600 965 500 960 430 938
+           C560 945 700 900 770 800 C800 760 820 725 826 700
+           C850 600 800 450 660 388 Z" fill="url(#swoosh-dark)"/>
+  <circle cx="335" cy="296" r="79" fill="url(#gold-dark)"/>
+  <path d="M626 508 Q642 588 722 606 Q642 624 626 700 Q610 624 529 606 Q610 588 626 508 Z" fill="url(#star-dark)"/>
+</svg>

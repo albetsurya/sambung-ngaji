@@ -1,0 +1,451 @@
+[data-preset="whatsapp"] {
+  --c-accent: 37 211 102;
+  --c-accent-dark: 18 140 126;
+  --c-accent-light: 220 248 198;
+  --c-accent-2: 18 140 126;
+  --c-accent-2-dark: 16 122 110;
+  --c-accent-2-light: 200 245 225;
+}
+[data-preset="whatsapp"].dark {
+  --c-bg: 11 20 26;
+  --c-card: 17 27 33;
+  --c-card2: 14 23 29;
+  --c-border: 42 57 66;
+  --c-accent: 37 211 102;
+  --c-accent-dark: 0 168 132;
+  --c-accent-light: 0 92 75;
+  --c-accent-2: 0 168 132;
+  --c-accent-2-dark: 37 211 102;
+  --c-accent-2-light: 17 51 44;
+  --c-text: 233 237 239;
+}
+
+[data-preset="instagram"] {
+  --c-accent: 225 48 108;
+  --c-accent-dark: 193 53 132;
+  --c-accent-light: 252 231 243;
+  --c-accent-2: 247 119 55;
+  --c-accent-2-dark: 253 29 29;
+  --c-accent-2-light: 255 228 214;
+}
+[data-preset="instagram"].dark {
+  --c-bg: 10 10 10;
+  --c-card: 22 22 22;
+  --c-card2: 16 16 16;
+  --c-border: 40 40 40;
+  --c-accent: 244 114 182;
+  --c-accent-dark: 249 168 212;
+  --c-accent-light: 80 25 60;
+  --c-accent-2: 247 119 55;
+  --c-accent-2-dark: 225 48 108;
+  --c-accent-2-light: 70 30 20;
+  --c-text: 255 255 255;
+}
+
+[data-preset="tiktok"] {
+  /* Monokromatik: aksen = hitam solid (teks/hover), soft = abu terang.
+     Merah #FE2C55 dicadangkan untuk badge, focus input, & efek glitch FAB. */
+  --c-accent: 0 0 0;
+  --c-accent-dark: 0 0 0;
+  --c-accent-light: 232 232 232;
+  --c-accent-2: 254 44 85;
+  --c-accent-2-dark: 230 30 70;
+  --c-accent-2-light: 255 220 230;
+}
+[data-preset="tiktok"].dark {
+  --c-bg: 0 0 0;
+  --c-card: 22 22 22;
+  --c-card2: 15 15 15;
+  --c-border: 42 42 42;
+  /* Aksen = putih solid; soft = abu gelap. */
+  --c-accent: 255 255 255;
+  --c-accent-dark: 255 255 255;
+  --c-accent-light: 38 38 38;
+  --c-accent-2: 254 44 85;
+  --c-accent-2-dark: 255 90 120;
+  --c-accent-2-light: 40 10 20;
+  --c-text: 255 255 255;
+}
+
+[data-preset="spotify"] {
+  --c-accent: 29 185 84;
+  --c-accent-dark: 22 145 65;
+  --c-accent-light: 220 245 227;
+  --c-accent-2: 29 185 84;
+  --c-accent-2-dark: 22 145 65;
+  --c-accent-2-light: 220 245 227;
+}
+[data-preset="spotify"].dark {
+  --c-bg: 18 18 18;
+  --c-card: 24 24 24;
+  --c-card2: 18 18 18;
+  --c-border: 40 40 40;
+  --c-accent: 29 185 84;
+  --c-accent-dark: 30 215 96;
+  --c-accent-light: 20 50 30;
+  --c-accent-2: 30 215 96;
+  --c-accent-2-dark: 74 222 128;
+  --c-accent-2-light: 25 60 35;
+  --c-text: 255 255 255;
+}
+
+[data-preset="masjid"] {
+  --c-accent: 5 150 105;
+  --c-accent-dark: 4 120 87;
+  --c-accent-light: 209 250 229;
+  --c-accent-2: 217 119 6;
+  --c-accent-2-dark: 180 83 9;
+  --c-accent-2-light: 254 243 199;
+}
+[data-preset="masjid"].dark {
+  --c-accent: 52 211 153;
+  --c-accent-dark: 110 231 183;
+  --c-accent-light: 6 78 59;
+  --c-accent-2: 251 191 36;
+  --c-accent-2-dark: 252 211 77;
+  --c-accent-2-light: 80 50 10;
+}
+
+[data-preset="ocean"] {
+  --c-accent: 6 182 212;
+  --c-accent-dark: 8 145 178;
+  --c-accent-light: 207 250 254;
+}
+[data-preset="ocean"].dark {
+  --c-bg: 8 20 30;
+  --c-card: 15 30 45;
+  --c-card2: 10 22 34;
+  --c-border: 30 58 80;
+  --c-accent: 34 211 238;
+  --c-accent-dark: 103 232 249;
+  --c-accent-light: 8 51 68;
+  --c-text: 240 249 255;
+}
+
+[data-preset="sunset"] {
+  --c-accent: 249 115 22;
+  --c-accent-dark: 234 88 12;
+  --c-accent-light: 255 237 213;
+}
+[data-preset="sunset"].dark {
+  --c-bg: 20 12 24;
+  --c-card: 32 20 38;
+  --c-card2: 24 15 28;
+  --c-border: 55 35 60;
+  --c-accent: 251 146 60;
+  --c-accent-dark: 253 186 116;
+  --c-accent-light: 60 25 15;
+  --c-text: 255 245 235;
+}
+
+[data-preset="hutan"] {
+  --c-accent: 21 128 61;
+  --c-accent-dark: 22 101 52;
+  --c-accent-light: 220 252 231;
+  --c-accent-2: 146 64 14;
+  --c-accent-2-dark: 120 53 15;
+  --c-accent-2-light: 254 243 199;
+}
+[data-preset="hutan"].dark {
+  --c-bg: 10 18 12;
+  --c-card: 18 30 22;
+  --c-card2: 13 22 16;
+  --c-border: 35 55 42;
+  --c-accent: 74 222 128;
+  --c-accent-dark: 110 231 160;
+  --c-accent-light: 10 50 28;
+  --c-accent-2: 217 150 60;
+  --c-accent-2-dark: 230 175 90;
+  --c-accent-2-light: 55 35 12;
+  --c-text: 240 248 242;
+}
+
+[data-preset="discord"] {
+  --c-accent: 88 101 242;
+  --c-accent-dark: 71 82 196;
+  --c-accent-light: 224 231 255;
+}
+[data-preset="discord"].dark {
+  --c-bg: 30 33 36;
+  --c-card: 42 46 51;
+  --c-card2: 35 39 42;
+  --c-border: 60 65 70;
+  --c-accent: 114 137 218;
+  --c-accent-dark: 150 170 240;
+  --c-accent-light: 40 45 90;
+  --c-text: 255 255 255;
+}
+
+[data-preset="midnight"] {
+  --c-accent: 139 92 246;
+  --c-accent-dark: 124 58 237;
+  --c-accent-light: 237 233 254;
+}
+[data-preset="midnight"].dark {
+  --c-bg: 0 0 0;
+  --c-card: 15 15 20;
+  --c-card2: 8 8 12;
+  --c-border: 35 35 45;
+  --c-accent: 167 139 250;
+  --c-accent-dark: 196 181 253;
+  --c-accent-light: 30 15 50;
+  --c-text: 250 250 255;
+}
+
+[data-preset="kertas"] {
+  --c-bg: 253 246 227;
+  --c-card: 255 252 244;
+  --c-card2: 247 236 208;
+  --c-border: 224 205 165;
+  --c-muted: 120 100 75;
+  --c-text: 60 45 25;
+  --c-accent: 180 83 9;
+  --c-accent-dark: 146 64 14;
+  --c-accent-light: 254 240 210;
+  --c-accent-2: 180 83 9;
+  --c-accent-2-dark: 146 64 14;
+  --c-accent-2-light: 254 240 210;
+}
+[data-preset="kertas"].dark {
+  --c-bg: 28 25 23;
+  --c-card: 38 34 30;
+  --c-card2: 32 28 25;
+  --c-border: 65 58 48;
+  --c-muted: 190 170 140;
+  --c-text: 245 235 220;
+  --c-accent: 245 170 60;
+  --c-accent-dark: 250 195 110;
+  --c-accent-light: 80 50 20;
+  --c-accent-2: 245 170 60;
+  --c-accent-2-dark: 250 195 110;
+  --c-accent-2-light: 80 50 20;
+}
+
+/* ========================================================================
+   TikTok preset - monokromatik + glitch hanya di FAB add.
+   - Tombol primer/chip terpilih: solid terbalik (hitam di light,
+     putih di dark) - otomatis dari token --c-accent di atas.
+   - Badge default: merah solid #FE2C55 (seperti badge TikTok).
+   - Input/teks area/select: outline merah hanya saat focus
+     (abu saat rest, agar tidak dibaca sebagai error).
+   - FAB primer (add): efek glitch cyan-kiri/merah-kanan ala logo TikTok.
+   - Teks putih di atas aksen pada dark mode dikoreksi jadi hitam.
+   ======================================================================== */
+
+/* Teks putih di atas bg-accent pada dark = tak terbaca (aksen = putih).
+   Backstop untuk elemen mentah; Button/FAB/toast/badge punya aturan
+   sendiri di bawah dan dikecualikan agar tidak tertimpa. */
+[data-preset="tiktok"].dark
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  color: #000000;
+}
+
+/* Toast sukses (dark): teks hitam di atas bg putih. */
+[data-preset="tiktok"].dark .toast-success {
+  color: #000000;
+}
+
+/* Tombol mengikuti background aplikasi + outline (tanpa fill aksen).
+   Primer/sekunder: fill sangat halus + outline mengikuti warna teks
+   (hitam di light, putih di dark) agar tetap terlihat di semua surface
+   termasuk di dalam sheet. Danger: outline + teks merah. */
+[data-preset="tiktok"] .btn-primary,
+[data-preset="tiktok"] .btn-secondary {
+  background-color: rgb(0 0 0 / 0.05);
+  border: 1.5px solid currentColor;
+  color: #000000;
+}
+[data-preset="tiktok"].dark .btn-primary,
+[data-preset="tiktok"].dark .btn-secondary {
+  background-color: rgb(255 255 255 / 0.09);
+  color: #ffffff;
+}
+[data-preset="tiktok"] .btn-danger {
+  background-color: transparent;
+  border: 1.5px solid currentColor;
+  color: rgb(var(--c-danger));
+}
+
+/* Chip/segmented/tab terpilih: outline abu saja - tanpa fill, tanpa glitch.
+   Mengecualikan Button, FAB, toast, badge (diatur aturannya sendiri). */
+[data-preset="tiktok"]
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  background-color: transparent;
+  border: 1px solid rgb(150 150 150);
+  color: #000000;
+}
+[data-preset="tiktok"].dark
+  [class~="bg-accent"][class~="text-white"]:not(.btn):not(.fab):not(
+    .toast
+  ):not(.badge) {
+  color: #ffffff;
+}
+
+/* Badge default merah solid */
+[data-preset="tiktok"] .badge-emerald {
+  background-color: rgb(254 44 85);
+  color: #ffffff;
+}
+
+/* Input/teks area/select: border abu saat rest, merah hanya saat focus. */
+[data-preset="tiktok"] input:focus,
+[data-preset="tiktok"] textarea:focus,
+[data-preset="tiktok"] select:focus {
+  border-color: rgb(254 44 85);
+  --tw-ring-color: rgb(254 44 85 / 0.18);
+}
+
+/* Tombol di dalam sheet (dark): teks putih + border abu muda. */
+[data-preset="tiktok"].dark .sheet .btn-primary,
+[data-preset="tiktok"].dark .sheet .btn-secondary {
+  color: #ffffff;
+  border-color: rgb(200 200 200);
+}
+
+/* FAB add - glitch berupa border kiri cyan & border kanan merah
+   (tanpa border atas/bawah), mengikuti warna mode. */
+[data-preset="tiktok"] .fab-primary {
+  background-color: #000000;
+  color: #ffffff;
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
+}
+[data-preset="tiktok"].dark .fab-primary {
+  background-color: #ffffff;
+  color: #000000;
+  border-left: 3px solid rgb(37 244 238);
+  border-right: 3px solid rgb(254 44 85);
+  border-top: 0 none;
+  border-bottom: 0 none;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.5);
+}
+
+/* Toggle switch tiktok (dark): knob hitam agar kontras di atas track putih. */
+[data-preset="tiktok"].dark .toggle-knob {
+  background-color: #000000;
+}
+
+/* ========================================================================
+   Glass preset - kaca frosted modern TANPA mengubah komponen.
+   Mekanisme: veil gradient tetap (body::before, di atas konten statis tapi
+   di bawah header/nav/sheet/toast) + token base bernuansa + aksen indigo.
+   Permukaan yang sudah blur (header, bottom-nav, kartu login, sheet,
+   overlay) otomatis tampil frosted; permukaan solid (input, tabel, kartu
+   isi) tetap solid demi keterbacaan. Komponen lain tidak tersentuh.
+   ======================================================================== */
+
+[data-preset="glass"] {
+  --c-bg: 240 243 248;
+  --c-card: 255 255 255;
+  --c-card2: 244 247 252;
+  --c-border: 218 226 238;
+  --c-text: 20 28 45;
+  --c-muted: 100 112 140;
+}
+[data-preset="glass"].dark {
+  --c-bg: 8 10 18;
+  --c-card: 16 20 34;
+  --c-card2: 11 14 26;
+  --c-border: 38 46 72;
+  --c-text: 238 242 250;
+  --c-muted: 150 160 190;
+}
+
+html[data-preset="glass"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.9), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(203 213 225 / 0.5), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(226 232 240 / 0.7), transparent 65%);
+}
+html[data-preset="glass"].dark body::before {
+  background:
+    radial-gradient(480px 320px at 85% -2%, rgb(255 255 255 / 0.07), transparent 65%),
+    radial-gradient(420px 300px at -5% 25%, rgb(148 163 184 / 0.1), transparent 65%),
+    radial-gradient(520px 360px at 50% 108%, rgb(255 255 255 / 0.05), transparent 65%);
+}
+
+/* ========================================================================
+   Utilitas kaca bening (standalone, bisa dipakai di mana saja).
+   ======================================================================== */
+
+.glass-clear-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+  color: #f8fafc;
+}
+
+.glass-clear-light {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}
+
+/* Terapkan ke permukaan frosted saat preset glass aktif (light). */
+[data-preset="glass"] header.sticky,
+[data-preset="glass"] nav[class~="rounded-3xl"],
+[data-preset="glass"] .sheet,
+[data-preset="glass"] .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(226, 232, 240, 0.38) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 32px 0 rgba(31, 38, 135, 0.16),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 2px 0 rgba(15, 23, 42, 0.08);
+}
+
+/* Varian dark-nya. */
+[data-preset="glass"].dark header.sticky,
+[data-preset="glass"].dark nav[class~="rounded-3xl"],
+[data-preset="glass"].dark .sheet,
+[data-preset="glass"].dark .toast {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 40px 0 rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4);
+}

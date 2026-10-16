@@ -1,148 +1,233 @@
-# Manajemen Pengajian & Biodata Jamaah
+# 🕌 Sambung Ngaji — Frontend
 
-Aplikasi manajemen pengajian mobile-first: biodata jamaah, absensi cepat, monitoring
-pembinaan, dan pengumuman WhatsApp otomatis. Frontend React + TypeScript + Tailwind,
-backend Google Apps Script + Google Spreadsheet, foto disimpan di Google Drive.
+Aplikasi web manajemen pengajian untuk **admin** & **jamaah**. Dibangun dengan **React 18 + TypeScript + Vite**, mengonsumsi API backend Go (lihat [`../backend/go/README.md`](../backend/go/README.md)).
 
-## Status implementasi
+![Status](https://img.shields.io/badge/status-active-success)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Sudah jadi & terhubung end-to-end:
+---
 
-- Autentikasi (login/logout/session token) + 4 role dengan permission ditegakkan di backend
-- CRUD jamaah + kategori otomatis (Caberawit/Pra Remaja/Remaja/Pra Nikah/Dewasa/Manula)
-- Upload foto ke Google Drive
-- Riwayat pendidikan (banyak baris per jamaah)
-- Kelompok, jadwal pengajian (meetings)
-- Absensi cepat (tap status → tersimpan, optimistic UI)
-- Monitoring pembinaan (histori, tidak pernah terhapus)
-- Pengumuman WhatsApp: template placeholder, generate, preview, copy, share
-- Dashboard berbeda per role + attention list (indikator, bukan keputusan otomatis)
-- Manajemen user & audit log (khusus Super Admin)
-- Soft delete, mobile-first UI, PWA dasar
+## ✨ Fitur
 
-Belum diimplementasikan (fondasi sudah disiapkan agar mudah ditambahkan):
+Aplikasi punya **2 mode** yang dibedakan berdasarkan role user.
 
-- Generate pengumuman mingguan otomatis dari UI (endpoint backend sudah ada: `generateWeeklyAnnouncements`)
-- CV Ta'aruf khusus PRA_NIKAH (tab terpisah)
-- Offline mode penuh untuk PWA
-- Filter jamaah lanjutan (desa) di UI (sudah didukung backend)
+### 🛠️ Mode Admin
 
-## Struktur folder
+Role: `SUPER_ADMIN`, `ADMIN`, `TIM_PNKB`, `TIM_ABSENSI`, `PENGAWAS`
+
+- **Dashboard** — statistik jamaah, kehadiran, perlu perhatian; layout beda per role
+- **Jamaah** — CRUD biodata, import dari text WhatsApp, upload foto, export CSV, virtual list
+- **Absensi** — per meeting, bulk "Hadir semua", filter kategori & gender
+- **Jadwal** — kalender bulanan, bulk create 1 bulan, import dari text/PDF
+- **Pengumuman** — template WhatsApp, generate otomatis, share ke WA
+- **Monitoring** — catatan pembinaan per jamaah + timeline
+- **Kelompok** — kelola kelompok pengajian
+- **User & Akses** — manajemen user, reset password, role assignment
+- **Permintaan Member** — approve/reject request jadi member
+- **Audit Log** — riwayat aktivitas sistem
+- **QR Pendaftaran** — share link/form pendaftaran jamaah baru
+
+### 🕌 Mode Member
+
+- **Beranda** — greeting, jadwal sholat, quick actions, preview jadwal pengajian terdekat
+- **Al-Quran** — 114 surah (per ayat / mushaf), audio multi-qari, bookmark
+- **Doa & Dzikir** — pagi, sore, harian; dzikir counter dengan progress
+- **Waktu Sholat** — jadwal 5 waktu, countdown, hijriah (adhan)
+- **Puasa Sunnah** — jadwal 60 hari ke depan
+- **Arah Kiblat** — kompas real-time berbasis sensor
+- **Tenangkan Hati** — ayat & doa sesuai mood
+- **Jurnal Sholat** — tracker 5 waktu + streak
+- **Tahfidz** — progress hafalan per surah/ayat + mode uji
+- **Jadwal Pengajian** — kalender + daftar, filter per kategori user
+- **Biodata Saya** — lihat & edit profil sendiri
+- **Asisten AI** — chat pribadi untuk tanya data sendiri
+
+### 🔗 Cross-cutting
+
+- **Auth** — login, register publik, ganti password/username
+- **Tema** — light/dark + preset warna custom
+- **PWA** — installable, offline cache via Workbox
+- **Backup** — export/import data lokal
+
+---
+
+## 🚀 Tech Stack
+
+### Core
+
+| Teknologi          | Fungsi                  |
+| ------------------ | ----------------------- |
+| **React 18**       | UI framework            |
+| **TypeScript 5**   | Type safety             |
+| **Vite 5**         | Build tool & dev server |
+| **React Router 6** | Routing                 |
+
+### Data & State
+
+| Teknologi                    | Fungsi                                     |
+| ---------------------------- | ------------------------------------------ |
+| **TanStack Query v5**        | Server state, caching, retry               |
+| **TanStack Query Persister** | Cache persisten (IndexedDB via idb-keyval) |
+| **Context API**              | Auth, Theme, Toast                         |
+
+### UI
+
+| Teknologi          | Fungsi          |
+| ------------------ | --------------- |
+| **Tailwind CSS 3** | Styling utility |
+| **FontAwesome**    | Icon library    |
+| **Inter**          | Typography      |
+
+### Fitur Khusus
+
+| Teknologi                     | Fungsi                             |
+| ----------------------------- | ---------------------------------- |
+| **FullCalendar**              | Kalender jadwal (admin + member)   |
+| **adhan**                     | Perhitungan waktu sholat           |
+| **browser-image-compression** | Kompres foto sebelum upload        |
+| **qrcode.react**              | QR pendaftaran                     |
+| **TanStack Virtual**          | Virtual list (daftar jamaah besar) |
+
+### PWA & Build
+
+| Teknologi                      | Fungsi                    |
+| ------------------------------ | ------------------------- |
+| **vite-plugin-pwa**            | Service worker + manifest |
+| **Workbox**                    | Runtime caching strategy  |
+| **@vite-pwa/assets-generator** | Generate icon PWA         |
+
+---
+
+## 📁 Struktur Project
 
 ```
-frontend/    React + TypeScript + Tailwind (Vite)
-backend/     Google Apps Script (.gs) — copy semua isinya ke Apps Script project
-README.md
+src/
+├── components/
+│   ├── common/         # Button, Input, Sheet, Modal, dsb
+│   ├── layout/         # AppLayout, Header, BottomNav, ProfileMenuSheet
+│   ├── member/         # Komponen khusus mode jamaah
+│   ├── jadwal/         # Kalender & tab jadwal admin
+│   └── monitoring/     # Komponen monitoring
+├── contexts/           # AuthContext, ThemeContext, ToastContext
+├── data/               # Data statis (quran, doa, dzikir, tahfidz, mood)
+├── hooks/              # Custom hooks (usePermission, useTahfidz, dsb)
+├── lib/                # QueryClient, helper
+├── pages/              # Halaman per route
+├── services/           # API clients (authApi, memberApi, domainApi, dsb)
+├── types/              # TypeScript types
+└── utils/              # Formatter, helper umum
 ```
 
 ---
 
-## 1. Setup Backend (Google Apps Script)
+## 🔧 Setup Development
 
-### a. Buat Spreadsheet & Apps Script project
+### Prerequisites
 
-1. Buat Google Spreadsheet baru di Google Drive (boleh kosong).
-2. Buka **Extensions > Apps Script**.
-3. Hapus isi default `Code.gs`, lalu buat file-file baru sesuai nama file di folder
-   `backend/` (Code.gs, Config.gs, Setup.gs, Utils.gs, Repository.gs, Auth.gs, Members.gs,
-   Education.gs, Groups.gs, Meetings.gs, Attendance.gs, Monitoring.gs, Announcements.gs,
-   Upload.gs, Dashboard.gs, UsersSettingsAudit.gs) dan salin isinya masing-masing.
-4. Buka `appsscript.json` (View > Show manifest file) dan samakan dengan `backend/appsscript.json`.
+- **Node.js** ≥ 20
+- **Yarn**
+- Backend Go jalan di `127.0.0.1:8080` (lihat README backend)
 
-### b. Inisialisasi sheet
+### Install
 
-1. Di editor Apps Script, pilih fungsi `setupSpreadsheet` pada dropdown fungsi (dekat tombol Run).
-2. Klik **Run**. Saat diminta izin, setujui akses ke Spreadsheet & Drive.
-3. Ini otomatis membuat semua sheet (`users`, `members`, `member_education`, `groups`,
-   `meetings`, `attendance`, `monitoring`, `announcements`, `announcement_templates`,
-   `audit_logs`, `settings`, `sessions`) beserta header kolomnya, plus:
-   - 1 user awal: **username `superadmin`, password `ganti123`** — segera ganti setelah login pertama.
-   - 5 template pengumuman default.
-   - Setting jadwal rutin (Minggu/Selasa/Kamis).
-4. Aman dijalankan berkali-kali (tidak menimpa data yang sudah ada).
+```bash
+yarn install
+```
 
-### c. Deploy sebagai Web App
+### Konfigurasi Env
 
-1. Klik **Deploy > New deployment**.
-2. Pilih tipe **Web app**.
-3. Execute as: **Me**. Who has access: **Anyone** (agar bisa diakses dari frontend tanpa login Google).
-4. Klik **Deploy**, salin URL yang muncul (formatnya `https://script.google.com/macros/s/XXXXX/exec`).
-5. Setiap kali mengubah kode backend, buat **New deployment** lagi (atau gunakan "Manage deployments" >
-   edit revisi pada deployment yang sama) agar perubahan aktif.
+Copy `.env.example` → `.env.local`:
 
-### d. Folder Google Drive untuk foto
+```bash
+cp .env.example .env.local
+```
 
-Tidak perlu dibuat manual — folder bernama **"Pengajian - Foto Jamaah"** otomatis dibuat
-di My Drive akun yang menjalankan script saat foto pertama diupload. Bila ingin folder lain,
-ubah `DRIVE_FOLDER_NAME` di `Config.gs`.
+Isi `VITE_API_BASE_URL` dengan endpoint backend. **Gunakan `127.0.0.1`, bukan `localhost`** (macOS IPv6 issue):
 
-### e. (Opsional) Standalone Apps Script project
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8080/api
+```
 
-Jika Apps Script project **tidak** dibuat dari dalam Spreadsheet (standalone project),
-isi `SPREADSHEET_ID` di `Config.gs` dengan ID spreadsheet Anda (bagian di URL spreadsheet
-antara `/d/` dan `/edit`).
+### Run
+
+```bash
+yarn dev
+```
+
+Buka `http://127.0.0.1:5173`.
 
 ---
 
-## 2. Setup Frontend (React)
+## 📜 Scripts
 
-### a. Install & konfigurasi
-
-```bash
-cd frontend
-npm install
-cp .env.example .env
-```
-
-Isi `.env`:
-
-```
-VITE_API_BASE_URL=https://script.google.com/macros/s/XXXXX/exec
-```
-
-(gunakan URL Web App hasil deploy di langkah 1c)
-
-### b. Jalankan development server
-
-```bash
-npm run dev
-```
-
-Buka `http://localhost:5173`. Login dengan `superadmin` / `ganti123`.
-
-### c. Build production
-
-```bash
-npm run build
-```
-
-Hasil build ada di `frontend/dist/` — bisa di-hosting di Google Sites, Vercel, Netlify,
-Firebase Hosting, GitHub Pages, atau server statis apa pun. Pastikan `VITE_API_BASE_URL`
-sudah benar sebelum build (env variable di-bake saat build, bukan runtime).
+| Perintah         | Fungsi                                   |
+| ---------------- | ---------------------------------------- |
+| `yarn dev`       | Dev server (Vite HMR)                    |
+| `yarn build`     | Type-check (`tsc -b`) + production build |
+| `yarn build:dev` | Build dengan mode development            |
+| `yarn preview`   | Preview hasil build lokal                |
+| `yarn fetch-doa` | Regenerate data doa dari sumber          |
 
 ---
 
-## 3. Role & akun demo
+## 🧪 Verifikasi Sebelum Commit
 
-Setelah login sebagai `superadmin`, buat user tambahan lewat menu **Lainnya > Manajemen User**
-untuk masing-masing role: `ADMIN`, `TIM_PNKB`, `TIM_ABSENSI`. Permission setiap role
-ditegakkan di backend (`Auth.gs` → `ROLE_PERMISSIONS`), bukan hanya disembunyikan di UI.
+```bash
+npx tsc --noEmit
+yarn build
+```
 
-## 4. Cara kerja komunikasi frontend ↔ backend
+Expected: `tsc` tanpa output, build `✓ built in ...` dengan PWA generated.
 
-Semua request dari frontend dikirim sebagai `POST` ke satu URL Web App dengan body
-`{ action, token, ...params }`. Backend (`Code.gs`) membaca `action`, memvalidasi
-`token` sesi, memeriksa permission role, lalu menjalankan handler yang sesuai dan
-selalu mengembalikan `{ success, data, message }`.
+---
 
-## 5. Troubleshooting
+## 🚢 Deploy
 
-- **"Unauthorized: sesi tidak valid"**: token kadaluarsa (default 12 jam) atau salah
-  URL deployment. Login ulang / cek `VITE_API_BASE_URL`.
-- **Data tidak muncul setelah edit sheet manual**: beberapa sheet (groups, settings,
-  templates) di-cache 5 menit (`CacheService`). Tunggu atau jalankan
-  `CacheService.getScriptCache().removeAll([...])` di editor Apps Script.
-- **Error saat upload foto**: pastikan izin Drive sudah disetujui saat pertama kali
-  menjalankan `setupSpreadsheet` / saat deployment meminta otorisasi ulang.
-- **CORS error di browser**: pastikan deployment Web App diakses dengan opsi
-  "Anyone" dan menggunakan URL `.../exec` (bukan `/dev`).
+Repo punya `vercel.json` — deploy otomatis via Vercel.
+
+### Setup di Vercel
+
+1. Import repo GitHub → framework preset **Vite**
+2. Set env variable: `VITE_API_BASE_URL` → URL backend production
+3. Build command & output default dari `vercel.json`
+
+---
+
+## 🔌 Kontrak API
+
+Semua request pakai pola **single-endpoint dispatcher**:
+
+```
+POST {VITE_API_BASE_URL}
+Content-Type: application/json
+
+Body:
+{
+  "action": "login",
+  "token": "...",
+  ...params
+}
+
+Response:
+{
+  "success": true,
+  "data": { ... },
+  "message": ""
+}
+```
+
+Implementasi: `src/services/api.ts` (`call<T>()` dengan retry otomatis).
+Daftar action lengkap: `src/services/domainApi.ts`.
+
+---
+
+## 📚 Terkait
+
+- **Backend Go** — [`../backend/go/README.md`](../backend/go/README.md)
+
+---
+
+## 📄 Lisensi
+
+MIT

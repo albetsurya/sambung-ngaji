@@ -1,0 +1,462 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  UserPlus,
+  X,
+  AlertTriangle,
+} from "../components/ui/FontAwesomeIcons";
+import { AppLayout, Header } from "../components/layout/AppLayout";
+import {
+  Badge,
+  Button,
+  Card,
+  Select,
+  Textarea,
+  BottomSheet,
+  LoadingOverlay,
+  ErrorState,
+  Avatar,
+} from "../components/ui";
+import { MemberSelfSkeleton } from "../components/ui/Skeleton";
+import { pendingApi } from "../features/admin/api/pendingApi";
+import { groupApi } from "../services/domainApi";
+import type { PendingMember } from "../types";
+import { formatDateShort, normalizeGender } from "../utils/format";
+import { useToast } from "../contexts/ToastContext";
+import { ApiError, abortAllApiCalls } from "../services/api";
+import { queryKeys } from "../lib/queryClient";
+
+const STATUS_BADGE = {
+  PENDING: { label: "Menunggu Verifikasi", color: "amber" as const },
+  APPROVED: { label: "Disetujui", color: "emerald" as const },
+  REJECTED: { label: "Ditolak", color: "red" as const },
+};
+
+export default function PendingMemberDetailPage() {
+  const { submission_id } = useParams();
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const queryClient = useQueryClient();
+  const [approveOpen, setApproveOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: queryKeys.pendingDetail(submission_id || ""),
+    queryFn: () => pendingApi.detail(submission_id!),
+    enabled: !!submission_id,
+    staleTime: 60_000,
+  });
+
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["pending-members"] });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.pendingDetail(submission_id || ""),
+    });
+    queryClient.invalidateQueries({ queryKey: ["members"] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+    queryClient.invalidateQueries({ queryKey: ["users"] });
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout hideNav>
+        <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
+        <MemberSelfSkeleton />
+      </AppLayout>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <AppLayout hideNav>
+        <Header title="Detail Pendaftar" onBack={() => navigate(-1)} />
+        <ErrorState
+          message={
+            error instanceof ApiError ? error.message : "Data tidak ditemukan"
+          }
+          onRetry={refetch}
+        />
+      </AppLayout>
+    );
+  }
+
+  const badge = STATUS_BADGE[data.status];
+  const canProcess = data.status === "PENDING";
+
+  return (
+    <AppLayout hideNav>
+      <Header
+        title="Detail Pendaftar"
+        onBack={() => navigate(-1)}
+        backLabel="Pendaftar"
+      />
+
+      <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+        <Avatar
+          src={data.photo_url}
+          name={data.full_name}
+          size={64}
+          gender={normalizeGender(data.gender)}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="text-[19px] font-semibold text-surface-text truncate tracking-[-0.01em]">
+            {data.full_name}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <Badge color={badge.color}>{badge.label}</Badge>
+          </div>
+          <p className="text-ios-caption text-surface-muted mt-1">
+            Dikirim {formatDateShort(data.submitted_at)}
+          </p>
+        </div>
+      </div>
+
+      <div className="px-4 py-4 space-y-4 pb-32">
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Data Diri
+          </p>
+          <div className="space-y-2.5">
+            <Field label="Nama Panggilan" value={data.nickname} />
+            <Field
+              label="Jenis Kelamin"
+              value={data.gender === "L" ? "Laki-laki" : "Perempuan"}
+            />
+            <Field label="Tempat Lahir" value={data.birth_place} />
+            <Field
+              label="Tanggal Lahir"
+              value={
+                data.birth_date ? formatDateShort(data.birth_date) : "-"
+              }
+            />
+            <Field
+              label="Status Pernikahan"
+              value={data.is_married ? "Sudah menikah" : "Belum menikah"}
+            />
+          </div>
+        </Card>
+
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Kontak & Alamat
+          </p>
+          <div className="space-y-2.5">
+            <Field
+              label="No. WhatsApp"
+              value={data.whatsapp_number ? `+${data.whatsapp_number}` : "-"}
+            />
+            <Field label="Alamat" value={data.home_address} />
+            <Field label="Desa" value={data.village} />
+            <Field label="Daerah" value={data.region} />
+          </div>
+        </Card>
+
+        <Card>
+          <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+            Akun Login
+          </p>
+          <div className="space-y-2.5">
+            <Field label="Username" value={data.username} />
+          </div>
+        </Card>
+
+        {(data.occupation || data.hobby) && (
+          <Card>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+              Pekerjaan & Hobi
+            </p>
+            <div className="space-y-2.5">
+              <Field label="Pekerjaan" value={data.occupation} />
+              <Field label="Hobi" value={data.hobby} />
+            </div>
+          </Card>
+        )}
+
+        {(data.education_level || data.school || data.major) && (
+          <Card>
+            <p className="text-ios-footnote font-medium text-surface-muted mb-3">
+              Pendidikan
+            </p>
+            <div className="space-y-2.5">
+              <Field label="Jenjang" value={data.education_level} />
+              <Field label="Sekolah" value={data.school} />
+              <Field label="Jurusan" value={data.major} />
+              <Field label="Tahun Mulai" value={data.education_start_year} />
+              <Field
+                label="Tahun Selesai"
+                value={data.education_end_year}
+              />
+            </div>
+          </Card>
+        )}
+
+        {data.status === "REJECTED" && data.rejection_reason && (
+          <Card>
+            <div className="flex items-start gap-2">
+              <AlertTriangle
+                size={16}
+                className="text-danger flex-shrink-0 mt-0.5"
+              />
+              <div>
+                <p className="text-ios-footnote font-medium text-danger mb-1">
+                  Alasan Ditolak
+                </p>
+                <p className="text-ios-footnote text-surface-text leading-relaxed">
+                  {data.rejection_reason}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {canProcess && (
+        <div className="fixed bottom-0 left-0 right-0 md:left-64 z-30 pb-safe">
+          <div className="app-shell px-4 pt-3 pb-4 bg-surface-bg/80 backdrop-blur-xl border-t border-surface-border">
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                fullWidth
+                onClick={() => setRejectOpen(true)}
+                leftIcon={<X size={16} />}
+              >
+                Tolak
+              </Button>
+              <Button
+                fullWidth
+                onClick={() => setApproveOpen(true)}
+                leftIcon={<UserPlus size={16} />}
+              >
+                Setujui
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ApproveSheet
+        open={approveOpen}
+        data={data}
+        onClose={() => setApproveOpen(false)}
+        onSuccess={() => {
+          invalidateAll();
+          setApproveOpen(false);
+          showToast("Pendaftar disetujui");
+          navigate("/more/registrants", { replace: true });
+        }}
+      />
+
+      <RejectSheet
+        open={rejectOpen}
+        submissionId={data.submission_id}
+        noWa={data.whatsapp_number}
+        onClose={() => setRejectOpen(false)}
+        onSuccess={() => {
+          invalidateAll();
+          setRejectOpen(false);
+          showToast("Pendaftar ditolak");
+        }}
+      />
+    </AppLayout>
+  );
+}
+
+
+function Field({ label, value }: { label: string; value?: string }) {
+  if (!value || value === "") {
+    return (
+      <div className="flex justify-between gap-3 py-1.5 border-b border-surface-border last:border-b-0">
+        <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+          {label}
+        </span>
+        <span className="text-ios-footnote text-surface-muted italic">
+          Belum diisi
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex justify-between gap-3 py-1.5 border-b border-surface-border last:border-b-0">
+      <span className="text-ios-footnote text-surface-muted flex-shrink-0">
+        {label}
+      </span>
+      <span className="text-ios-body text-surface-text text-right">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+
+function ApproveSheet({
+  open,
+  data,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  data: PendingMember;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const { showToast } = useToast();
+  const [groupId, setGroupId] = useState("");
+
+  const { data: groups = [] } = useQuery({
+    queryKey: queryKeys.groups(),
+    queryFn: () => groupApi.list(),
+    enabled: open,
+    staleTime: 5 * 60_000,
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    // Prefill dari pilihan pendaftar saat daftar, kalau ada.
+    setGroupId(data.group_id || "");
+  }, [open]);
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const g = groups.find((x) => x.group_id === groupId);
+      return pendingApi.approve({
+        submission_id: data.submission_id,
+        group_id: groupId || undefined,
+        group_label: g?.group_name || undefined,
+      });
+    },
+    onSuccess: () => onSuccess(),
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyetujui",
+        "error",
+      );
+    },
+  });
+
+  return (
+    <>
+      <BottomSheet open={open} onClose={onClose} title="Setujui Pendaftar">
+        <div className="mb-4 p-3 rounded-xl bg-accent-soft border border-accent/15">
+          <p className="text-ios-footnote text-accent/80 leading-relaxed">
+            <strong>{data.full_name}</strong> akan ditambahkan sebagai jamaah
+            aktif.
+            {data.username && (
+              <>
+                {" "}
+                Akun login dengan username{" "}
+                <span className=" font-medium">
+                  {data.username}
+                </span>{" "}
+                akan langsung aktif.
+              </>
+            )}
+          </p>
+        </div>
+
+        <Select
+          label="Kelompok (wajib)"
+          value={groupId}
+          onChange={(e) => setGroupId(e.target.value)}
+          hint="Wajib dipilih agar group_id tersimpan"
+        >
+          <option value="">Pilih kelompok</option>
+          {groups.map((g) => (
+            <option key={g.group_id} value={g.group_id}>
+              {g.group_name}
+            </option>
+          ))}
+        </Select>
+
+        <div className="mb-4 p-3 rounded-xl bg-warning-soft/60 border border-warning/20">
+          <p className="text-ios-caption text-warning leading-relaxed">
+            Akun tidak dikirim otomatis. Sampaikan username &amp; password ke
+            jamaah secara manual via WhatsApp atau tatap muka.
+          </p>
+        </div>
+
+        <Button
+          fullWidth
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+          leftIcon={!mutation.isPending ? <UserPlus size={16} /> : undefined}
+        >
+          {mutation.isPending ? "Memproses..." : "Setujui & Aktifkan Akun"}
+        </Button>
+      </BottomSheet>
+
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." onCancel={() => abortAllApiCalls()} />
+    </>
+  );
+}
+
+
+function RejectSheet({
+  open,
+  submissionId,
+  noWa,
+  onClose,
+  onSuccess,
+}: {
+  open: boolean;
+  submissionId: string;
+  noWa?: string;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const { showToast } = useToast();
+  const [reason, setReason] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setReason("");
+  }, [open]);
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      pendingApi.reject({
+        submission_id: submissionId,
+        reason: reason || "Tidak memenuhi syarat",
+      }),
+    onSuccess: () => onSuccess(),
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menolak",
+        "error",
+      );
+    },
+  });
+
+  return (
+    <>
+      <BottomSheet open={open} onClose={onClose} title="Tolak Pendaftar">
+        <div className="mb-4 p-3 rounded-xl bg-danger-soft border border-danger/20">
+          <p className="text-ios-footnote text-danger leading-relaxed">
+            Pendaftar akan ditolak dan tidak akan ditambahkan sebagai jamaah.
+            Alasan tidak terkirim otomatis. Sampaikan manual kalau perlu.
+          </p>
+        </div>
+
+        <Textarea
+          label="Alasan Penolakan"
+          placeholder="Contoh: Data tidak lengkap, tidak memenuhi syarat, dll"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+
+        <Button
+          variant="danger"
+          fullWidth
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+          leftIcon={!mutation.isPending ? <X size={16} /> : undefined}
+        >
+          {mutation.isPending ? "Memproses..." : "Tolak Pendaftar"}
+        </Button>
+      </BottomSheet>
+
+      <LoadingOverlay open={mutation.isPending} label="Memproses..." onCancel={() => abortAllApiCalls()} />
+    </>
+  );
+}

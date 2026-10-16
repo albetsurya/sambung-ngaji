@@ -1,0 +1,4 @@
+import type { TajwidCard } from "../data/cards";
+import { NGAJI_CERIA_ASSETS } from "@/features/ngaji-ceria/data/assets";
+
+export function Card({ card, active, disabled, onPlay }: { card: TajwidCard; active: boolean; disabled: boolean; onPlay: () => void }) { return <button type="button" disabled={disabled} onClick={onPlay} className={`min-w-24 rounded-2xl border p-3 text-center transition-transform active:scale-95 ${active ? "border-violet-300 bg-violet-500/25" : "border-white/15 bg-white/5"}`}><span className="game-arabic text-3xl text-violet-200">{card.icon}</span><span className="mt-1 block text-[10px] font-black text-white">{card.name}</span><span className="mt-1 block text-[9px] text-white/60"><img src={NGAJI_CERIA_ASSETS.iconEnergyPetir} alt="Energy" className="inline-block h-3 w-3 object-contain align-middle" /> {card.energy} · {card.damage} dmg</span></button>; }
