@@ -108,6 +108,7 @@ export default function TilawatiTimelineEditorPage() {
   const [future, setFuture] = useState<PageTimeline[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [finishing, setFinishing] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [zoom, setZoom] = useState(32);
@@ -1042,6 +1043,39 @@ export default function TilawatiTimelineEditorPage() {
     }
   }
 
+  async function finishPage() {
+    if (!draft || saving || finishing || dirty) return;
+    if (
+      !window.confirm(
+        `Tandai Jilid ${jilid} Halaman ${hal} sebagai selesai dan kirim audionya ke Tartila?`,
+      )
+    )
+      return;
+    setFinishing(true);
+    setError("");
+    try {
+      const response = await fetch("/api/tilawati-editor?action=finish-page", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jilid, page: hal }),
+      });
+      const data = (await response.json()) as {
+        ok: boolean;
+        message?: string;
+        copiedFiles?: number;
+      };
+      if (!response.ok || !data.ok)
+        throw new Error(data.message || "Gagal menyelesaikan halaman.");
+      setMessage(
+        `Halaman ${hal} ditandai selesai. ${data.copiedFiles ?? 0} file audio dikirim ke Tartila.`,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setFinishing(false);
+    }
+  }
+
   async function publishCloud() {
     if (!draft || saving) return;
     stopPreview(); setSaving(true); setError("");
@@ -1750,10 +1784,17 @@ export default function TilawatiTimelineEditorPage() {
           {isNgajiCeriaServerAvailable() && <button className="te-btn te-primary" disabled={loading || saving || !draft || !getToken()} onClick={publishCloud}>Publish ke Cloud</button>}
           <button
             className="te-btn te-primary"
-            disabled={loading || saving || !draft || !dirty}
+            disabled={loading || saving || !draft || dirty}
             onClick={saveFinal}
           >
             {saving ? "Merender & menyimpan…" : "Simpan Hasil Akhir"}
+          </button>
+          <button
+            className="te-btn te-secondary"
+            disabled={loading || saving || finishing || !draft || dirty}
+            onClick={() => void finishPage()}
+          >
+            {finishing ? "Mengirim ke Tartila…" : "Selesai Halaman"}
           </button>
         </div>
       </header>
