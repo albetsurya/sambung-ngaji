@@ -1,0 +1,43 @@
+# ATURAN EMAS & PANDUAN ARSITEKTUR SABIL (TARTILA & SAMBUNG NGAJI)
+
+Setiap AI Agent (Cursor, Claude, GPT, Antigravity, Copilot, dll.) WAJIB membaca dan mematuhi aturan ini sebelum membaca atau memodifikasi kode:
+
+## 1. BATASAN DIREKTORI KETAT (STRICT BOUNDARIES)
+1. **Backend Go** di `sambung-ngaji/backend/go` adalah **Single Source of Truth** untuk data USER (Auth, Profil, Kredensial, dan Status Gamifikasi seperti Maskot).
+2. **Frontend Tartila** di `tartila` HANYA bertindak sebagai Klien edukasi anak (Tilawati, kuis, arena, kamar maskot).
+3. **Frontend Sambung Ngaji** di `sambung-ngaji/frontend` HANYA bertindak sebagai Klien administrasi & jamaah pengajian.
+4. **DILARANG MENGGABUNGKAN DATABASE SUPABASE**:
+   - Supabase Tartila HANYA untuk realtime game/arena/classroom (tabel `rooms`, `players`, `arena`, `classroom`).
+   - PostgreSQL Backend Go adalah database primer untuk user, member, dan preferensi maskot.
+5. **DILARANG KERAS**:
+   - Dilarang membuat file `.go` atau migrasi database backend di dalam direktori `tartila` atau `sambung-ngaji/frontend`.
+   - Dilarang membuat file `.tsx`, `.ts`, atau frontend build di dalam direktori `sambung-ngaji/backend`.
+   - Dilarang menjalankan perintah frontend (`npm`, `yarn`) di direktori Go, atau sebaliknya.
+
+## 2. ATURAN DATA USER DI FRONTEND TARTILA
+- **DILARANG QUERY TABEL USERS VIA SUPABASE CLIENT**:
+  - Hapus/jangan gunakan `supabase.from('users')` di Tartila.
+  - Wajib panggil API Backend Go via `src/services/userApi.ts`:
+    - `getUserProfile()` -> `GET /api/v1/user/profile`
+    - `updateUserMascot(gender)` -> `PATCH /api/v1/user/mascot`
+
+## 3. INTEGRITAS KONTRAK BACKEND GO
+- **JANGAN PERNAH MENGUBAH RETURN TYPE DARI `GET /api/v1/auth/me`**:
+  - Endpoint ini dikonsumsi oleh `sambung-ngaji/frontend` dan wajib mengembalikan `*model.Member`.
+  - Untuk profil Tartila, gunakan `GET /api/v1/user/profile` yang mengembalikan `*model.PublicUser` (berisi field `mascot_gender`).
+- **MIGRASI DATABASE GO**:
+  - Selalu simpan di `sambung-ngaji/backend/go/db/migrations/` dengan format berurutan 6-digit (`0000XX_name.up.sql` dan `0000XX_name.down.sql`).
+
+## 4. ATURAN MASKOT (TITO & TILA)
+- Karakter:
+  - **Tito (Putra)**: `'boy'`
+  - **Tila (Putri)**: `'girl'`
+- **DILARANG MENGGUNAKAN ISTILAH BIOLOGIS** seperti "jantan" / "betina" di seluruh UI, nama komponen, dan kode.
+- **State Persistence**: Tersimpan di Zustand `useEconomyStore.ts` via middleware `persist` (`localStorage`).
+- **Optimistic UI**: Pembaruan di Kamar Maskot (`KamarTilaPage.tsx`) harus menerapkan pembaruan optimistik dengan rollback otomatis bila API gagal.
+- **Komponen Dinamis**: `<TilaCompanion />` dan `<TilaMascot />` dilarang menerima hardcoded `gender="boy"` atau `gender="girl"`; harus membaca state dinamis via `mascotHelper.ts`.
+
+## 5. VERIFIKASI WAJIB
+- Di `tartila`: jalankan `npm run build && npm test`
+- Di `sambung-ngaji/frontend`: jalankan `npx tsc --noEmit && yarn build`
+- Di `sambung-ngaji/backend/go`: jalankan `go test ./... && go build ./...`

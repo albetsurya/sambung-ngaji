@@ -2,9 +2,25 @@
 
 Aplikasi web manajemen pengajian untuk **admin** & **jamaah**. Dibangun dengan **React 18 + TypeScript + Vite**, mengonsumsi API backend Go (lihat [`../backend/go/README.md`](../backend/go/README.md)).
 
+Aplikasi ini adalah bagian dari ekosistem **Sabil** dan merupakan sibling frontend dari **Tartila** (`/tartila`). Keduanya berbagi Backend Go yang sama sebagai *Single Source of Truth*.
+
 ![Status](https://img.shields.io/badge/status-active-success)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+---
+
+## 🏛️ Relasi Ekosistem
+
+```mermaid
+graph LR
+    SambungNgajiFE["Frontend Sambung Ngaji<br/>(React 18 + Yarn)<br/>Admin & Jamaah"]
+    TartilaFE["Frontend Tartila<br/>(React 19 + NPM)<br/>Edukasi & Gamifikasi"]
+    BackendGo["Backend Go (Fiber v2)<br/>127.0.0.1:8080<br/>★ Single Source of Truth"]
+
+    SambungNgajiFE -- "Member & Dispatcher<br/>GET /api/v1/auth/me" --> BackendGo
+    TartilaFE -- "Profile & Mascot<br/>GET /api/v1/user/profile" --> BackendGo
+```
 
 ---
 
@@ -56,46 +72,46 @@ Role: `SUPER_ADMIN`, `ADMIN`, `TIM_PNKB`, `TIM_ABSENSI`, `PENGAWAS`
 
 ### Core
 
-| Teknologi          | Fungsi                  |
-| ------------------ | ----------------------- |
-| **React 18**       | UI framework            |
-| **TypeScript 5**   | Type safety             |
-| **Vite 5**         | Build tool & dev server |
-| **React Router 6** | Routing                 |
+| Teknologi | Fungsi |
+| --------- | ------ |
+| **React 18** | UI framework |
+| **TypeScript 5** | Type safety |
+| **Vite 5** | Build tool & dev server |
+| **React Router 6** | Routing |
 
 ### Data & State
 
-| Teknologi                    | Fungsi                                     |
-| ---------------------------- | ------------------------------------------ |
-| **TanStack Query v5**        | Server state, caching, retry               |
+| Teknologi | Fungsi |
+| --------- | ------ |
+| **TanStack Query v5** | Server state, caching, retry |
 | **TanStack Query Persister** | Cache persisten (IndexedDB via idb-keyval) |
-| **Context API**              | Auth, Theme, Toast                         |
+| **Context API** | Auth, Theme, Toast |
 
 ### UI
 
-| Teknologi          | Fungsi          |
-| ------------------ | --------------- |
+| Teknologi | Fungsi |
+| --------- | ------ |
 | **Tailwind CSS 3** | Styling utility |
-| **FontAwesome**    | Icon library    |
-| **Inter**          | Typography      |
+| **FontAwesome** | Icon library |
+| **Inter** | Typography |
 
 ### Fitur Khusus
 
-| Teknologi                     | Fungsi                             |
-| ----------------------------- | ---------------------------------- |
-| **FullCalendar**              | Kalender jadwal (admin + member)   |
-| **adhan**                     | Perhitungan waktu sholat           |
-| **browser-image-compression** | Kompres foto sebelum upload        |
-| **qrcode.react**              | QR pendaftaran                     |
-| **TanStack Virtual**          | Virtual list (daftar jamaah besar) |
+| Teknologi | Fungsi |
+| --------- | ------ |
+| **FullCalendar** | Kalender jadwal (admin + member) |
+| **adhan** | Perhitungan waktu sholat |
+| **browser-image-compression** | Kompres foto sebelum upload |
+| **qrcode.react** | QR pendaftaran |
+| **TanStack Virtual** | Virtual list (daftar jamaah besar) |
 
 ### PWA & Build
 
-| Teknologi                      | Fungsi                    |
-| ------------------------------ | ------------------------- |
-| **vite-plugin-pwa**            | Service worker + manifest |
-| **Workbox**                    | Runtime caching strategy  |
-| **@vite-pwa/assets-generator** | Generate icon PWA         |
+| Teknologi | Fungsi |
+| --------- | ------ |
+| **vite-plugin-pwa** | Service worker + manifest |
+| **Workbox** | Runtime caching strategy |
+| **@vite-pwa/assets-generator** | Generate icon PWA |
 
 ---
 
@@ -126,8 +142,8 @@ src/
 ### Prerequisites
 
 - **Node.js** ≥ 20
-- **Yarn**
-- Backend Go jalan di `127.0.0.1:8080` (lihat README backend)
+- **Yarn** (selalu gunakan `yarn`, bukan `npm`)
+- Backend Go jalan di `127.0.0.1:8080` (lihat [`../backend/go/README.md`](../backend/go/README.md))
 
 ### Install
 
@@ -143,7 +159,7 @@ Copy `.env.example` → `.env.local`:
 cp .env.example .env.local
 ```
 
-Isi `VITE_API_BASE_URL` dengan endpoint backend. **Gunakan `127.0.0.1`, bukan `localhost`** (macOS IPv6 issue):
+Isi `VITE_API_BASE_URL` dengan endpoint backend. **Gunakan `127.0.0.1`, bukan `localhost`** (mencegah isu DNS IPv6 di macOS/Linux):
 
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:8080/api
@@ -161,13 +177,13 @@ Buka `http://127.0.0.1:5173`.
 
 ## 📜 Scripts
 
-| Perintah         | Fungsi                                   |
-| ---------------- | ---------------------------------------- |
-| `yarn dev`       | Dev server (Vite HMR)                    |
-| `yarn build`     | Type-check (`tsc -b`) + production build |
-| `yarn build:dev` | Build dengan mode development            |
-| `yarn preview`   | Preview hasil build lokal                |
-| `yarn fetch-doa` | Regenerate data doa dari sumber          |
+| Perintah | Fungsi |
+| -------- | ------ |
+| `yarn dev` | Dev server (Vite HMR) |
+| `yarn build` | Type-check (`tsc -b`) + production build |
+| `yarn build:dev` | Build dengan mode development |
+| `yarn preview` | Preview hasil build lokal |
+| `yarn fetch-doa` | Regenerate data doa dari sumber |
 
 ---
 
@@ -178,7 +194,7 @@ npx tsc --noEmit
 yarn build
 ```
 
-Expected: `tsc` tanpa output, build `✓ built in ...` dengan PWA generated.
+Expected: `tsc` tanpa output error, build `✓ built in ...` dengan service worker PWA ter-generate.
 
 ---
 
@@ -196,7 +212,7 @@ Repo punya `vercel.json` — deploy otomatis via Vercel.
 
 ## 🔌 Kontrak API
 
-Semua request pakai pola **single-endpoint dispatcher**:
+Semua request pengajian umum memakai pola **single-endpoint dispatcher**:
 
 ```
 POST {VITE_API_BASE_URL}
@@ -220,11 +236,45 @@ Response:
 Implementasi: `src/services/api.ts` (`call<T>()` dengan retry otomatis).
 Daftar action lengkap: `src/services/domainApi.ts`.
 
+Sedangkan untuk sesi autentikasi dan biodata profil member saat ini, aplikasi memanggil:
+- `GET /api/v1/auth/me` (mengembalikan data `*model.Member`)
+- `PUT /api/v1/auth/me` (mengupdate profil jamaah)
+
+---
+
+## 🤖 Panduan untuk AI Agent (AI Agent Guidelines)
+
+Jika Anda adalah AI Agent (seperti Claude, GPT, Antigravity, Copilot, atau Cursor) yang bekerja di direktori ini, patuhi aturan mutlak berikut:
+
+### 1. Batasan Direktori yang Sangat Ketat (Strict Boundaries)
+- **HANYA KELOLA FRONTEND SAMBUNG NGAJI DI SINI**:
+  - ❌ DILARANG menambahkan kode backend Go (`.go`) di folder ini.
+  - ❌ DILARANG menambahkan aset kuis atau game Tartila di folder ini.
+  - Untuk modul edukasi/tilawati Tartila, arahkan ke `/tartila`.
+  - Untuk backend Go, arahkan ke `../backend/go`.
+
+### 2. Pertahankan Integritas Kontrak Sesi Jamaah (`Member`)
+- Komponen member di repositori ini secara ketat mengandalkan respon objek `Member` dari `GET /api/v1/auth/me` (melalui `src/services/memberSelfApi.ts`).
+- **JANGAN PERNAH** mengganti pemanggilan ini menjadi kontrak `PublicUser` Tartila, karena tipe data profil jamaah (`kategori`, `kelompok_id`, `jenis_kelamin`, dsb) diperlukan untuk perizinan dan personalisasi tampilan jamaah.
+
+### 3. Paket & Dependency Management
+- Repositori ini dikonfigurasi menggunakan **`yarn`** (bukan `npm` atau `pnpm`).
+- Selalu gunakan `yarn add` untuk menambah dependensi dan `yarn install` untuk menginstal paket.
+
+### 4. Verifikasi Wajib Sebelum Menyelesaikan Tugas
+Sebelum menyatakan pekerjaan selesai atau melakukan commit, jalankan:
+```bash
+npx tsc --noEmit
+yarn build
+```
+Pastikan seluruh type-checking TypeScript dan build Vite berhasil tanpa kegagalan.
+
 ---
 
 ## 📚 Terkait
 
 - **Backend Go** — [`../backend/go/README.md`](../backend/go/README.md)
+- **Frontend Tartila** — [`../../tartila/README.md`](../../tartila/README.md)
 
 ---
 
