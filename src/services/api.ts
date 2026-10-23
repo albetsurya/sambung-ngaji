@@ -5,12 +5,18 @@ const TOKEN_KEY = "pengajian_token";
 const GROUP_ID_KEY = "pengajian_group_id";
 let _groupId = "";
 
+function secureCookieAttribute(): string {
+  return typeof window !== "undefined" && window.location.protocol === "https:"
+    ? "; Secure"
+    : "";
+}
+
 export function setGroupId(id: string | null) {
   _groupId = id ?? "";
   if (_groupId) {
-    document.cookie = `pengajian_group_id=${encodeURIComponent(_groupId)}; path=/; SameSite=Strict`;
+    document.cookie = `pengajian_group_id=${encodeURIComponent(_groupId)}; path=/; SameSite=Strict${secureCookieAttribute()}`;
   } else {
-    document.cookie = "pengajian_group_id=; path=/; SameSite=Strict; Max-Age=-1";
+    document.cookie = `pengajian_group_id=; path=/; SameSite=Strict; Max-Age=-1${secureCookieAttribute()}`;
   }
 }
 
@@ -68,11 +74,13 @@ export function getToken(): string | null {
 }
 
 export function setToken(token: string) {
-  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict`;
+  // Frontend-set cookies cannot be HttpOnly. Production should move this
+  // session cookie to the backend response with HttpOnly + Secure.
+  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict${secureCookieAttribute()}`;
 }
 
 export function clearToken() {
-  document.cookie = "pengajian_token=; path=/; SameSite=Strict; Max-Age=-1";
+  document.cookie = `pengajian_token=; path=/; SameSite=Strict; Max-Age=-1${secureCookieAttribute()}`;
 }
 
 

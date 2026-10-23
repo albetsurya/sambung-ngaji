@@ -1,0 +1,91 @@
+{
+  "last_updated": "2026-10-22T00:00:00Z",
+  "format": "page_progress",
+  "total_pages": 84,
+  "pages": {
+    "jilid_1": {
+      "total_chunks": 82,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Menunggu edit dari user",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "jilid_2": {
+      "total_chunks": 76,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Menunggu edit dari user",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "jilid_3": {
+      "total_chunks": 0,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Belum terstruktur di mapping",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "jilid_4": {
+      "total_chunks": 0,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Belum terstruktur di mapping",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "jilid_5": {
+      "total_chunks": 0,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Belum terstruktur di mapping",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "jilid_6": {
+      "total_chunks": 0,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "Belum terstruktur di mapping",
+      "action": "complete_chunk",
+      "complete_instruction": "Set completed < number > menjadi < persentase > dan status menjadi selesai"
+    },
+    "prologues": {
+      "total_files": 3,
+      "completed": 0,
+      "percentage": 0,
+      "status": "belum_dimulai",
+      "last_edited_chunk": null,
+      "notes": "basmalah & taawudz files",
+      "action": "complete_file",
+      "complete_instruction": "Set completed menjadi 3 dan status menjadi selesai untuk semua file basmalah/taawudz"
+    }
+  },
+  "legend": {
+    "status": {
+      "belum_dimulai": "Belum dikedit - action: complete_chunk",
+      "sedang_diedit": "Sedang diedit di host - action: complete_chunk", 
+      "selesai": "Sudah diedit, siap dicopy ke Tartila - action: dikirim",
+      "dikirim": "Sudah dikirim ke Tartila"
+    }
+  },
+  "workflow": {
+    "step_1_edit": "Edit audio di folder: /home/albet-surya-kembara/Documents/productivity/projects/sabil/sambung-ngaji/frontend/public/audio/tilawati/",
+    "step_2_update": "Kirim pesan ke AI dengan format: 'Selesai edit X chunk di Jilid Y, status menjadi selesai'",
+    "step_3_copy": "AI akan copy dari Sambung Ngaji ke Tartila dist/audio/tilawati/",
+    "step_4_verify": "Tartila: jalankan npm run build untuk verifikasi"
+  }
+}
