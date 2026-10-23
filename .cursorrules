@@ -26,7 +26,8 @@ Setiap AI Agent (Cursor, Claude, GPT, Antigravity, Copilot, dll.) WAJIB membaca 
   - Endpoint ini dikonsumsi oleh `sambung-ngaji/frontend` dan wajib mengembalikan `*model.Member`.
   - Untuk profil Tartila, gunakan `GET /api/v1/user/profile` yang mengembalikan `*model.PublicUser` (berisi field `mascot_gender`).
 - **MIGRASI DATABASE GO**:
-  - Selalu simpan di `sambung-ngaji/backend/go/db/migrations/` dengan format berurutan 6-digit (`0000XX_name.up.sql` dan `0000XX_name.down.sql`).
+  - Simpan di `sambung-ngaji/backend/go/db/migrations/` dengan format 6-digit (`0000XX_name.up.sql` dan `0000XX_name.down.sql`).
+  - Sinkronkan versi up-nya ke `sambung-ngaji/backend/go/supabase/migrations/` dengan format `0XX_name.up.sql` (tanpa file down.sql).
 
 ## 4. ATURAN MASKOT (TITO & TILA)
 - Karakter:
