@@ -2,7 +2,7 @@
 import type { PageQuizData } from "./tilawatiQuizTypes";
 
 export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
-  1: {
+  "1": {
     "pageNumber": 1,
     "title": "Halaman 1: Materi",
     "subtitle": "Yang berwarna merah supaya ditekan membacanya",
@@ -344,13 +344,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "اَلْفَ سَنَةٍ",
         "transliterationParts": [
           "alfa",
-          "sanahin"
+          "sanatin"
         ],
         "options": [
           "alfa",
-          "sanahin",
+          "sanatin",
           "alfa",
-          "sanahin",
+          "sanatin",
           "a",
           "i",
           "u",
@@ -368,11 +368,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 15,
         "arabic": "اَلْسِنَةٌ",
         "transliterationParts": [
-          "alsinahun"
+          "alsinatun"
         ],
         "options": [
-          "alsinahun",
-          "alsinahun",
+          "alsinatun",
+          "alsinatun",
           "a",
           "i",
           "u",
@@ -390,11 +390,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 16,
         "arabic": "سُلْطَانًا",
         "transliterationParts": [
-          "sulthaanana"
+          "sulthaanan"
         ],
         "options": [
-          "sulthaanana",
-          "sulthaanana",
+          "sulthaanan",
+          "sulthaanan",
           "a",
           "i",
           "u",
@@ -542,7 +542,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  2: {
+  "2": {
     "pageNumber": 2,
     "title": "Halaman 2: Materi",
     "subtitle": "Yang berwarna merah supaya ditekan membacanya",
@@ -597,14 +597,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 2,
         "arabic": "وَالْعَاقِبَةُ = وَلْعَاقِبَةُ",
         "transliterationParts": [
-          "waal'aaqibahu",
-          "wal'aaqibahu"
+          "waal'aaqibatu",
+          "wal'aaqibatu"
         ],
         "options": [
-          "waal'aaqibahu",
-          "wal'aaqibahu",
-          "waal'aaqibahu",
-          "wal'aaqibahu",
+          "waal'aaqibatu",
+          "wal'aaqibatu",
+          "waal'aaqibatu",
+          "wal'aaqibatu",
           "a",
           "i",
           "u",
@@ -679,16 +679,16 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "عَلَى الْاٰخِرَةِ = عَلَلْاٰخِرَةِ",
         "transliterationParts": [
           "'alaa",
-          "alaaakhirahi",
-          "'alalaaakhirahi"
+          "alaakhirati",
+          "'alalaakhirati"
         ],
         "options": [
           "'alaa",
-          "alaaakhirahi",
-          "'alalaaakhirahi",
+          "alaakhirati",
+          "'alalaakhirati",
           "'alaa",
-          "alaaakhirahi",
-          "'alalaaakhirahi",
+          "alaakhirati",
+          "'alalaakhirati",
           "a",
           "i",
           "u",
@@ -707,16 +707,16 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "اِلَى الْمَدِيْنَةِ = اِلَلْمَدِيْنَةِ",
         "transliterationParts": [
           "ilaa",
-          "almadiynahi",
-          "ilalmadiynahi"
+          "almadiynati",
+          "ilalmadiynati"
         ],
         "options": [
           "ilaa",
-          "almadiynahi",
-          "ilalmadiynahi",
+          "almadiynati",
+          "ilalmadiynati",
           "ilaa",
-          "almadiynahi",
-          "ilalmadiynahi",
+          "almadiynati",
+          "ilalmadiynati",
           "a",
           "i",
           "u",
@@ -735,16 +735,16 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "فِي الْاٰيٰتِ = فِلْاٰيٰتِ",
         "transliterationParts": [
           "fiy",
-          "alaaayaati",
-          "filaaayaati"
+          "alaayaati",
+          "filaayaati"
         ],
         "options": [
           "fiy",
-          "alaaayaati",
-          "filaaayaati",
+          "alaayaati",
+          "filaayaati",
           "fiy",
-          "alaaayaati",
-          "filaaayaati",
+          "alaayaati",
+          "filaayaati",
           "a",
           "i",
           "u",
@@ -788,13 +788,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَقَعَتِ الْوَاقِعَةُ",
         "transliterationParts": [
           "waqa'ati",
-          "alwaaqi'ahu"
+          "alwaaqi'atu"
         ],
         "options": [
           "waqa'ati",
-          "alwaaqi'ahu",
+          "alwaaqi'atu",
           "waqa'ati",
-          "alwaaqi'ahu",
+          "alwaaqi'atu",
           "a",
           "i",
           "u",
@@ -810,7 +810,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  3: {
+  "3": {
     "pageNumber": 3,
     "title": "Halaman 3: Materi",
     "subtitle": "",
@@ -1409,7 +1409,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  4: {
+  "4": {
     "pageNumber": 4,
     "title": "Halaman 4: Materi",
     "subtitle": "Latihlah dengan sabar",
@@ -1717,13 +1717,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "اَزِفَتِ الْاٰزِفَةُ",
         "transliterationParts": [
           "azifati",
-          "alaaazifahu"
+          "alaazifatu"
         ],
         "options": [
           "azifati",
-          "alaaazifahu",
+          "alaazifatu",
           "azifati",
-          "alaaazifahu",
+          "alaazifatu",
           "a",
           "i",
           "u",
@@ -1767,15 +1767,15 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "فِي الْاٰخِرَةِ عَذَابٌ",
         "transliterationParts": [
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "'adzaabun"
         ],
         "options": [
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "'adzaabun",
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "'adzaabun",
           "a",
           "i",
@@ -1794,13 +1794,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 14,
         "arabic": "عَاقِبَةُ الْاُمُوْرِ",
         "transliterationParts": [
-          "'aaqibahu",
+          "'aaqibatu",
           "alumuwri"
         ],
         "options": [
-          "'aaqibahu",
+          "'aaqibatu",
           "alumuwri",
-          "'aaqibahu",
+          "'aaqibatu",
           "alumuwri",
           "a",
           "i",
@@ -1842,7 +1842,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  5: {
+  "5": {
     "pageNumber": 5,
     "title": "Halaman 5: Materi",
     "subtitle": "Ajarkan mim sukun dengan benar",
@@ -2359,11 +2359,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 23,
         "arabic": "مَمْنُوْعَةٍ",
         "transliterationParts": [
-          "mamnuw'ahin"
+          "mamnuw'atin"
         ],
         "options": [
-          "mamnuw'ahin",
-          "mamnuw'ahin",
+          "mamnuw'atin",
+          "mamnuw'atin",
           "a",
           "i",
           "u",
@@ -2381,11 +2381,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 24,
         "arabic": "مَمْدُوْدَةٍ",
         "transliterationParts": [
-          "mamduwdahin"
+          "mamduwdatin"
         ],
         "options": [
-          "mamduwdahin",
-          "mamduwdahin",
+          "mamduwdatin",
+          "mamduwdatin",
           "a",
           "i",
           "u",
@@ -2403,11 +2403,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 25,
         "arabic": "مَمْلُوْكَةٍ",
         "transliterationParts": [
-          "mamluwkahin"
+          "mamluwkatin"
         ],
         "options": [
-          "mamluwkahin",
-          "mamluwkahin",
+          "mamluwkatin",
+          "mamluwkatin",
           "a",
           "i",
           "u",
@@ -2423,7 +2423,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  6: {
+  "6": {
     "pageNumber": 6,
     "title": "Halaman 6: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -2940,7 +2940,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  7: {
+  "7": {
     "pageNumber": 7,
     "title": "Halaman 7: Materi",
     "subtitle": "1. Ro’ bersyakal fathah, dlommah, sukun sesudah fathah dan dlommah dibaca tebal\n2. Ro’ bersyakal kasroh dan sukun sesudah kasroh dibaca tipis",
@@ -3193,11 +3193,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 11,
         "arabic": "مَرْحَبًا",
         "transliterationParts": [
-          "marhabana"
+          "marhaban"
         ],
         "options": [
-          "marhabana",
-          "marhabana",
+          "marhaban",
+          "marhaban",
           "a",
           "i",
           "u",
@@ -3215,11 +3215,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 12,
         "arabic": "مَرْزُوْقًا",
         "transliterationParts": [
-          "marzuwqana"
+          "marzuwqan"
         ],
         "options": [
-          "marzuwqana",
-          "marzuwqana",
+          "marzuwqan",
+          "marzuwqan",
           "a",
           "i",
           "u",
@@ -3237,11 +3237,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 13,
         "arabic": "مَرْحَمَةً",
         "transliterationParts": [
-          "marhamahan"
+          "marhamatan"
         ],
         "options": [
-          "marhamahan",
-          "marhamahan",
+          "marhamatan",
+          "marhamatan",
           "a",
           "i",
           "u",
@@ -3303,11 +3303,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 16,
         "arabic": "رُسُلًا",
         "transliterationParts": [
-          "rusulana"
+          "rusulan"
         ],
         "options": [
-          "rusulana",
-          "rusulana",
+          "rusulan",
+          "rusulan",
           "a",
           "i",
           "u",
@@ -3325,11 +3325,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 17,
         "arabic": "رِجَالًا",
         "transliterationParts": [
-          "rijaalana"
+          "rijaalan"
         ],
         "options": [
-          "rijaalana",
-          "rijaalana",
+          "rijaalan",
+          "rijaalan",
           "a",
           "i",
           "u",
@@ -3347,11 +3347,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 18,
         "arabic": "رِسَالًا",
         "transliterationParts": [
-          "risaalana"
+          "risaalan"
         ],
         "options": [
-          "risaalana",
-          "risaalana",
+          "risaalan",
+          "risaalan",
           "a",
           "i",
           "u",
@@ -3369,11 +3369,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 19,
         "arabic": "رِسَالَةً",
         "transliterationParts": [
-          "risaalahan"
+          "risaalatan"
         ],
         "options": [
-          "risaalahan",
-          "risaalahan",
+          "risaalatan",
+          "risaalatan",
           "a",
           "i",
           "u",
@@ -3391,11 +3391,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 20,
         "arabic": "بِرْكَةٌ",
         "transliterationParts": [
-          "birkahun"
+          "birkatun"
         ],
         "options": [
-          "birkahun",
-          "birkahun",
+          "birkatun",
+          "birkatun",
           "a",
           "i",
           "u",
@@ -3413,11 +3413,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 21,
         "arabic": "ذِرْوَةٌ",
         "transliterationParts": [
-          "dzirwahun"
+          "dzirwatun"
         ],
         "options": [
-          "dzirwahun",
-          "dzirwahun",
+          "dzirwatun",
+          "dzirwatun",
           "a",
           "i",
           "u",
@@ -3435,11 +3435,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 22,
         "arabic": "مِرْحَمَةٌ",
         "transliterationParts": [
-          "mirhamahun"
+          "mirhamatun"
         ],
         "options": [
-          "mirhamahun",
-          "mirhamahun",
+          "mirhamatun",
+          "mirhamatun",
           "a",
           "i",
           "u",
@@ -3455,7 +3455,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  8: {
+  "8": {
     "pageNumber": 8,
     "title": "Halaman 8: Materi",
     "subtitle": "",
@@ -3716,11 +3716,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 10,
         "arabic": "مَسْطُوْرًا",
         "transliterationParts": [
-          "masthuwrana"
+          "masthuwran"
         ],
         "options": [
-          "masthuwrana",
-          "masthuwrana",
+          "masthuwran",
+          "masthuwran",
           "a",
           "i",
           "u",
@@ -3902,7 +3902,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  9: {
+  "9": {
     "pageNumber": 9,
     "title": "Halaman 9: Materi",
     "subtitle": "",
@@ -4004,17 +4004,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "تِلْكَ اٰيٰتُ الْكِتٰبِ الْمُبِيْنِ",
         "transliterationParts": [
           "tilka",
-          "aaayaatu",
+          "aayaatu",
           "alkitaabi",
           "almubiyni"
         ],
         "options": [
           "tilka",
-          "aaayaatu",
+          "aayaatu",
           "alkitaabi",
           "almubiyni",
           "tilka",
-          "aaayaatu",
+          "aayaatu",
           "alkitaabi",
           "almubiyni",
           "a",
@@ -4130,17 +4130,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "wakaanuwa",
           "laa",
           "yastathiy'uwna",
-          "sam'ana"
+          "sam'an"
         ],
         "options": [
           "wakaanuwa",
           "laa",
           "yastathiy'uwna",
-          "sam'ana",
+          "sam'an",
           "wakaanuwa",
           "laa",
           "yastathiy'uwna",
-          "sam'ana",
+          "sam'an",
           "a",
           "i",
           "u",
@@ -4162,14 +4162,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "dzaalika",
           "fiy",
           "alkitaabi",
-          "masthuwrana"
+          "masthuwran"
         ],
         "options": [
           "kaana",
           "dzaalika",
           "fiy",
           "alkitaabi",
-          "masthuwrana",
+          "masthuwran",
           "kaana",
           "dzaalika",
           "fiy",
@@ -4222,7 +4222,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  10: {
+  "10": {
     "pageNumber": 10,
     "title": "Halaman 10: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -4842,7 +4842,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  11: {
+  "11": {
     "pageNumber": 11,
     "title": "Halaman 11: Materi",
     "subtitle": "",
@@ -4918,17 +4918,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "ya'kuluwna",
           "fiy",
           "buthuwnihim",
-          "naarana"
+          "naaran"
         ],
         "options": [
           "ya'kuluwna",
           "fiy",
           "buthuwnihim",
-          "naarana",
+          "naaran",
           "ya'kuluwna",
           "fiy",
           "buthuwnihim",
-          "naarana",
+          "naaran",
           "a",
           "i",
           "u",
@@ -4950,14 +4950,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "kaanuwa",
           "laa",
           "yarjuwna",
-          "nusyuwrana"
+          "nusyuwran"
         ],
         "options": [
           "bal",
           "kaanuwa",
           "laa",
           "yarjuwna",
-          "nusyuwrana",
+          "nusyuwran",
           "bal",
           "kaanuwa",
           "laa",
@@ -4980,19 +4980,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَكَانَ عَاقِبَةُ اَمْرِهَا خُسْرًا",
         "transliterationParts": [
           "wakaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "amrihaa",
-          "khusrana"
+          "khusran"
         ],
         "options": [
           "wakaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "amrihaa",
-          "khusrana",
+          "khusran",
           "wakaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "amrihaa",
-          "khusrana",
+          "khusran",
           "a",
           "i",
           "u",
@@ -5013,17 +5013,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "walaa",
           "yaghuwtsa",
           "waya'uwqa",
-          "wanasrana"
+          "wanasran"
         ],
         "options": [
           "walaa",
           "yaghuwtsa",
           "waya'uwqa",
-          "wanasrana",
+          "wanasran",
           "walaa",
           "yaghuwtsa",
           "waya'uwqa",
-          "wanasrana",
+          "wanasran",
           "a",
           "i",
           "u",
@@ -5171,7 +5171,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  12: {
+  "12": {
     "pageNumber": 12,
     "title": "Halaman 12: Materi",
     "subtitle": "",
@@ -5444,19 +5444,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَعْدُ الْاٰخِرَةِ جِئْنَا بِكُمْ لَفِيْفًا",
         "transliterationParts": [
           "wa'du",
-          "alaaakhirahi",
+          "alaakhirati",
           "ji'naa",
           "bikum",
-          "lafiyfana"
+          "lafiyfan"
         ],
         "options": [
           "wa'du",
-          "alaaakhirahi",
+          "alaakhirati",
           "ji'naa",
           "bikum",
-          "lafiyfana",
+          "lafiyfan",
           "wa'du",
-          "alaaakhirahi",
+          "alaakhirati",
           "ji'naa",
           "bikum",
           "a",
@@ -5474,7 +5474,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  13: {
+  "13": {
     "pageNumber": 13,
     "title": "Halaman 13: Materi",
     "subtitle": "",
@@ -5642,17 +5642,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "وَجُنُوْدَهٗ وَهُمْ لَا يَشْعُرُوْنَ",
         "transliterationParts": [
-          "wajunuwdah",
+          "wajunuwdahٗ",
           "wahum",
           "laa",
           "yasy'uruwna"
         ],
         "options": [
-          "wajunuwdah",
+          "wajunuwdahٗ",
           "wahum",
           "laa",
           "yasy'uruwna",
-          "wajunuwdah",
+          "wajunuwdahٗ",
           "wahum",
           "laa",
           "yasy'uruwna",
@@ -5676,17 +5676,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana"
+          "diynan"
         ],
         "options": [
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana",
+          "diynan",
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana",
+          "diynan",
           "a",
           "i",
           "u",
@@ -5706,19 +5706,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna"
         ],
         "options": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna",
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "a",
           "i",
@@ -5797,7 +5797,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  14: {
+  "14": {
     "pageNumber": 14,
     "title": "Halaman 14: Materi",
     "subtitle": "",
@@ -5936,15 +5936,15 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana"
+          "rahiyman"
         ],
         "options": [
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana",
+          "rahiyman",
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana",
+          "rahiyman",
           "a",
           "i",
           "u",
@@ -6108,7 +6108,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  15: {
+  "15": {
     "pageNumber": 15,
     "title": "Halaman 15: Materi",
     "subtitle": "Fathah diikuti wawu sukun bersuara AU dibaca 1 alif",
@@ -6229,11 +6229,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "يَوْمًا",
         "transliterationParts": [
-          "yawmana"
+          "yawman"
         ],
         "options": [
-          "yawmana",
-          "yawmana",
+          "yawman",
+          "yawman",
           "a",
           "i",
           "u",
@@ -6251,11 +6251,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "قَوْمًا",
         "transliterationParts": [
-          "qawmana"
+          "qawman"
         ],
         "options": [
-          "qawmana",
-          "qawmana",
+          "qawman",
+          "qawman",
           "a",
           "i",
           "u",
@@ -6273,11 +6273,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 7,
         "arabic": "هَوْنًا",
         "transliterationParts": [
-          "hawnana"
+          "hawnan"
         ],
         "options": [
-          "hawnana",
-          "hawnana",
+          "hawnan",
+          "hawnan",
           "a",
           "i",
           "u",
@@ -6361,11 +6361,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 11,
         "arabic": "كَوْكَبًا",
         "transliterationParts": [
-          "kawkabana"
+          "kawkaban"
         ],
         "options": [
-          "kawkabana",
-          "kawkabana",
+          "kawkaban",
+          "kawkaban",
           "a",
           "i",
           "u",
@@ -6383,11 +6383,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 12,
         "arabic": "لَوْمَةً",
         "transliterationParts": [
-          "lawmahan"
+          "lawmatan"
         ],
         "options": [
-          "lawmahan",
-          "lawmahan",
+          "lawmatan",
+          "lawmatan",
           "a",
           "i",
           "u",
@@ -6405,11 +6405,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 13,
         "arabic": "قَوْلًا",
         "transliterationParts": [
-          "qawlana"
+          "qawlan"
         ],
         "options": [
-          "qawlana",
-          "qawlana",
+          "qawlan",
+          "qawlan",
           "a",
           "i",
           "u",
@@ -6427,11 +6427,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 14,
         "arabic": "مَوْفُوْرًا",
         "transliterationParts": [
-          "mawfuwrana"
+          "mawfuwran"
         ],
         "options": [
-          "mawfuwrana",
-          "mawfuwrana",
+          "mawfuwran",
+          "mawfuwran",
           "a",
           "i",
           "u",
@@ -6449,11 +6449,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 15,
         "arabic": "فَوْرًا",
         "transliterationParts": [
-          "fawrana"
+          "fawran"
         ],
         "options": [
-          "fawrana",
-          "fawrana",
+          "fawran",
+          "fawran",
           "a",
           "i",
           "u",
@@ -6471,11 +6471,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 16,
         "arabic": "فَوْزًا",
         "transliterationParts": [
-          "fawzana"
+          "fawzan"
         ],
         "options": [
-          "fawzana",
-          "fawzana",
+          "fawzan",
+          "fawzan",
           "a",
           "i",
           "u",
@@ -6559,11 +6559,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 20,
         "arabic": "تَوْرَاةٌ",
         "transliterationParts": [
-          "tawraahun"
+          "tawraatun"
         ],
         "options": [
-          "tawraahun",
-          "tawraahun",
+          "tawraatun",
+          "tawraatun",
           "a",
           "i",
           "u",
@@ -6581,11 +6581,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 21,
         "arabic": "تَوْبَةٌ",
         "transliterationParts": [
-          "tawbahun"
+          "tawbatun"
         ],
         "options": [
-          "tawbahun",
-          "tawbahun",
+          "tawbatun",
+          "tawbatun",
           "a",
           "i",
           "u",
@@ -6603,11 +6603,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 22,
         "arabic": "سَوْءَةٌ",
         "transliterationParts": [
-          "saw'ahun"
+          "saw'atun"
         ],
         "options": [
-          "saw'ahun",
-          "saw'ahun",
+          "saw'atun",
+          "saw'atun",
           "a",
           "i",
           "u",
@@ -6623,7 +6623,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  16: {
+  "16": {
     "pageNumber": 16,
     "title": "Halaman 16: Materi",
     "subtitle": "Fathah diikuti ya sukun bersuara “ai” dibaca 1 alif",
@@ -6744,11 +6744,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "طَيْرًا",
         "transliterationParts": [
-          "thayrana"
+          "thayran"
         ],
         "options": [
-          "thayrana",
-          "thayrana",
+          "thayran",
+          "thayran",
           "a",
           "i",
           "u",
@@ -6766,11 +6766,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "خَيْرًا",
         "transliterationParts": [
-          "khayrana"
+          "khayran"
         ],
         "options": [
-          "khayrana",
-          "khayrana",
+          "khayran",
+          "khayran",
           "a",
           "i",
           "u",
@@ -6788,11 +6788,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 7,
         "arabic": "سَيْرًا",
         "transliterationParts": [
-          "sayrana"
+          "sayran"
         ],
         "options": [
-          "sayrana",
-          "sayrana",
+          "sayran",
+          "sayran",
           "a",
           "i",
           "u",
@@ -6876,11 +6876,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 11,
         "arabic": "لَيْلًا",
         "transliterationParts": [
-          "laylana"
+          "laylan"
         ],
         "options": [
-          "laylana",
-          "laylana",
+          "laylan",
+          "laylan",
           "a",
           "i",
           "u",
@@ -6898,11 +6898,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 12,
         "arabic": "بَيْتًا",
         "transliterationParts": [
-          "baytana"
+          "baytan"
         ],
         "options": [
-          "baytana",
-          "baytana",
+          "baytan",
+          "baytan",
           "a",
           "i",
           "u",
@@ -6920,11 +6920,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 13,
         "arabic": "دَيْنًا",
         "transliterationParts": [
-          "daynana"
+          "daynan"
         ],
         "options": [
-          "daynana",
-          "daynana",
+          "daynan",
+          "daynan",
           "a",
           "i",
           "u",
@@ -7074,11 +7074,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 20,
         "arabic": "بَيْعَةٌ",
         "transliterationParts": [
-          "bay'ahun"
+          "bay'atun"
         ],
         "options": [
-          "bay'ahun",
-          "bay'ahun",
+          "bay'atun",
+          "bay'atun",
           "a",
           "i",
           "u",
@@ -7138,7 +7138,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  17: {
+  "17": {
     "pageNumber": 17,
     "title": "Halaman 17: Materi",
     "subtitle": "",
@@ -7213,19 +7213,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "qaala",
           "liabiyhi",
-          "waqawmih",
+          "waqawmihٖ",
           "maa",
           "ta'buduwna"
         ],
         "options": [
           "qaala",
           "liabiyhi",
-          "waqawmih",
+          "waqawmihٖ",
           "maa",
           "ta'buduwna",
           "qaala",
           "liabiyhi",
-          "waqawmih",
+          "waqawmihٖ",
           "maa",
           "a",
           "i",
@@ -7305,15 +7305,15 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "waja'alnaa",
           "nawmakum",
-          "subaatana"
+          "subaatan"
         ],
         "options": [
           "waja'alnaa",
           "nawmakum",
-          "subaatana",
+          "subaatan",
           "waja'alnaa",
           "nawmakum",
-          "subaatana",
+          "subaatan",
           "a",
           "i",
           "u",
@@ -7397,14 +7397,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "natluwhu",
           "'alayka",
           "mina",
-          "alaaayaati"
+          "alaayaati"
         ],
         "options": [
           "dzaalika",
           "natluwhu",
           "'alayka",
           "mina",
-          "alaaayaati",
+          "alaayaati",
           "dzaalika",
           "natluwhu",
           "'alayka",
@@ -7455,7 +7455,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  18: {
+  "18": {
     "pageNumber": 18,
     "title": "Halaman 18: Materi",
     "subtitle": "",
@@ -7620,18 +7620,18 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "faahyaynaahu",
           "waja'alnaa",
-          "lah",
-          "nuwrana"
+          "lahٗ",
+          "nuwran"
         ],
         "options": [
           "faahyaynaahu",
           "waja'alnaa",
-          "lah",
-          "nuwrana",
+          "lahٗ",
+          "nuwran",
           "faahyaynaahu",
           "waja'alnaa",
-          "lah",
-          "nuwrana",
+          "lahٗ",
+          "nuwran",
           "a",
           "i",
           "u",
@@ -7650,19 +7650,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَسُلَيْمٰنَ وَاٰتَيْنَا دَاوٗدَ زَبُوْرًا",
         "transliterationParts": [
           "wasulaymaana",
-          "waaaataynaa",
-          "daawda",
-          "zabuwrana"
+          "waaataynaa",
+          "daawٗda",
+          "zabuwran"
         ],
         "options": [
           "wasulaymaana",
-          "waaaataynaa",
-          "daawda",
-          "zabuwrana",
+          "waaataynaa",
+          "daawٗda",
+          "zabuwran",
           "wasulaymaana",
-          "waaaataynaa",
-          "daawda",
-          "zabuwrana",
+          "waaataynaa",
+          "daawٗda",
+          "zabuwran",
           "a",
           "i",
           "u",
@@ -7779,7 +7779,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  19: {
+  "19": {
     "pageNumber": 19,
     "title": "Halaman 19: Materi",
     "subtitle": "",
@@ -8013,18 +8013,18 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "walaa",
           "tusyrikuwa",
-          "bih",
-          "syay'ana"
+          "bihٖ",
+          "syay'an"
         ],
         "options": [
           "walaa",
           "tusyrikuwa",
-          "bih",
-          "syay'ana",
+          "bihٖ",
+          "syay'an",
           "walaa",
           "tusyrikuwa",
-          "bih",
-          "syay'ana",
+          "bihٖ",
+          "syay'an",
           "a",
           "i",
           "u",
@@ -8045,7 +8045,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "laa",
           "yasjuduwna"
         ],
@@ -8053,13 +8053,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "laa",
           "yasjuduwna",
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "a",
           "i",
           "u",
@@ -8103,7 +8103,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  20: {
+  "20": {
     "pageNumber": 20,
     "title": "Halaman 20: Materi",
     "subtitle": "",
@@ -8181,7 +8181,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "maa",
           "laysa",
           "laka",
-          "bih",
+          "bihٖ",
           "'ilmun"
         ],
         "options": [
@@ -8190,7 +8190,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "maa",
           "laysa",
           "laka",
-          "bih",
+          "bihٖ",
           "'ilmun",
           "falaa",
           "tas'alni",
@@ -8215,7 +8215,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "qaala",
           "bal",
-          "fa'alah",
+          "fa'alahٗ",
           "kabiyruhum",
           "haadzaa",
           "fas'aluwhum"
@@ -8223,13 +8223,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "options": [
           "qaala",
           "bal",
-          "fa'alah",
+          "fa'alahٗ",
           "kabiyruhum",
           "haadzaa",
           "fas'aluwhum",
           "qaala",
           "bal",
-          "fa'alah",
+          "fa'alahٗ",
           "kabiyruhum",
           "a",
           "i",
@@ -8315,17 +8315,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "hadiytsana"
+          "hadiytsan"
         ],
         "options": [
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "hadiytsana",
+          "hadiytsan",
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "hadiytsana",
+          "hadiytsan",
           "a",
           "i",
           "u",
@@ -8345,19 +8345,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna"
         ],
         "options": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna",
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "a",
           "i",
@@ -8436,7 +8436,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  21: {
+  "21": {
     "pageNumber": 21,
     "title": "Halaman 21: Materi",
     "subtitle": "Ajarkan makhroj sefasih mungkin",
@@ -8509,11 +8509,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 2,
         "arabic": "اٰخِرُوْنَ",
         "transliterationParts": [
-          "aaakhiruwna"
+          "aakhiruwna"
         ],
         "options": [
-          "aaakhiruwna",
-          "aaakhiruwna",
+          "aakhiruwna",
+          "aakhiruwna",
           "a",
           "i",
           "u",
@@ -8531,11 +8531,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 3,
         "arabic": "اٰفِلِيْنَ",
         "transliterationParts": [
-          "aaafiliyna"
+          "aafiliyna"
         ],
         "options": [
-          "aaafiliyna",
-          "aaafiliyna",
+          "aafiliyna",
+          "aafiliyna",
           "a",
           "i",
           "u",
@@ -8553,11 +8553,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 4,
         "arabic": "اٰخَرِيْنَ",
         "transliterationParts": [
-          "aaakhariyna"
+          "aakhariyna"
         ],
         "options": [
-          "aaakhariyna",
-          "aaakhariyna",
+          "aakhariyna",
+          "aakhariyna",
           "a",
           "i",
           "u",
@@ -8969,7 +8969,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  22: {
+  "22": {
     "pageNumber": 22,
     "title": "Halaman 22: Materi",
     "subtitle": "",
@@ -9046,14 +9046,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "laa",
           "yusyrikuwna",
           "biy",
-          "syay'ana"
+          "syay'an"
         ],
         "options": [
           "ya'buduwnaniy",
           "laa",
           "yusyrikuwna",
           "biy",
-          "syay'ana",
+          "syay'an",
           "ya'buduwnaniy",
           "laa",
           "yusyrikuwna",
@@ -9078,17 +9078,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "aw",
           "ya'tiyahumu",
           "al'adzaabu",
-          "qubulana"
+          "qubulan"
         ],
         "options": [
           "aw",
           "ya'tiyahumu",
           "al'adzaabu",
-          "qubulana",
+          "qubulan",
           "aw",
           "ya'tiyahumu",
           "al'adzaabu",
-          "qubulana",
+          "qubulan",
           "a",
           "i",
           "u",
@@ -9137,17 +9137,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "mani",
           "astathaa'a",
           "ilayhi",
-          "sabiylana"
+          "sabiylan"
         ],
         "options": [
           "mani",
           "astathaa'a",
           "ilayhi",
-          "sabiylana",
+          "sabiylan",
           "mani",
           "astathaa'a",
           "ilayhi",
-          "sabiylana",
+          "sabiylan",
           "a",
           "i",
           "u",
@@ -9295,7 +9295,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  23: {
+  "23": {
     "pageNumber": 23,
     "title": "Halaman 23: Materi",
     "subtitle": "Fashohah\nAjarkan makhroj sefasih mungkin (berirama)",
@@ -9830,7 +9830,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  24: {
+  "24": {
     "pageNumber": 24,
     "title": "Halaman 24: Materi",
     "subtitle": "",
@@ -9935,14 +9935,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "dzaalika",
           "fiy",
           "alkitaabi",
-          "masthuwrana"
+          "masthuwran"
         ],
         "options": [
           "kaana",
           "dzaalika",
           "fiy",
           "alkitaabi",
-          "masthuwrana",
+          "masthuwran",
           "kaana",
           "dzaalika",
           "fiy",
@@ -10091,18 +10091,18 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana"
+          "bihٖ",
+          "'ilman"
         ],
         "options": [
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana",
+          "bihٖ",
+          "'ilman",
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana",
+          "bihٖ",
+          "'ilman",
           "a",
           "i",
           "u",
@@ -10151,7 +10151,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  25: {
+  "25": {
     "pageNumber": 25,
     "title": "Halaman 25: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -10705,7 +10705,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  26: {
+  "26": {
     "pageNumber": 26,
     "title": "Halaman 26: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -11325,7 +11325,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  27: {
+  "27": {
     "pageNumber": 27,
     "title": "Halaman 27: Materi",
     "subtitle": "",
@@ -11534,17 +11534,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "kayfa",
           "kaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "almufsidiyna"
         ],
         "options": [
           "kayfa",
           "kaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "almufsidiyna",
           "kayfa",
           "kaana",
-          "'aaqibahu",
+          "'aaqibatu",
           "almufsidiyna",
           "a",
           "i",
@@ -11627,17 +11627,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "qawlana"
+          "qawlan"
         ],
         "options": [
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "qawlana",
+          "qawlan",
           "laa",
           "yakaaduwna",
           "yafqahuwna",
-          "qawlana",
+          "qawlan",
           "a",
           "i",
           "u",
@@ -11653,7 +11653,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  28: {
+  "28": {
     "pageNumber": 28,
     "title": "Halaman 28: Materi",
     "subtitle": "",
@@ -11789,18 +11789,18 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana"
+          "bihٖ",
+          "'ilman"
         ],
         "options": [
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana",
+          "bihٖ",
+          "'ilman",
           "walaa",
           "yuhiythuwna",
-          "bih",
-          "'ilmana",
+          "bihٖ",
+          "'ilman",
           "a",
           "i",
           "u",
@@ -11852,17 +11852,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "walaa",
           "tukhzinaa",
           "yawma",
-          "alqiyaamahi"
+          "alqiyaamati"
         ],
         "options": [
           "walaa",
           "tukhzinaa",
           "yawma",
-          "alqiyaamahi",
+          "alqiyaamati",
           "walaa",
           "tukhzinaa",
           "yawma",
-          "alqiyaamahi",
+          "alqiyaamati",
           "a",
           "i",
           "u",
@@ -11941,19 +11941,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna"
         ],
         "options": [
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "ghaafiluwna",
           "wahum",
           "'ani",
-          "alaaakhirahi",
+          "alaakhirati",
           "hum",
           "a",
           "i",
@@ -11970,7 +11970,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  29: {
+  "29": {
     "pageNumber": 29,
     "title": "Halaman 29: Materi",
     "subtitle": "Ajarkan makhroj sefasih mungkin",
@@ -12569,7 +12569,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  30: {
+  "30": {
     "pageNumber": 30,
     "title": "Halaman 30: Materi",
     "subtitle": "",
@@ -12866,17 +12866,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "faqadi",
           "astamsaka",
-          "bial'urwahi",
+          "bial'urwati",
           "alwutsqaaa"
         ],
         "options": [
           "faqadi",
           "astamsaka",
-          "bial'urwahi",
+          "bial'urwati",
           "alwutsqaaa",
           "faqadi",
           "astamsaka",
-          "bial'urwahi",
+          "bial'urwati",
           "alwutsqaaa",
           "a",
           "i",
@@ -12893,7 +12893,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  31: {
+  "31": {
     "pageNumber": 31,
     "title": "Halaman 31: Materi",
     "subtitle": "Ajarkan makhroj sefasih mungkin",
@@ -12968,17 +12968,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna"
         ],
         "options": [
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna",
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna",
           "a",
           "i",
@@ -13094,19 +13094,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَيَوْمَ الْقِيٰمَةِ يَكُوْنُ عَلَيْهِمْ شَهِيْدًا",
         "transliterationParts": [
           "wayawma",
-          "alqiyaamahi",
+          "alqiyaamati",
           "yakuwnu",
           "'alayhim",
-          "syahiydana"
+          "syahiydan"
         ],
         "options": [
           "wayawma",
-          "alqiyaamahi",
+          "alqiyaamati",
           "yakuwnu",
           "'alayhim",
-          "syahiydana",
+          "syahiydan",
           "wayawma",
-          "alqiyaamahi",
+          "alqiyaamati",
           "yakuwnu",
           "'alayhim",
           "a",
@@ -13130,14 +13130,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "laa",
           "yusyrikuwna",
           "biy",
-          "syay'ana"
+          "syay'an"
         ],
         "options": [
           "ya'buduwnaniy",
           "laa",
           "yusyrikuwna",
           "biy",
-          "syay'ana",
+          "syay'an",
           "ya'buduwnaniy",
           "laa",
           "yusyrikuwna",
@@ -13193,19 +13193,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "فَيَحْلِفُوْنَ لَهٗ كَمَا يَحْلِفُوْنَ لَكُمْ",
         "transliterationParts": [
           "fayahlifuwna",
-          "lah",
+          "lahٗ",
           "kamaa",
           "yahlifuwna",
           "lakum"
         ],
         "options": [
           "fayahlifuwna",
-          "lah",
+          "lahٗ",
           "kamaa",
           "yahlifuwna",
           "lakum",
           "fayahlifuwna",
-          "lah",
+          "lahٗ",
           "kamaa",
           "yahlifuwna",
           "a",
@@ -13223,7 +13223,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  32: {
+  "32": {
     "pageNumber": 32,
     "title": "Halaman 32: Materi",
     "subtitle": "",
@@ -13362,11 +13362,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "مَذْمُوْمًا",
         "transliterationParts": [
-          "madzmuwmana"
+          "madzmuwman"
         ],
         "options": [
-          "madzmuwmana",
-          "madzmuwmana",
+          "madzmuwman",
+          "madzmuwman",
           "a",
           "i",
           "u",
@@ -13384,11 +13384,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "مَذْلُوْلًا",
         "transliterationParts": [
-          "madzluwlana"
+          "madzluwlan"
         ],
         "options": [
-          "madzluwlana",
-          "madzluwlana",
+          "madzluwlan",
+          "madzluwlan",
           "a",
           "i",
           "u",
@@ -13780,11 +13780,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 24,
         "arabic": "مُظْلِمًا",
         "transliterationParts": [
-          "muzhlimana"
+          "muzhliman"
         ],
         "options": [
-          "muzhlimana",
-          "muzhlimana",
+          "muzhliman",
+          "muzhliman",
           "a",
           "i",
           "u",
@@ -13802,11 +13802,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 25,
         "arabic": "مَظْلُوْمًا",
         "transliterationParts": [
-          "mazhluwmana"
+          "mazhluwman"
         ],
         "options": [
-          "mazhluwmana",
-          "mazhluwmana",
+          "mazhluwman",
+          "mazhluwman",
           "a",
           "i",
           "u",
@@ -13822,7 +13822,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  33: {
+  "33": {
     "pageNumber": 33,
     "title": "Halaman 33: Materi",
     "subtitle": "Perhatikan huruf-huruf yang sukun",
@@ -13898,19 +13898,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "wana'lamu",
           "maa",
           "tuwaswisu",
-          "bih",
-          "nafsuh"
+          "bihٖ",
+          "nafsuhٗ"
         ],
         "options": [
           "wana'lamu",
           "maa",
           "tuwaswisu",
-          "bih",
-          "nafsuh",
+          "bihٖ",
+          "nafsuhٗ",
           "wana'lamu",
           "maa",
           "tuwaswisu",
-          "bih",
+          "bihٖ",
           "a",
           "i",
           "u",
@@ -14117,7 +14117,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  34: {
+  "34": {
     "pageNumber": 34,
     "title": "Halaman 34: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -14671,7 +14671,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  35: {
+  "35": {
     "pageNumber": 35,
     "title": "Halaman 35: Materi",
     "subtitle": "Ajarkan huruf-huruf yang merah dengan teliti",
@@ -15225,7 +15225,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  36: {
+  "36": {
     "pageNumber": 36,
     "title": "Halaman 36: Materi",
     "subtitle": "",
@@ -15360,7 +15360,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَلَعَذَابُ الْاٰخِرَةِ اَكْبَرُ لَوْ كَانُوْا يَعْلَمُوْنَ",
         "transliterationParts": [
           "wala'adzaabu",
-          "alaaakhirahi",
+          "alaakhirati",
           "akbaru",
           "law",
           "kaanuwa",
@@ -15368,13 +15368,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         ],
         "options": [
           "wala'adzaabu",
-          "alaaakhirahi",
+          "alaakhirati",
           "akbaru",
           "law",
           "kaanuwa",
           "ya'lamuwna",
           "wala'adzaabu",
-          "alaaakhirahi",
+          "alaakhirati",
           "akbaru",
           "law",
           "a",
@@ -15396,15 +15396,15 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "waja'alnaakum",
           "aktsara",
-          "nafiyrana"
+          "nafiyran"
         ],
         "options": [
           "waja'alnaakum",
           "aktsara",
-          "nafiyrana",
+          "nafiyran",
           "waja'alnaakum",
           "aktsara",
-          "nafiyrana",
+          "nafiyran",
           "a",
           "i",
           "u",
@@ -15425,17 +15425,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "wayastakbiru",
           "fasayahsyuruhum",
           "ilayhi",
-          "jamiy'ana"
+          "jamiy'an"
         ],
         "options": [
           "wayastakbiru",
           "fasayahsyuruhum",
           "ilayhi",
-          "jamiy'ana",
+          "jamiy'an",
           "wayastakbiru",
           "fasayahsyuruhum",
           "ilayhi",
-          "jamiy'ana",
+          "jamiy'an",
           "a",
           "i",
           "u",
@@ -15454,17 +15454,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَكَرِهُوْا رِضْوَانَهٗ فَاَحْبَطَ اَعْمَالَهُمْ",
         "transliterationParts": [
           "wakarihuwa",
-          "ridhwaanah",
+          "ridhwaanahٗ",
           "faahbatha",
           "a'maalahum"
         ],
         "options": [
           "wakarihuwa",
-          "ridhwaanah",
+          "ridhwaanahٗ",
           "faahbatha",
           "a'maalahum",
           "wakarihuwa",
-          "ridhwaanah",
+          "ridhwaanahٗ",
           "faahbatha",
           "a'maalahum",
           "a",
@@ -15485,17 +15485,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "فَاخْتَلَطَ بِهٖ نَبَاتُ الْاَرْضِ",
         "transliterationParts": [
           "faakhtalatha",
-          "bih",
+          "bihٖ",
           "nabaatu",
           "alardhi"
         ],
         "options": [
           "faakhtalatha",
-          "bih",
+          "bihٖ",
           "nabaatu",
           "alardhi",
           "faakhtalatha",
-          "bih",
+          "bihٖ",
           "nabaatu",
           "alardhi",
           "a",
@@ -15517,19 +15517,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "fakharaja",
           "'alaaa",
-          "qawmih",
+          "qawmihٖ",
           "mina",
           "almihraabi"
         ],
         "options": [
           "fakharaja",
           "'alaaa",
-          "qawmih",
+          "qawmihٖ",
           "mina",
           "almihraabi",
           "fakharaja",
           "'alaaa",
-          "qawmih",
+          "qawmihٖ",
           "mina",
           "a",
           "i",
@@ -15546,7 +15546,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  37: {
+  "37": {
     "pageNumber": 37,
     "title": "Halaman 37: Materi",
     "subtitle": "",
@@ -15714,17 +15714,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "وَاٰخَرُوْنَ يَضْرِبُوْنَ فِي الْاَرْضِ",
         "transliterationParts": [
-          "waaaakharuwna",
+          "waaakharuwna",
           "yadhribuwna",
           "fiy",
           "alardhi"
         ],
         "options": [
-          "waaaakharuwna",
+          "waaakharuwna",
           "yadhribuwna",
           "fiy",
           "alardhi",
-          "waaaakharuwna",
+          "waaakharuwna",
           "yadhribuwna",
           "fiy",
           "alardhi",
@@ -15780,17 +15780,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna"
         ],
         "options": [
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna",
           "wamaa",
           "nahnu",
-          "lah",
+          "lahٗ",
           "bimu'miniyna",
           "a",
           "i",
@@ -15839,17 +15839,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "lilkaafiriyna",
           "laysa",
-          "lah",
+          "lahٗ",
           "daafi'un"
         ],
         "options": [
           "lilkaafiriyna",
           "laysa",
-          "lah",
+          "lahٗ",
           "daafi'un",
           "lilkaafiriyna",
           "laysa",
-          "lah",
+          "lahٗ",
           "daafi'un",
           "a",
           "i",
@@ -15866,7 +15866,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  38: {
+  "38": {
     "pageNumber": 38,
     "title": "Halaman 38: Materi",
     "subtitle": "",
@@ -16192,7 +16192,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  39: {
+  "39": {
     "pageNumber": 39,
     "title": "Halaman 39: Materi",
     "subtitle": "",
@@ -16462,17 +16462,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "yu'iydukum",
           "fiyhaa",
           "wayukhrijukum",
-          "ikhraajana"
+          "ikhraajan"
         ],
         "options": [
           "yu'iydukum",
           "fiyhaa",
           "wayukhrijukum",
-          "ikhraajana",
+          "ikhraajan",
           "yu'iydukum",
           "fiyhaa",
           "wayukhrijukum",
-          "ikhraajana",
+          "ikhraajan",
           "a",
           "i",
           "u",
@@ -16521,7 +16521,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  40: {
+  "40": {
     "pageNumber": 40,
     "title": "Halaman 40: Materi",
     "subtitle": "Ajarkan makhroj sefasih mungkin",
@@ -16594,11 +16594,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 2,
         "arabic": "مُزْجَاةٍ",
         "transliterationParts": [
-          "muzjaahin"
+          "muzjaatin"
         ],
         "options": [
-          "muzjaahin",
-          "muzjaahin",
+          "muzjaatin",
+          "muzjaatin",
           "a",
           "i",
           "u",
@@ -16660,11 +16660,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "تَصْدِيْقًا",
         "transliterationParts": [
-          "tashdiyqana"
+          "tashdiyqan"
         ],
         "options": [
-          "tashdiyqana",
-          "tashdiyqana",
+          "tashdiyqan",
+          "tashdiyqan",
           "a",
           "i",
           "u",
@@ -16682,11 +16682,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "تَصْرِيْفًا",
         "transliterationParts": [
-          "tashriyfana"
+          "tashriyfan"
         ],
         "options": [
-          "tashriyfana",
-          "tashriyfana",
+          "tashriyfan",
+          "tashriyfan",
           "a",
           "i",
           "u",
@@ -16924,11 +16924,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 17,
         "arabic": "اَزْوَاجًا",
         "transliterationParts": [
-          "azwaajana"
+          "azwaajan"
         ],
         "options": [
-          "azwaajana",
-          "azwaajana",
+          "azwaajan",
+          "azwaajan",
           "a",
           "i",
           "u",
@@ -16946,11 +16946,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 18,
         "arabic": "مُزْجَاةٍ",
         "transliterationParts": [
-          "muzjaahin"
+          "muzjaatin"
         ],
         "options": [
-          "muzjaahin",
-          "muzjaahin",
+          "muzjaatin",
+          "muzjaatin",
           "a",
           "i",
           "u",
@@ -16968,11 +16968,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 19,
         "arabic": "زُجَاجَةٍ",
         "transliterationParts": [
-          "zujaajahin"
+          "zujaajatin"
         ],
         "options": [
-          "zujaajahin",
-          "zujaajahin",
+          "zujaajatin",
+          "zujaajatin",
           "a",
           "i",
           "u",
@@ -17100,11 +17100,11 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "id": 25,
         "arabic": "زِلْزَالًا",
         "transliterationParts": [
-          "zilzaalana"
+          "zilzaalan"
         ],
         "options": [
-          "zilzaalana",
-          "zilzaalana",
+          "zilzaalan",
+          "zilzaalan",
           "a",
           "i",
           "u",
@@ -17120,7 +17120,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  41: {
+  "41": {
     "pageNumber": 41,
     "title": "Halaman 41: Materi",
     "subtitle": "",
@@ -17429,7 +17429,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  42: {
+  "42": {
     "pageNumber": 42,
     "title": "Halaman 42: Materi",
     "subtitle": "",
@@ -17538,17 +17538,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "fayazhlalna",
           "rawaakida",
           "'alaaa",
-          "zhahrih"
+          "zhahrihٖ"
         ],
         "options": [
           "fayazhlalna",
           "rawaakida",
           "'alaaa",
-          "zhahrih",
+          "zhahrihٖ",
           "fayazhlalna",
           "rawaakida",
           "'alaaa",
-          "zhahrih",
+          "zhahrihٖ",
           "a",
           "i",
           "u",
@@ -17567,21 +17567,21 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "arabic": "لَا طَاقَةَ لَنَا الْيَوْمَ بِجَالُوْتَ وَجُنُوْدِهٖ",
         "transliterationParts": [
           "laa",
-          "thaaqaha",
+          "thaaqata",
           "lanaa",
           "alyawma",
           "bijaaluwta",
-          "wajunuwdih"
+          "wajunuwdihٖ"
         ],
         "options": [
           "laa",
-          "thaaqaha",
+          "thaaqata",
           "lanaa",
           "alyawma",
           "bijaaluwta",
-          "wajunuwdih",
+          "wajunuwdihٖ",
           "laa",
-          "thaaqaha",
+          "thaaqata",
           "lanaa",
           "alyawma",
           "a",
@@ -17662,15 +17662,15 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana"
+          "rahiyman"
         ],
         "options": [
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana",
+          "rahiyman",
           "wakaana",
           "bialmu'miniyna",
-          "rahiymana",
+          "rahiyman",
           "a",
           "i",
           "u",
@@ -17691,7 +17691,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "laa",
           "yasjuduwna"
         ],
@@ -17699,13 +17699,13 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "laa",
           "yasjuduwna",
           "waidzaa",
           "quri'a",
           "'alayhimu",
-          "alquraaanu",
+          "alquraanu",
           "a",
           "i",
           "u",
@@ -17727,14 +17727,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "kadzaba",
           "alfu'aadu",
           "maa",
-          "raaaaa"
+          "raaaa"
         ],
         "options": [
           "maa",
           "kadzaba",
           "alfu'aadu",
           "maa",
-          "raaaaa",
+          "raaaa",
           "maa",
           "kadzaba",
           "alfu'aadu",
@@ -17754,7 +17754,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  43: {
+  "43": {
     "pageNumber": 43,
     "title": "Halaman 43: Materi",
     "subtitle": "",
@@ -18088,7 +18088,7 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  44: {
+  "44": {
     "pageNumber": 44,
     "title": "Halaman 44: Materi",
     "subtitle": "",
@@ -18222,19 +18222,19 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "transliterationParts": [
           "wahuwa",
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "mina",
           "alkhaasiriyna"
         ],
         "options": [
           "wahuwa",
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "mina",
           "alkhaasiriyna",
           "wahuwa",
           "fiy",
-          "alaaakhirahi",
+          "alaakhirati",
           "mina",
           "a",
           "i",
@@ -18257,14 +18257,14 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "lahum",
           "walaa",
           "liyahdiyahum",
-          "thariyqana"
+          "thariyqan"
         ],
         "options": [
           "liyaghfira",
           "lahum",
           "walaa",
           "liyahdiyahum",
-          "thariyqana",
+          "thariyqan",
           "liyaghfira",
           "lahum",
           "walaa",
@@ -18289,17 +18289,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "wamaa",
           "ja'alnaaka",
           "'alayhim",
-          "hafiyzhana"
+          "hafiyzhan"
         ],
         "options": [
           "wamaa",
           "ja'alnaaka",
           "'alayhim",
-          "hafiyzhana",
+          "hafiyzhan",
           "wamaa",
           "ja'alnaaka",
           "'alayhim",
-          "hafiyzhana",
+          "hafiyzhan",
           "a",
           "i",
           "u",
@@ -18379,17 +18379,17 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana"
+          "diynan"
         ],
         "options": [
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana",
+          "diynan",
           "waradhiytu",
           "lakumu",
           "alislaama",
-          "diynana",
+          "diynan",
           "a",
           "i",
           "u",
@@ -18404,5 +18404,5 @@ export const TILAWATI_JILID_3_PAGES: Record<number, PageQuizData> = {
         "audioUrl": ""
       }
     ]
-  },
+  }
 };

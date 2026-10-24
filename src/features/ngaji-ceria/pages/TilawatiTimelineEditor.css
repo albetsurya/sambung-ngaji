@@ -32,6 +32,10 @@
 .te-action-icon { display: inline-block; font-size: 16px; line-height: 1; }
 .te-action-label { margin-left: 4px; }
 .te-zoom { display: flex; gap: 8px; align-items: center; font-size: 12px; }
+.te-speed { display: flex; gap: 6px; align-items: center; font-size: 12px; color: #94a3b8; font-weight: 700; }
+.te-speed select, .te-speed-setting select { background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 8px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; outline: none; }
+.te-speed select:hover, .te-speed-setting select:hover { border-color: #fcd882; }
+.te-speed-setting { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 16px; font-size: 12px; font-weight: 700; color: #94a3b8; }
 .te-scroll { width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid #334155; border-radius: 8px; background: #0c1220; }
 .te-tracks { position: relative; min-height: 309px; overflow: hidden; }
 .te-ruler { height: 32px; position: relative; overflow: hidden; border-bottom: 1px solid #334155; cursor: ew-resize; touch-action: none; }
@@ -127,7 +131,7 @@
   .te-toolbar .te-action-btn { width: 42px; height: 38px; padding: 0; }
   .te-toolbar .te-action-label { display: none; }
   .te-toolbar .te-action-icon { margin: 0; font-size: 18px; }
-  .te-zoom { display: none; }
+  .te-zoom, .te-speed { display: none; }
   .te-help { font-size: 11px; }
   .te-scroll { border-radius: 7px; -webkit-overflow-scrolling: touch; }
   .te-ruler { height: 38px; }
@@ -162,4 +166,229 @@
   .te-mobile-toolbar button span { display: block; margin-bottom: 2px; color: #ffcb45; font-size: 17px; }
   .te-mobile-toolbar .te-mobile-play { color: #fff; background: #00662c; border-color: #00923f; box-shadow: 0 2px 0 #003d1b; }
   .te-mobile-toolbar .te-mobile-play span { color: #fff; }
+}
+
+/* Badges & Page Strip */
+.te-page-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.te-page-status-badge.is-finished {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.te-page-status-badge.is-pending {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.te-page-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 24px;
+  background: #0d1522;
+  border-bottom: 1px solid #1e293b;
+  overflow-x: auto;
+}
+.te-page-strip-label {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+.te-page-strip-stat {
+  font-weight: 700;
+  color: #fde68a;
+  white-space: nowrap;
+}
+.te-page-strip-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.te-page-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #1e293b;
+  border: 1px solid #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.te-page-chip:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+.te-page-chip.is-done {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.te-page-chip.is-current {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b;
+  color: #fff;
+  font-weight: 900;
+}
+.te-page-chip-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Modal Receipt */
+.te-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(4px);
+  animation: te-fade-in 0.2s ease-out;
+}
+.te-modal-card {
+  width: 100%;
+  max-width: 480px;
+  background: #172132;
+  border: 2px solid #334155;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  animation: te-pop-in 0.22s ease-out;
+}
+.te-modal-badge-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.2);
+  border: 2px solid #10b981;
+  color: #34d399;
+  font-size: 26px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.te-modal-card h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8fafc;
+  margin: 0 0 6px;
+}
+.te-modal-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+.te-modal-receipt-box {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+.te-receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.te-receipt-col {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.te-receipt-key {
+  color: #94a3b8;
+}
+.te-receipt-val {
+  color: #f1f5f9;
+}
+.te-receipt-val.is-success {
+  color: #34d399;
+}
+.te-receipt-val.is-accent {
+  color: #fbbf24;
+}
+.te-receipt-path {
+  display: block;
+  width: 100%;
+  font-size: 10.5px;
+  font-family: monospace;
+  background: #1e293b;
+  color: #93c5fd;
+  padding: 5px 8px;
+  border-radius: 6px;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+.te-receipt-progress-wrap {
+  width: 100%;
+}
+.te-receipt-progress-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 11px;
+}
+.te-receipt-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.te-receipt-progress-fill {
+  height: 100%;
+  background: #10b981;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.te-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.te-modal-actions .te-btn {
+  flex: 1;
+}
+
+@keyframes te-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes te-pop-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }

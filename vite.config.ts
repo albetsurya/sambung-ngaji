@@ -50,7 +50,8 @@ function audioUrlToFile(audioUrl: unknown): string {
   if (typeof audioUrl !== "string" || !audioUrl.startsWith("/audio/tilawati/")) {
     throw new Error("Audio harus menggunakan URL /audio/tilawati/...");
   }
-  const file = path.resolve(audioRoot, audioUrl.slice("/audio/tilawati/".length));
+  const cleanPath = decodeURIComponent(audioUrl.slice("/audio/tilawati/".length));
+  const file = path.resolve(audioRoot, cleanPath);
   if (file !== audioRoot && !file.startsWith(`${audioRoot}${path.sep}`)) {
     throw new Error("Path audio tidak valid");
   }
@@ -431,6 +432,20 @@ function tilawatiEditorPlugin() {
     name: "tilawati-editor-local-files",
     configureServer(server: any) {
       server.middlewares.use(async (req: any, res: any, next: any) => {
+        if (req.url?.startsWith("/audio/tilawati/")) {
+          const rawPath = req.url.split("?")[0];
+          const decoded = decodeURIComponent(rawPath.slice("/audio/tilawati/".length));
+          const filePath = path.resolve(audioRoot, decoded);
+          if (filePath.startsWith(`${audioRoot}${path.sep}`) && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const ext = path.extname(filePath).toLowerCase();
+            const mime = ext === ".ogg" ? "audio/ogg" : ext === ".mp3" ? "audio/mpeg" : "application/octet-stream";
+            res.setHeader("Content-Type", mime);
+            res.setHeader("Content-Length", fs.statSync(filePath).size);
+            fs.createReadStream(filePath).pipe(res);
+            return;
+          }
+        }
+
         if (!req.url?.startsWith("/api/tilawati-editor")) {
           next();
           return;
@@ -463,9 +478,12 @@ function tilawatiEditorPlugin() {
               page,
             );
             const layout = readTimelineEdits()[`${Number(jilid)}:${Number(page)}`] || {};
+            const pageStatus = readPageStatus();
+            const finishedPages = (pageStatus.pages?.[`jilid_${Number(jilid)}`]?.finished_pages as number[]) || [];
             sendEditorJson(res, 200, {
               ok: true,
               clips,
+              finishedPages,
               published: layout.published || null,
               revision: (layout.published as Record<string, unknown> | undefined)?.revision || "",
               textLinks: layout.textLinks || {},

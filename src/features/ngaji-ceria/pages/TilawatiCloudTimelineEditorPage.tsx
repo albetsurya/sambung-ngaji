@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { latinToArabic } from "../utils/translit";
+import { arabicToLatinParts, latinToArabic } from "../utils/translit";
 import { TILAWATI_PAGE_DATASETS } from "../data/tilawatiPageDatasets";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
 import {
@@ -766,6 +766,33 @@ export default function TilawatiCloudTimelineEditorPage() {
     }
   }
 
+  function autoFixLatinPage() {
+    if (!draft) return;
+    const nextTexts = draft.texts.map((t) => {
+      if (!t.arabic) return t;
+      const newParts = arabicToLatinParts(t.arabic);
+      if (newParts.length === 0) return t;
+      const oldParts = t.transliterationParts || [];
+      const rep = new Map<string, string>();
+      for (let i = 0; i < oldParts.length; i++) {
+        if (newParts[i] && oldParts[i] !== newParts[i]) {
+          rep.set(oldParts[i], newParts[i]);
+        }
+      }
+      let options = (t.options || []).map((opt) => rep.get(opt) || opt);
+      for (const p of newParts) {
+        if (!options.includes(p)) options.unshift(p);
+      }
+      return {
+        ...t,
+        transliterationParts: newParts,
+        options,
+      };
+    });
+    change({ ...draft, texts: nextTexts });
+    setMessage("Teks Latin di seluruh halaman ini telah diperbaiki sesuai tulisan Arab.");
+  }
+
   async function saveFinal() {
     if (!draft || saving) return;
     stopPreview();
@@ -897,6 +924,14 @@ export default function TilawatiCloudTimelineEditorPage() {
           onClick={() => void draftSave.save()}
         >
           Simpan Draft
+        </button>
+        <button
+          className="te-btn"
+          disabled={loading || saving || !draft}
+          onClick={autoFixLatinPage}
+          title="Auto perbaiki transliterasi Latin dari teks Arab untuk seluruh teks di halaman ini"
+        >
+          Perbaiki Latin Halaman
         </button>
         <button
           className="te-btn te-primary"
@@ -1622,16 +1657,24 @@ export default function TilawatiCloudTimelineEditorPage() {
                 <>
                   <h3>Edit teks</h3>
                   <label>
-                    Teks Arab
+                    Teks Arab (auto-generate Latin)
                     <textarea
                       aria-label="Teks Arab"
                       dir="rtl"
                       className="te-arabic"
                       rows={3}
                       value={selectedText.arabic}
-                      onChange={(event) =>
-                        editText({ arabic: event.target.value })
-                      }
+                      onChange={(event) => {
+                        const val = event.target.value;
+                        const autoParts = arabicToLatinParts(val);
+                        editText({
+                          arabic: val,
+                          transliterationParts:
+                            autoParts.length > 0
+                              ? autoParts
+                              : selectedText.transliterationParts,
+                        });
+                      }}
                     />
                   </label>
                   <label>
@@ -1653,6 +1696,17 @@ export default function TilawatiCloudTimelineEditorPage() {
                       }}
                     />
                   </label>
+                  <button
+                    type="button"
+                    className="te-btn te-small"
+                    style={{ marginTop: "-4px", marginBottom: "8px" }}
+                    onClick={() => {
+                      const parts = arabicToLatinParts(selectedText.arabic);
+                      if (parts.length > 0) editText({ transliterationParts: parts });
+                    }}
+                  >
+                    Auto Perbaiki Latin dari Arab
+                  </button>
                   <label>
                     Nada / keterangan
                     <input
