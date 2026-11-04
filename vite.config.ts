@@ -18,9 +18,17 @@ const timelineEditsPath = path.resolve(
   "src/features/ngaji-ceria/data/tilawatiTimelineEdits.json",
 );
 const pageStatusPath = path.resolve(audioRoot, "page_status.json");
+const tartilaRoot = path.resolve(frontendRoot, "../../tartila");
 const tartilaAudioDist = process.env.TARTILA_AUDIO_DIST
   ? path.resolve(process.env.TARTILA_AUDIO_DIST)
-  : path.resolve(frontendRoot, "../../tartila/dist/audio/tilawati");
+  : path.resolve(tartilaRoot, "dist/audio/tilawati");
+const tartilaAudioPublic = process.env.TARTILA_AUDIO_PUBLIC
+  ? path.resolve(process.env.TARTILA_AUDIO_PUBLIC)
+  : path.resolve(tartilaRoot, "public/audio/tilawati");
+const tartilaTimelineEditsPath = path.resolve(
+  tartilaRoot,
+  "src/features/ngaji-ceria/data/tilawatiTimelineEdits.json",
+);
 
 function sendEditorJson(res: any, status: number, body: unknown): void {
   res.statusCode = status;
@@ -92,7 +100,7 @@ function audioDuration(file: string): number {
 function listPageAudio(jilidValue: unknown, pageValue: unknown) {
   const jilid = Number(jilidValue);
   const page = Number(pageValue);
-  if (!Number.isInteger(jilid) || jilid < 1 || jilid > 5) throw new Error("Jilid tidak valid");
+  if (!Number.isInteger(jilid) || jilid < 1 || jilid > 6) throw new Error("Jilid tidak valid");
   if (!Number.isInteger(page) || page < 1 || page > 44) throw new Error("Halaman tidak valid");
 
   const directory = path.resolve(audioRoot, `jilid_${jilid}`, `hal${page}`);
@@ -167,6 +175,10 @@ function saveTimelineEdit(jilid: unknown, page: unknown, edit: Record<string, un
   edits[key] = { ...(edits[key] || {}), ...edit };
   fs.mkdirSync(path.dirname(timelineEditsPath), { recursive: true });
   fs.writeFileSync(timelineEditsPath, `${JSON.stringify(edits, null, 2)}\n`, "utf8");
+  if (fs.existsSync(tartilaRoot)) {
+    fs.mkdirSync(path.dirname(tartilaTimelineEditsPath), { recursive: true });
+    fs.writeFileSync(tartilaTimelineEditsPath, `${JSON.stringify(edits, null, 2)}\n`, "utf8");
+  }
 }
 
 function numberValue(value: unknown, label: string): number {
@@ -395,6 +407,23 @@ function finishPage(body: Record<string, unknown>) {
   if (!sourceDirectory.startsWith(`${audioRoot}${path.sep}`)) throw new Error("Folder audio tidak valid");
   const destinationDirectory = path.join(tartilaAudioDist, `jilid_${jilid}`, `hal${page}`);
   const copiedFiles = copyDirectory(sourceDirectory, destinationDirectory);
+
+  if (fs.existsSync(tartilaRoot)) {
+    const publicDestination = path.join(tartilaAudioPublic, `jilid_${jilid}`, `hal${page}`);
+    copyDirectory(sourceDirectory, publicDestination);
+    if (fs.existsSync(timelineEditsPath)) {
+      fs.mkdirSync(path.dirname(tartilaTimelineEditsPath), { recursive: true });
+      fs.copyFileSync(timelineEditsPath, tartilaTimelineEditsPath);
+    }
+    const tartilaPubStatus = path.join(tartilaAudioPublic, "page_status.json");
+    const tartilaDistStatus = path.join(tartilaAudioDist, "page_status.json");
+    if (fs.existsSync(pageStatusPath)) {
+      fs.copyFileSync(pageStatusPath, tartilaPubStatus);
+      if (fs.existsSync(tartilaAudioDist)) {
+        fs.copyFileSync(pageStatusPath, tartilaDistStatus);
+      }
+    }
+  }
 
   const status = readPageStatus();
   const pages = (status.pages as Record<string, Record<string, any>> | undefined) ?? {};

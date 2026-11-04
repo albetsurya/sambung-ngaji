@@ -13,7 +13,7 @@ import { TILAWATI_JILID_2_PAGES as RAW_TILAWATI_JILID_2_PAGES } from "./tilawati
 import { TILAWATI_JILID_3_PAGES as RAW_TILAWATI_JILID_3_PAGES } from "./tilawatiQuizJilid3";
 import { TILAWATI_JILID_4_PAGES as RAW_TILAWATI_JILID_4_PAGES } from "./tilawatiQuizJilid4";
 import { TILAWATI_JILID_5_PAGES as RAW_TILAWATI_JILID_5_PAGES } from "./tilawatiQuizJilid5";
-import { TILAWATI_JILID_6_PAGES } from "./tilawatiQuizJilid6";
+import { TILAWATI_JILID_6_PAGES as RAW_TILAWATI_JILID_6_PAGES } from "./tilawatiQuizJilid6";
 
 const audioUrl = (jilid: number, pageNumber: number, filename: string): string =>
   `/audio/tilawati/jilid_${jilid}/hal${pageNumber}/${filename}`;
@@ -55,7 +55,14 @@ function mergeQuestions(questions: QuizQuestion[], mergedAudioUrl: string): Quiz
       .join("   "),
     transliterationParts,
     options: [...transliterationParts, ...distractors.slice(0, Math.max(8, transliterationParts.length))],
-    hintTone: tones.length > 1 ? `Rost: ${tones.join(" — ")}` : first.hintTone,
+    hintTone:
+      tones.length >= 3
+        ? (questions.some((q) => q.hintTone.includes("3x"))
+            ? "Rost: Datar — Naik — Turun (3x)"
+            : "Rost: Datar — Naik — Turun")
+        : tones.length === 2
+          ? "Rost: Datar — Turun"
+          : first.hintTone,
     audioUrl: mergedAudioUrl,
     audioMappingComplete: true,
   };
@@ -166,7 +173,6 @@ function groupJilid1Footers(pages: Record<number, PageQuizData>): Record<number,
 }
 
 function applyQuizEdits(jilid: number, pages: Record<number, PageQuizData>): Record<number, PageQuizData> {
-  if (isNgajiCeriaServerAvailable()) return pages;
   return Object.fromEntries(
     Object.entries(pages).map(([pageNumber, page]) => {
       const questions = page.questions
@@ -182,7 +188,6 @@ function applyQuizEdits(jilid: number, pages: Record<number, PageQuizData>): Rec
 }
 
 function applyTimelineEdits(jilid: number, pages: Record<number, PageQuizData>): Record<number, PageQuizData> {
-  if (isNgajiCeriaServerAvailable()) return pages;
   return Object.fromEntries(
     Object.entries(pages).map(([pageNumber, page]) => {
       const edit = TIMELINE_EDITS[`${jilid}:${pageNumber}`];
@@ -220,6 +225,7 @@ const TILAWATI_JILID_2_PAGES = applyTimelineEdits(2, applyQuizEdits(2, groupData
 const TILAWATI_JILID_3_PAGES = applyTimelineEdits(3, applyQuizEdits(3, groupDatasetByAudioRows(3, RAW_TILAWATI_JILID_3_PAGES)));
 const TILAWATI_JILID_4_PAGES = applyTimelineEdits(4, applyQuizEdits(4, groupDatasetByAudioRows(4, RAW_TILAWATI_JILID_4_PAGES)));
 const TILAWATI_JILID_5_PAGES = applyTimelineEdits(5, applyQuizEdits(5, groupDatasetByAudioRows(5, RAW_TILAWATI_JILID_5_PAGES)));
+const TILAWATI_JILID_6_PAGES = applyTimelineEdits(6, applyQuizEdits(6, groupDatasetByAudioRows(6, RAW_TILAWATI_JILID_6_PAGES)));
 
 export type { QuizQuestion, PageQuizData } from "./tilawatiQuizTypes";
 

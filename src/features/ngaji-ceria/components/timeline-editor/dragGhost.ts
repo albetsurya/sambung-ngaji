@@ -48,17 +48,12 @@ export function buildDragGhost(info: GhostInfo): HTMLDivElement {
   badge.setAttribute("aria-hidden", "true");
   ghost.appendChild(badge);
 
-  ghost.dataset.t0 = String(Date.now());
   return ghost;
 }
 
-/** Membersihkan sisa ghost dari sesi yang gagal cleanup (lebih tua dari batas). */
-export function purgeStrayGhosts(maxAgeMs = 30000) {
-  const now = Date.now();
-  document.querySelectorAll(".te-drag-ghost").forEach((el) => {
-    const t0 = Number((el as HTMLElement).dataset.t0 || 0);
-    if (!t0 || now - t0 > maxAgeMs) el.remove();
-  });
+/** Membersihkan semua ghost lama supaya hanya satu ghost yang tampil. */
+export function purgeStrayGhosts() {
+  document.querySelectorAll(".te-drag-ghost").forEach((el) => el.remove());
 }
 
 /**
@@ -120,16 +115,32 @@ function placeGhostWithSize(ghost: HTMLElement, clientX: number, clientY: number
   ghost.style.top = `${Math.min(Math.max(clientY - h / 2, margin), maxY)}px`;
 }
 
-let pixel: HTMLCanvasElement | null = null;
+const TRANSPARENT_GIF =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
-/** Piksel transparan 1x1 sebagai gambar drag bawaan OS (disembunyikan). */
-export function transparentDragPixel(): HTMLCanvasElement {
+let pixel: HTMLImageElement | null = null;
+
+/**
+ * Piksel transparan 1x1 sebagai gambar drag bawaan OS (disembunyikan).
+ * WebKit/Safari mengabaikan canvas yang tidak menempel di dokumen, sehingga
+ * gambar drag bawaan tetap muncul dan ghost manual terlihat dobel. Pakai
+ * <img> data-URI yang dipasang ke body agar gambar bawaan benar-benar hilang.
+ */
+export function transparentDragPixel(): HTMLImageElement {
   if (!pixel) {
-    pixel = document.createElement("canvas");
-    pixel.width = 1;
-    pixel.height = 1;
+    pixel = new Image();
+    pixel.alt = "";
+    pixel.src = TRANSPARENT_GIF;
+    pixel.style.cssText =
+      "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;";
   }
+  if (!pixel.isConnected) document.body.appendChild(pixel);
   return pixel;
+}
+
+// Dekode data-URI lebih awal supaya drag pertama sudah punya gambar transparan.
+if (typeof document !== "undefined") {
+  new Image().src = TRANSPARENT_GIF;
 }
 
 let stopActiveFollow: (() => void) | null = null;

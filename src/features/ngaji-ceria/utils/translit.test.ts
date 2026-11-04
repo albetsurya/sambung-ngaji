@@ -44,4 +44,46 @@ describe('translit bidirectional conversions', () => {
     expect(arabicToLatinParts('مَرْحَمَةً')).toEqual(['marhamatan']);
     expect(arabicToLatinParts('سَنَةٍ')).toEqual(['sanatin']);
   });
+
+  it('correctly handles non-tanwin syllables like "ni" in "\'aniyatin"', () => {
+    expect(latinToArabic("'aniyatin")).toBe('عَنِيَتٍ');
+    expect(latinToArabic("'aaniyatin")).toBe('عَانِيَتٍ');
+  });
+
+  it('correctly distinguishes ha tebal (ه) vs ha tipis (ح)', () => {
+    expect(latinToArabic('hahunaa')).toBe('هَاهُنَا');
+    expect(latinToArabic('haahunaa')).toBe('هٰهُنَا');
+    expect(latinToArabic('hha')).toBe('هَ');
+    expect(latinToArabic('Ha')).toBe('هَ');
+    expect(latinToArabic('ja ha kha')).toBe('جَ حَ خَ');
+  });
+
+  it('strips tanwin when waqf symbol (○) present', () => {
+    expect(arabicToLatin('كَاذِبَةٌ ○')).toBe('kaadzibah');
+    expect(arabicToLatin('كَاذِبَةٌ')).toBe('kaadzibatun');
+  });
+
+  it('handles waqf at end of sentence', () => {
+    // Waqf at end suppresses tanwin of last word
+    expect(arabicToLatin('كَاذِبَةٌ صَدَقَةٌ ○')).toBe('kaadzibatun shadaqah');
+  });
+
+  it('handles waqf in middle of sentence', () => {
+    // Waqf suppresses tanwin of word before it
+    expect(arabicToLatin('كَاذِبَةٌ ○ صَدَقَةٌ')).toBe('kaadzibah shadaqatun');
+  });
+
+  it('handles multiple waqf symbols', () => {
+    expect(arabicToLatin('كَاذِبَةٌ ○ صَدَقَةٌ ○')).toBe('kaadzibah shadaqah');
+  });
+
+  it('handles inverted-dammah (U+0657) on ta marbuta', () => {
+    // U+0657 (ٗ) after ة indicates silent - ة should be 'h', not 'tu'
+    expect(arabicToLatin('ةٗ')).toBe('h');
+    expect(arabicToLatin('حَمْدَةٗ')).toBe('hamdah');
+    // Compare with regular dammah which gives 'tu'
+    expect(arabicToLatin('ةُ')).toBe('tu');
+    // U+0657 on ه (ha) still emits 'u'
+    expect(arabicToLatin('لَهٗ')).toBe('lahu');
+  });
 });

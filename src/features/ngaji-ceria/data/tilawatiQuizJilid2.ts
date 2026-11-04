@@ -19928,17 +19928,17 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "arabic": "هٰ هٖ هٗ",
         "transliterationParts": [
           "haa",
-          "hٖ",
-          "hٗ"
+          "hi",
+          "hu"
         ],
         "options": [
-          "hٖ",
+          "hi",
           "haa",
-          "hٗ",
-          "hٗ",
+          "hu",
+          "hu",
           "haa",
-          "hٗ",
-          "hٗ",
+          "hu",
+          "hu",
           "a",
           "i",
           "u",
@@ -19959,17 +19959,17 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "arabic": "هٰ هٖ هٗ",
         "transliterationParts": [
           "haa",
-          "hٖ",
-          "hٗ"
+          "hi",
+          "hu"
         ],
         "options": [
-          "hٖ",
+          "hi",
           "haa",
-          "hٗ",
-          "hٗ",
+          "hu",
+          "hu",
           "haa",
-          "hٗ",
-          "hٗ",
+          "hu",
+          "hu",
           "a",
           "i",
           "u",
@@ -20015,13 +20015,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 3,
         "arabic": "لَهٗ قَانِتُوْنَ",
         "transliterationParts": [
-          "lahٗ",
+          "lahu",
           "qaanituwna"
         ],
         "options": [
-          "lahٗ",
+          "lahu",
           "qaanituwna",
-          "lahٗ",
+          "lahu",
           "qaanituwna",
           "a",
           "i",
@@ -20065,13 +20065,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "مَعَهٗ جَمِيْعًا",
         "transliterationParts": [
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an"
         ],
         "options": [
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an",
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an",
           "a",
           "i",
@@ -20090,14 +20090,14 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "وَكُتُبِهٖ وَرُسُلِهٖ",
         "transliterationParts": [
-          "wakutubihٖ",
-          "warusulihٖ"
+          "wakutubihi",
+          "warusulihi"
         ],
         "options": [
-          "wakutubihٖ",
-          "warusulihٖ",
-          "wakutubihٖ",
-          "warusulihٖ",
+          "wakutubihi",
+          "warusulihi",
+          "wakutubihi",
+          "warusulihi",
           "a",
           "i",
           "u",
@@ -20115,13 +20115,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 7,
         "arabic": "مَعَهٗ نَذِيْرًا",
         "transliterationParts": [
-          "ma'ahٗ",
+          "ma'ahu",
           "nadziyran"
         ],
         "options": [
-          "ma'ahٗ",
+          "ma'ahu",
           "nadziyran",
-          "ma'ahٗ",
+          "ma'ahu",
           "nadziyran",
           "a",
           "i",
@@ -20141,13 +20141,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "arabic": "عَلٰى سُوْقِهٖ",
         "transliterationParts": [
           "'alaaa",
-          "suwqihٖ"
+          "suwqihi"
         ],
         "options": [
           "'alaaa",
-          "suwqihٖ",
+          "suwqihi",
           "'alaaa",
-          "suwqihٖ",
+          "suwqihi",
           "a",
           "i",
           "u",
@@ -20165,13 +20165,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 9,
         "arabic": "عِبَادَهٗ خَبِيْرًا",
         "transliterationParts": [
-          "'ibaadahٗ",
+          "'ibaadahu",
           "khabiyran"
         ],
         "options": [
-          "'ibaadahٗ",
+          "'ibaadahu",
           "khabiyran",
-          "'ibaadahٗ",
+          "'ibaadahu",
           "khabiyran",
           "a",
           "i",
@@ -20191,13 +20191,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "arabic": "وَنَا بِجَانِبِهٖ",
         "transliterationParts": [
           "wanaa",
-          "bijaanibihٖ"
+          "bijaanibihi"
         ],
         "options": [
           "wanaa",
-          "bijaanibihٖ",
+          "bijaanibihi",
           "wanaa",
-          "bijaanibihٖ",
+          "bijaanibihi",
           "a",
           "i",
           "u",
@@ -20215,13 +20215,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 11,
         "arabic": "دَاوٗدَ زَبُوْرًا",
         "transliterationParts": [
-          "daawٗda",
+          "daawuda",
           "zabuwran"
         ],
         "options": [
-          "daawٗda",
+          "daawuda",
           "zabuwran",
-          "daawٗda",
+          "daawuda",
           "zabuwran",
           "a",
           "i",
@@ -20241,13 +20241,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "arabic": "اٰمَنَ بِهٖ",
         "transliterationParts": [
           "aamana",
-          "bihٖ"
+          "bihi"
         ],
         "options": [
           "aamana",
-          "bihٖ",
+          "bihi",
           "aamana",
-          "bihٖ",
+          "bihi",
           "a",
           "i",
           "u",
@@ -20265,13 +20265,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 13,
         "arabic": "وَلَهٗ عَذَابٌ",
         "transliterationParts": [
-          "walahٗ",
+          "walahu",
           "'adzaabun"
         ],
         "options": [
-          "walahٗ",
+          "walahu",
           "'adzaabun",
-          "walahٗ",
+          "walahu",
           "'adzaabun",
           "a",
           "i",
@@ -20315,13 +20315,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 15,
         "arabic": "لَهٗ مَقَالِيْدٌ",
         "transliterationParts": [
-          "lahٗ",
+          "lahu",
           "maqaaliydun"
         ],
         "options": [
-          "lahٗ",
+          "lahu",
           "maqaaliydun",
-          "lahٗ",
+          "lahu",
           "maqaaliydun",
           "a",
           "i",
@@ -20347,15 +20347,15 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 0,
         "arabic": "مَالَهٗ وَمَا كَسَبَ",
         "transliterationParts": [
-          "maalahٗ",
+          "maalahu",
           "wamaa",
           "kasaba"
         ],
         "options": [
-          "maalahٗ",
+          "maalahu",
           "wamaa",
           "kasaba",
-          "maalahٗ",
+          "maalahu",
           "wamaa",
           "kasaba",
           "a",
@@ -20500,13 +20500,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 6,
         "arabic": "لِجَعَلَهٗ سَاكِنًا",
         "transliterationParts": [
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan"
         ],
         "options": [
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan",
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan",
           "a",
           "i",
@@ -20550,13 +20550,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 8,
         "arabic": "مَعَهٗ جَمِيْعًا",
         "transliterationParts": [
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an"
         ],
         "options": [
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an",
-          "ma'ahٗ",
+          "ma'ahu",
           "jamiy'an",
           "a",
           "i",
@@ -20575,13 +20575,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 9,
         "arabic": "لَهٗ قَانِتُوْنَ",
         "transliterationParts": [
-          "lahٗ",
+          "lahu",
           "qaanituwna"
         ],
         "options": [
-          "lahٗ",
+          "lahu",
           "qaanituwna",
-          "lahٗ",
+          "lahu",
           "qaanituwna",
           "a",
           "i",
@@ -21211,13 +21211,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 3,
         "arabic": "بِعِبَادِهٖ خَبِيْرٌ",
         "transliterationParts": [
-          "bi'ibaadihٖ",
+          "bi'ibaadihi",
           "khabiyrun"
         ],
         "options": [
-          "bi'ibaadihٖ",
+          "bi'ibaadihi",
           "khabiyrun",
-          "bi'ibaadihٖ",
+          "bi'ibaadihi",
           "khabiyrun",
           "a",
           "i",
@@ -21264,13 +21264,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 5,
         "arabic": "لِجَعَلَهٗ سَاكِنًا",
         "transliterationParts": [
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan"
         ],
         "options": [
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan",
-          "lija'alahٗ",
+          "lija'alahu",
           "saakinan",
           "a",
           "i",
@@ -21600,13 +21600,13 @@ export const TILAWATI_JILID_2_PAGES: Record<number, PageQuizData> = {
         "id": 4,
         "arabic": "لَهٗ وَلَدٌ",
         "transliterationParts": [
-          "lahٗ",
+          "lahu",
           "waladun"
         ],
         "options": [
-          "lahٗ",
+          "lahu",
           "waladun",
-          "lahٗ",
+          "lahu",
           "waladun",
           "a",
           "i",

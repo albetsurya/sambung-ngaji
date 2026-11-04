@@ -69,7 +69,7 @@ export default function NgajiCeriaMapPage() {
       {!access.isOpen || access.isComingSoon ? <section className="flex min-h-[45dvh] flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-[#E2D4C0] bg-white/70 px-6 text-center">
         <span className="text-5xl">{access.isComingSoon ? "🎙️" : "🔒"}</span>
         <h3 className="font-display text-xl font-black text-[#5A3A2A]">{access.isComingSoon ? "Rekaman Audio Menyusul" : "Masuk untuk Akses Penuh"}</h3>
-        <p className="max-w-xs text-sm leading-relaxed text-[#8C7A68]">{access.isComingSoon ? "Jilid 6 segera hadir. Audio latihan sedang disiapkan." : `Jilid ${jilid} terbuka untuk member. Masuk agar semua halaman belajar dapat dimainkan.`}</p>
+        <p className="max-w-xs text-sm leading-relaxed text-[#8C7A68]">{access.isComingSoon ? "Materi ini segera hadir. Audio latihan sedang disiapkan." : `Jilid ${jilid} terbuka untuk member. Masuk agar semua halaman belajar dapat dimainkan.`}</p>
         {!access.isLoggedIn && !access.isComingSoon && <button type="button" onClick={() => setPromptOpen(true)} className="game-button bg-[#2D5A27]">Masuk untuk Akses Penuh</button>}
       </section> : <div className="relative mx-auto flex max-w-xs flex-col gap-10 py-8">
         <div className="pointer-events-none absolute inset-y-8 left-1/2 w-1 -translate-x-1/2 border-r-4 border-dashed border-[#E2D4C0]" />

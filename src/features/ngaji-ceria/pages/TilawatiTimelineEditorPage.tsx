@@ -104,7 +104,7 @@ const SNAP_EPSILON = 0.001;
 export default function TilawatiTimelineEditorPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const jilid = Math.min(5, Math.max(1, Number(params.get("jilid")) || 1));
+  const jilid = Math.min(6, Math.max(1, Number(params.get("jilid")) || 1));
   const hal = Math.min(44, Math.max(1, Number(params.get("hal")) || 1));
   const [assets, setAssets] = useState<AudioAsset[]>([]);
   const [draft, setDraft] = useState<PageTimeline | null>(null);
@@ -639,6 +639,11 @@ export default function TilawatiTimelineEditorPage() {
     if (!draft || !dragData.current) return;
     const drag = dragData.current;
     if (drag.type === "audio") change(pairTimelineText(draft, textId, drag.id));
+    if (drag.type === "text") {
+      const targetClipId =
+        texts.find((text) => String(text.id) === textId)?.clipId ?? null;
+      change(pairTimelineText(draft, drag.id, targetClipId));
+    }
     if (drag.type === "asset") {
       const asset = assets.find((item) => item.audioUrl === drag.id);
       if (asset) {
@@ -1872,7 +1877,7 @@ export default function TilawatiTimelineEditorPage() {
               disabled={saving}
               onChange={(event) => switchPage(Number(event.target.value), hal)}
             >
-              {[1, 2, 3, 4, 5].map((value) => (
+              {[1, 2, 3, 4, 5, 6].map((value) => (
                 <option key={value} value={value}>
                   Jilid {value}
                 </option>

@@ -57,7 +57,7 @@ export const TimelineBoard: React.FC<Props> = ({
       draggable onDragStart={(e) => onStartDrag(e, { type: "text", id: String(text.id) })}
       onPointerDown={(e) => onBeginTouch(e, { type: "text", id: String(text.id) })}
       onDragEnd={onEndDrag} onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => { e.preventDefault(); e.stopPropagation(); }}
+      onDrop={(e) => { e.preventDefault(); e.stopPropagation(); onDropText?.(String(text.id)); }}
       onClick={() => onSelectText(String(text.id))}>
       <span className="te-arabic" dir="rtl">{text.arabic}</span>
     </button>

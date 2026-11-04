@@ -38,19 +38,67 @@ const HARAKAT_KEYS = Object.keys(HARAKAT_WORDS).sort((a, b) => b.length - a.leng
 
 const CONSONANTS_2: Record<string, string> = {
   'ts': 'ث', 'th': 'ط', 'kh': 'خ', 'dz': 'ذ', 'dh': 'ض',
-  'sy': 'ش', 'sh': 'ص', 'zh': 'ظ', 'gh': 'غ', 'ny': 'ن'
+  'sy': 'ش', 'sh': 'ص', 'zh': 'ظ', 'gh': 'غ', 'ny': 'ن',
+  'hh': 'ه'
 };
 
 const CONSONANTS_1: Record<string, string> = {
   'b': 'ب', 't': 'ت', 'j': 'ج', 'h': 'ح', 'd': 'د', 'r': 'ر',
   'z': 'ز', 's': 'س', 'f': 'ف', 'q': 'ق', 'k': 'ك', 'l': 'ل',
-  'm': 'م', 'n': 'ن', 'w': 'و', 'y': 'ي', "'": 'ع', '`': 'ع'
+  'm': 'م', 'n': 'ن', 'w': 'و', 'y': 'ي', "'": 'ع', '`': 'ع',
+  '\u0001': 'ه'
 };
 
 const VOWELS: Record<string, string> = {
   'an': 'ً', 'in': 'ٍ', 'un': 'ٌ',
   'a': 'َ', 'i': 'ِ', 'u': 'ُ',
   'o': 'َ', 'e': 'ِ'
+};
+
+const KNOWN_ARABIC_WORDS: Record<string, string> = {
+  hahunaa: 'هَاهُنَا',
+  haahunaa: 'هٰهُنَا',
+  hahuna: 'هَهُنَا',
+  zahaqa: 'زَهَقَ',
+  zahaqan: 'زَهَقًا',
+  huwa: 'هُوَ',
+  hiya: 'هِيَ',
+  humaa: 'هُمَا',
+  hum: 'هُمْ',
+  hunna: 'هُنَّ',
+  hadza: 'هٰذَا',
+  haadza: 'هٰذَا',
+  hadzihi: 'هٰذِهِ',
+  haulaai: 'هٰٓؤُلَاءِ',
+  halaka: 'هَلَكَ',
+  hazama: 'هَزَمَ',
+  lahu: 'لَهٗ',
+  lahum: 'لَهُمْ',
+  bihi: 'بِهٖ',
+  fiiha: 'فِيْهَا',
+  fiihaa: 'فِيْهَا',
+  minhu: 'مِنْهُ',
+  minhum: 'مِنْهُمْ',
+  anhu: 'عَنْهُ',
+  anhum: 'عَنْهُمْ',
+  alayhim: 'عَلَيْهِمْ',
+  alayhi: 'عَلَيْهِ',
+  allahu: 'اللّٰهُ',
+  allaha: 'اللّٰهَ',
+  allahi: 'اللّٰهِ',
+  lillahi: 'لِلّٰهِ',
+  alhamdulillah: 'الْحَمْدُ لِلّٰهِ',
+  dzahaba: 'ذَهَبَ',
+  huda: 'هُدًى',
+  hudan: 'هُدًى',
+  ahli: 'اَهْلِ',
+  yahdi: 'يَهْدِيْ',
+  ihdina: 'اِهْدِنَا',
+  hamiymun: 'حَمِيْمٌ',
+  hamim: 'حَمِيْمٌ',
+  rahima: 'رَحِمَ',
+  marhamatan: 'مَرْحَمَةً',
+  sanatin: 'سَنَةٍ',
 };
 
 /**
@@ -61,8 +109,21 @@ const VOWELS: Record<string, string> = {
 export function latinToArabic(text: string): string {
   if (!text) return '';
 
-  let s = text.toLowerCase();
-  const hasHarakat = HARAKAT_KEYS.some((k) => s.includes(k));
+  const trimmed = text.trim();
+  const trimmedLower = trimmed.toLowerCase();
+  if (KNOWN_ARABIC_WORDS[trimmedLower]) {
+    return KNOWN_ARABIC_WORDS[trimmedLower];
+  }
+
+  const hasHarakat = HARAKAT_KEYS.some((k) => trimmedLower.includes(k));
+  if (!hasHarakat && /[\s]/.test(text)) {
+    const tokens = text.split(/(\s+)/);
+    return tokens.map((t) => (/^\s+$/.test(t) ? t : latinToArabic(t))).join('');
+  }
+
+  // Preservasi 'H' kapital sebagai penanda ha tebal (ه)
+  let s = text.replace(/H/g, '\u0001');
+  s = s.toLowerCase();
   if (hasHarakat) {
     s = s.replace(/[\t ]*[–—-][\t ]*/g, ' ');
   }
@@ -105,18 +166,45 @@ export function latinToArabic(text: string): string {
     let cons: string | null = null;
     let cLen = 0;
 
-    if (i + 2 <= s.length && CONSONANTS_2[s.substring(i, i + 2)]) {
+    // Deteksi ha tebal (ه):
+    // 1. Prefix isyarat hahuna(a)
+    // 2. Akhiran dhomir (-hu, -hi, -ha, -haa, -hum, -him, -huma, -humaa, -hunna)
+    const isHahuna = s.startsWith('hahu', i);
+    const isPronounSuffix =
+      c === 'h' &&
+      i > 1 &&
+      (s.substring(i) === 'hu' ||
+        s.substring(i) === 'hi' ||
+        s.substring(i) === 'ha' ||
+        s.substring(i) === 'haa' ||
+        s.substring(i) === 'hum' ||
+        s.substring(i) === 'him' ||
+        s.substring(i) === 'huma' ||
+        s.substring(i) === 'humaa' ||
+        s.substring(i) === 'hunna');
+
+    if (isHahuna || isPronounSuffix) {
+      cons = 'ه';
+      cLen = 1;
+    } else if (i + 2 <= s.length && CONSONANTS_2[s.substring(i, i + 2)]) {
       cons = CONSONANTS_2[s.substring(i, i + 2)];
       cLen = 2;
     } else if (CONSONANTS_1[c]) {
       cons = CONSONANTS_1[c];
       cLen = 1;
     } else if (['a', 'i', 'u', 'o', 'e'].includes(c)) {
-      if (i + 2 <= s.length && VOWELS[s.substring(i, i + 2)]) {
-        res.push('ا' + VOWELS[s.substring(i, i + 2)]);
+      const v2 = s.substring(i, i + 2);
+      if (v2 === 'aa') {
+        res.push('آ');
+        i += 2;
+      } else if (v2 === 'ii' || (v2 === 'iy' && !/[aiueo]/.test(s[i + 2] || ''))) {
+        res.push('إِيْ');
+        i += 2;
+      } else if (v2 === 'uu' || (v2 === 'uw' && !/[aiueo]/.test(s[i + 2] || ''))) {
+        res.push('أُوْ');
         i += 2;
       } else {
-        res.push('ا' + VOWELS[c]);
+        res.push('ا' + (VOWELS[c] || 'َ'));
         i++;
       }
       continue;
@@ -129,9 +217,29 @@ export function latinToArabic(text: string): string {
     i += cLen;
     let vowel: string | null = null;
 
-    if (i + 2 <= s.length && VOWELS[s.substring(i, i + 2)]) {
-      const vStr = s.substring(i, i + 2);
-      vowel = VOWELS[vStr];
+    const v2 = i + 2 <= s.length ? s.substring(i, i + 2) : '';
+    const isTanwin = v2 === 'an' || v2 === 'in' || v2 === 'un';
+
+    if (isTanwin) {
+      // Tanwin hanya sah di akhir kata (setelah n adalah batas kata / spasi / akhir teks)
+      const nextChar = i + 2 < s.length ? s[i + 2] : '';
+      const isWordEnd = !nextChar || /[\s\-_–—,.;/]/.test(nextChar);
+      if (isWordEnd) {
+        vowel = VOWELS[v2];
+        i += 2;
+      } else {
+        // Bukan tanwin karena diikuti karakter kata lain (seperti 'ani' -> a + ni)
+        vowel = VOWELS[s[i]];
+        i++;
+      }
+    } else if (v2 === 'aa') {
+      vowel = 'َا';
+      i += 2;
+    } else if (v2 === 'ii' || (v2 === 'iy' && !/[aiueo]/.test(s[i + 2] || ''))) {
+      vowel = 'ِيْ';
+      i += 2;
+    } else if (v2 === 'uu' || (v2 === 'uw' && !/[aiueo]/.test(s[i + 2] || ''))) {
+      vowel = 'ُوْ';
       i += 2;
     } else if (i < s.length && VOWELS[s[i]]) {
       vowel = VOWELS[s[i]];
@@ -190,11 +298,26 @@ const VOWEL_MAP: Record<string, string> = {
   '\u064d': 'in',
   '\u064c': 'un',
   '\u0670': 'aa',
-  '\u0652': '',
+  '\u0656': 'i', // kasrah berdiri / subscript alef
+  '\u0657': 'u', // dammah terbalik / inverted dammah
+  '\u0653': '',  // maddah / tanda mad panjang (ٓ)
+  '\u0654': '',  // hamzah di atas
+  '\u0655': '',  // hamzah di bawah
+  '\u0652': '',  // sukun
+  '\u06df': '',  // sifr mustadir
+  '\u06e0': '',  // sifr mustatil
+  '\u06e1': '',  // kepala kho (sukun mushaf)
+  '\u06e2': '',  // mim kecil
 };
 
+const QURANIC_ORNAMENTS = /[\u06d6-\u06ed\u0600-\u0605\u25cb\u25ef]/g;
+const WAQF_SYMBOL = '\u25cb';  // ○
+
 function arabicTokenToLatin(token: string): string {
-  const strippedTatweel = token.replace(/\u0640+/g, '');
+  const hasWaqf = token.includes(WAQF_SYMBOL);
+  // Remove waqf symbol for processing; if waqf present, skip tanwin output
+  const cleanToken = token.replace(WAQF_SYMBOL, '');
+  const strippedTatweel = cleanToken.replace(/\u0640+/g, '');
   if (strippedTatweel.length === 1 && ARABIC_HARAKAT_STANDALONE[strippedTatweel]) {
     return ARABIC_HARAKAT_STANDALONE[strippedTatweel];
   }
@@ -203,8 +326,8 @@ function arabicTokenToLatin(token: string): string {
   let i = 0;
   let prevVowel = '';
 
-  while (i < token.length) {
-    const ch = token[i];
+  while (i < cleanToken.length) {
+    const ch = cleanToken[i];
 
     if (ch === '\u0640') {
       i++;
@@ -214,10 +337,10 @@ function arabicTokenToLatin(token: string): string {
     if (ARABIC_LETTER_MAP[ch] !== undefined) {
       // Alif / alif maqsura penyangga tanwin fathatain (ـًا / ـًى) bersifat silent
       if ((ch === 'ا' || ch === 'ى') && prevVowel === 'an') {
-        const nextChar = i + 1 < token.length ? token[i + 1] : '';
+        const nextChar = i + 1 < cleanToken.length ? cleanToken[i + 1] : '';
         if (!VOWEL_MAP[nextChar] || nextChar === '\u0652') {
           i++;
-          if (i < token.length && token[i] === '\u0652') i++;
+          if (i < cleanToken.length && cleanToken[i] === '\u0652') i++;
           continue;
         }
       }
@@ -230,14 +353,24 @@ function arabicTokenToLatin(token: string): string {
       i++;
 
       let hasShaddah = false;
-      if (i < token.length && token[i] === '\u0651') {
+      if (i < cleanToken.length && cleanToken[i] === '\u0651') {
         hasShaddah = true;
         i++;
       }
 
       let vowel = '';
-      if (i < token.length && VOWEL_MAP[token[i]] !== undefined) {
-        vowel = VOWEL_MAP[token[i]];
+      if (i < cleanToken.length && VOWEL_MAP[cleanToken[i]] !== undefined) {
+        const vowelChar = cleanToken[i];
+        vowel = VOWEL_MAP[vowelChar];
+        // When waqf present, suppress tanwin (fathatain/dammatain/kasratain)
+        if (hasWaqf && (vowel === 'an' || vowel === 'in' || vowel === 'un')) {
+          vowel = '';
+        }
+        // U+0657 (inverted-dammah) on ta marbuta (ة): silent 'h', no vowel emitted
+        if (ch === 'ة' && vowelChar === '\u0657') {
+          letter = 'h';
+          vowel = '';
+        }
         i++;
       }
 
@@ -265,8 +398,14 @@ function arabicTokenToLatin(token: string): string {
     }
 
     if (VOWEL_MAP[ch] !== undefined) {
-      out += VOWEL_MAP[ch];
-      prevVowel = VOWEL_MAP[ch];
+      const v = VOWEL_MAP[ch];
+      // When waqf present, suppress tanwin
+      if (hasWaqf && (v === 'an' || v === 'in' || v === 'un')) {
+        prevVowel = '';
+      } else {
+        out += v;
+        prevVowel = v;
+      }
       i++;
       continue;
     }
@@ -283,10 +422,18 @@ function arabicTokenToLatin(token: string): string {
  */
 export function arabicToLatinParts(arabic: string): string[] {
   if (!arabic) return [];
-  const tokens = arabic.trim().split(/\s+/).filter(Boolean);
-  return tokens
+  // Merge waqf symbol with adjacent token so tanwin is suppressed when waqf present.
+  // Handles waqf at start (^○ space) and after word (space ○).
+  const waqfAtStart = new RegExp(`^${WAQF_SYMBOL}\\s+`, 'g');
+  const waqfAfterWord = new RegExp(`\\s+${WAQF_SYMBOL}`, 'g');
+  const withWaqf = arabic.replace(waqfAtStart, WAQF_SYMBOL).replace(waqfAfterWord, WAQF_SYMBOL).trim();
+  const rawTokens = withWaqf.trim().split(/\s+/).filter(Boolean);
+  return rawTokens
+    .filter((t) => !/^[\u06d6-\u06ed\u0600-\u0605\u25cb\u25ef\d\s١-٩٠=:\-–—.,_/]+$/.test(t))
+    .map((t) => t.replace(/[\u06d6-\u06ed\u0600-\u0605\u25ef]/g, ''))
+    .filter(Boolean)
     .map(arabicTokenToLatin)
-    .filter((part) => part && !/^[=:\-–—.,_]+$/.test(part));
+    .filter((part) => part && !/^[=:\-–—.,_/]+$/.test(part));
 }
 
 /**
