@@ -1,0 +1,11 @@
+PROJECT_NAME      = SambungNgaji Frontend
+STACK             = React 18 + TypeScript + Vite 5 + TailwindCSS 3 + React Query 5
+BRANCH_DEV        = develop
+BRANCH_PROD       = main
+BUILD_CMD         = npx tsc -b && vite build
+TEST_CMD          = (no test runner)
+LINT_CMD          = npx tsc --noEmit
+API_CONTRACT      = POST /api {action, params, token} -> {success, data, message}
+ENV_VARS          = VITE_API_BASE_URL, VITE_API_TOKEN
+GITIGNORE_CHECK   = node_modules, dist, .env*, *.local
+NOTES             = backend Go di ../backend/go, Apps Script di ../backend/apps-script

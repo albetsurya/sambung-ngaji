@@ -5,19 +5,35 @@ const TOKEN_KEY = "pengajian_token";
 const GROUP_ID_KEY = "pengajian_group_id";
 let _groupId = "";
 
+function secureCookieAttribute(): string {
+  return typeof window !== "undefined" && window.location.protocol === "https:"
+    ? "; Secure"
+    : "";
+}
+
 export function setGroupId(id: string | null) {
   _groupId = id ?? "";
+  if (typeof window !== "undefined") {
+    try {
+      if (_groupId) localStorage.setItem(GROUP_ID_KEY, _groupId);
+      else localStorage.removeItem(GROUP_ID_KEY);
+    } catch {}
+  }
   if (_groupId) {
-    document.cookie = `pengajian_group_id=${encodeURIComponent(_groupId)}; path=/; SameSite=Strict`;
+    document.cookie = `pengajian_group_id=${encodeURIComponent(_groupId)}; path=/; SameSite=Strict${secureCookieAttribute()}`;
   } else {
-    document.cookie = "pengajian_group_id=; path=/; SameSite=Strict; Max-Age=-1";
+    document.cookie = `pengajian_group_id=; path=/; SameSite=Strict; Max-Age=-1${secureCookieAttribute()}`;
   }
 }
 
 function getGroupId(): string {
   if (_groupId) return _groupId;
   const match = document.cookie.match(/(?:^|;\s*)pengajian_group_id=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : "";
+  if (match) return decodeURIComponent(match[1]);
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(GROUP_ID_KEY) || "";
+  }
+  return "";
 }
 
 const REQUEST_TIMEOUT_MS = 45_000;
@@ -63,16 +79,28 @@ function releaseSlot(): void {
 
 
 export function getToken(): string | null {
+  if (typeof window === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)pengajian_token=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  if (match) return decodeURIComponent(match[1]);
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function setToken(token: string) {
-  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict`;
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {}
+  // Frontend-set cookies cannot be HttpOnly. Production should move this
+  // session cookie to the backend response with HttpOnly + Secure.
+  document.cookie = `pengajian_token=${encodeURIComponent(token)}; path=/; SameSite=Strict${secureCookieAttribute()}`;
 }
 
 export function clearToken() {
-  document.cookie = "pengajian_token=; path=/; SameSite=Strict; Max-Age=-1";
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {}
+  document.cookie = `pengajian_token=; path=/; SameSite=Strict; Max-Age=-1${secureCookieAttribute()}`;
 }
 
 

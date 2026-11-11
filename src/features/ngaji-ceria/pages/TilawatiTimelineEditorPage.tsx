@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { latinToArabic } from "../utils/translit";
+import { arabicToLatinParts, latinToArabic } from "../utils/translit";
 import { TILAWATI_PAGE_DATASETS } from "../data/tilawatiPageDatasets";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
 import {
@@ -53,8 +53,18 @@ type PageResponse = {
   ok: boolean;
   message?: string;
   clips: AudioAsset[];
+  finishedPages?: number[];
   published?: PublishedTimeline;
   revision: string;
+};
+type FinishReceipt = {
+  jilid: number;
+  hal: number;
+  copiedFiles: number;
+  destination?: string;
+  totalPages?: number;
+  completed?: number;
+  percentage?: number;
 };
 const clone = (project: PageTimeline) =>
   JSON.parse(JSON.stringify(project)) as PageTimeline;
@@ -94,7 +104,7 @@ const SNAP_EPSILON = 0.001;
 export default function TilawatiTimelineEditorPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const jilid = Math.min(5, Math.max(1, Number(params.get("jilid")) || 1));
+  const jilid = Math.min(6, Math.max(1, Number(params.get("jilid")) || 1));
   const hal = Math.min(44, Math.max(1, Number(params.get("hal")) || 1));
   const [assets, setAssets] = useState<AudioAsset[]>([]);
   const [draft, setDraft] = useState<PageTimeline | null>(null);
@@ -108,9 +118,13 @@ export default function TilawatiTimelineEditorPage() {
   const [future, setFuture] = useState<PageTimeline[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const [finishedPages, setFinishedPages] = useState<number[]>([]);
+  const [finishReceipt, setFinishReceipt] = useState<FinishReceipt | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [zoom, setZoom] = useState(32);
+  const [speed, setSpeed] = useState(1);
   const [cutAt, setCutAt] = useState(0);
   const [playhead, setPlayhead] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -180,6 +194,17 @@ export default function TilawatiTimelineEditorPage() {
         return data;
       })
       .then(async (data) => {
+        if (Array.isArray(data.finishedPages)) {
+          setFinishedPages(data.finishedPages);
+        } else {
+          fetch("/audio/tilawati/page_status.json", { cache: "no-store" })
+            .then((r) => r.json())
+            .then((ps) => {
+              const list = ps?.pages?.[`jilid_${jilid}`]?.finished_pages;
+              if (Array.isArray(list)) setFinishedPages(list);
+            })
+            .catch(() => {});
+        }
         const cloud = await getPublishedTimeline(jilid, hal).catch(() => null);
         const restored = await restoreTimelineDraft(jilid, hal, cloud?.revision ?? "", controller.signal);
         if (controller.signal.aborted) return;
@@ -614,6 +639,11 @@ export default function TilawatiTimelineEditorPage() {
     if (!draft || !dragData.current) return;
     const drag = dragData.current;
     if (drag.type === "audio") change(pairTimelineText(draft, textId, drag.id));
+    if (drag.type === "text") {
+      const targetClipId =
+        texts.find((text) => String(text.id) === textId)?.clipId ?? null;
+      change(pairTimelineText(draft, drag.id, targetClipId));
+    }
     if (drag.type === "asset") {
       const asset = assets.find((item) => item.audioUrl === drag.id);
       if (asset) {
@@ -904,10 +934,12 @@ export default function TilawatiTimelineEditorPage() {
     startAt = 0,
     displayOffset = 0,
     previewId: string = "timeline",
+    playbackSpeed: number = speed,
   ) {
     stopPreview();
     setError("");
     const token = playToken.current;
+    const effectiveSpeed = Math.max(0.25, Math.min(4, playbackSpeed || 1));
     try {
       // Konteks yang sudah tertutup (mis. setelah unmount/cleanup) tidak
       // boleh dipakai lagi: resume()/decode di atasnya melempar
@@ -958,7 +990,8 @@ export default function TilawatiTimelineEditorPage() {
         }),
       );
       if (token !== playToken.current) return;
-      let elapsed = 0;
+      let elapsedReal = 0;
+      let totalAudioDuration = 0;
       const startTime = ctx.currentTime + 0.04;
       scheduledSegments.forEach(({ segment, duration }, index) => {
         const buffer = audioBuffers[index];
@@ -970,20 +1003,23 @@ export default function TilawatiTimelineEditorPage() {
         if (safeDuration > 1e-6) {
           const source = ctx.createBufferSource();
           source.buffer = buffer;
+          source.playbackRate.value = effectiveSpeed;
           source.connect(ctx.destination);
-          source.start(startTime + elapsed, safeOffset, safeDuration);
+          source.start(startTime + elapsedReal, safeOffset, safeDuration);
           activeSources.current.push(source);
         }
-        elapsed += duration;
+        elapsedReal += duration / effectiveSpeed;
+        totalAudioDuration += duration;
       });
       setPlaying(true);
       setPreviewingId(previewId);
       setPlayhead(displayOffset + startAt);
       const tick = () => {
         if (token !== playToken.current) return;
-        const progress = Math.max(0, ctx.currentTime - startTime);
-        setPlayhead(displayOffset + startAt + Math.min(progress, elapsed));
-        if (progress >= elapsed) {
+        const progressReal = Math.max(0, ctx.currentTime - startTime);
+        const progressAudio = progressReal * effectiveSpeed;
+        setPlayhead(displayOffset + startAt + Math.min(progressAudio, totalAudioDuration));
+        if (progressReal >= elapsedReal) {
           setPlaying(false);
           setPreviewingId(null);
           activeSources.current = [];
@@ -998,6 +1034,55 @@ export default function TilawatiTimelineEditorPage() {
       setError(err instanceof Error ? err.message : String(err));
       setPreviewingId(null);
     }
+  }
+
+  function handleSpeedChange(newSpeed: number) {
+    setSpeed(newSpeed);
+    if (playing) {
+      if (previewingId === "timeline") {
+        void preview(clips, playhead, 0, "timeline", newSpeed);
+      } else if (previewingId === "clip" && selectedClip) {
+        void preview(
+          [selectedClip],
+          Math.max(0, playhead - (selectedPosition?.start || 0)),
+          selectedPosition?.start || 0,
+          "clip",
+          newSpeed,
+        );
+      } else {
+        const currentAsset = assets.find((a) => a.audioUrl === previewingId);
+        if (currentAsset) {
+          void preview([clipFromAsset(currentAsset)], 0, 0, currentAsset.audioUrl, newSpeed);
+        }
+      }
+    }
+  }
+
+  function autoFixLatinPage() {
+    if (!draft) return;
+    const nextTexts = draft.texts.map((t) => {
+      if (!t.arabic) return t;
+      const newParts = arabicToLatinParts(t.arabic);
+      if (newParts.length === 0) return t;
+      const oldParts = t.transliterationParts || [];
+      const rep = new Map<string, string>();
+      for (let i = 0; i < oldParts.length; i++) {
+        if (newParts[i] && oldParts[i] !== newParts[i]) {
+          rep.set(oldParts[i], newParts[i]);
+        }
+      }
+      let options = (t.options || []).map((opt) => rep.get(opt) || opt);
+      for (const p of newParts) {
+        if (!options.includes(p)) options.unshift(p);
+      }
+      return {
+        ...t,
+        transliterationParts: newParts,
+        options,
+      };
+    });
+    change({ ...draft, texts: nextTexts });
+    setMessage("Teks Latin di seluruh halaman ini telah diperbaiki sesuai tulisan Arab.");
   }
 
   async function saveFinal() {
@@ -1039,6 +1124,66 @@ export default function TilawatiTimelineEditorPage() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function finishPage() {
+    if (!draft || saving || finishing || dirty) return;
+    if (
+      !window.confirm(
+        `Tandai Jilid ${jilid} Halaman ${hal} sebagai selesai dan kirim audionya ke Tartila?`,
+      )
+    )
+      return;
+    setFinishing(true);
+    setError("");
+    try {
+      const response = await fetch("/api/tilawati-editor?action=finish-page", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jilid, page: hal }),
+      });
+      const data = (await response.json()) as {
+        ok: boolean;
+        message?: string;
+        copiedFiles?: number;
+        destination?: string;
+        status?: {
+          total_pages?: number;
+          completed?: number;
+          percentage?: number;
+          finished_pages?: number[];
+        };
+      };
+      if (!response.ok || !data.ok)
+        throw new Error(data.message || "Gagal menyelesaikan halaman.");
+
+      const updatedPages =
+        data.status?.finished_pages ??
+        (finishedPages.includes(hal)
+          ? finishedPages
+          : [...finishedPages, hal].sort((a, b) => a - b));
+      setFinishedPages(updatedPages);
+
+      setFinishReceipt({
+        jilid,
+        hal,
+        copiedFiles: data.copiedFiles ?? 0,
+        destination: data.destination,
+        totalPages: data.status?.total_pages ?? 44,
+        completed: data.status?.completed ?? updatedPages.length,
+        percentage:
+          data.status?.percentage ??
+          Math.round((updatedPages.length / (data.status?.total_pages ?? 44)) * 100),
+      });
+
+      setMessage(
+        `Halaman ${hal} ditandai selesai. ${data.copiedFiles ?? 0} file audio dikirim ke Tartila.`,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setFinishing(false);
     }
   }
 
@@ -1679,7 +1824,14 @@ export default function TilawatiTimelineEditorPage() {
           ← Cek Audio Manual
         </button>
         <div>
-          <h1>Page Timeline Editor</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <h1>Page Timeline Editor</h1>
+            <span
+              className={`te-page-status-badge ${finishedPages.includes(hal) ? "is-finished" : "is-pending"}`}
+            >
+              {finishedPages.includes(hal) ? "✓ Selesai & Terdistribusi" : "Belum Selesai"}
+            </span>
+          </div>
           <p>
             Jilid {jilid} · Halaman {hal} ·{" "}
             {dirty ? "Draft belum disimpan" : "Sesuai hasil tersimpan"}
@@ -1725,7 +1877,7 @@ export default function TilawatiTimelineEditorPage() {
               disabled={saving}
               onChange={(event) => switchPage(Number(event.target.value), hal)}
             >
-              {[1, 2, 3, 4, 5].map((value) => (
+              {[1, 2, 3, 4, 5, 6].map((value) => (
                 <option key={value} value={value}>
                   Jilid {value}
                 </option>
@@ -1739,14 +1891,26 @@ export default function TilawatiTimelineEditorPage() {
                 switchPage(jilid, Number(event.target.value))
               }
             >
-              {Array.from({ length: 44 }, (_, index) => (
-                <option key={index} value={index + 1}>
-                  Hal {index + 1}
-                </option>
-              ))}
+              {Array.from({ length: 44 }, (_, index) => {
+                const pageNum = index + 1;
+                const isDone = finishedPages.includes(pageNum);
+                return (
+                  <option key={pageNum} value={pageNum}>
+                    Hal {pageNum} {isDone ? "✓ (Selesai)" : ""}
+                  </option>
+                );
+              })}
             </select>
           </div>
           <button className="te-btn" disabled={loading || saving || !draft} onClick={() => void draftSave.save()}>Simpan Draft</button>
+          <button
+            className="te-btn"
+            disabled={loading || saving || !draft}
+            onClick={autoFixLatinPage}
+            title="Auto perbaiki transliterasi Latin dari teks Arab untuk seluruh teks di halaman ini"
+          >
+            Perbaiki Latin Halaman
+          </button>
           {isNgajiCeriaServerAvailable() && <button className="te-btn te-primary" disabled={loading || saving || !draft || !getToken()} onClick={publishCloud}>Publish ke Cloud</button>}
           <button
             className="te-btn te-primary"
@@ -1755,8 +1919,45 @@ export default function TilawatiTimelineEditorPage() {
           >
             {saving ? "Merender & menyimpan…" : "Simpan Hasil Akhir"}
           </button>
+          <button
+            className="te-btn te-secondary"
+            disabled={loading || saving || finishing || !draft || dirty}
+            onClick={() => void finishPage()}
+          >
+            {finishing ? "Mengirim ke Tartila…" : "Selesai Halaman"}
+          </button>
         </div>
       </header>
+
+      <div className="te-page-strip" aria-label="Indikator status per halaman">
+        <div className="te-page-strip-label">
+          <span>Hal Jilid {jilid}:</span>
+          <span className="te-page-strip-stat">
+            {finishedPages.length}/44 Selesai
+          </span>
+        </div>
+        <div className="te-page-strip-list">
+          {Array.from({ length: 44 }, (_, index) => {
+            const pageNum = index + 1;
+            const isDone = finishedPages.includes(pageNum);
+            const isCurrent = pageNum === hal;
+            return (
+              <button
+                key={pageNum}
+                type="button"
+                className={`te-page-chip ${isCurrent ? "is-current" : ""} ${isDone ? "is-done" : ""}`}
+                onClick={() => switchPage(jilid, pageNum)}
+                title={`Halaman ${pageNum}: ${isDone ? "Selesai & Didistribusikan ke Tartila" : "Belum Selesai"}`}
+                aria-label={`Halaman ${pageNum}${isDone ? ", selesai" : ""}`}
+                aria-current={isCurrent ? "page" : undefined}
+              >
+                <span>{pageNum}</span>
+                {isDone && <span className="te-page-chip-icon" aria-hidden="true">✓</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
       <div className="te-status" aria-live="polite">
         {[error, message, draftSave.status].filter(Boolean).join(" · ") || "Draft tersimpan otomatis; publish merender klip audio final."}
       </div>
@@ -1967,6 +2168,22 @@ export default function TilawatiTimelineEditorPage() {
                     value={zoom}
                     onChange={(event) => setZoom(Number(event.target.value))}
                   />
+                </label>
+                <label className="te-speed" title="Kecepatan pemutaran (Playback speed)">
+                  Speed{" "}
+                  <select
+                    aria-label="Kecepatan pemutaran"
+                    value={speed}
+                    onChange={(event) => handleSpeedChange(Number(event.target.value))}
+                  >
+                    <option value={0.5}>0.5x</option>
+                    <option value={0.75}>0.75x</option>
+                    <option value={1}>1x</option>
+                    <option value={1.25}>1.25x</option>
+                    <option value={1.5}>1.5x</option>
+                    <option value={1.75}>1.75x</option>
+                    <option value={2}>2x</option>
+                  </select>
                 </label>
               </div>
               <p className="te-help">
@@ -2300,6 +2517,22 @@ export default function TilawatiTimelineEditorPage() {
                   ×
                 </button>
               </h2>
+              <label className="te-speed-setting">
+                Kecepatan pemutaran (Speed)
+                <select
+                  aria-label="Kecepatan pemutaran"
+                  value={speed}
+                  onChange={(event) => handleSpeedChange(Number(event.target.value))}
+                >
+                  <option value={0.5}>0.5x (Lambat)</option>
+                  <option value={0.75}>0.75x</option>
+                  <option value={1}>1x (Normal)</option>
+                  <option value={1.25}>1.25x</option>
+                  <option value={1.5}>1.5x (Cepat)</option>
+                  <option value={1.75}>1.75x</option>
+                  <option value={2}>2x</option>
+                </select>
+              </label>
               {!selection && (
                 <p className="te-help">
                   Pilih audio atau teks melalui timeline / daftar item untuk
@@ -2563,16 +2796,24 @@ export default function TilawatiTimelineEditorPage() {
                 <>
                   <h3>Edit teks</h3>
                   <label>
-                    Teks Arab
+                    Teks Arab (auto-generate Latin)
                     <textarea
                       aria-label="Teks Arab"
                       dir="rtl"
                       className="te-arabic"
                       rows={3}
                       value={selectedText.arabic}
-                      onChange={(event) =>
-                        editText({ arabic: event.target.value })
-                      }
+                      onChange={(event) => {
+                        const val = event.target.value;
+                        const autoParts = arabicToLatinParts(val);
+                        editText({
+                          arabic: val,
+                          transliterationParts:
+                            autoParts.length > 0
+                              ? autoParts
+                              : selectedText.transliterationParts,
+                        });
+                      }}
                     />
                   </label>
                   <label>
@@ -2591,6 +2832,17 @@ export default function TilawatiTimelineEditorPage() {
                       }}
                     />
                   </label>
+                  <button
+                    type="button"
+                    className="te-btn te-small"
+                    style={{ marginTop: "-4px", marginBottom: "8px" }}
+                    onClick={() => {
+                      const parts = arabicToLatinParts(selectedText.arabic);
+                      if (parts.length > 0) editText({ transliterationParts: parts });
+                    }}
+                  >
+                    Auto Perbaiki Latin dari Arab
+                  </button>
                   <label>
                     Nada / keterangan
                     <input
@@ -2709,7 +2961,7 @@ export default function TilawatiTimelineEditorPage() {
                 disabled={!clips.length}
               >
                 <span>{playing ? "■" : "▶"}</span>
-                {playing ? "Stop" : "Preview"}
+                {playing ? "Stop" : `Preview${speed !== 1 ? ` (${speed}x)` : ""}`}
               </button>
               <button
                 aria-label="Tambah teks"
@@ -2728,6 +2980,91 @@ export default function TilawatiTimelineEditorPage() {
             </nav>
           </div>
         )
+      )}
+
+      {finishReceipt && (
+        <div
+          className="te-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="te-receipt-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setFinishReceipt(null);
+          }}
+        >
+          <div className="te-modal-card">
+            <div className="te-modal-badge-icon" aria-hidden="true">
+              ✓
+            </div>
+            <h2 id="te-receipt-title">Halaman Selesai & Terdistribusi</h2>
+            <p className="te-modal-sub">
+              Halaman ini telah ditandai selesai dan seluruh file audio final
+              telah berhasil disalin ke folder distribusi Tartila.
+            </p>
+
+            <div className="te-modal-receipt-box">
+              <div className="te-receipt-row">
+                <span className="te-receipt-key">Target Halaman</span>
+                <span className="te-receipt-val" style={{ fontWeight: 800 }}>
+                  Jilid {finishReceipt.jilid} · Halaman {finishReceipt.hal}
+                </span>
+              </div>
+              <div className="te-receipt-row">
+                <span className="te-receipt-key">File Audio Terdistribusi</span>
+                <span className="te-receipt-val is-success" style={{ fontWeight: 800 }}>
+                  {finishReceipt.copiedFiles} file (.ogg)
+                </span>
+              </div>
+              {finishReceipt.destination && (
+                <div className="te-receipt-row te-receipt-col">
+                  <span className="te-receipt-key">Folder Tujuan Tartila</span>
+                  <code className="te-receipt-path">{finishReceipt.destination}</code>
+                </div>
+              )}
+              {finishReceipt.percentage !== undefined && (
+                <div className="te-receipt-row te-receipt-col">
+                  <div className="te-receipt-progress-header">
+                    <span className="te-receipt-key">Progres Jilid {finishReceipt.jilid}</span>
+                    <span className="te-receipt-val is-accent" style={{ fontWeight: 800 }}>
+                      {finishReceipt.completed} / {finishReceipt.totalPages} Halaman ({finishReceipt.percentage}%)
+                    </span>
+                  </div>
+                  <div className="te-receipt-progress-track">
+                    <div
+                      className="te-receipt-progress-fill"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, finishReceipt.percentage))}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="te-modal-actions">
+              {finishReceipt.hal < 44 && (
+                <button
+                  type="button"
+                  className="te-btn te-primary"
+                  onClick={() => {
+                    const nextHal = finishReceipt.hal + 1;
+                    setFinishReceipt(null);
+                    switchPage(finishReceipt.jilid, nextHal);
+                  }}
+                >
+                  Lanjut ke Hal {finishReceipt.hal + 1} →
+                </button>
+              )}
+              <button
+                type="button"
+                className="te-btn"
+                onClick={() => setFinishReceipt(null)}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

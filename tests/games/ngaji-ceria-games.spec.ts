@@ -67,7 +67,7 @@ async function seedSession(page: Page, role: string) {
   };
   await page.addInitScript((seeded) => {
     document.cookie = "pengajian_token=test-token; path=/; SameSite=Strict";
-    localStorage.setItem("sambung_ngaji_cached_user", JSON.stringify(seeded));
+    sessionStorage.setItem("sambung_ngaji_cached_user", JSON.stringify(seeded));
   }, user);
   await page.route("**/api/v1/auth/validate-session", async (route) => {
     await route.fulfill({

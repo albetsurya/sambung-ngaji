@@ -128,7 +128,7 @@ function StandaloneBookCard({
   );
 }
 
-/** Pembungkus per-jilid yang menerapkan kebijakan akses (tamu J1–2, J6 segera hadir). */
+/** Pembungkus per-jilid yang menerapkan kebijakan akses (tamu J1–2, J7 ke atas segera hadir). */
 function JilidBookEntry({ jilidId, onOpen, onLocked, ...card }: {
   jilidId: string;
   onOpen: () => void;
@@ -177,7 +177,7 @@ export default function NgajiCeriaLibraryPage() {  const navigate = useNavigate(
               </h2>
               <p className="text-xs text-white/80 mt-1 leading-relaxed">
                 {isGuest
-                  ? "Masuk untuk membuka Jilid 3–5. Pilih ilustrasi buku di bawah untuk mulai belajar."
+                  ? "Masuk untuk membuka Jilid 3–6. Pilih ilustrasi buku di bawah untuk mulai belajar."
                   : "Pilih ilustrasi buku di bawah untuk membuka lembar belajar Tilawati."}
               </p>
             </div>

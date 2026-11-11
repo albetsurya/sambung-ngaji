@@ -32,7 +32,7 @@ export const normalizeArabic = (text: string) => text.normalize("NFKD").replace(
 /** Pasangan teks→klip dipakai dahulu; satu sumber dapat dipotong menjadi banyak klip. */
 export function resolveTilawatiAudio(request: TilawatiAudioRequest, cloud?: PublishedTimeline | null): TilawatiAudioResolution {
   const { question, jilid, pageNumber, questionIndex } = request;
-  const timeline = (cloud ?? (!isNgajiCeriaServerAvailable() ? EDITS[`${jilid}:${pageNumber}`]?.published : null))?.timeline;
+  const timeline = (cloud ?? EDITS[`${jilid}:${pageNumber}`]?.published ?? null)?.timeline;
   const questionUrl = request.audioUrl || (question ? getQuestionAudioUrl(question, jilid, pageNumber, questionIndex, Boolean(question.isOpening)) : "");
   const arabic = normalizeArabic(request.arabic || question?.arabic || "");
   const text = timeline?.texts.find((item) => question && String(item.id) === String(question.id))
@@ -146,8 +146,11 @@ export function usePublishedTilawati(jilid: number, page: number) {
     let alive = true;
     const load = () => { void getPublishedTimeline(jilid, page).then((published) => { if (alive) setValue({ key: `${jilid}:${page}`, published }); }).catch(() => { if (alive) setValue({ key: `${jilid}:${page}`, published: null }); }); };
     load();
-    window.addEventListener("ngajiceria:timeline-published", load);
-    return () => { alive = false; window.removeEventListener("ngajiceria:timeline-published", load); };
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("ngajiceria:timeline-published", load);
+      return () => { alive = false; window.removeEventListener("ngajiceria:timeline-published", load); };
+    }
+    return () => { alive = false; };
   }, [jilid, page]);
   return value.key === `${jilid}:${page}` ? value.published : null;
 }

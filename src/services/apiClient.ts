@@ -18,8 +18,14 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config) => {
   const token = getToken();
-  if (token && !config.headers.Authorization) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    if (typeof config.headers.set === "function") {
+      if (!config.headers.get("Authorization")) {
+        config.headers.set("Authorization", `Bearer ${token}`);
+      }
+    } else if (!config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });

@@ -8,6 +8,7 @@ import { ACCENTS, type GameOverModalProps } from "./types";
 import { awardProgress, getProgress, recordLeaderboard } from "./progression";
 import { soundManager } from "../../../services/soundManager";
 import { canonicalGameId } from "../../../data/gameAccess";
+import { useEventStore } from "../../../hooks/useEventStore";
 
 export interface SecondChanceConfig {
   onSuccess: () => void;
@@ -19,6 +20,7 @@ export interface SecondChanceConfig {
 export function GameOverModal({ visible, score, best, isNewRecord, onRetry, onExit, accent = "pink", title = "Sesi Selesai", description, children, secondChance, maxCombo = 0, victory = score > 0, achievementIds = [] }: GameOverModalProps & { secondChance?: SecondChanceConfig }) {
   const location = useLocation();
   const reducedMotion = useReducedMotion();
+  const trackEventProgress = useEventStore((state) => state.trackProgress);
   const committed = useRef(false);
   const [xpGained, setXpGained] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -37,10 +39,11 @@ export function GameOverModal({ visible, score, best, isNewRecord, onRetry, onEx
     if (victory && gameId === "malaikat-mission") achievements.push("malaikat-master");
     if (score > 0 && gameId === "tajwid-tetris") achievements.push("tetris-lines");
     const progress = awardProgress(gameId, score, 25 + Math.min(20, maxCombo * 2), achievements);
+    void trackEventProgress("PLAY_GAME");
     setXpGained(progress.xp - before);
     recordLeaderboard(gameId, score);
     soundManager.playSfx(victory ? "victory" : "defeat");
-  }, [visible, secondChance, skipped, score, maxCombo, victory, location.pathname, achievementIds]);
+  }, [visible, secondChance, skipped, score, maxCombo, victory, location.pathname, achievementIds, trackEventProgress]);
   if (!visible) return null;
   const options = secondChance?.options ?? ["Bismillah", "Alhamdulillah", "MasyaAllah"];
   const correctIndex = secondChance?.correctIndex ?? 0;

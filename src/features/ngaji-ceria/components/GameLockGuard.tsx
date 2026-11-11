@@ -15,7 +15,7 @@ export function useGameAccess(routeId: string): { tier: AccessTier; isSuperAdmin
 export function useJilidAccess(jilidId: number): { tier: AccessTier; isLoggedIn: boolean; isOpen: boolean; isComingSoon: boolean } {
   const { user } = useAuth();
   const tier = tierForRole(user?.role);
-  const comingSoon = jilidId >= 6;
+  const comingSoon = jilidId >= 7;
   return {
     tier,
     isLoggedIn: tier !== "guest",

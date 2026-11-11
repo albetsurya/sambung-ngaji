@@ -7,7 +7,7 @@ import {
 } from "react";
 import type { User } from "../types";
 import { authApi } from "../features/auth/api/authApi";
-import { getToken, clearToken, ApiError, setGroupId } from "../services/api";
+import { clearToken, ApiError, setGroupId } from "../services/api";
 import { migrateAnonDataToUser } from "../lib/scopedStorage";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -15,7 +15,7 @@ const CACHED_USER_KEY = "sambung_ngaji_cached_user";
 
 function getCachedUser(): User | null {
   try {
-    const raw = localStorage.getItem(CACHED_USER_KEY);
+    const raw = sessionStorage.getItem(CACHED_USER_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -25,11 +25,25 @@ function getCachedUser(): User | null {
 function setCachedUser(user: User | null) {
   try {
     if (user) {
-      localStorage.setItem(CACHED_USER_KEY, JSON.stringify(user));
+      sessionStorage.setItem(CACHED_USER_KEY, JSON.stringify(user));
     } else {
-      localStorage.removeItem(CACHED_USER_KEY);
+      sessionStorage.removeItem(CACHED_USER_KEY);
     }
   } catch {}
+  try {
+    // Remove the old persistent copy left by earlier builds.
+    localStorage.removeItem(CACHED_USER_KEY);
+  } catch {}
+}
+
+function isAuthenticationError(error: unknown): boolean {
+  return (
+    error instanceof ApiError &&
+    (error.message.toLowerCase().includes("unauthorized") ||
+      error.message.toLowerCase().includes("sesi tidak valid") ||
+      error.message.toLowerCase().includes("token") ||
+      error.statusCode === 401)
+  );
 }
 
 let validateSessionPromise: Promise<User> | null = null;
@@ -60,33 +74,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   const [user, setUser] = useState<User | null>(() => {
-    const token = getToken();
-    if (!token) return null;
     return getCachedUser();
   });
 
-  const [loading, setLoading] = useState<boolean>(() => {
-    const token = getToken();
-    if (!token) return false;
-    // Jika ada token dan cached user, tidak perlu memblokir UI dengan loading
-    return !getCachedUser();
-  });
+  // Validate on every boot so a backend HttpOnly session is supported too.
+  // The cached profile remains hidden behind this loading state until it is
+  // confirmed by the server.
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-
-    const token = getToken();
-    if (!token) {
-      setCachedUser(null);
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    const initialCache = getCachedUser();
-    if (initialCache) {
-      setGroupId(initialCache.group_id ?? null);
-    }
 
     (async () => {
       try {
@@ -98,22 +95,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setGroupId(u?.group_id ?? null);
         setUser(u);
         setCachedUser(u);
-      } catch (error) {
+      } catch {
         if (cancelled) return;
 
-        const isAuthError =
-          error instanceof ApiError &&
-          (error.message.toLowerCase().includes("unauthorized") ||
-            error.message.toLowerCase().includes("sesi tidak valid") ||
-            error.message.toLowerCase().includes("token") ||
-            error.statusCode === 401);
-
-        if (isAuthError) {
-          clearToken();
-          setCachedUser(null);
-          setGroupId(null);
-          setUser(null);
-        }
+        // A cached profile is only an optimistic render hint, never proof of
+        // authentication. Do not leave it active when validation fails.
+        clearToken();
+        setCachedUser(null);
+        setGroupId(null);
+        setUser(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -167,7 +157,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u);
       setCachedUser(u);
     } catch (err) {
-      // jika error, jangan ganti state kecuali auth error
+      if (isAuthenticationError(err)) {
+        clearToken();
+        setCachedUser(null);
+        setGroupId(null);
+        setUser(null);
+      }
     }
   }
 

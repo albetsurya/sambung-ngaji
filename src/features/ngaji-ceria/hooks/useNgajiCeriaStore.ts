@@ -12,7 +12,7 @@ const STORAGE_KEY = "ngaji-ceria-progress";
 
 function getUserScope(): string {
   try {
-    const cached = JSON.parse(localStorage.getItem("sambung_ngaji_cached_user") || "null") as { user_id?: unknown } | null;
+    const cached = JSON.parse(sessionStorage.getItem("sambung_ngaji_cached_user") || "null") as { user_id?: unknown } | null;
     if (typeof cached?.user_id === "string" && cached.user_id.trim()) {
       return cached.user_id.trim();
     }

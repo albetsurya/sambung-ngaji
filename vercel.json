@@ -2,6 +2,18 @@
   "buildCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"develop\" ]; then npm run build:dev; else npm run build; fi",
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; frame-src 'self' https://accounts.google.com; worker-src 'self' blob:; manifest-src 'self'"
+        }
+      ]
+    },
+    {
       "source": "/sw.js",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },

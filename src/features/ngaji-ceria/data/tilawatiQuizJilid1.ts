@@ -2,7 +2,7 @@
 import type { PageQuizData } from "./tilawatiQuizTypes";
 
 export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
-  1: {
+  "1": {
     "pageNumber": 1,
     "title": "Halaman 1: Materi",
     "subtitle": "",
@@ -472,7 +472,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  2: {
+  "2": {
     "pageNumber": 2,
     "title": "Halaman 2: Materi",
     "subtitle": "",
@@ -989,7 +989,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  3: {
+  "3": {
     "pageNumber": 3,
     "title": "Halaman 3: Materi",
     "subtitle": "",
@@ -1525,7 +1525,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  4: {
+  "4": {
     "pageNumber": 4,
     "title": "Halaman 4: Materi",
     "subtitle": "",
@@ -2061,7 +2061,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  5: {
+  "5": {
     "pageNumber": 5,
     "title": "Halaman 5: Materi",
     "subtitle": "",
@@ -2581,7 +2581,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  6: {
+  "6": {
     "pageNumber": 6,
     "title": "Halaman 6: Materi",
     "subtitle": "",
@@ -3232,7 +3232,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  7: {
+  "7": {
     "pageNumber": 7,
     "title": "Halaman 7: Materi",
     "subtitle": "",
@@ -3774,7 +3774,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  8: {
+  "8": {
     "pageNumber": 8,
     "title": "Halaman 8: Materi",
     "subtitle": "",
@@ -4338,7 +4338,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  9: {
+  "9": {
     "pageNumber": 9,
     "title": "Halaman 9: Materi",
     "subtitle": "",
@@ -4883,7 +4883,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  10: {
+  "10": {
     "pageNumber": 10,
     "title": "Halaman 10: Materi",
     "subtitle": "",
@@ -5425,7 +5425,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  11: {
+  "11": {
     "pageNumber": 11,
     "title": "Halaman 11: Materi",
     "subtitle": "",
@@ -5995,7 +5995,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  12: {
+  "12": {
     "pageNumber": 12,
     "title": "Halaman 12: Materi",
     "subtitle": "",
@@ -6674,7 +6674,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  13: {
+  "13": {
     "pageNumber": 13,
     "title": "Halaman 13: Materi",
     "subtitle": "",
@@ -7168,7 +7168,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  14: {
+  "14": {
     "pageNumber": 14,
     "title": "Halaman 14: Materi",
     "subtitle": "",
@@ -7710,7 +7710,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  15: {
+  "15": {
     "pageNumber": 15,
     "title": "Halaman 15: Materi",
     "subtitle": "",
@@ -8222,7 +8222,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  16: {
+  "16": {
     "pageNumber": 16,
     "title": "Halaman 16: Materi",
     "subtitle": "",
@@ -8758,7 +8758,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  17: {
+  "17": {
     "pageNumber": 17,
     "title": "Halaman 17: Materi",
     "subtitle": "",
@@ -9252,7 +9252,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  18: {
+  "18": {
     "pageNumber": 18,
     "title": "Halaman 18: Materi",
     "subtitle": "",
@@ -9931,7 +9931,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  19: {
+  "19": {
     "pageNumber": 19,
     "title": "Halaman 19: Materi",
     "subtitle": "",
@@ -10467,7 +10467,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  20: {
+  "20": {
     "pageNumber": 20,
     "title": "Halaman 20: Materi",
     "subtitle": "",
@@ -10973,7 +10973,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  21: {
+  "21": {
     "pageNumber": 21,
     "title": "Halaman 21: Materi",
     "subtitle": "",
@@ -11509,7 +11509,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  22: {
+  "22": {
     "pageNumber": 22,
     "title": "Halaman 22: Materi",
     "subtitle": "",
@@ -12188,7 +12188,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  23: {
+  "23": {
     "pageNumber": 23,
     "title": "Halaman 23: Materi",
     "subtitle": "",
@@ -12700,7 +12700,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  24: {
+  "24": {
     "pageNumber": 24,
     "title": "Halaman 24: Materi",
     "subtitle": "",
@@ -13236,7 +13236,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  25: {
+  "25": {
     "pageNumber": 25,
     "title": "Halaman 25: Materi",
     "subtitle": "",
@@ -13826,7 +13826,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  26: {
+  "26": {
     "pageNumber": 26,
     "title": "Halaman 26: Materi",
     "subtitle": "",
@@ -14446,7 +14446,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  27: {
+  "27": {
     "pageNumber": 27,
     "title": "Halaman 27: Materi",
     "subtitle": "",
@@ -14940,7 +14940,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  28: {
+  "28": {
     "pageNumber": 28,
     "title": "Halaman 28: Materi",
     "subtitle": "",
@@ -15428,7 +15428,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  29: {
+  "29": {
     "pageNumber": 29,
     "title": "Halaman 29: Materi",
     "subtitle": "",
@@ -16023,7 +16023,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  30: {
+  "30": {
     "pageNumber": 30,
     "title": "Halaman 30: Materi",
     "subtitle": "",
@@ -16511,7 +16511,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  31: {
+  "31": {
     "pageNumber": 31,
     "title": "Halaman 31: Materi",
     "subtitle": "",
@@ -17053,7 +17053,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  32: {
+  "32": {
     "pageNumber": 32,
     "title": "Halaman 32: Materi",
     "subtitle": "",
@@ -17609,7 +17609,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  33: {
+  "33": {
     "pageNumber": 33,
     "title": "Halaman 33: Materi",
     "subtitle": "",
@@ -18142,7 +18142,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  34: {
+  "34": {
     "pageNumber": 34,
     "title": "Halaman 34: Materi",
     "subtitle": "",
@@ -18645,7 +18645,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  35: {
+  "35": {
     "pageNumber": 35,
     "title": "Halaman 35: Materi",
     "subtitle": "",
@@ -19142,7 +19142,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  36: {
+  "36": {
     "pageNumber": 36,
     "title": "Halaman 36: Materi",
     "subtitle": "",
@@ -19639,7 +19639,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  37: {
+  "37": {
     "pageNumber": 37,
     "title": "Halaman 37: Materi",
     "subtitle": "",
@@ -20122,7 +20122,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  38: {
+  "38": {
     "pageNumber": 38,
     "title": "Halaman 38: Materi",
     "subtitle": "",
@@ -20605,7 +20605,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  39: {
+  "39": {
     "pageNumber": 39,
     "title": "Halaman 39: Materi",
     "subtitle": "",
@@ -21138,7 +21138,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  40: {
+  "40": {
     "pageNumber": 40,
     "title": "Halaman 40: Materi",
     "subtitle": "",
@@ -21675,7 +21675,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  41: {
+  "41": {
     "pageNumber": 41,
     "title": "Halaman 41: Materi",
     "subtitle": "",
@@ -22202,7 +22202,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  42: {
+  "42": {
     "pageNumber": 42,
     "title": "Halaman 42: Materi",
     "subtitle": "",
@@ -22739,7 +22739,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  43: {
+  "43": {
     "pageNumber": 43,
     "title": "Halaman 43: Materi",
     "subtitle": "",
@@ -23284,7 +23284,7 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
       }
     ]
   },
-  44: {
+  "44": {
     "pageNumber": 44,
     "title": "Halaman 44: Materi",
     "subtitle": "",
@@ -23690,5 +23690,5 @@ export const TILAWATI_JILID_1_PAGES: Record<number, PageQuizData> = {
         "audioUrl": ""
       }
     ]
-  },
+  }
 };

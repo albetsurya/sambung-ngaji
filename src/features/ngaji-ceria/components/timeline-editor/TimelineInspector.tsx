@@ -2,7 +2,7 @@ import React from "react";
 import type { AudioAsset, TimelineAudioClip, TimelineText } from "../../utils/pageTimeline";
 import { newTimelineId } from "../../utils/pageTimeline";
 import { NGAJI_CERIA_ASSETS } from "@/features/ngaji-ceria/data/assets";
-import { latinToArabic } from "../../utils/translit";
+import { arabicToLatinParts, latinToArabic } from "../../utils/translit";
 
 interface Props {
   assets: AudioAsset[];
@@ -76,13 +76,28 @@ export const TimelineInspector: React.FC<Props> = ({
     </>}
     {selectedText && <>
       <h3>Edit teks</h3>
-      <label>Teks Arab<textarea aria-label="Teks Arab" dir="rtl" className="te-arabic" rows={3} value={selectedText.arabic} onChange={(e) => onEditText({ arabic: e.target.value })} /></label>
+      <label>Teks Arab (auto-generate Latin)<textarea aria-label="Teks Arab" dir="rtl" className="te-arabic" rows={3} value={selectedText.arabic} onChange={(e) => {
+        const val = e.target.value;
+        const autoParts = arabicToLatinParts(val);
+        onEditText({ arabic: val, transliterationParts: autoParts.length > 0 ? autoParts : selectedText.transliterationParts });
+      }} /></label>
       <label>Transliterasi (satu token per baris, auto-generate Arab)<textarea rows={3} value={selectedText.transliterationParts.join("\n")} onChange={(e) => {
         const val = e.target.value;
         const parts = val.split("\n");
         const autoArabic = parts.map((p) => latinToArabic(p.trim())).filter(Boolean).join(" ");
         onEditText({ transliterationParts: parts, arabic: autoArabic || selectedText.arabic });
       }} /></label>
+      <button
+        type="button"
+        className="te-btn te-small"
+        style={{ marginTop: "-4px", marginBottom: "8px" }}
+        onClick={() => {
+          const parts = arabicToLatinParts(selectedText.arabic);
+          if (parts.length > 0) onEditText({ transliterationParts: parts });
+        }}
+      >
+        Auto Perbaiki Latin dari Arab
+      </button>
       <label>Nada / keterangan<input value={selectedText.hintTone} onChange={(e) => onEditText({ hintTone: e.target.value })} /></label>
       <label>Pasangan klip<select value={selectedText.clipId || ""} onChange={(e) => onPairClipForText(e.target.value || null)}><option value="">Tanpa audio</option>
         {clips.map((clip) => <option key={clip.id} value={clip.id}>{clip.label} · {seconds(clipDuration(clip))}</option>)}</select></label>

@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { NgajiCeriaLayout } from "../components/NgajiCeriaLayout";
 import { DailyMissionsCard } from "../components/DailyMissionsCard";
+import { EventDetailModal } from "../components/EventDetailModal";
 import { CeriaGameLoading } from "../components/CeriaGameLoading";
 import { NGAJI_CERIA_ASSETS } from "../data/assets";
 import { useNgajiCeriaProgress } from "../hooks/useNgajiCeriaProgress";
 import { useNgajiCeriaStreak } from "../hooks/useNgajiCeriaStreak";
+import { useEventStore } from "../hooks/useEventStore";
 import {
   useNgajiCeriaStore,
   type NgajiCeriaState,
@@ -29,11 +31,18 @@ export default function NgajiCeriaHomePage() {
   const [isLoading, setIsLoading] = useState(() => {
     return sessionStorage.getItem("trigger_ngaji_ceria_splash") === "true";
   });
+  const [showEventModal, setShowEventModal] = useState(false);
+  const activeEvent = useEventStore((state) => state.activeEvent);
+  const fetchActiveEvent = useEventStore((state) => state.fetchActiveEvent);
 
   React.useEffect(() => {
     if (!isLoading) return;
     sessionStorage.removeItem("trigger_ngaji_ceria_splash");
   }, [isLoading]);
+
+  React.useEffect(() => {
+    void fetchActiveEvent();
+  }, [fetchActiveEvent]);
 
   const finishLoading = React.useCallback(() => setIsLoading(false), []);
 
@@ -92,6 +101,36 @@ export default function NgajiCeriaHomePage() {
               </span>
             </div>
           </div>
+
+          {activeEvent && (
+            <section
+              className="rounded-[26px] border-[3px] bg-[#F59E0B] p-4"
+              style={{ borderColor: "#134E4A", boxShadow: "6px 6px 0 0 #134E4A" }}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="inline-block rounded-full border-2 border-[#134E4A] bg-[#FFF8EE] px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-[#134E4A]">
+                    Event Aktif
+                  </span>
+                  <h3 className="mt-2 truncate font-display text-base font-black text-[#134E4A]">
+                    {activeEvent.name}
+                  </h3>
+                  {activeEvent.description && (
+                    <p className="mt-1 line-clamp-2 text-[11px] font-bold text-[#134E4A]/80">
+                      {activeEvent.description}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEventModal(true)}
+                  className="shrink-0 rounded-xl border-[3px] border-[#134E4A] bg-[#0D9488] px-3 py-2 text-[11px] font-black text-white shadow-[3px_3px_0_0_#134E4A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                >
+                  Lihat Misi
+                </button>
+              </div>
+            </section>
+          )}
 
           <section className="relative overflow-hidden rounded-[26px] bg-[#5A3A2A] text-white p-5 shadow-lg border-2 border-[#3E2518]">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#FFCB45]/15 blur-2xl" />
@@ -282,6 +321,11 @@ export default function NgajiCeriaHomePage() {
           <div className="h-32" aria-hidden="true" />
         </div>
       </NgajiCeriaLayout>
+
+      <EventDetailModal
+        visible={showEventModal}
+        onClose={() => setShowEventModal(false)}
+      />
 
       <BibiCompanion size={110} parallaxFactor={0.08} autoRoam reactiveSpeech />
     </>

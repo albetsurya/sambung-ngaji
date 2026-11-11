@@ -25,6 +25,7 @@ import { usePublishedTilawati, useTilawatiAudio } from "../services/tilawatiAudi
 import { getNgajiActivity } from "../hooks/useNgajiCeriaStore";
 import { soundManager } from "../services/soundManager";
 import { awardProgress } from "./games/_shared/progression";
+import { useEventStore } from "../hooks/useEventStore";
 
 const QUIZ_DATASETS = {
   1: TILAWATI_JILID_1_PAGES,
@@ -52,6 +53,7 @@ export default function NgajiCeriaQuizPage() {
   const published = usePublishedTilawati(activeJilid, activePageNum);
   const questions: QuizQuestion[] = published?.questions ?? pageData?.questions ?? [];
   const pageAwarded = useRef(false);
+  const trackEventProgress = useEventStore((state) => state.trackProgress);
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
@@ -150,6 +152,7 @@ export default function NgajiCeriaQuizPage() {
        const stars = getNgajiActivity().stars;
        const completed = Object.keys(activeDataset).every((page) => stars[`jilid-${activeJilid}-hal-${page}`] > 0);
        awardProgress("tilawati-quiz", 100, 10, completed ? [`jilid-${activeJilid}-clear`] : []);
+       void trackEventProgress("FINISH_QUIZ");
 
       if (activePageNum < pageCount) {
         stopAllAudio();
@@ -183,7 +186,7 @@ export default function NgajiCeriaQuizPage() {
         <div className="text-5xl">{access.isComingSoon ? "🎙️" : "🔒"}</div>
         <span className="rounded-full bg-[#FFF6D5] px-3 py-1 text-xs font-black text-[#8C5A3A]">{access.isComingSoon ? "Segera Hadir" : "Masuk untuk Akses Penuh"}</span>
         <h1 className="font-display text-2xl font-black text-[#5A3A2A]">{access.isComingSoon ? "Rekaman Audio Menyusul" : `Jilid ${activeJilid} terkunci`}</h1>
-        <p className="max-w-xs text-sm leading-relaxed text-[#8C7A68]">{access.isComingSoon ? "Materi Jilid 6 sedang disiapkan agar pengalaman belajarnya tetap nyaman." : "Masuk atau daftar untuk membuka Jilid 3 sampai 5."}</p>
+        <p className="max-w-xs text-sm leading-relaxed text-[#8C7A68]">{access.isComingSoon ? "Materi ini sedang disiapkan agar pengalaman belajarnya tetap nyaman." : "Masuk atau daftar untuk membuka Jilid 3 sampai 6."}</p>
         {!access.isLoggedIn && <button type="button" className="game-button bg-[#2D5A27]" onClick={() => navigate("/login")}>Masuk untuk Akses Penuh</button>}
       </div>
     </NgajiCeriaLayout>;

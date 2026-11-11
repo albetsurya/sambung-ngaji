@@ -64,7 +64,7 @@ class SoundManager {
   private bgmSynthTimer: number | null = null;
 
   constructor() {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
       window.addEventListener("pointerdown", () => this.unlock(), { passive: true });
       window.addEventListener("keydown", () => this.unlock());
     }

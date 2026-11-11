@@ -3,9 +3,9 @@
  *
  * - Tamu / publik (tanpa login): Jilid 1–2, serta game Hijaiyah Pop,
  *   hub Ritme Ngaji, hub Quiz Ngaji, dan Arabic Wordle.
- * - Member (sudah login, peran apa pun): seluruh Jilid 1–5 dan seluruh game.
+ * - Member (sudah login, peran apa pun): seluruh Jilid 1–6 dan seluruh game.
  * - Super Admin: semua terbuka (termasuk konten pratinjau).
- * - Jilid 6 selalu "Segera Hadir" (lencana, bukan konten).
+ * - Jilid 7 ke atas "Segera Hadir" (lencana, bukan konten).
  */
 
 /** Alias route -> id kanonis (beberapa route lama menunjuk game yang sama). */
@@ -58,14 +58,14 @@ export function isGameOpen(routeId: string, tier: AccessTier): boolean {
   return isGameOpenForGuest(routeId);
 }
 
-/** Jilid maksimum berdasarkan tier (Jilid 6 selalu segera-hadir). */
+/** Jilid maksimum berdasarkan tier (di atas itu segera-hadir). */
 export function maxJilidForTier(tier: AccessTier): number {
   if (tier === "guest") return 2;
-  return 5;
+  return 6;
 }
 
 export function isComingSoonJilid(jilidId: number): boolean {
-  return jilidId >= 6;
+  return jilidId >= 7;
 }
 
 /** "jilid-3" -> 3 (0 bila tak dikenali). */

@@ -32,7 +32,7 @@ export default function NgajiCeriaProfilePage() {
   const displayName = user?.name || "Tamu Ngaji Ceria";
   const earned = new Set(progress.achievements);
   const stars = useNgajiCeriaStore((state) => state.stars);
-  for (let jilid = 1; jilid <= 5; jilid++) {
+  for (let jilid = 1; jilid <= 6; jilid++) {
     const pages = Object.keys(getTilawatiDataset(jilid));
     if (pages.length && pages.every((page) => stars[`jilid-${jilid}-hal-${page}`] > 0)) earned.add(`jilid-${jilid}-clear`);
   }

@@ -17,6 +17,18 @@ const timelineEditsPath = path.resolve(
   frontendRoot,
   "src/features/ngaji-ceria/data/tilawatiTimelineEdits.json",
 );
+const pageStatusPath = path.resolve(audioRoot, "page_status.json");
+const tartilaRoot = path.resolve(frontendRoot, "../../tartila");
+const tartilaAudioDist = process.env.TARTILA_AUDIO_DIST
+  ? path.resolve(process.env.TARTILA_AUDIO_DIST)
+  : path.resolve(tartilaRoot, "dist/audio/tilawati");
+const tartilaAudioPublic = process.env.TARTILA_AUDIO_PUBLIC
+  ? path.resolve(process.env.TARTILA_AUDIO_PUBLIC)
+  : path.resolve(tartilaRoot, "public/audio/tilawati");
+const tartilaTimelineEditsPath = path.resolve(
+  tartilaRoot,
+  "src/features/ngaji-ceria/data/tilawatiTimelineEdits.json",
+);
 
 function sendEditorJson(res: any, status: number, body: unknown): void {
   res.statusCode = status;
@@ -46,7 +58,8 @@ function audioUrlToFile(audioUrl: unknown): string {
   if (typeof audioUrl !== "string" || !audioUrl.startsWith("/audio/tilawati/")) {
     throw new Error("Audio harus menggunakan URL /audio/tilawati/...");
   }
-  const file = path.resolve(audioRoot, audioUrl.slice("/audio/tilawati/".length));
+  const cleanPath = decodeURIComponent(audioUrl.slice("/audio/tilawati/".length));
+  const file = path.resolve(audioRoot, cleanPath);
   if (file !== audioRoot && !file.startsWith(`${audioRoot}${path.sep}`)) {
     throw new Error("Path audio tidak valid");
   }
@@ -87,7 +100,7 @@ function audioDuration(file: string): number {
 function listPageAudio(jilidValue: unknown, pageValue: unknown) {
   const jilid = Number(jilidValue);
   const page = Number(pageValue);
-  if (!Number.isInteger(jilid) || jilid < 1 || jilid > 5) throw new Error("Jilid tidak valid");
+  if (!Number.isInteger(jilid) || jilid < 1 || jilid > 6) throw new Error("Jilid tidak valid");
   if (!Number.isInteger(page) || page < 1 || page > 44) throw new Error("Halaman tidak valid");
 
   const directory = path.resolve(audioRoot, `jilid_${jilid}`, `hal${page}`);
@@ -162,6 +175,10 @@ function saveTimelineEdit(jilid: unknown, page: unknown, edit: Record<string, un
   edits[key] = { ...(edits[key] || {}), ...edit };
   fs.mkdirSync(path.dirname(timelineEditsPath), { recursive: true });
   fs.writeFileSync(timelineEditsPath, `${JSON.stringify(edits, null, 2)}\n`, "utf8");
+  if (fs.existsSync(tartilaRoot)) {
+    fs.mkdirSync(path.dirname(tartilaTimelineEditsPath), { recursive: true });
+    fs.writeFileSync(tartilaTimelineEditsPath, `${JSON.stringify(edits, null, 2)}\n`, "utf8");
+  }
 }
 
 function numberValue(value: unknown, label: string): number {
@@ -355,11 +372,109 @@ function publishTimeline(body: Record<string, unknown>) {
   return { published, clips: listPageAudio(jilid, page) };
 }
 
+function readPageStatus(): Record<string, any> {
+  if (!fs.existsSync(pageStatusPath)) return { pages: {} };
+  try {
+    return JSON.parse(fs.readFileSync(pageStatusPath, "utf8"));
+  } catch {
+    throw new Error("page_status.json tidak berisi JSON yang valid");
+  }
+}
+
+function copyDirectory(source: string, destination: string): number {
+  if (!fs.existsSync(source)) return 0;
+  fs.mkdirSync(destination, { recursive: true });
+  let copied = 0;
+  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+    const from = path.join(source, entry.name);
+    const to = path.join(destination, entry.name);
+    if (entry.isDirectory()) copied += copyDirectory(from, to);
+    else {
+      fs.copyFileSync(from, to);
+      copied += 1;
+    }
+  }
+  return copied;
+}
+
+function finishPage(body: Record<string, unknown>) {
+  const jilid = Number(body.jilid);
+  const page = Number(body.page ?? body.hal);
+  if (!Number.isInteger(jilid) || jilid < 1 || jilid > 6) throw new Error("Jilid tidak valid");
+  if (!Number.isInteger(page) || page < 1 || page > 44) throw new Error("Halaman tidak valid");
+
+  const sourceDirectory = path.resolve(audioRoot, `jilid_${jilid}`, `hal${page}`);
+  if (!sourceDirectory.startsWith(`${audioRoot}${path.sep}`)) throw new Error("Folder audio tidak valid");
+  const destinationDirectory = path.join(tartilaAudioDist, `jilid_${jilid}`, `hal${page}`);
+  const copiedFiles = copyDirectory(sourceDirectory, destinationDirectory);
+
+  if (fs.existsSync(tartilaRoot)) {
+    const publicDestination = path.join(tartilaAudioPublic, `jilid_${jilid}`, `hal${page}`);
+    copyDirectory(sourceDirectory, publicDestination);
+    if (fs.existsSync(timelineEditsPath)) {
+      fs.mkdirSync(path.dirname(tartilaTimelineEditsPath), { recursive: true });
+      fs.copyFileSync(timelineEditsPath, tartilaTimelineEditsPath);
+    }
+    const tartilaPubStatus = path.join(tartilaAudioPublic, "page_status.json");
+    const tartilaDistStatus = path.join(tartilaAudioDist, "page_status.json");
+    if (fs.existsSync(pageStatusPath)) {
+      fs.copyFileSync(pageStatusPath, tartilaPubStatus);
+      if (fs.existsSync(tartilaAudioDist)) {
+        fs.copyFileSync(pageStatusPath, tartilaDistStatus);
+      }
+    }
+  }
+
+  const status = readPageStatus();
+  const pages = (status.pages as Record<string, Record<string, any>> | undefined) ?? {};
+  const key = `jilid_${jilid}`;
+  const entry = pages[key] ?? {};
+  const finishedPages: number[] = Array.isArray(entry.finished_pages)
+    ? entry.finished_pages.map(Number).filter((value) => Number.isInteger(value))
+    : [];
+  if (!finishedPages.includes(page)) finishedPages.push(page);
+  finishedPages.sort((left, right) => left - right);
+  const totalPages = Number(entry.total_pages) || 44;
+  const completed = finishedPages.length;
+  const nextEntry = {
+    ...entry,
+    total_pages: totalPages,
+    completed,
+    percentage: Math.round((completed / totalPages) * 100),
+    status: completed >= totalPages ? "selesai" : "sedang_diedit",
+    last_edited_chunk: `hal${page}`,
+    finished_pages: finishedPages,
+    notes: `Halaman ${page} selesai dan dikirim ke Tartila`,
+  };
+  const nextStatus = {
+    ...status,
+    last_updated: new Date().toISOString(),
+    pages: { ...pages, [key]: nextEntry },
+  };
+  fs.writeFileSync(pageStatusPath, `${JSON.stringify(nextStatus, null, 2)}\n`, "utf8");
+
+  return { copiedFiles, destination: destinationDirectory, status: nextEntry };
+}
+
 function tilawatiEditorPlugin() {
   return {
     name: "tilawati-editor-local-files",
     configureServer(server: any) {
       server.middlewares.use(async (req: any, res: any, next: any) => {
+        if (req.url?.startsWith("/audio/tilawati/")) {
+          const rawPath = req.url.split("?")[0];
+          const decoded = decodeURIComponent(rawPath.slice("/audio/tilawati/".length));
+          const filePath = path.resolve(audioRoot, decoded);
+          if (filePath.startsWith(`${audioRoot}${path.sep}`) && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            const ext = path.extname(filePath).toLowerCase();
+            const mime = ext === ".ogg" ? "audio/ogg" : ext === ".mp3" ? "audio/mpeg" : "application/octet-stream";
+            res.setHeader("Content-Type", mime);
+            res.setHeader("Content-Length", fs.statSync(filePath).size);
+            fs.createReadStream(filePath).pipe(res);
+            return;
+          }
+        }
+
         if (!req.url?.startsWith("/api/tilawati-editor")) {
           next();
           return;
@@ -392,9 +507,12 @@ function tilawatiEditorPlugin() {
               page,
             );
             const layout = readTimelineEdits()[`${Number(jilid)}:${Number(page)}`] || {};
+            const pageStatus = readPageStatus();
+            const finishedPages = (pageStatus.pages?.[`jilid_${Number(jilid)}`]?.finished_pages as number[]) || [];
             sendEditorJson(res, 200, {
               ok: true,
               clips,
+              finishedPages,
               published: layout.published || null,
               revision: (layout.published as Record<string, unknown> | undefined)?.revision || "",
               textLinks: layout.textLinks || {},
@@ -436,6 +554,11 @@ function tilawatiEditorPlugin() {
           }
           if (action === "publish") {
             const result = publishTimeline(body);
+            sendEditorJson(res, 200, { ok: true, ...result });
+            return;
+          }
+          if (action === "finish-page") {
+            const result = finishPage(body);
             sendEditorJson(res, 200, { ok: true, ...result });
             return;
           }

@@ -8,6 +8,7 @@ import {
   TILAWATI_JILID_3_PAGES,
   TILAWATI_JILID_4_PAGES,
   TILAWATI_JILID_5_PAGES,
+  TILAWATI_JILID_6_PAGES,
 } from "../data/tilawatiQuizData";
 import type { PageQuizData, QuizQuestion } from "../data/tilawatiQuizTypes";
 import { getQuestionAudioUrl } from "../data/tilawatiAudioQuestionMap";
@@ -24,6 +25,7 @@ const QUIZ_DATASETS: Record<number, Record<number, PageQuizData>> = {
   3: TILAWATI_JILID_3_PAGES,
   4: TILAWATI_JILID_4_PAGES,
   5: TILAWATI_JILID_5_PAGES,
+  6: TILAWATI_JILID_6_PAGES,
 };
 const AUDIO_TEST_STORAGE_KEY = "ngaji-ceria:tilawati-audio-tested:v1";
 
@@ -60,7 +62,7 @@ type TimelineClip = {
 export default function CekAudioManualPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialJilid = Math.min(5, Math.max(1, Number(searchParams.get("jilid")) || 1));
+  const initialJilid = Math.min(6, Math.max(1, Number(searchParams.get("jilid")) || 1));
   const initialHal = Math.min(44, Math.max(1, Number(searchParams.get("hal")) || 1));
   const [jilid, setJilid] = useState(initialJilid);
   const [hal, setHal] = useState(initialHal);
@@ -68,7 +70,7 @@ export default function CekAudioManualPage() {
   useEffect(() => {
     const paramJilid = Number(searchParams.get("jilid"));
     const paramHal = Number(searchParams.get("hal"));
-    if (paramJilid && paramJilid !== jilid) setJilid(Math.min(5, Math.max(1, paramJilid)));
+    if (paramJilid && paramJilid !== jilid) setJilid(Math.min(6, Math.max(1, paramJilid)));
     if (paramHal && paramHal !== hal) setHal(Math.min(44, Math.max(1, paramHal)));
   }, [searchParams]);
 
@@ -118,7 +120,7 @@ export default function CekAudioManualPage() {
   // Check if current page is kelipatan 6 (Latihan-latihan bacaan)
   const isKelipatanEnam = hal % 6 === 0;
 
-  // Page dataset based on active jilid. Jilid 6 is intentionally not enabled yet.
+  // Page dataset based on active jilid (1–6).
   const pageData = QUIZ_DATASETS[jilid]?.[hal] ?? null;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -680,9 +682,9 @@ export default function CekAudioManualPage() {
   return (
     <NgajiCeriaLayout title="Cek Audio Manual" showBack>
       <div className="p-4 max-w-md mx-auto min-h-screen bg-slate-50/50">
-        {/* Jilid Selector Tabs (1 to 5) */}
+        {/* Jilid Selector Tabs (1 to 6) */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 scrollbar-none">
-          {[1, 2, 3, 4, 5].map((j) => (
+          {[1, 2, 3, 4, 5, 6].map((j) => (
             <button
               key={j}
               onClick={() => {

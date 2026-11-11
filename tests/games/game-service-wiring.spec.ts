@@ -164,7 +164,7 @@ test("Match Arena mempertahankan bonus kombo ketika sesi berakhir setelah pasang
   const user = { user_id: "test-member", username: "member", name: "Member", role: "MEMBER" };
   await page.addInitScript((user) => {
     document.cookie = "pengajian_token=member-wiring; path=/; SameSite=Strict";
-    localStorage.setItem("sambung_ngaji_cached_user", JSON.stringify(user));
+    sessionStorage.setItem("sambung_ngaji_cached_user", JSON.stringify(user));
   }, user);
   await page.route("**/api/v1/auth/validate-session", (route) => route.fulfill({ contentType: "application/json", body: JSON.stringify({ success: true, data: { user } }) }));
   await page.route("**/api/v1/ngaji-ceria/**", (route) => route.fulfill({ contentType: "application/json", body: JSON.stringify({ success: true, data: {} }) }));

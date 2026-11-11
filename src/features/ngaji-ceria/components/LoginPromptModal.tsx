@@ -31,7 +31,7 @@ export function LoginPromptModal({ open, onClose, title = "Konten Terkunci" }: {
       <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-xs font-black text-amber-300">🔒 {title}</span>
       <h2 className="mt-3 font-display text-xl font-black">Masuk untuk Akses Penuh</h2>
       <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-[#5A3A2A]/70">
-        Masuk atau daftar untuk membuka seluruh Jilid 1–5 dan semua game. Tamu dapat memainkan Jilid 1–2, Hijaiyah Pop, Ritme Ngaji, Quiz Ngaji, dan Arabic Wordle.
+        Masuk atau daftar untuk membuka seluruh Jilid 1–6 dan semua game. Tamu dapat memainkan Jilid 1–2, Hijaiyah Pop, Ritme Ngaji, Quiz Ngaji, dan Arabic Wordle.
       </p>
       <button type="button" onClick={() => navigate("/login")} className="game-button mt-4 w-full bg-[#2E7D32]">Masuk / Daftar</button>
       <button type="button" onClick={onClose} className="game-button mt-2 w-full border-2 border-[#E2D4C0] bg-white text-[#5A3A2A]">Nanti Saja</button>

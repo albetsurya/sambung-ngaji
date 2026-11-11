@@ -40,6 +40,9 @@ const AiChatPage = lazy(() => import("./pages/AiChatPage"));
 const AnnouncementTemplatesPage = lazy(
   () => import("./pages/AnnouncementTemplatesPage"),
 );
+const AdminEventsPage = lazy(
+  () => import("./features/admin/pages/AdminEventsPage"),
+);
 const JadwalPage = lazy(() => import("./pages/JadwalPage"));
 const MemberHomePage = lazy(() => import("./pages/MemberHomePage"));
 const FinanceGuard = lazy(() =>
@@ -998,6 +1001,14 @@ function AppRoutes() {
             element={
               <RoleRoute allowed={["SUPER_ADMIN", "ADMIN", "PENGAWAS"]}>
                 <AnnouncementTemplatesPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="/admin/events"
+            element={
+              <RoleRoute allowed={["SUPER_ADMIN"]}>
+                <AdminEventsPage />
               </RoleRoute>
             }
           />
