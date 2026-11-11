@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, GraduationCap, Heart, ArrowRight, Check } from '../ui/FontAwesomeIcons';
+import { BookOpen, Heart, ArrowRight, Check } from '../ui/FontAwesomeIcons';
 import { Button } from '../ui';
 
 const SLIDES = [
@@ -11,14 +11,6 @@ const SLIDES = [
     icon: BookOpen,
     color: 'bg-blue-500 text-blue-600',
     lightColor: 'bg-blue-50'
-  },
-  {
-    id: 'ceria',
-    title: 'Belajar Ngaji Jadi Seru',
-    desc: 'Metode Tilawati yang interaktif dengan game-game menarik untuk semua usia.',
-    icon: GraduationCap,
-    color: 'bg-green-500 text-green-600',
-    lightColor: 'bg-green-50'
   },
   {
     id: 'personal',

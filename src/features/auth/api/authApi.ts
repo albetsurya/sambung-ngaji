@@ -23,24 +23,6 @@ export const authApi = {
     }
   },
 
-  async loginWithGoogle(credential: string) {
-    const data = await restPost<{ token?: string; user: User }>(
-      "/api/v1/auth/oauth/google",
-      { credential, intent: "ceria" },
-    );
-    storeSessionToken(data.token);
-    return data.user;
-  },
-
-  async registerCeria(name: string, username: string, password: string, confirmPassword: string) {
-    const data = await restPost<{ token?: string; user: User }>(
-      "/api/v1/auth/register/ceria",
-      { name, username, password, confirm_password: confirmPassword },
-    );
-    storeSessionToken(data.token);
-    return data.user;
-  },
-
   async logout() {
     const token = getToken();
     try {
