@@ -32,7 +32,7 @@ export const ROLE_LABEL: Record<Role, string> = {
 };
 const NAV_BY_ROLE: Record<Role, string[]> = {
   SUPER_ADMIN: ["beranda", "jamaah", "absensi", "keuangan", "lainnya"],
-  ADMIN: ["beranda", "jamaah", "absensi", "keuangan", "lainnya"],
+  ADMIN: ["beranda", "jamaah", "absensi", "lainnya"],
   TIM_KU: ["kas", "shodaqoh", "zakat", "lainnya"],
   TIM_PNKB: ["beranda", "jamaah", "lainnya"],
   TIM_ABSENSI: ["beranda", "jamaah", "absensi", "schedule", "lainnya"],

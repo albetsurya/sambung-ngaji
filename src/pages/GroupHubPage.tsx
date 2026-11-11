@@ -42,7 +42,7 @@ import type { Group } from "../types";
 export default function GroupHubPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { assignedGroup, isSuperAdmin, isAdminLike, focusGroupId, canAccessFinance } = usePermission();
+  const { assignedGroup, isSuperAdmin, focusGroupId, canAccessFinance } = usePermission();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editSheetOpen, setEditSheetOpen] = useState(false);
@@ -168,7 +168,7 @@ export default function GroupHubPage() {
         to: "/more/member-requests",
         section: "jamaah",
       },
-      ...(isAdminLike
+      ...(isSuperAdmin
         ? [
             {
               key: "group_label",
@@ -250,7 +250,7 @@ export default function GroupHubPage() {
   return (
     <AppLayout
       fab={
-        isAdminLike ? (
+        isSuperAdmin ? (
           <FloatingActionButton
             label="Tambah Kelompok"
             onClick={() => {

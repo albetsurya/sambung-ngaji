@@ -28,8 +28,8 @@ export default function GroupsPage() {
   const [editing, setEditing] = useState<Group | null>(null);
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  const { isAdminLike } = usePermission();
-  const canEdit = isAdminLike;
+  const { isSuperAdmin } = usePermission();
+  const canEdit = isSuperAdmin;
 
   const {
     data: groups = [],

@@ -36,7 +36,7 @@ import { GroupSheet } from "./GroupsPage";
 export default function MemberEditProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { isAdminLike } = usePermission();
+  const { isSuperAdmin } = usePermission();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Partial<Member>>({});
@@ -54,7 +54,7 @@ export default function MemberEditProfilePage() {
   const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
-    if (isAdminLike) {
+    if (isSuperAdmin) {
       groupApi
         .list()
         .then(setGroups)
@@ -71,7 +71,7 @@ export default function MemberEditProfilePage() {
         showToast("Gagal memuat profil", "error");
       })
       .finally(() => setLoading(false));
-  }, [isAdminLike]);
+  }, [isSuperAdmin]);
 
   useEffect(() => {
     if (!groups.length) return;
@@ -205,7 +205,7 @@ export default function MemberEditProfilePage() {
       await memberSelfApi.updateProfile(payload);
 
       if (
-        isAdminLike &&
+        isSuperAdmin &&
         original?.member_id &&
         (form.group_id !== original.group_id ||
           form.group_label !== original.group_label)
@@ -362,13 +362,13 @@ export default function MemberEditProfilePage() {
                   : "-"
               }
             />
-            {!isAdminLike && (
+            {!isSuperAdmin && (
               <LockedField label="Kelompok" value={original?.group_label} />
             )}
           </div>
         </section>
 
-        {isAdminLike && (
+        {isSuperAdmin && (
           <section className="bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
             <div className="px-4 py-3 border-b border-surface-border bg-surface-card2/40 flex items-center justify-between gap-2">
               <h3 className="text-ios-body font-semibold text-surface-text">
@@ -621,7 +621,7 @@ export default function MemberEditProfilePage() {
 
       <LoadingOverlay open={submitting} label="Menyimpan biodata..." onCancel={() => abortAllApiCalls()} />
       <LoadingOverlay open={deletingPhoto} label="Menghapus foto..." onCancel={() => abortAllApiCalls()} />
-      {isAdminLike && (
+      {isSuperAdmin && (
         <GroupSheet
           open={addGroupOpen}
           group={null}
