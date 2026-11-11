@@ -42,7 +42,6 @@ const ADMIN_ITEMS = [
 ];
 const KELOLA_ITEMS = [
   { label: "Kelola Kelompok", to: "/my-group", icon: Building2 },
-  { label: "Event Management", to: "/admin/events", icon: Calendar },
 ];
 const MEMBER_ITEMS = [
   { key: "beranda", label: "Beranda", to: "/member", icon: Home },

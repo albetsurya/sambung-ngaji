@@ -62,8 +62,6 @@ interface AuthContextValue {
   groupId: string | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  loginWithGoogle: (credential: string) => Promise<void>;
-  registerCeria: (name: string, username: string, password: string, confirmPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -122,22 +120,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCachedUser(u);
   }
 
-  async function loginWithGoogle(credential: string) {
-    const u = await authApi.loginWithGoogle(credential);
-    migrateAnonDataToUser(u?.user_id);
-    setGroupId(u?.group_id ?? null);
-    setUser(u);
-    setCachedUser(u);
-  }
-
-  async function registerCeria(name: string, username: string, password: string, confirmPassword: string) {
-    const u = await authApi.registerCeria(name, username, password, confirmPassword);
-    migrateAnonDataToUser(u?.user_id);
-    setGroupId(u?.group_id ?? null);
-    setUser(u);
-    setCachedUser(u);
-  }
-
   async function logout() {
     queryClient.clear();
     // Start revocation while the bearer token is still available. The local
@@ -173,8 +155,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         groupId: user?.group_id ?? null,
         loading,
         login,
-        loginWithGoogle,
-        registerCeria,
         logout,
         refreshUser,
       }}

@@ -16,7 +16,6 @@ import { PrayerTimesCard } from "../features/member/components/PrayerTimesCard";
 import { AppLogoIcon } from "../components/ui/AppLogoIcon";
 import { MOOD_LIST } from "../features/ai-chat/data/mood";
 import { MoodIcon } from "../features/ai-chat/components/MoodIcon";
-import { NGAJI_CERIA_ASSETS } from "../features/ngaji-ceria/data/assets";
 import { useAuth } from "../contexts/AuthContext";
 import { Avatar } from "../components/ui";
 import { ProfileMenuSheet } from "../components/layout/ProfileMenuSheet";
@@ -152,54 +151,6 @@ export default function PublicLandingPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-3 pb-1">
-        <button
-          type="button"
-          onClick={() => {
-            sessionStorage.setItem("trigger_ngaji_ceria_splash", "true");
-            navigate("/member/ngaji-ceria");
-          }}
-          className="group relative w-full overflow-hidden rounded-3xl border-2 border-[#FCD882] dark:border-[#6B4A1E] bg-[#FFF9ED] dark:bg-[#2A2418] p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]"
-        >
-          <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#FFCB45]/25 dark:bg-[#FFCB45]/10 blur-2xl" />
-          <div className="relative flex items-center gap-3">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/80 dark:bg-white/10 p-2 shadow-sm ring-1 ring-[#FCD882] dark:ring-[#6B4A1E]">
-              <img
-                src={NGAJI_CERIA_ASSETS.iconGames}
-                alt=""
-                aria-hidden="true"
-                className="h-full w-full object-contain transition-transform group-hover:rotate-6 group-hover:scale-110"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-ios-body font-black text-[#5A3A2A] dark:text-[#F5DDB5]">
-                  Ngaji Ceria
-                </h2>
-                {!isAuthenticated && (
-                  <span className="rounded-full bg-white/80 dark:bg-white/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-[#F58A3A] dark:text-[#FFA860]">
-                    Mode Tamu
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-ios-caption leading-relaxed text-[#8C7A68] dark:text-[#B8A898]">
-                Belajar Tilawati, main game edukatif, dan bangun kebiasaan
-                ngaji.
-              </p>
-            </div>
-            <ChevronRight
-              size={18}
-              className="shrink-0 text-[#F58A3A] dark:text-[#FFA860] transition-transform group-hover:translate-x-1"
-            />
-          </div>
-          {!isAuthenticated && (
-            <p className="relative mt-3 border-t border-[#FCD882]/60 dark:border-[#6B4A1E]/60 pt-2 text-[10px] font-semibold text-[#A47635] dark:text-[#D4B078]">
-              Bisa dicoba tanpa login · fitur lanjutan terbuka setelah masuk
-            </p>
-          )}
-        </button>
-      </div>
-
       <div className="px-4 py-4">
         <p className="text-ios-footnote font-medium text-surface-muted mb-2 px-0.5">
           Fitur umum
@@ -230,7 +181,7 @@ export default function PublicLandingPage() {
         </div>
         {!isAuthenticated && (
           <button
-            onClick={() => navigate("/login?intent=member")}
+            onClick={() => navigate("/login")}
             className="w-full mt-4 rounded-2xl border border-accent/30 bg-accent-soft p-3.5 flex items-center justify-center gap-2 text-ios-body font-semibold text-accent transition-all active:scale-[0.99]"
           >
             Masuk sebagai Member Jamaah
@@ -244,7 +195,7 @@ export default function PublicLandingPage() {
         <ProfileMenuSheet
           open={profileOpen}
           onClose={() => setProfileOpen(false)}
-          profilePath="/member/ngaji-ceria/profile"
+          profilePath="/member/profil"
           logoutRedirect="/"
         />
       )}

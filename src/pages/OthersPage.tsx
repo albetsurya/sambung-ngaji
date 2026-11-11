@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Building2,
   KeyRound,
@@ -18,6 +18,7 @@ import {
   Home,
   FileText,
   UserPlus,
+  Plus,
   Search,
   ChevronRight,
 } from "../components/ui/FontAwesomeIcons";
@@ -42,6 +43,9 @@ import { ThemePickerSheet } from "../components/ui/ThemePickerSheet";
 import { queryKeys } from "../lib/queryClient";
 import type { Group } from "../types";
 import { GroupedListSkeleton } from "../components/ui/Skeleton";
+import { GroupSheet } from "./GroupsPage";
+import { useToast } from "../contexts/ToastContext";
+import { ApiError } from "../services/api";
 
 type MenuGroup = "tampilan" | "jamaah" | "schedule" | "info" | "sistem" | "akun";
 
@@ -65,9 +69,12 @@ export default function OthersPage() {
   const { isAdminLike, isSuperAdmin, role, assignedGroup, canAccessFinance } =
     usePermission();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
+  const [addGroupOpen, setAddGroupOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [focusGroupId, setFocusGroupId] = useState<string | null>(() => {
     try {
@@ -105,6 +112,24 @@ export default function OthersPage() {
     setFocusGroupId(groupId);
     setSuperAdminFocusGroup(groupId);
   }
+
+  const saveGroupMutation = useMutation({
+    mutationFn: (payload: Partial<Group>) => groupApi.save(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups() });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.membersPaged() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard() });
+      showToast("Kelompok berhasil ditambahkan");
+      setAddGroupOpen(false);
+    },
+    onError: (err) => {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyimpan kelompok",
+        "error",
+      );
+    },
+  });
 
   const focusGroup: Group | undefined = useMemo(
     () => allGroups.find((g) => g.group_id === focusGroupId),
@@ -171,10 +196,19 @@ export default function OthersPage() {
       {
         key: "group_label",
         label: "Kelompok",
-        description: "Kelola kelompok pengajian",
+        description: "Kelola & tambah kelompok pengajian",
         Icon: Building2,
         to: "/more/groups",
-        show: isAdminLike && !isHubUser && !isSuperAdmin,
+        show: isAdminLike && !isSuperAdmin,
+        group: "jamaah",
+      },
+      {
+        key: "add-group",
+        label: "Tambah Kelompok",
+        description: "Buat kelompok pengajian baru",
+        Icon: Plus,
+        onClick: () => setAddGroupOpen(true),
+        show: isAdminLike && !isSuperAdmin,
         group: "jamaah",
       },
       {
@@ -464,7 +498,7 @@ export default function OthersPage() {
                       : "/my-group",
                   )
                 }
-                insetDivider={false}
+                insetDivider
                 leading={
                   <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
                     <Building2 size={16} />
@@ -492,6 +526,46 @@ export default function OthersPage() {
                         {pendingCount > 99 ? "99+" : pendingCount}
                       </span>
                     ) : null}
+                  </div>
+                </ChevronRow>
+              </ListRow>
+              <ListRow
+                onClick={() => setAddGroupOpen(true)}
+                insetDivider
+                leading={
+                  <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                    <Plus size={16} />
+                  </span>
+                }
+              >
+                <ChevronRow>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      Tambah Kelompok
+                    </p>
+                    <p className="text-ios-caption text-surface-muted truncate">
+                      Buat data kelompok pengajian baru
+                    </p>
+                  </div>
+                </ChevronRow>
+              </ListRow>
+              <ListRow
+                onClick={() => navigate("/more/groups")}
+                insetDivider={false}
+                leading={
+                  <span className="w-9 h-9 rounded-xl bg-accent-soft flex items-center justify-center text-accent shrink-0">
+                    <Building2 size={16} />
+                  </span>
+                }
+              >
+                <ChevronRow>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ios-body font-medium text-surface-text truncate">
+                      Daftar Kelompok
+                    </p>
+                    <p className="text-ios-caption text-surface-muted truncate">
+                      Lihat & edit data master kelompok
+                    </p>
                   </div>
                 </ChevronRow>
               </ListRow>
@@ -708,6 +782,13 @@ export default function OthersPage() {
       <ChangePasswordSheet
         open={changePasswordOpen}
         onClose={() => setChangePasswordOpen(false)}
+      />
+      <GroupSheet
+        open={addGroupOpen}
+        group={null}
+        onClose={() => setAddGroupOpen(false)}
+        onSave={(payload) => saveGroupMutation.mutate(payload)}
+        saving={saveGroupMutation.isPending}
       />
     </AppLayout>
   );

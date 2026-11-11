@@ -15,8 +15,13 @@ import {
   QrCode,
   ScrollText as Scroll,
   UserPlus,
+  Plus,
 } from "../components/ui/FontAwesomeIcons";
-import { AppLayout, Header } from "../components/layout/AppLayout";
+import {
+  AppLayout,
+  Header,
+  FloatingActionButton,
+} from "../components/layout/AppLayout";
 import {
   BottomSheet,
   ChevronRow,
@@ -37,10 +42,11 @@ import type { Group } from "../types";
 export default function GroupHubPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { assignedGroup, isSuperAdmin, focusGroupId, canAccessFinance } = usePermission();
+  const { assignedGroup, isSuperAdmin, isAdminLike, focusGroupId, canAccessFinance } = usePermission();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [editSheetOpen, setEditSheetOpen] = useState(false);
+  const [sheetGroup, setSheetGroup] = useState<Group | null>(null);
   const [groupPickerOpen, setGroupPickerOpen] = useState(false);
   const [pendingFinanceTo, setPendingFinanceTo] = useState<string | null>(null);
   const urlGroupId = searchParams.get("group_id");
@@ -162,12 +168,12 @@ export default function GroupHubPage() {
         to: "/more/member-requests",
         section: "jamaah",
       },
-      ...(isGlobalMode
+      ...(isAdminLike
         ? [
             {
               key: "group_label",
               label: "Kelompok",
-              description: "Kelola data master kelompok pengajian",
+              description: "Kelola & tambah data master kelompok pengajian",
               Icon: Building2,
               to: "/more/groups",
               section: "jamaah" as const,
@@ -242,7 +248,19 @@ export default function GroupHubPage() {
       : `${myGroup?.group_name || ""} · mode super admin`
     : myGroup?.group_name;
   return (
-    <AppLayout>
+    <AppLayout
+      fab={
+        isAdminLike ? (
+          <FloatingActionButton
+            label="Tambah Kelompok"
+            onClick={() => {
+              setSheetGroup(null);
+              setEditSheetOpen(true);
+            }}
+          />
+        ) : undefined
+      }
+    >
       <Header
         title={headerTitle}
         subtitle={headerSubtitle}
@@ -271,6 +289,17 @@ export default function GroupHubPage() {
                 }}
               />
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setSheetGroup(null);
+                setEditSheetOpen(true);
+              }}
+              className="inline-flex items-center gap-1 px-3 h-8 rounded-full border border-dashed border-accent/50 bg-accent-soft/60 text-accent text-ios-footnote font-semibold whitespace-nowrap shrink-0 transition-all hover:bg-accent-soft active:scale-95"
+            >
+              <Plus size={13} />
+              <span>Tambah</span>
+            </button>
           </div>
         )}
         {!isSuperAdmin && !effectiveGroupId ? (
@@ -288,7 +317,10 @@ export default function GroupHubPage() {
                 <GroupedList>
                   <ListRow
                     insetDivider={false}
-                    onClick={() => setEditSheetOpen(true)}
+                    onClick={() => {
+                      setSheetGroup(myGroup);
+                      setEditSheetOpen(true);
+                    }}
                   >
                     <ChevronRow>
                       <div className="flex items-center gap-3 w-full min-w-0">
@@ -374,8 +406,11 @@ export default function GroupHubPage() {
       </BottomSheet>
       <GroupSheet
         open={editSheetOpen}
-        group={myGroup ?? null}
-        onClose={() => setEditSheetOpen(false)}
+        group={sheetGroup}
+        onClose={() => {
+          setEditSheetOpen(false);
+          setSheetGroup(null);
+        }}
         onSave={(payload) => saveMutation.mutate(payload)}
         saving={saveMutation.isPending}
       />

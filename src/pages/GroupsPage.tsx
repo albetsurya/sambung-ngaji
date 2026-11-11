@@ -133,12 +133,26 @@ export default function GroupsPage() {
                 {canEdit ? (
                   <ChevronRow>
                     <div>
-                      <p className="text-ios-body font-medium text-surface-text truncate">
-                        {g.group_name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-ios-body font-medium text-surface-text truncate">
+                          {g.group_name}
+                        </p>
+                        {g.group_code && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent-soft text-accent shrink-0">
+                            {g.group_code}
+                          </span>
+                        )}
+                        {g.is_active === false && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-danger-soft text-danger shrink-0">
+                            Nonaktif
+                          </span>
+                        )}
+                      </div>
                       <p className="text-ios-footnote text-surface-muted truncate">
-                        {g.mentor ? `Pembina: ${g.mentor}` : ""}{" "}
-                        {g.schedule ? `· ${g.schedule}` : ""}
+                        {g.mentor ? `Pembina: ${g.mentor}` : ""}
+                        {g.mentor && g.schedule ? " · " : ""}
+                        {g.schedule ? g.schedule : ""}
+                        {g.signatory ? ` · TTD: ${g.signatory}` : ""}
                       </p>
                     </div>
                   </ChevronRow>
@@ -196,51 +210,88 @@ export function GroupSheet({
         mentor: "",
         signatory: "",
         schedule: "Minggu,Selasa,Kamis",
+        is_active: true,
       },
     );
   }, [group, open]);
 
   function handleSave() {
-    onSave(group ? { ...form, group_id: group.group_id } : form);
+    const trimmedName = (form.group_name || "").trim();
+    if (!trimmedName) return;
+    const payload: Partial<Group> = {
+      group_code: (form.group_code || "").trim(),
+      group_name: trimmedName,
+      mentor: (form.mentor || "").trim(),
+      signatory: (form.signatory || "").trim(),
+      schedule: (form.schedule || "").trim(),
+      is_active: form.is_active ?? true,
+    };
+    onSave(group ? { ...payload, group_id: group.group_id } : payload);
   }
 
   return (
     <BottomSheet
       open={open}
       onClose={onClose}
-      title={group ? "Edit Kelompok" : "Kelompok Baru"}
+      title={group ? "Edit Kelompok" : "Tambah Kelompok Baru"}
     >
-      <Input
-        label="Kode Kelompok"
-        value={form.group_code || ""}
-        onChange={(e) => setForm((f) => ({ ...f, group_code: e.target.value }))}
-      />
-      <Input
-        label="Nama Kelompok"
-        value={form.group_name || ""}
-        onChange={(e) => setForm((f) => ({ ...f, group_name: e.target.value }))}
-      />
-      <Input
-        label="Pembina"
-        value={form.mentor || ""}
-        onChange={(e) => setForm((f) => ({ ...f, mentor: e.target.value }))}
-      />
-      <Input
-        label="Penandatangan"
-        value={form.signatory || ""}
-        onChange={(e) =>
-          setForm((f) => ({ ...f, signatory: e.target.value }))
-        }
-      />
-      <Input
-        label="Jadwal"
-        value={form.schedule || ""}
-        onChange={(e) => setForm((f) => ({ ...f, jadwal: e.target.value }))}
-        hint="Contoh: Minggu,Selasa,Kamis"
-      />
-      <Button fullWidth onClick={handleSave} disabled={saving}>
-        {saving ? "Menyimpan..." : "Simpan"}
-      </Button>
+      <div className="space-y-3">
+        <Input
+          label="Nama Kelompok *"
+          placeholder="Contoh: Kelompok 1"
+          value={form.group_name || ""}
+          onChange={(e) => setForm((f) => ({ ...f, group_name: e.target.value }))}
+          required
+        />
+        <Input
+          label="Kode Kelompok"
+          placeholder="Contoh: KLP-01"
+          value={form.group_code || ""}
+          onChange={(e) => setForm((f) => ({ ...f, group_code: e.target.value }))}
+        />
+        <Input
+          label="Pembina"
+          placeholder="Nama pembina kelompok"
+          value={form.mentor || ""}
+          onChange={(e) => setForm((f) => ({ ...f, mentor: e.target.value }))}
+        />
+        <Input
+          label="Penandatangan"
+          placeholder="Nama penandatangan laporan"
+          value={form.signatory || ""}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, signatory: e.target.value }))
+          }
+        />
+        <Input
+          label="Jadwal Pengajian"
+          value={form.schedule || ""}
+          onChange={(e) => setForm((f) => ({ ...f, schedule: e.target.value }))}
+          hint="Contoh: Minggu,Selasa,Kamis"
+        />
+        {group && (
+          <label className="flex items-center gap-2.5 pt-1 text-ios-footnote text-surface-text cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={form.is_active !== false}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, is_active: e.target.checked }))
+              }
+              className="h-4 w-4 rounded accent-accent"
+            />
+            <span>Kelompok aktif</span>
+          </label>
+        )}
+        <div className="pt-2">
+          <Button
+            fullWidth
+            onClick={handleSave}
+            disabled={saving || !(form.group_name || "").trim()}
+          >
+            {saving ? "Menyimpan..." : group ? "Simpan Perubahan" : "Tambah Kelompok"}
+          </Button>
+        </div>
+      </div>
     </BottomSheet>
   );
 }

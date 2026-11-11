@@ -8,6 +8,7 @@ import {
   Check,
   Trash2,
   Loader2,
+  Plus,
 } from "../components/ui/FontAwesomeIcons";
 import { AppLayout, Header } from "../components/layout/AppLayout";
 import {
@@ -20,22 +21,29 @@ import {
 } from "../components/ui";
 import { MemberFormSkeleton } from "../components/ui/Skeleton";
 import { memberSelfApi } from "../features/member/api/memberSelfApi";
-import { uploadApi } from "../services/domainApi";
-import type { Member } from "../types";
+import { memberApi } from "../features/member/api/memberApi";
+import { uploadApi, groupApi } from "../services/domainApi";
+import type { Group, Member } from "../types";
 import { normalizePhoneNumber, formatDateShort } from "../utils/format";
 import { useToast } from "../contexts/ToastContext";
 import { ApiError, abortAllApiCalls } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import { usePermission } from "../hooks/usePermission";
 import { queryKeys } from "../lib/queryClient";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
+import { GroupSheet } from "./GroupsPage";
 
 export default function MemberEditProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdminLike } = usePermission();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<Partial<Member>>({});
   const [original, setOriginal] = useState<Member | null>(null);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [addGroupOpen, setAddGroupOpen] = useState(false);
+  const [savingGroup, setSavingGroup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -46,6 +54,12 @@ export default function MemberEditProfilePage() {
   const keyboardOpen = useKeyboardVisible();
 
   useEffect(() => {
+    if (isAdminLike) {
+      groupApi
+        .list()
+        .then(setGroups)
+        .catch(() => {});
+    }
     memberSelfApi
       .getProfile()
       .then((m) => {
@@ -57,7 +71,44 @@ export default function MemberEditProfilePage() {
         showToast("Gagal memuat profil", "error");
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [isAdminLike]);
+
+  useEffect(() => {
+    if (!groups.length) return;
+    setForm((f) => {
+      if (f.group_id) return f;
+      const name = f.group_label || f.group_name || "";
+      if (!name) return f;
+      const matched =
+        groups.find((g) => g.group_name === name) ||
+        groups.find((g) => g.group_name.toLowerCase() === name.toLowerCase());
+      if (!matched) return f;
+      return { ...f, group_id: matched.group_id, group_label: matched.group_name };
+    });
+  }, [groups]);
+
+  async function handleSaveNewGroup(payload: Partial<Group>) {
+    setSavingGroup(true);
+    try {
+      const created = await groupApi.save(payload);
+      setGroups((prev) => [...prev, created]);
+      setForm((f) => ({
+        ...f,
+        group_id: created.group_id,
+        group_label: created.group_name,
+      }));
+      queryClient.invalidateQueries({ queryKey: queryKeys.groups() });
+      showToast("Kelompok baru ditambahkan");
+      setAddGroupOpen(false);
+    } catch (err) {
+      showToast(
+        err instanceof ApiError ? err.message : "Gagal menyimpan kelompok",
+        "error",
+      );
+    } finally {
+      setSavingGroup(false);
+    }
+  }
 
   function update<K extends keyof Member>(key: K, value: Member[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -152,6 +203,21 @@ export default function MemberEditProfilePage() {
       };
 
       await memberSelfApi.updateProfile(payload);
+
+      if (
+        isAdminLike &&
+        original?.member_id &&
+        (form.group_id !== original.group_id ||
+          form.group_label !== original.group_label)
+      ) {
+        const matched = groups.find(
+          (g) => g.group_id === form.group_id || g.group_name === form.group_label,
+        );
+        await memberApi.update(original.member_id, {
+          group_id: form.group_id || matched?.group_id || "",
+          group_label: matched?.group_name || form.group_label || "",
+        });
+      }
 
       if (photoFile) {
         const base64 = await fileToBase64(photoFile);
@@ -296,9 +362,51 @@ export default function MemberEditProfilePage() {
                   : "-"
               }
             />
-            <LockedField label="Kelompok" value={original?.group_label} />
+            {!isAdminLike && (
+              <LockedField label="Kelompok" value={original?.group_label} />
+            )}
           </div>
         </section>
+
+        {isAdminLike && (
+          <section className="bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-surface-border bg-surface-card2/40 flex items-center justify-between gap-2">
+              <h3 className="text-ios-body font-semibold text-surface-text">
+                Kelompok Pengajian
+              </h3>
+              <button
+                type="button"
+                onClick={() => setAddGroupOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-accent-soft text-accent text-ios-caption font-semibold transition-all hover:bg-accent-soft/80 active:scale-95"
+              >
+                <Plus size={12} />
+                <span>Tambah Kelompok</span>
+              </button>
+            </div>
+            <div className="p-4">
+              <Select
+                label="Kelompok"
+                value={form.group_id || ""}
+                onChange={(e) => {
+                  const gid = e.target.value;
+                  const g = groups.find((x) => x.group_id === gid);
+                  setForm((f) => ({
+                    ...f,
+                    group_id: gid,
+                    group_label: g?.group_name || "",
+                  }));
+                }}
+              >
+                <option value="">Pilih kelompok</option>
+                {groups.map((g) => (
+                  <option key={g.group_id} value={g.group_id}>
+                    {g.group_name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </section>
+        )}
 
         <section className="bg-surface-card rounded-2xl border border-surface-border shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-surface-border bg-surface-card2/40">
@@ -513,6 +621,15 @@ export default function MemberEditProfilePage() {
 
       <LoadingOverlay open={submitting} label="Menyimpan biodata..." onCancel={() => abortAllApiCalls()} />
       <LoadingOverlay open={deletingPhoto} label="Menghapus foto..." onCancel={() => abortAllApiCalls()} />
+      {isAdminLike && (
+        <GroupSheet
+          open={addGroupOpen}
+          group={null}
+          onClose={() => setAddGroupOpen(false)}
+          onSave={handleSaveNewGroup}
+          saving={savingGroup}
+        />
+      )}
     </AppLayout>
   );
 }
